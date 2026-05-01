@@ -974,6 +974,7 @@ footer::after{
   .logo-icon{width:28px;height:28px;font-size:14px}
   .btn-fav,.btn-wish{padding:0 8px}
   .btn-dep,.btn-line{padding:0 7px;font-size:11px;}
+  .btn-dep{padding:0 14px;font-size:12px;min-width:80px;}
   .user-email{max-width:80px}
   .hero{padding:30px 16px 25px}
   .hero-counters{gap:10px}
@@ -1141,6 +1142,7 @@ footer::after{
   overflow:hidden;
   cursor:grab;
   user-select:none;
+  touch-action:pan-x pan-y;
 }
 .rec-track-wrap.dragging{cursor:grabbing;}
 .rec-track {
@@ -1555,7 +1557,7 @@ footer::after{
 .ftr-icon-btn .fb-ico{width:42px;height:42px;font-size:18px;}
 .footer-social-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;max-width:220px;}
 
-.h-gallery-wrap{overflow-x:auto;overflow-y:hidden;cursor:grab;user-select:none;padding:8px 4px 20px;position:relative;touch-action:pan-x;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory;scrollbar-width:none}
+.h-gallery-wrap{overflow-x:auto;overflow-y:hidden;cursor:grab;user-select:none;padding:8px 4px 20px;position:relative;touch-action:pan-x pan-y;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory;scrollbar-width:none}
 .h-gallery-wrap::-webkit-scrollbar{display:none}
 .h-gallery-wrap.dragging{cursor:grabbing}
 .h-gallery-track{display:flex;gap:16px;width:max-content;padding:4px 2px}
@@ -1896,15 +1898,17 @@ footer::after{
     <button class="nav-dd-btn" onclick="toggleDD('dd-srv')"><i class="fas fa-wrench"></i> <span data-i18n="nav.service">บริการอื่นๆ</span> <i class="fas fa-chevron-down" style="font-size:10px"></i></button>
     <div class="dd-panel" id="dd-srv">
      <div class="dd-sec">
-      <div class="dd-sec-title">บริการซ่อมแซม & ดูแลบ้าน</div>
-      <div class="dd-row" onclick="gotoOtherSrv('ac')"><span><i class="fas fa-wind"></i> ล้างแอร์</span></div>
-      <div class="dd-row" onclick="gotoOtherSrv('maid')"><span><i class="fas fa-broom"></i> แม่บ้าน</span></div>
-      <div class="dd-row" onclick="gotoOtherSrv('furn')"><span><i class="fas fa-couch"></i> ซ่อมเฟอร์นิเจอร์</span></div>
-      <div class="dd-row" onclick="gotoOtherSrv('plumb')"><span><i class="fas fa-wrench"></i> ระบบประปา</span></div>
-      <div class="dd-row" onclick="gotoOtherSrv('elec')"><span><i class="fas fa-bolt"></i> อุปกรณ์ไฟฟ้า</span></div>
-      <div class="dd-row" onclick="gotoOtherSrv('door')"><span><i class="fas fa-door-closed"></i> ลูกบิดประตู</span></div>
+      <div class="dd-sec-title" data-srvdd-sec>บริการซ่อมแซม & ดูแลบ้าน</div>
+      <div class="dd-grid">
+       <div class="dd-item" data-srvdd-item="ac" onclick="openSrvFromDD('ac')"><i class="fas fa-wind" style="width:16px;text-align:center"></i>&nbsp;&nbsp;<span data-srvdd-label="ac">ล้างแอร์</span></div>
+       <div class="dd-item" data-srvdd-item="maid" onclick="openSrvFromDD('maid')"><i class="fas fa-broom" style="width:16px;text-align:center"></i>&nbsp;&nbsp;<span data-srvdd-label="maid">แม่บ้าน</span></div>
+       <div class="dd-item" data-srvdd-item="furn" onclick="openSrvFromDD('furn')"><i class="fas fa-couch" style="width:16px;text-align:center"></i>&nbsp;&nbsp;<span data-srvdd-label="furn">ซ่อมเฟอร์นิเจอร์</span></div>
+       <div class="dd-item" data-srvdd-item="plumb" onclick="openSrvFromDD('plumb')"><i class="fas fa-wrench" style="width:16px;text-align:center"></i>&nbsp;&nbsp;<span data-srvdd-label="plumb">ระบบประปา</span></div>
+       <div class="dd-item" data-srvdd-item="elec" onclick="openSrvFromDD('elec')"><i class="fas fa-bolt" style="width:16px;text-align:center"></i>&nbsp;&nbsp;<span data-srvdd-label="elec">อุปกรณ์ไฟฟ้า</span></div>
+       <div class="dd-item" data-srvdd-item="paint" onclick="openSrvFromDD('paint')"><i class="fas fa-paint-roller" style="width:16px;text-align:center"></i>&nbsp;&nbsp;<span data-srvdd-label="paint">ทาสีบ้าน</span></div>
+      </div>
      </div>
-     <div class="btn-view-fav" onclick="openAllModal('services');closeAllDD()"><i class="fas fa-th-large"></i> ดูบริการทั้งหมด</div>
+     <div class="btn-view-fav" onclick="closeAllDD();_silentShowPage('home',true);setTimeout(()=>{openAllModal('services');scrollToEl('osrv-sec');},60)"><i class="fas fa-th-large"></i> <span data-srvdd-viewall>ดูบริการทั้งหมด</span></div>
     </div>
    </div>
    <a class="nl" href="/portfolio" onclick="event.preventDefault();showPage('portfolio')"><i class="fas fa-briefcase"></i> <span data-i18n="nav.portfolio">ผลงาน</span></a>
@@ -1998,9 +2002,6 @@ footer::after{
      </div>
     </div>
    </div>
-   <a class="btn-line btn-line-nav" id="ln-link" href="https://line.me/ti/p/@matchdoor" target="_blank" rel="noopener">
-    <i class="fab fa-line"></i> <span data-i18n="nav.addline">Add LINE</span>
-   </a>
    <div class="nav-dd">
     <button class="btn-dep" onclick="toggleDD('dd-dep')"><i class="fas fa-tag"></i> <span data-i18n="nav.deposit">ฝากทรัพย์</span></button>
     <div class="dd-panel right dep-panel" id="dd-dep">
@@ -2032,6 +2033,9 @@ footer::after{
      </div>
     </div>
    </div>
+   <a class="btn-line btn-line-nav" id="ln-link" href="https://line.me/ti/p/@matchdoor" target="_blank" rel="noopener">
+    <i class="fab fa-line"></i> <span data-i18n="nav.addline">Add LINE</span>
+   </a>
    <div class="hamburger" id="hamburger" onclick="toggleHamburger()">
     <span></span><span></span><span></span>
    </div>
@@ -2091,16 +2095,13 @@ footer::after{
    </div>
    <div class="sf">
     <div class="ac-wrap"><label><i class="fas fa-search"></i> คำค้นหา</label><input id="s-kw" placeholder="ชื่อโครงการ ทำเล..." autocomplete="off" oninput="debouncedSearch()"><div class="ac-list" id="ac-list" style="display:none"></div></div>
-    <div><label><i class="fas fa-building"></i> ประเภท</label><select id="s-type"><option value="">ทุกประเภท</option><option>บ้านเดี่ยว</option><option>ทาวน์โฮม</option><option>คอนโด</option><option>อาคารพาณิชย์</option><option>ที่ดิน</option><option>วิลล่า</option><option>รีสอร์ท</option><option>โรงแรม</option></select></div>
+    <div><label><i class="fas fa-building"></i> ประเภท</label><select id="s-type"><option value="">ทุกประเภท</option><option value="บ้านเดี่ยว">บ้านเดี่ยว</option><option value="ทาวน์โฮม">ทาวน์โฮม</option><option value="คอนโด">คอนโด</option><option value="อาคารพาณิชย์">อาคารพาณิชย์</option><option value="ที่ดิน">ที่ดิน</option><option value="วิลล่า">วิลล่า</option><option value="รีสอร์ท">รีสอร์ท</option><option value="โรงแรม">โรงแรม</option></select></div>
     <div><label><i class="fas fa-map-marker-alt"></i> จังหวัด / ทำเล</label><select id="s-prov"><option value="">ทุกทำเล</option></select></div>
     <div><label><i class="fas fa-tag"></i> ราคาต่ำสุด</label><select id="s-min" onchange="updatePriceMax()"></select></div>
     <div><label><i class="fas fa-tag"></i> ราคาสูงสุด</label><select id="s-max"></select></div>
     <button class="btn-search" onclick="doSearch()"><i class="fas fa-search"></i> ค้นหา</button>
    </div>
-   <div id="loc-search-layer" style="margin-top:12px;display:none">
-    <div class="loc-cats" id="loc-cats"></div>
-    <div class="loc-options" id="loc-options"></div>
-   </div>
+   <!-- loc-search-layer removed: use native select dropdown -->
   </div>
     <div class="quick-search-bar" id="quick-search-bar">
    <!-- 🔥 ทำเลยอดนิยม -->
@@ -4308,6 +4309,15 @@ function renderServices(){
   if($('osrv-grid')) $('osrv-grid').innerHTML = services.map(s=>`<div class="osrv-card" onclick="showSrvDetail('${s.id}')"><div class="osrv-icon"><i class="fas ${s.icon}"></i></div><div class="osrv-name">${ui('srv.'+s.id+'.name')||s.name}</div><div class="osrv-desc">${ui('srv.'+s.id+'.desc')||s.short_desc}</div><div class="osrv-btns" onclick="event.stopPropagation()"><a class="obtn obtn-ln" href="${lineUrl(C.LINE)}" target="_blank"><i class="fab fa-line"></i> Line</a><a class="obtn obtn-tel" href="tel:${C.PHONE}"><i class="fas fa-mobile-alt"></i> โทร</a></div></div>`).join('');
 }
 function showSrvDetail(id){ const s=services.find(x=>String(x.id)===String(id)); if(!s)return; $('srv-title2').textContent=s.name; $('srv-body').innerHTML=`<div style="text-align:center;margin-bottom:16px"><i class="fas ${s.icon}" style="font-size:52px;color:var(--p)"></i></div><p style="margin-bottom:12px;color:var(--tx2)">${s.full_desc}</p><div style="background:var(--bg);padding:12px 16px;border-radius:10px;margin-bottom:16px"><div style="margin-bottom:6px"><strong>💰 ราคา:</strong> ${s.price}</div><div><strong>⏱️ ระยะเวลา:</strong> ${s.duration}</div></div><div class="cta-row"><a class="btn-cta cta-ln" href="${lineUrl(C.LINE)}" target="_blank"><i class="fab fa-line"></i> แชทสอบถาม</a><a class="btn-cta cta-tel" href="tel:${C.PHONE}"><i class="fas fa-mobile-alt"></i> โทรเลย</a></div>`; $('srv-modal').classList.add('open'); }
+function showSrvDetailNav(id){ _silentShowPage('home',true); setTimeout(()=>{ showSrvDetail(id); scrollToEl('osrv-sec'); },60); }
+function openSrvFromDD(id){
+  closeAllDD();
+  _silentShowPage('home',true);
+  setTimeout(()=>{
+    scrollToEl('osrv-sec');
+    setTimeout(()=>{ showSrvDetail(id); },200);
+  },60);
+}
 
 function blogCardFull(b){
   const photos = (b.photos && b.photos.length) ? b.photos.filter(Boolean) : [];
@@ -4703,64 +4713,10 @@ const LOC_CATS = [
   { key:'uni', label:'🎓 มหาวิทยาลัย', opts:['ใกล้ ม.เกษตรศาสตร์','ใกล้ ม.รังสิต','ใกล้ ม.ธรรมศาสตร์','ใกล้ จุฬาฯ','ใกล้ ม.กรุงเทพ','ใกล้ ม.ศิลปากร','ใกล้ ม.นเรศวร','ใกล้ ม.เชียงใหม่'] }
 ];
 
-function initLocSearch() {
-  const sprov = $('s-prov');
-  if(!sprov) return;
-  sprov.addEventListener('focus', () => { showLocLayer(); });
-  sprov.addEventListener('change', () => {
-    const v = sprov.value;
-    if(v) { $('loc-search-layer').style.display='none'; locActiveCat=null; }
-  });
-  document.addEventListener('click', e => {
-    if(!e.target.closest('.search-box')) {
-      $('loc-search-layer').style.display='none'; locActiveCat=null;
-    }
-  });
-}
-
-function showLocLayer() {
-  const layer = $('loc-search-layer');
-  const catsEl = $('loc-cats');
-  const optsEl = $('loc-options');
-  if(!layer||!catsEl||!optsEl) return;
-  const dbProvs = [...new Set(props.map(p=>p.province).filter(Boolean))];
-  catsEl.innerHTML = LOC_CATS.map(c=>`<button class="loc-cat ${locActiveCat===c.key?'active':''}" onclick="selectLocCat('${c.key}')">${c.label}</button>`).join('');
-  if(!locActiveCat) {
-    optsEl.innerHTML = dbProvs.slice(0,10).map(p=>`<button class="loc-opt" onclick="applyLocOpt('${p}')">${p}</button>`).join('');
-  }
-  layer.style.display='block';
-}
-
-function selectLocCat(key) {
-  locActiveCat = key;
-  const layer = $('loc-search-layer');
-  const catsEl = $('loc-cats');
-  const optsEl = $('loc-options');
-  catsEl.innerHTML = LOC_CATS.map(c=>`<button class="loc-cat ${locActiveCat===c.key?'active':''}" onclick="selectLocCat('${c.key}')">${c.label}</button>`).join('');
-  const cat = LOC_CATS.find(c=>c.key===key);
-  if(!cat) return;
-  let opts = cat.opts;
-  if(key === 'province') {
-    const dbProvs = [...new Set(props.map(p=>p.province).filter(Boolean))];
-    opts = [...new Set([...dbProvs, ...cat.opts])];
-  }
-  optsEl.innerHTML = opts.map(o=>`<button class="loc-opt" onclick="applyLocOpt('${o}')">${o}</button>`).join('');
-  layer.style.display='block';
-}
-
-function applyLocOpt(val) {
-  const sp = $('s-prov');
-  let found = false;
-  for(const opt of sp.options) { if(opt.value===val||opt.text===val){opt.selected=true;found=true;break;} }
-  if(!found) {
-    const o = document.createElement('option');
-    o.value=val; o.text=val; o.selected=true;
-    sp.appendChild(o);
-  }
-  $('loc-search-layer').style.display='none';
-  locActiveCat=null;
-  applyFilters().catch(console.error);
-}
+function initLocSearch() { /* disabled — ใช้ native select ปกติ */ }
+function showLocLayer() { /* disabled */ }
+function selectLocCat(key) { /* disabled */ }
+function applyLocOpt(val) { /* disabled */ }
 
 function populateProvinceSelect() {
   const sp = $('s-prov');
@@ -4810,7 +4766,10 @@ function selectAC(id, title, loc) {
   const inp = $('s-kw');
   if(inp) inp.value = title;
   $('ac-list').style.display='none';
+  const p = props.find(x=>String(x.id)===String(id));
+  if(p && p.tx && p.tx !== tx) _syncTxTabs(p.tx);
   openModal(id);
+  setTimeout(()=>scrollToEl('all-sec'), 80);
 }
 
 function initSwipe(sliderEl, prevFn, nextFn) {
@@ -5303,19 +5262,29 @@ function initRecCarouselSwipe() {
   const wrap = $('rec-track-wrap');
   if(!wrap || wrap._swipeInit) return;
   wrap._swipeInit = true;
+  let _startX = 0, _startY = 0, _isVert = false;
   wrap.addEventListener('touchstart', e => {
-    recDragStart = e.touches[0].clientX; recIsDragging = true; stopRecAutoSlide();
+    _startX = e.touches[0].clientX; _startY = e.touches[0].clientY;
+    recDragStart = _startX; recIsDragging = false; _isVert = false; stopRecAutoSlide();
   }, {passive:true});
   wrap.addEventListener('touchmove', e => {
-    if(!recIsDragging) return;
-    recDragDelta = e.touches[0].clientX - recDragStart;
+    const dx = e.touches[0].clientX - _startX;
+    const dy = e.touches[0].clientY - _startY;
+    if(!recIsDragging) {
+      if(Math.abs(dx) > 4 || Math.abs(dy) > 4) {
+        _isVert = Math.abs(dy) > Math.abs(dx);
+        if(!_isVert) recIsDragging = true;
+      }
+    }
+    if(recIsDragging && !_isVert) recDragDelta = dx;
   }, {passive:true});
   wrap.addEventListener('touchend', () => {
-    if(!recIsDragging) return; recIsDragging = false;
-    if(recDragDelta < -50) recCarouselMove(1);
-    else if(recDragDelta > 50) recCarouselMove(-1);
-    else startRecAutoSlide();
-    recDragDelta = 0;
+    if(!_isVert) {
+      if(recDragDelta < -50) recCarouselMove(1);
+      else if(recDragDelta > 50) recCarouselMove(-1);
+      else startRecAutoSlide();
+    } else { startRecAutoSlide(); }
+    recIsDragging = false; recDragDelta = 0; _isVert = false;
   });
   wrap.addEventListener('mouseenter', stopRecAutoSlide);
   wrap.addEventListener('mouseleave', startRecAutoSlide);
@@ -5750,21 +5719,35 @@ function gcRenderDots() {
 function gcInitDrag() {
   const wrap = document.getElementById('gc-wrap');
   if(!wrap) return;
+  let _startY = 0, _isVert = false;
   const onDown = e => {
     gcStopAuto();
     gcDragging = false;
     gcStartX = e.touches ? e.touches[0].clientX : e.clientX;
+    _startY = e.touches ? e.touches[0].clientY : 0;
+    _isVert = false;
     gcDragDelta = 0;
     wrap.classList.add('dragging');
     document.addEventListener('mousemove', onMove);
     document.addEventListener('mouseup', onUp);
-    document.addEventListener('touchmove', onMove, {passive:false});
+    document.addEventListener('touchmove', onMove, {passive:true});
     document.addEventListener('touchend', onUp);
   };
   const onMove = e => {
     const x = e.touches ? e.touches[0].clientX : e.clientX;
-    gcDragDelta = x - gcStartX;
-    if(Math.abs(gcDragDelta) > 8) { gcDragging = true; if(e.cancelable) e.preventDefault(); }
+    const y = e.touches ? e.touches[0].clientY : 0;
+    const dx = x - gcStartX;
+    const dy = y - _startY;
+    if(!gcDragging && e.touches) {
+      if(Math.abs(dx) > 6 || Math.abs(dy) > 6) {
+        _isVert = Math.abs(dy) > Math.abs(dx);
+        if(!_isVert) gcDragging = true;
+      }
+    } else if(!e.touches) {
+      gcDragDelta = dx;
+      if(Math.abs(gcDragDelta) > 8) gcDragging = true;
+    }
+    if(!_isVert) gcDragDelta = dx;
   };
   const onUp = () => {
     wrap.classList.remove('dragging');
@@ -5772,8 +5755,9 @@ function gcInitDrag() {
     document.removeEventListener('mouseup', onUp);
     document.removeEventListener('touchmove', onMove);
     document.removeEventListener('touchend', onUp);
-    if(Math.abs(gcDragDelta) > 50) gcMove(gcDragDelta < 0 ? 1 : -1);
+    if(!_isVert && Math.abs(gcDragDelta) > 50) gcMove(gcDragDelta < 0 ? 1 : -1);
     setTimeout(() => { gcDragging = false; }, 50);
+    _isVert = false;
     gcStartAuto();
   };
   wrap.addEventListener('mousedown', onDown);
@@ -5837,14 +5821,38 @@ function hGalleryMove(trackId, dir) {
 function initHGallerySwipe(wrapId) {
   const wrap = document.getElementById(wrapId);
   if(!wrap) return;
-  let startX = 0, startScroll = 0, isDragging = false, moved = 0;
+  let startX = 0, startY = 0, startScroll = 0, isDragging = false, moved = 0, isVertical = false;
+  // Touch: only hijack horizontal swipes, let vertical pass to page scroll
+  wrap.addEventListener('touchstart', e => {
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    startScroll = wrap.scrollLeft;
+    isDragging = false; moved = 0; isVertical = false;
+  }, {passive:true});
+  wrap.addEventListener('touchmove', e => {
+    const dx = startX - e.touches[0].clientX;
+    const dy = startY - e.touches[0].clientY;
+    if(!isDragging) {
+      // Determine direction on first significant move
+      if(Math.abs(dx) > 4 || Math.abs(dy) > 4) {
+        isVertical = Math.abs(dy) > Math.abs(dx);
+        isDragging = true;
+      }
+    }
+    if(isDragging && !isVertical) {
+      moved = Math.abs(dx);
+      wrap.scrollLeft = startScroll + dx;
+    }
+    // If vertical, do nothing — browser handles page scroll
+  }, {passive:true});
+  wrap.addEventListener('touchend', () => { isDragging = false; moved = 0; isVertical = false; });
+  // Mouse drag (desktop)
   wrap.addEventListener('mousedown', e => {
     startX = e.clientX;
     startScroll = wrap.scrollLeft;
     isDragging = true;
     moved = 0;
     wrap.classList.add('dragging');
-    // Don't preventDefault — allow click to propagate unless dragged
   });
   window.addEventListener('mousemove', e => {
     if(!isDragging) return;
@@ -6133,7 +6141,7 @@ const UI_TEXT = {
     'dd.rent.lux':'Luxury','dd.rent.superlux':'Super Luxury',
     'dd.srv.sec':'บริการซ่อมแซม & ดูแลบ้าน',
     'dd.srv.ac':'ล้างแอร์','dd.srv.maid':'แม่บ้าน','dd.srv.furn':'ซ่อมเฟอร์นิเจอร์',
-    'dd.srv.plumb':'ระบบประปา','dd.srv.elec':'อุปกรณ์ไฟฟ้า','dd.srv.door':'ลูกบิดประตู',
+    'dd.srv.plumb':'ระบบประปา','dd.srv.elec':'อุปกรณ์ไฟฟ้า','dd.srv.door':'ลูกบิดประตู','dd.srv.paint':'ทาสีบ้าน',
     'dd.srv.viewall':'ดูบริการทั้งหมด',
     'dd.fav.title':'รายการโปรด','dd.fav.clear':'ล้างทั้งหมด','dd.fav.view':'ดูทั้งหมด',
     /* lang panel */
@@ -6306,7 +6314,7 @@ const UI_TEXT = {
     'dd.rent.lux':'Luxury','dd.rent.superlux':'Super Luxury',
     'dd.srv.sec':'Repair & Home Care Services',
     'dd.srv.ac':'AC Cleaning','dd.srv.maid':'Maid Service','dd.srv.furn':'Furniture Repair',
-    'dd.srv.plumb':'Plumbing','dd.srv.elec':'Electrical','dd.srv.door':'Door Handles',
+    'dd.srv.plumb':'Plumbing','dd.srv.elec':'Electrical','dd.srv.door':'Door Handles','dd.srv.paint':'House Painting',
     'dd.srv.viewall':'View All Services',
     'dd.fav.title':'Favorites','dd.fav.clear':'Clear All','dd.fav.view':'View All',
     'lang.header':'🌐 Select Language',
@@ -6456,7 +6464,7 @@ const UI_TEXT = {
     'dd.rent.lux':'豪华','dd.rent.superlux':'顶级豪华',
     'dd.srv.sec':'维修与家居服务',
     'dd.srv.ac':'空调清洗','dd.srv.maid':'家政服务','dd.srv.furn':'家具维修',
-    'dd.srv.plumb':'水管维修','dd.srv.elec':'电气设备','dd.srv.door':'门锁维修',
+    'dd.srv.plumb':'水管维修','dd.srv.elec':'电气设备','dd.srv.door':'门锁维修','dd.srv.paint':'房屋粉刷',
     'dd.srv.viewall':'查看全部服务',
     'dd.fav.title':'收藏夹','dd.fav.clear':'清除全部','dd.fav.view':'查看全部',
     'lang.header':'🌐 选择语言',
@@ -6606,7 +6614,7 @@ const UI_TEXT = {
     'dd.rent.lux':'ラグジュアリー','dd.rent.superlux':'スーパーラグジュアリー',
     'dd.srv.sec':'修繕・ハウスケアサービス',
     'dd.srv.ac':'エアコン洗浄','dd.srv.maid':'家政婦サービス','dd.srv.furn':'家具修理',
-    'dd.srv.plumb':'配管','dd.srv.elec':'電気設備','dd.srv.door':'ドアハンドル',
+    'dd.srv.plumb':'配管','dd.srv.elec':'電気設備','dd.srv.door':'ドアハンドル','dd.srv.paint':'外壁塗装',
     'dd.srv.viewall':'全サービスを見る',
     'dd.fav.title':'お気に入り','dd.fav.clear':'すべて削除','dd.fav.view':'すべて見る',
     'lang.header':'🌐 言語を選択',
@@ -6812,8 +6820,8 @@ function applyLang(){
   const priceSecs = document.querySelectorAll('#dd-prop .dd-sec');
   if(priceSecs[1]){ priceSecs[1].querySelector('.dd-sec-title').textContent=ui('dd.price.sec'); }
   const priceRows = document.querySelectorAll('#dd-prop .dd-row');
-  if(priceRows.length>=5){
-    const prl=[['dd.price.all','dd.price.unlim'],['dd.price.1_3','dd.price.start'],['dd.price.3_5','dd.price.pop'],['dd.price.5_10','dd.price.prem'],['dd.price.10p','']];
+  if(priceRows.length>=3){
+    const prl=[['dd.price.all','dd.price.unlim'],['dd.price.1_3','dd.price.start'],['dd.price.3_5','dd.price.pop'],['dd.price.5_10','dd.rent.lux']];
     priceRows.forEach((row,i)=>{ if(!prl[i])return; const spans=row.querySelectorAll('span'); if(spans[0]){const ico=spans[0].querySelector('i');spans[0].textContent=ui(prl[i][0]);if(ico)spans[0].insertBefore(ico,spans[0].firstChild);} if(spans[1]&&prl[i][1])spans[1].textContent=ui(prl[i][1]); });
   }
   // Rent dropdown
@@ -6824,18 +6832,22 @@ function applyLang(){
   const rentSec2 = document.querySelector('#dd-rent .dd-sec:nth-child(2) .dd-sec-title');
   if(rentSec2) rentSec2.textContent=ui('dd.rent.price.sec');
   const rentRows = document.querySelectorAll('#dd-rent .dd-row');
-  if(rentRows.length>=6){
-    const rrl=[['dd.rent.all','dd.price.unlim'],['dd.rent.5k','dd.rent.save'],['dd.rent.10k','dd.price.pop'],['dd.rent.20k','dd.price.prem'],['dd.rent.50k','dd.rent.lux'],['dd.rent.50kp','dd.rent.superlux']];
+  if(rentRows.length>=4){
+    const rrl=[['dd.rent.all','dd.price.unlim'],['dd.rent.10k','dd.rent.save'],['dd.rent.50k','dd.price.pop'],['dd.rent.50k','dd.price.prem'],['dd.rent.50kp','dd.rent.lux']];
     rentRows.forEach((row,i)=>{ if(!rrl[i])return; const spans=row.querySelectorAll('span'); if(spans[0]){const ico=spans[0].querySelector('i');spans[0].textContent=ui(rrl[i][0]);if(ico)spans[0].insertBefore(ico,spans[0].firstChild);} if(spans[1]&&rrl[i][1])spans[1].textContent=ui(rrl[i][1]); });
   }
   // Service dropdown
-  _setQSel('#dd-srv .dd-sec-title', ui('dd.srv.sec'));
-  const srvRows = document.querySelectorAll('#dd-srv .dd-row');
-  const srvKeys=['dd.srv.ac','dd.srv.maid','dd.srv.furn','dd.srv.plumb','dd.srv.elec','dd.srv.door'];
-  srvRows.forEach((row,i)=>{ if(!srvKeys[i])return; const span=row.querySelector('span'); if(span){const ico=span.querySelector('i');span.textContent=ui(srvKeys[i]);if(ico)span.insertBefore(ico,span.firstChild);} });
-  _setQSel('#dd-srv .btn-view-fav',ui('dd.srv.viewall')); // icon stays via css
-  const srvViewAll=document.querySelector('#dd-srv .btn-view-fav');
-  if(srvViewAll){const ico=srvViewAll.querySelector('i');srvViewAll.textContent=ui('dd.srv.viewall');if(ico)srvViewAll.insertBefore(ico,srvViewAll.firstChild);}
+  _setQSel('#dd-srv [data-srvdd-sec]', ui('dd.srv.sec'));
+  // Update each service item label by its id key
+  const srvItemMap = {ac:'dd.srv.ac',maid:'dd.srv.maid',furn:'dd.srv.furn',plumb:'dd.srv.plumb',elec:'dd.srv.elec',paint:'dd.srv.paint'};
+  Object.entries(srvItemMap).forEach(([id,key])=>{
+    const lbl=document.querySelector(`[data-srvdd-label="${id}"]`);
+    if(lbl) lbl.textContent=ui(key);
+  });
+  const srvViewAllSpan=document.querySelector('[data-srvdd-viewall]');
+  if(srvViewAllSpan)srvViewAllSpan.textContent=ui('dd.srv.viewall');
+  const srvViewAllBtn=document.querySelector('#dd-srv .btn-view-fav');
+  if(srvViewAllBtn){const ico=srvViewAllBtn.querySelector('i');}
   // Favorites panel
   const favH3=document.querySelector('#dd-fav .fav-header h3');
   if(favH3){const ico=favH3.querySelector('i');const pill=favH3.querySelector('.fav-count-pill');favH3.textContent=ui('dd.fav.title')+' ';if(ico)favH3.insertBefore(ico,favH3.firstChild);if(pill)favH3.appendChild(pill);}
