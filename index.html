@@ -3447,15 +3447,15 @@ footer::after{
       <div class="stat-counters">
         <div class="stat-counter-card">
           <span class="stat-counter-icon">🏆</span>
-          <div class="stat-text-group"><span class="stat-counter-num"><span class="suf-num" id="sold-cnt" data-target="47">0</span></span><span class="stat-counter-label" data-i18n="ph.port.sold">ปิดขายแล้ว</span></div>
+          <div class="stat-text-group"><span class="stat-counter-num"><span class="suf-num" id="sold-cnt" data-target="0">0</span></span><span class="stat-counter-label" data-i18n="ph.port.sold">ปิดขายแล้ว</span></div>
         </div>
         <div class="stat-counter-card">
           <span class="stat-counter-icon">🔑</span>
-          <div class="stat-text-group"><span class="stat-counter-num"><span class="suf-num" id="rent-cnt" data-target="23">0</span></span><span class="stat-counter-label" data-i18n="ph.port.rented">ปิดเช่าแล้ว</span></div>
+          <div class="stat-text-group"><span class="stat-counter-num"><span class="suf-num" id="rent-cnt" data-target="0">0</span></span><span class="stat-counter-label" data-i18n="ph.port.rented">ปิดเช่าแล้ว</span></div>
         </div>
         <div class="stat-counter-card">
           <span class="stat-counter-icon">😊</span>
-          <div class="stat-text-group"><span class="stat-counter-num"><span class="suf-num" id="happy-cnt" data-target="180">0</span></span><span class="stat-counter-label" data-i18n="ph.port.happy">ลูกค้าพึงพอใจ</span></div>
+          <div class="stat-text-group"><span class="stat-counter-num"><span class="suf-num" id="happy-cnt" data-target="0">0</span></span><span class="stat-counter-label" data-i18n="ph.port.happy">ลูกค้าพึงพอใจ</span></div>
         </div>
       </div>
     </div>
@@ -4513,6 +4513,8 @@ async function loadData(){
               if(typeof renderHomePortfolio==='function') renderHomePortfolio();
               if(typeof renderFavDropdown==='function') renderFavDropdown();
               renderRecCarousel && renderRecCarousel();
+              // sync ตัวเลข stats ทั้งหมดด้วยข้อมูลจริงจาก Supabase
+              if(typeof syncAllStats==='function') syncAllStats();
             }
             // โหลด legal pages แบบ background
             loadLegalPages().catch(e=>console.warn('[loadLegalPages]',e));
@@ -4531,6 +4533,49 @@ async function loadData(){
   }
   afterLoad();
 }
+// ── syncAllStats: อัปเดตตัวเลข stats ทั้งหมดจากข้อมูลจริง ──────────────
+function syncAllStats(){
+  // คำนวณจากข้อมูลจริงใน memory (props, agents, port)
+  const soldCount   = port.filter(p=>p.status==='SOLD').length;
+  const rentCount   = port.filter(p=>p.status==='RENTED').length;
+  const happyCount  = soldCount + rentCount;   // ลูกค้าพึงพอใจ = SOLD + RENTED รวมกัน
+  const propCount   = props.length;
+  const agentCount  = agents.length;
+  const totalClosed = happyCount;              // ปิดดีลแล้ว = SOLD + RENTED
+
+  // ── หน้าหลัก: Hero stat counters (อัปเดต data-target AND animate .suf-num) ──
+  const heroCounters = document.querySelectorAll('#hero-stat-counters .stat-counter-num[data-target]');
+  const heroVals = [propCount, agentCount, totalClosed];
+  heroCounters.forEach((wrapper, i) => {
+    const val = heroVals[i];
+    if(val === undefined) return;
+    wrapper.dataset.target = String(val);
+    const numEl = wrapper.querySelector('.suf-num');
+    if(numEl) animateCounter(numEl, val, 900);
+  });
+
+  // ── หน้าผลงาน: Portfolio stat counters ──
+  // fallback ใช้ 0 — ไม่แสดงตัวเลข mock เมื่อข้อมูลจริงยังไม่พร้อม
+  const soldEl  = document.getElementById('sold-cnt');
+  const rentEl  = document.getElementById('rent-cnt');
+  const happyEl = document.getElementById('happy-cnt');
+  if(soldEl)  { soldEl.dataset.target  = String(soldCount);  animateCounter(soldEl,  soldCount,  900); }
+  if(rentEl)  { rentEl.dataset.target  = String(rentCount);  animateCounter(rentEl,  rentCount,  900); }
+  if(happyEl) { happyEl.dataset.target = String(happyCount); animateCounter(happyEl, happyCount, 900); }
+
+  // ── หน้าตัวแทน: Agent stat counters (สอดคล้องกับ showPage('agents')) ──
+  // ag-listing-cnt = จำนวนประกาศทั้งหมด (props.length)
+  // ag-sale-cnt    = ปิดดีลแล้ว (totalClosed = SOLD+RENTED) ← สอดคล้องกับหน้าหลักและผลงาน
+  // ag-agent-cnt   = จำนวนตัวแทน (agents.length)
+  const agListEl  = document.getElementById('ag-listing-cnt');
+  const agSaleEl  = document.getElementById('ag-sale-cnt');
+  const agAgentEl = document.getElementById('ag-agent-cnt');
+  if(agListEl)  animateCounter(agListEl,  propCount,   900);
+  if(agSaleEl)  animateCounter(agSaleEl,  totalClosed, 900);
+  if(agAgentEl) animateCounter(agAgentEl, agentCount,  900);
+
+  console.log(`[syncAllStats] props=${propCount} agents=${agentCount} sold=${soldCount} rented=${rentCount} happy=${happyCount} totalClosed=${totalClosed}`);
+}
 function afterLoad(){
   // ── Safety: ถ้า props ว่างให้ใช้ MOCK ทันที ──────────────────────
   if(!props.length){
@@ -4539,18 +4584,13 @@ function afterLoad(){
     services = MOCK.services; blogs = MOCK.blogs;
     agents.forEach(a=>{ a.propIds=props.filter(p=>p.agentId===a.id).map(p=>p.id); });
   }
+  // ── Flag: ข้อมูลพร้อมแล้ว — ให้ IntersectionObserver ใช้ syncAllStats() แทน mock ──
+  window._dataReady = true;
   filtered = [...props];
   allFiltered = [...props];
 
-  // ── sync hero stat counters ───────────────────────────────────────
-  const totalClosed = port.filter(p=>p.status==='SOLD'||p.status==='RENTED').length || port.length;
-  const heroCounters = document.querySelectorAll('#hero-stat-counters .stat-counter-num[data-target]');
-  if(heroCounters[0]) heroCounters[0].dataset.target = String(props.length || 200);
-  if(heroCounters[1]) heroCounters[1].dataset.target = String(agents.length || 20);
-  if(heroCounters[2]) heroCounters[2].dataset.target = String(totalClosed || 70);
-  const soldEl = document.getElementById('sold-cnt'); if(soldEl) soldEl.dataset.target = String(port.filter(p=>p.status==='SOLD').length || 47);
-  const rentEl = document.getElementById('rent-cnt'); if(rentEl) rentEl.dataset.target = String(port.filter(p=>p.status==='RENTED').length || 23);
-  const happyEl = document.getElementById('happy-cnt'); if(happyEl) happyEl.dataset.target = String(totalClosed || 70);
+  // ── sync hero stat counters ─────────────────────────────────────
+  syncAllStats();
 
   loadSystemImages();
   renderFavDropdown();
@@ -5244,9 +5284,11 @@ function _silentShowPage(name, skipScrollTop) {
   else if (name === 'agents') {
     renderAgents();
     setTimeout(() => {
+      // ใช้ข้อมูลเดียวกับ syncAllStats เพื่อให้ตัวเลขสอดคล้องกันทุกหน้า
+      const _totalClosed = port.filter(p=>p.status==='SOLD'||p.status==='RENTED').length;
       animateCounter($('ag-listing-cnt'), props.length);
-      animateCounter($('ag-sale-cnt'), port.length);
-      animateCounter($('ag-agent-cnt'), agents.length);
+      animateCounter($('ag-sale-cnt'),    _totalClosed);  // SOLD+RENTED เท่านั้น (สอดคล้องกับหน้าหลัก/ผลงาน)
+      animateCounter($('ag-agent-cnt'),   agents.length);
     }, 200);
   }
   // seo-toggle-btn: แสดงบนหน้า home และ listings เท่านั้น
@@ -6919,7 +6961,7 @@ function showBlogDetail(blog){
   _openModal('blog-modal');
 }
 
-function renderPortfolio(filter){ let list=port; if(filter!=='all'){if(filter==='SOLD'||filter==='RENTED')list=list.filter(p=>p.status===filter);else list=list.filter(p=>p.type===filter);} $('sold-cnt').textContent=port.filter(p=>p.status==='SOLD').length; $('rent-cnt').textContent=port.filter(p=>p.status==='RENTED').length; $('happy-cnt').textContent=port.length; $('port-grid').innerHTML=list.length?list.map(p=>{
+function renderPortfolio(filter){ let list=port; if(filter!=='all'){if(filter==='SOLD'||filter==='RENTED')list=list.filter(p=>p.status===filter);else list=list.filter(p=>p.type===filter);} if(typeof syncAllStats==='function') syncAllStats(); $('port-grid').innerHTML=list.length?list.map(p=>{
   const photos=[p.photo,...(p.photos||[])].filter(Boolean);
   let imgHtml;
   if(photos.length>1){
@@ -7676,6 +7718,8 @@ function animateStatCounters(scope) {
 }
 
 // Trigger hero counters when visible
+// หมายเหตุ: ถ้าข้อมูลจริงโหลดแล้ว (window._dataReady) ให้ใช้ syncAllStats() แทน animateStatCounters()
+// เพื่อให้ตัวเลขมาจาก Supabase จริง ไม่ใช่ data-target mock ที่ตั้งใน HTML
 (function() {
   let triggered = false;
   const hero = document.querySelector('.hero');
@@ -7683,7 +7727,14 @@ function animateStatCounters(scope) {
   const obs = new IntersectionObserver(entries => {
     if(entries[0].isIntersecting && !triggered) {
       triggered = true;
-      animateStatCounters(hero.closest('.page'));
+      if(window._dataReady && typeof syncAllStats === 'function') {
+        // ข้อมูลจริงพร้อมแล้ว — sync จาก Supabase data
+        syncAllStats();
+      } else {
+        // ข้อมูลยังโหลดไม่เสร็จ — animate จาก data-target ปัจจุบัน (อาจเป็น mock)
+        animateStatCounters(hero.closest('.page'));
+        // เมื่อข้อมูลโหลดเสร็จ syncAllStats() จะถูกเรียกอีกครั้งโดยอัตโนมัติ
+      }
       obs.disconnect();
     }
   }, { threshold: 0.2 });
