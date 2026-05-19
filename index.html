@@ -4515,6 +4515,21 @@ async function loadData(){
               renderRecCarousel && renderRecCarousel();
               // sync ตัวเลข stats ทั้งหมดด้วยข้อมูลจริงจาก Supabase
               if(typeof syncAllStats==='function') syncAllStats();
+              // ── re-render หน้าผลงาน ถ้า active อยู่ — ให้แน่ใจว่าใช้ข้อมูลจริง ไม่ใช่ mock ──
+              if(document.getElementById('page-portfolio')?.classList.contains('active') && typeof renderPortfolio==='function'){
+                renderPortfolio('all');
+              }
+              // ── re-render หน้าตัวแทน ถ้า active อยู่ — ให้แน่ใจว่าใช้ข้อมูลจริง ไม่ใช่ mock ──
+              if(document.getElementById('page-agents')?.classList.contains('active') && typeof renderAgents==='function'){
+                renderAgents();
+                // อัปเดต stat counters ด้วยข้อมูลจริง
+                const _totalClosed = port.filter(p=>p.status==='SOLD'||p.status==='RENTED').length;
+                if(typeof animateCounter==='function'){
+                  animateCounter(document.getElementById('ag-listing-cnt'), props.length);
+                  animateCounter(document.getElementById('ag-sale-cnt'),    _totalClosed);
+                  animateCounter(document.getElementById('ag-agent-cnt'),   agents.length);
+                }
+              }
             }
             // โหลด legal pages แบบ background
             loadLegalPages().catch(e=>console.warn('[loadLegalPages]',e));
