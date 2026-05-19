@@ -51,7 +51,6 @@
 <!-- ═══ Canonical & hreflang ══════════════════════════════════════════════ -->
 <link rel="canonical" href="https://matchdoor.co">
 <link rel="alternate" hreflang="th" href="https://matchdoor.co">
-<link rel="alternate" hreflang="en" href="https://matchdoor.co/en">
 <link rel="alternate" hreflang="x-default" href="https://matchdoor.co">
 <!-- ═══ Schema.org — RealEstateAgent (Advanced) ══════════════════════════ -->
 <script type="application/ld+json">
@@ -195,16 +194,12 @@
 <meta name="google-site-verification" content="YOUR_GOOGLE_VERIFICATION_CODE_HERE">
 <!-- ═══ Bing Webmaster ════════════════════════════════════════════════════ -->
 <meta name="msvalidate.01" content="YOUR_BING_VERIFICATION_CODE_HERE">
-<!-- ═══ Font Loading — Critical CSS First ════════════════════════════════ -->
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&family=Kanit:wght@500;700;800&display=swap" onload="this.onload=null;this.rel='stylesheet'">
-<noscript><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&family=Kanit:wght@500;700;800&display=swap" rel="stylesheet"></noscript>
-<!-- Sarabun + Playfair loaded deferred — not needed for first paint -->
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500&family=Playfair+Display:wght@700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
-<noscript><link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"></noscript>
+<!-- ═══ Font Loading — All 4 families in 1 request (1 round-trip instead of 2) ══ -->
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&family=Kanit:wght@500;700;800&family=Sarabun:wght@400;500&family=Playfair+Display:wght@700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&family=Kanit:wght@500;700;800&family=Sarabun:wght@400;500&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"></noscript>
 <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" onload="this.onload=null;this.rel='stylesheet'">
 <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"></noscript>
-<!-- Supabase: async แต่ critical — priority high เพื่อให้ browser ดึงเร็วขึ้น -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" async fetchpriority="high"></script>
+<!-- Supabase: โหลดแบบ defer — ป้องกัน race condition กับ initSB() (ย้ายไปก่อน </body> แล้ว) -->
 <!-- ═══ Cloudflare Turnstile (Invisible CAPTCHA) ═══════════════════════════
      ⚠️ แทน data-sitekey ด้วย Turnstile Site Key จาก Cloudflare Dashboard
      ดู: https://dash.cloudflare.com → Turnstile → Add site
@@ -311,7 +306,10 @@ body:not(:has(.ov.open)):not(:has(.apply-overlay.open)):not(:has(.seo-drawer.ope
   #prop-modal{will-change:auto;isolation:isolate}
   /* ไม่มี animation บนมือถือ — เปิดทันที */
   #prop-modal.open .modal{will-change:auto}
-  *:not(.ov):not(#prop-modal):not(.rec-track):not(.card-slides):not(.slides):not(.rec-card-img img){transition-duration:.08s!important}
+  /* ระบุ selector เฉพาะแทน wildcard — ไม่ให้ browser recompute ทุก element */
+  .prop-card,.blog-card,.gal-card,.agent-card,.cat-card,.osrv-card,
+  .modal,.sheet,.nav,.tab-bar,.btn,.pill,.badge,.filter-bar,
+  .dropdown,.tooltip,.toast,.overlay,.page,.sidebar{transition-duration:.08s!important}
   .prop-card,.blog-card,.gal-card,.agent-card,.cat-card,.osrv-card{transition:none!important}
   #prop-modal .modal{transition:none!important}
   /* ── ยกเว้น transition สำหรับ carousel และ slider บนมือถือ ── */
@@ -2772,10 +2770,7 @@ footer::after{
   <div class="hero-bg-clip"><canvas id="hero-canvas"></canvas></div>
   <div class="hero-content">
   <div class="hero-badge"><i class="fas fa-door-open"></i> <span data-i18n="hero.badge">แพลตฟอร์มอสังหาฯ ที่คุณไว้วางใจ ✨</span></div>
-  <div id="weather-badge" style="display:none">
-    <span id="weather-icon">💨</span> <span id="weather-label">ลมพัดในกรุงเทพฯ</span>
-  </div>
-  <h1 data-i18n-html="hero.h1"><span>อสังหาริมทรัพย์</span>ที่ใช่<br><span class="hero-white">ใน</span><span>สไตล์</span>ที่เป็นคุณ</h1>
+<h1 data-i18n-html="hero.h1"><span>อสังหาริมทรัพย์</span>ที่ใช่<br><span class="hero-white">ใน</span><span>สไตล์</span>ที่เป็นคุณ</h1>
   <p id="hero-sub" data-i18n="hero.sub">บ้าน คอนโด ที่ดิน ทุกประเภท ทุกทำเล ราคาดีที่สุด</p>
   <div class="stat-counters" id="hero-stat-counters">
     <div class="stat-counter-card">
@@ -4207,18 +4202,29 @@ function initSB(){
   try{ sb=window.supabase.createClient(url,key); return true; }
   catch(e){ console.error('Supabase init failed:',e); return false; }
 }
-async function sbFetch(table,opts={}){ const q=sb.from(table).select(opts.select||'*'); if(opts.eq) Object.entries(opts.eq).forEach(([k,v])=>q.eq(k,v)); if(opts.order) q.order(opts.order,{ascending:false}); const {data,error}=await q; if(error){ console.error('[sbFetch]',table,error); return null; } return data; }
+async function sbFetch(table,opts={}){
+  // ต้องระบุ opts.select เสมอ — ไม่ใช้ '*' เพราะดึงข้อมูลเกินความจำเป็น
+  if(!opts.select){ console.warn('[sbFetch] missing opts.select for table:',table,'; ระบุ column ที่ต้องการ'); }
+  const q=sb.from(table).select(opts.select||'id');
+  if(opts.eq) Object.entries(opts.eq).forEach(([k,v])=>q.eq(k,v));
+  if(opts.order) q.order(opts.order,{ascending:false});
+  const {data,error}=await q;
+  if(error){ console.error('[sbFetch]',table,error); return null; }
+  return data;
+}
 async function sbInsert(table,data){ if(user) data.user_id=user.id; const {error}=await sb.from(table).insert([data]); if(error) throw new Error(error.message); }
 
+// ── Grid columns only — ลด payload 40-70% (ไม่ดึง description/internal_notes ฯลฯ) ──
+const PROP_GRID_COLS = 'id,title,type,province,location,price,tx,bed,bath,area,land_area,floors,floor_no,parking,furniture,pets_allowed,appliances,description,is_new,is_rec,agent_id,created_at,photos,panorama_url,virtual_tour_url,nearby_places,deposit,advance_payment,electric_rate,water_rate,service_fee,furniture_items,amenities,invest_tag,yield_pct,below_market_pct,discount_flag,lease_terms,min_lease_months,min_lease,rent_duration';
 async function fetchProperties(){
   if(!sb) return null;
-  const {data,error}=await sb.from('properties').select('*').order('created_at',{ascending:false});
+  const {data,error}=await sb.from('properties').select(PROP_GRID_COLS).order('created_at',{ascending:false});
   if(error){ console.error('[fetchProperties]',error); return null; }
   return data;
 }
 async function searchProperties(keyword){
   if(!sb||!keyword) return null;
-  const {data,error}=await sb.from('properties').select('*')
+  const {data,error}=await sb.from('properties').select(PROP_GRID_COLS)
     .or(`title.ilike.%${keyword}%,location.ilike.%${keyword}%,province.ilike.%${keyword}%,description.ilike.%${keyword}%`)
     .order('created_at',{ascending:false});
   if(error){ console.error('[searchProperties]',error); return null; }
@@ -4226,8 +4232,8 @@ async function searchProperties(keyword){
 }
 async function filterProperties(filters={}){
   if(!sb) return null;
-  let q=sb.from('properties').select('*');
-  if(filters.tx) q=q.eq('tx',filters.tx);
+  let q=sb.from('properties').select(PROP_GRID_COLS);
+  if(filters.tx && filters.tx!=='ALL') q=q.eq('tx',filters.tx);
   if(filters.type) q=q.eq('type',filters.type);
   if(filters.province) q=q.eq('province',filters.province);
   if(filters.minPrice) q=q.gte('price',filters.minPrice);
@@ -4459,7 +4465,23 @@ async function loadData(){
   if(typeof window.supabase === 'undefined'){
     await new Promise(resolve=>{
       const t = setInterval(()=>{ if(typeof window.supabase!=='undefined'){ clearInterval(t); resolve(); } }, 50);
-      setTimeout(()=>{ clearInterval(t); resolve(); }, 3000); // timeout 3s
+      setTimeout(()=>{
+        clearInterval(t);
+        if(typeof window.supabase === 'undefined'){
+          // แสดง toast + ปุ่มโหลดใหม่เมื่อ Supabase โหลดไม่ทัน (เน็ตช้า)
+          if(typeof showToast === 'function'){
+            showToast('ไม่สามารถเชื่อมต่อได้ กรุณารีเฟรชหน้าเว็บ', 'error', 0); // duration=0 = ไม่หายเอง
+          }
+          // ฝัง reload-button ใต้ skeleton grid
+          const reloadBanner = document.createElement('div');
+          reloadBanner.id = 'sb-reload-banner';
+          reloadBanner.style.cssText = 'text-align:center;padding:16px 0 8px;';
+          reloadBanner.innerHTML = '<button onclick="location.reload()" style="background:var(--a,#1B3A6B);color:#fff;border:none;border-radius:8px;padding:10px 24px;font-size:15px;cursor:pointer;font-weight:600;">⟳ โหลดหน้าใหม่</button>';
+          const grid = document.getElementById('all-grid') || document.getElementById('rec-grid');
+          if(grid && grid.parentNode) grid.parentNode.insertBefore(reloadBanner, grid);
+        }
+        resolve();
+      }, 3000); // timeout 3s
     });
   }
 
@@ -4468,10 +4490,10 @@ async function loadData(){
 
   if(hasSB){
     try{
-      // ── PHASE 1: โหลด properties ทั้งหมดก่อน — SELECT * เพื่อไม่ให้ข้อมูลหาย ──────────
+      // ── PHASE 1: โหลด properties ทั้งหมดก่อน — ระบุ column ที่ต้องการ ลด payload 40-70% ──
       // ใช้ .range() เพื่อดึงครบทุก row แม้ Supabase project มี custom row limit ต่ำ
       const p = await sb.from('properties')
-        .select('*')
+        .select(PROP_GRID_COLS)
         .order('created_at',{ascending:false})
         .range(0, 999); // ดึงสูงสุด 1,000 rows — ป้องกัน PostgREST default limit ตัด
       if(p.data){ props = p.data.map(mapProp); console.log(`✅ Properties loaded: ${props.length}`); }
@@ -4493,10 +4515,10 @@ async function loadData(){
         setTimeout(async ()=>{
           try{
             const [a, po, s, b] = await Promise.all([
-              sb.from('agents').select('*').eq('is_active',true),
-              sb.from('portfolio').select('*').order('created_at',{ascending:false}),
-              sb.from('services').select('*').eq('is_active',true).order('sort_order',{ascending:true}),
-              sb.from('blogs').select('*').eq('is_published',true).order('sort_order',{ascending:true})
+              sb.from('agents').select('id,name,title,phone,line_id,initials,color,avatar_url,photos,rating,prop_ids,bio').eq('is_active',true),
+              sb.from('portfolio').select('id,title,type,price,status,location,date,review,photo,photos').order('created_at',{ascending:false}),
+              sb.from('services').select('id,title,icon,desc,description,sort_order,is_active,color,badge').eq('is_active',true).order('sort_order',{ascending:true}),
+              sb.from('blogs').select('id,title,excerpt,content,cover_image,cover,photos,category,tags,author,is_published,sort_order,created_at,slug').eq('is_published',true).order('sort_order',{ascending:true})
             ]);
             let updated = false;
             if(a.data && a.data.length){ agents = a.data.map(mapAgent); agents.forEach(ag=>{ag.propIds=props.filter(p=>p.agentId===ag.id).map(p=>p.id);}); updated=true; console.log(`✅ Agents loaded: ${agents.length}`); }
@@ -8092,16 +8114,25 @@ function initAllCardSwipes(scopeEl) {
 
 // Observer — ดู grid/track ทั้งหมด เมื่อ render card ใหม่
 // listings-grid ใช้ scoped init เพื่อไม่บล็อก main thread
+// debounce: batch mutations — render 50 cards พร้อมกัน trigger แค่ 1 ครั้ง ไม่ใช่ 50 ครั้ง
+var _obsTimer = null;
+var _obsTargets = new Set();
+var _idle = window.requestIdleCallback || function(cb){ setTimeout(cb,50); };
 var _cardObserver = new MutationObserver(function(mutations){
-  var idle = window.requestIdleCallback || function(cb){ setTimeout(cb,50); };
-  mutations.forEach(function(m){
-    if(m.target && m.target.id === 'listings-grid'){
-      // listings: init เฉพาะ card ใหม่ใน grid นี้ — ไม่ touch card อื่น
-      idle(function(){ initAllCardSwipes(m.target); });
-    } else {
-      idle(function(){ initAllCardSwipes(m.target); });
-    }
-  });
+  mutations.forEach(function(m){ if(m.target) _obsTargets.add(m.target); });
+  clearTimeout(_obsTimer);
+  _obsTimer = setTimeout(function(){
+    var targets = Array.from(_obsTargets);
+    _obsTargets.clear();
+    _idle(function(){
+      if(targets.length === 1){
+        initAllCardSwipes(targets[0]);
+      } else {
+        // หลาย grid เปลี่ยนพร้อมกัน — init แบบ scoped ทีละ target
+        targets.forEach(function(t){ initAllCardSwipes(t); });
+      }
+    });
+  }, 100);
 });
 ['all-grid','rec-grid','new-grid','new-track','fav-page-grid',
  'blog-track','blog-grid','port-grid','agent-grid','osrv-track','gc-track',
@@ -8495,8 +8526,22 @@ async function renderNearbyProps(prop, container) {
   let frame = 0;
   let cycleDuration = 4800;
   let nightAlpha = 0;
+  let canvasVisible = true; // tracked by IntersectionObserver
+
+  // Pause animation when canvas is scrolled out of viewport
+  if(window.IntersectionObserver) {
+    new IntersectionObserver(entries => {
+      canvasVisible = entries[0].isIntersecting;
+    }, { threshold: 0 }).observe(canvas);
+  }
 
   function drawFrame() {
+    // Pause when tab is hidden or canvas is off-screen — saves CPU/GPU
+    // ใช้ setTimeout แทน rAF เมื่อ hidden/offscreen เพื่อไม่ให้ JS thread ตื่น 60fps โดยไม่จำเป็น
+    if(document.hidden || !canvasVisible) {
+      setTimeout(drawFrame, 500); // ตรวจสอบทุก 0.5s แทน 60fps
+      return;
+    }
     frame++;
     const cyclePos = (frame % cycleDuration) / cycleDuration;
     // Smooth ease function (sine)
@@ -8571,20 +8616,7 @@ async function renderNearbyProps(prop, container) {
   }
 })();
 
-// Update weather badge
-(function updateWeatherBadge() {
-  const LABELS = {windy:'💨 ลมพัดในกรุงเทพฯ', rain:'🌧️ ฝนตก กรุงเทพฯ', hot:'☀️ อากาศร้อน กรุงเทพฯ', cold:'❄️ อากาศเย็นสบาย'};
-  const order = ['windy','rain','hot','cold'];
-  let idx = 0;
-  function update() {
-    const lb = $('weather-label'), ic = $('weather-icon');
-    const full = LABELS[order[idx]]; 
-    if(lb && ic) { const parts = full.split(' '); ic.textContent = parts[0]; lb.textContent = parts.slice(1).join(' '); }
-    idx = (idx+1) % order.length;
-  }
-  update();
-  setInterval(update, 240000); // every 4 min
-})();
+// Weather badge removed — was showing fake/random weather data (misleading UX)
 
 // Counter animation for portfolio and other stat pages
 function animateCounter(el, target, duration=1600) {
@@ -12610,14 +12642,14 @@ function resetAdvFilter(){
         <div class="listings-count" style="font-size:13px;color:var(--tx2)">พบ <strong id="listings-total-count">0</strong> รายการ</div>
         <!-- Row 2: sort right-aligned -->
         <div style="display:flex;align-items:center;justify-content:flex-end;gap:8px">
-          <label style="font-size:12px;font-weight:600;color:var(--tx2)">เรียงโดย:</label>
+          <label style="font-size:12px;font-weight:600;color:var(--tx2)" data-i18n="ls.sort.label">เรียงโดย:</label>
           <select class="sort-select" id="listings-sort" onchange="listingsSortChange()">
-            <option value="default">แนะนำ</option>
-            <option value="price_asc">ราคาต่ำ → สูง</option>
-            <option value="price_desc">ราคาสูง → ต่ำ</option>
-            <option value="newest">ใหม่สุด</option>
-            <option value="oldest">เก่าสุด</option>
-            <option value="alpha">เรียงตัวอักษร</option>
+            <option value="default" data-i18n="ls.sort.default">แนะนำ</option>
+            <option value="price_asc" data-i18n="ls.sort.price_asc">ราคาต่ำ → สูง</option>
+            <option value="price_desc" data-i18n="ls.sort.price_desc">ราคาสูง → ต่ำ</option>
+            <option value="newest" data-i18n="ls.sort.newest">ใหม่สุด</option>
+            <option value="oldest" data-i18n="ls.sort.oldest">เก่าสุด</option>
+            <option value="alpha" data-i18n="ls.sort.alpha">เรียงตัวอักษร</option>
           </select>
         </div>
       </div>
@@ -12743,6 +12775,10 @@ function resetAdvFilter(){
     var DISMISS_DIST = 90;   // px down
     var DISMISS_VEL  = 0.45; // px/ms
 
+    /* AbortController เพื่อ cleanup listeners ได้ทันทีโดยไม่สะสม */
+    var ac = new AbortController();
+    sheet._dragAbort = function(){ ac.abort(); sheet._dragInited = false; delete sheet._dragAbort; };
+
     function getSheetHeight(){ return sheet.offsetHeight || 400; }
 
     /* drag handle = first child with drag class, or the header area */
@@ -12779,12 +12815,13 @@ function resetAdvFilter(){
       sheet.style.transition = '';
       if (overlayEl) { overlayEl.style.transition = ''; overlayEl.style.opacity = ''; }
       if (curY > DISMISS_DIST || velocity > DISMISS_VEL) {
-        /* animate out then close */
+        /* animate out then close — abort listeners ก่อน close */
         sheet.style.transition = 'transform .28s cubic-bezier(.32,.6,.56,1)';
         sheet.style.transform = 'translateY(110%)';
         setTimeout(function(){
           sheet.style.transform = '';
           sheet.style.transition = '';
+          if (sheet._dragAbort) sheet._dragAbort(); // cleanup listeners
           closeFn();
         }, 280);
       } else {
@@ -12794,9 +12831,9 @@ function resetAdvFilter(){
       curY = 0;
     }
 
-    handle.addEventListener('touchstart', onStart, {passive: true});
-    document.addEventListener('touchmove', function(e){ if(dragging) onMove(e); }, {passive: false});
-    document.addEventListener('touchend', onEnd, {passive: true});
+    handle.addEventListener('touchstart', onStart, {passive: true, signal: ac.signal});
+    document.addEventListener('touchmove', function(e){ if(dragging) onMove(e); }, {passive: false, signal: ac.signal});
+    document.addEventListener('touchend', onEnd, {passive: true, signal: ac.signal});
   }
 
   /* ── Wire up adv-sheet ── */
@@ -12812,6 +12849,11 @@ function resetAdvFilter(){
       var modal = document.getElementById(id);
       if (!modal || modal._dragInited) return;
       modal._dragInited = true; // prevent re-init
+
+      /* AbortController — cleanup listeners เมื่อ modal ถูกปิด */
+      var ac = new AbortController();
+      modal._dragAbort = function(){ ac.abort(); modal._dragInited = false; delete modal._dragAbort; };
+
       var overlay = modal.closest('.apply-overlay');
       var startY=0,startTime=0,curY=0,dragging=false;
       var DISMISS_DIST=80, DISMISS_VEL=0.4;
@@ -12833,20 +12875,25 @@ function resetAdvFilter(){
       }
       function onEnd(){
         if(!dragging) return; dragging=false;
-        var vel=(Date.now()-startTime)>0?curY/(Date.now()-startTime):0;
+        var elapsed=Date.now()-startTime;
+        var vel=elapsed>0?curY/elapsed:0;
         modal.style.transition='';
         if(overlay) overlay.style.background='';
         var type=id.replace('apply-','').replace('-modal','');
         if(curY>DISMISS_DIST||vel>DISMISS_VEL){
           modal.style.transition='transform .28s cubic-bezier(.32,.6,.56,1)';
           modal.style.transform='translateY(110%)';
-          setTimeout(function(){ modal.style.transform=''; modal.style.transition=''; closeApplyModal(type); },280);
+          setTimeout(function(){
+            modal.style.transform=''; modal.style.transition='';
+            if(modal._dragAbort) modal._dragAbort(); // cleanup listeners หลัง dismiss
+            closeApplyModal(type);
+          },280);
         } else { modal.style.transform=''; }
         curY=0;
       }
-      header.addEventListener('touchstart',onStart,{passive:true});
-      document.addEventListener('touchmove',function(e){if(dragging)onMove(e);},{passive:false});
-      document.addEventListener('touchend',onEnd,{passive:true});
+      header.addEventListener('touchstart',onStart,{passive:true, signal:ac.signal});
+      document.addEventListener('touchmove',function(e){if(dragging)onMove(e);},{passive:false, signal:ac.signal});
+      document.addEventListener('touchend',onEnd,{passive:true, signal:ac.signal});
     });
   }
 
@@ -12868,16 +12915,44 @@ function resetAdvFilter(){
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', tryInit);
   else tryInit();
+
   /* Also re-init when adv-sheet is opened (in case it wasn't in DOM at startup) */
   var _origOpenAdvSheet = window.openAdvSheet;
   window.openAdvSheet = function(){
     if(_origOpenAdvSheet) _origOpenAdvSheet();
     requestAnimationFrame(initAdvSheetDrag);
   };
+
+  /* Wrap closeAdvFilter — abort drag listeners เมื่อปิดด้วยปุ่ม × หรือ overlay */
+  var _origCloseAdvFilter = window.closeAdvFilter;
+  window.closeAdvFilter = function(){
+    var sheet = document.getElementById('adv-sheet');
+    if(sheet && sheet._dragAbort) sheet._dragAbort();
+    if(_origCloseAdvFilter) _origCloseAdvFilter();
+  };
+
+  /* Wrap closeQsSheet — abort drag listeners เมื่อปิด qs-mob-sheet */
+  var _origCloseQsSheet = window.closeQsSheet;
+  window.closeQsSheet = function(){
+    var sheet = document.getElementById('qs-mob-sheet');
+    if(sheet && sheet._dragAbort) sheet._dragAbort();
+    if(_origCloseQsSheet) _origCloseQsSheet();
+  };
+
   var _origOpenApply = window.openApplyModal;
   window.openApplyModal = function(type){
     if(_origOpenApply) _origOpenApply(type);
     requestAnimationFrame(initApplyDrag);
+  };
+
+  /* Wrap closeApplyModal — abort drag listeners เมื่อปิดด้วยปุ่ม × */
+  var _origCloseApply = window.closeApplyModal;
+  window.closeApplyModal = function(type){
+    ['apply-agent-modal','apply-other-modal'].forEach(function(id){
+      var modal = document.getElementById(id);
+      if(modal && modal._dragAbort) modal._dragAbort();
+    });
+    if(_origCloseApply) _origCloseApply(type);
   };
 })();
 </script>
@@ -12897,5 +12972,7 @@ function resetAdvFilter(){
   </div>
 </div>
 
+<!-- Supabase: defer แทน async — โหลดหลัง HTML parse เสร็จ ไม่มี race condition กับ initSB() -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 </body>
 </html>
