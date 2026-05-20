@@ -71,7 +71,7 @@
       },
       "image": "https://matchdoor.co/og-image.jpg",
       "description": "Matchdoor บริการซื้อขายเช่าอสังหาริมทรัพย์ทุกประเภท กรุงเทพมหานคร ใกล้ BTS MRT บ้านเดี่ยว คอนโด ทาวน์โฮม ที่ดิน ราคาดี ปรึกษาฟรี",
-      "telephone": "+66-XX-XXX-XXXX",
+      "telephone": "+66-61-589-7459",
       "areaServed": [
         {"@type": "City", "name": "กรุงเทพมหานคร", "sameAs": "https://www.wikidata.org/wiki/Q1861"},
         {"@type": "State", "name": "Thailand"}
@@ -370,8 +370,10 @@ nav{z-index:1000!important}
 .ls-ac-list .ac-sub{font-size:11px;color:var(--gr);margin-left:auto;white-space:nowrap}
 /* quick-search panel */
 .qs-group .qs-dd-panel{z-index:1060!important}
-</style>
-<style>
+
+/* ════════════════════════════════════════════════════
+   GLOBAL STYLES
+   ════════════════════════════════════════════════════ */
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
   /* Real Estate Psychology Palette */
@@ -580,10 +582,6 @@ nav{
 }
 .footer-logo-sub{font-size:8px;letter-spacing:0.8px;text-transform:uppercase;color:rgba(255,220,150,.4);margin-top:3px;font-family:'Kanit',sans-serif}
 
-@media(max-width:480px){
-  .logo-img-wrap{width:44px;height:44px;border-radius:11px}
-  .logo-word-main{font-size:18px}
-}
 .nav-links{display:flex;align-items:center;gap:2px;flex:1}
 .nl,.nav-dd-btn{padding:6px 10px;border-radius:8px;font-size:12.5px;font-weight:500;cursor:pointer;white-space:nowrap;color:rgba(240,236,227,.9);transition:.2s}
 .nl:hover,.nav-dd-btn:hover{background:rgba(255,255,255,.15);color:#fff}
@@ -2499,6 +2497,10 @@ footer::after{
 @media(max-width:600px){.pg-label{display:none}.pg-btn{padding:6px 8px;font-size:12px;min-width:30px}.pg-btn.pg-first,.pg-btn.pg-last{padding:6px 8px}}
 .pg-ellipsis{padding:7px 4px;color:var(--gr);font-size:14px;font-weight:700;cursor:default;user-select:none}
 .listings-search-bar{background:#fff;border-radius:12px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,.06);margin-bottom:16px}
+/* ── Drag-to-dismiss: Bottom Sheets ── */
+.adv-sheet-drag,.qs-mob-sheet-drag{cursor:grab}
+.adv-sheet-drag:active,.qs-mob-sheet-drag:active{cursor:grabbing}
+@media(max-width:600px){.apply-modal{touch-action:pan-x}}
 
 </style>
 </head>
@@ -2867,219 +2869,14 @@ footer::after{
     <button class="qs-dd-btn" onclick="toggleQsDD('qs-bts-dd',this)" data-panel="qs-bts-dd">
      <span class="qs-icon">🚈</span> BTS <i class="fas fa-chevron-down chevdown"></i>
     </button>
-    <div class="qs-dd-panel" id="qs-bts-dd">
-     <div class="qs-dd-sec" style="color:#0a8a3a">🟢 BTS สายสุขุมวิท — เหนือ (N1–N24) · 24 สถานี</div>
-     <button class="qs-opt" onclick="quickSearch('ราชเทวี BTS');closeQsDDs()">🚉 ราชเทวี (N1)</button>
-     <button class="qs-opt" onclick="quickSearch('พญาไท BTS');closeQsDDs()">🚉 พญาไท (N2)</button>
-     <button class="qs-opt" onclick="quickSearch('อนุสาวรีย์ชัยสมรภูมิ BTS');closeQsDDs()">🚉 อนุสาวรีย์ฯ (N3)</button>
-     <button class="qs-opt" onclick="quickSearch('สนามเป้า BTS');closeQsDDs()">🚉 สนามเป้า (N4)</button>
-     <button class="qs-opt" onclick="quickSearch('อารีย์ BTS');closeQsDDs()">🚉 อารีย์ (N5)</button>
-     <button class="qs-opt" onclick="quickSearch('สะพานควาย BTS');closeQsDDs()">🚉 สะพานควาย (N7)</button>
-     <button class="qs-opt" onclick="quickSearch('หมอชิต BTS');closeQsDDs()">🚉 หมอชิต (N8)</button>
-     <button class="qs-opt" onclick="quickSearch('ห้าแยกลาดพร้าว BTS');closeQsDDs()">🚉 ห้าแยกลาดพร้าว (N9)</button>
-     <button class="qs-opt" onclick="quickSearch('พหลโยธิน 24 BTS');closeQsDDs()">🚉 พหลโยธิน 24 (N10)</button>
-     <button class="qs-opt" onclick="quickSearch('รัชโยธิน BTS');closeQsDDs()">🚉 รัชโยธิน (N11)</button>
-     <button class="qs-opt" onclick="quickSearch('เสนานิคม BTS');closeQsDDs()">🚉 เสนานิคม (N12)</button>
-     <button class="qs-opt" onclick="quickSearch('มหาวิทยาลัยเกษตรศาสตร์ BTS');closeQsDDs()">🚉 ม.เกษตรศาสตร์ (N13)</button>
-     <button class="qs-opt" onclick="quickSearch('กรมป่าไม้ BTS');closeQsDDs()">🚉 กรมป่าไม้ (N14)</button>
-     <button class="qs-opt" onclick="quickSearch('บางบัว BTS');closeQsDDs()">🚉 บางบัว (N15)</button>
-     <button class="qs-opt" onclick="quickSearch('กรมทหารราบที่ 11 BTS');closeQsDDs()">🚉 กรมทหารราบที่ 11 (N16)</button>
-     <button class="qs-opt" onclick="quickSearch('วัดพระศรีมหาธาตุ BTS');closeQsDDs()">🚉 วัดพระศรีมหาธาตุ (N17)</button>
-     <button class="qs-opt" onclick="quickSearch('พหลโยธิน 59 BTS');closeQsDDs()">🚉 พหลโยธิน 59 (N18)</button>
-     <button class="qs-opt" onclick="quickSearch('สายหยุด BTS');closeQsDDs()">🚉 สายหยุด (N19)</button>
-     <button class="qs-opt" onclick="quickSearch('สะพานใหม่ BTS');closeQsDDs()">🚉 สะพานใหม่ (N20)</button>
-     <button class="qs-opt" onclick="quickSearch('โรงพยาบาลภูมิพลอดุลยเดช BTS');closeQsDDs()">🚉 รพ.ภูมิพลอดุลยเดช (N21)</button>
-     <button class="qs-opt" onclick="quickSearch('พิพิธภัณฑ์กองทัพอากาศ BTS');closeQsDDs()">🚉 พิพิธภัณฑ์กองทัพอากาศ (N22)</button>
-     <button class="qs-opt" onclick="quickSearch('แยก คปอ. BTS');closeQsDDs()">🚉 แยก คปอ. (N23)</button>
-     <button class="qs-opt" onclick="quickSearch('คูคต BTS');closeQsDDs()">🚉 คูคต (N24)</button>
-     <div class="qs-dd-sec" style="color:#0a8a3a">🟢 BTS สายสุขุมวิท — กลาง & ตะวันออก (CEN–E23) · 24 สถานี</div>
-     <button class="qs-opt" onclick="quickSearch('สยาม BTS');closeQsDDs()">🚉 สยาม (CEN)</button>
-     <button class="qs-opt" onclick="quickSearch('ชิดลม BTS');closeQsDDs()">🚉 ชิดลม (E1)</button>
-     <button class="qs-opt" onclick="quickSearch('เพลินจิต BTS');closeQsDDs()">🚉 เพลินจิต (E2)</button>
-     <button class="qs-opt" onclick="quickSearch('นานา BTS');closeQsDDs()">🚉 นานา (E3)</button>
-     <button class="qs-opt" onclick="quickSearch('อโศก BTS');closeQsDDs()">🚉 อโศก (E4)</button>
-     <button class="qs-opt" onclick="quickSearch('พร้อมพงษ์ BTS');closeQsDDs()">🚉 พร้อมพงษ์ (E5)</button>
-     <button class="qs-opt" onclick="quickSearch('ทองหล่อ BTS');closeQsDDs()">🚉 ทองหล่อ (E6)</button>
-     <button class="qs-opt" onclick="quickSearch('เอกมัย BTS');closeQsDDs()">🚉 เอกมัย (E7)</button>
-     <button class="qs-opt" onclick="quickSearch('พระโขนง BTS');closeQsDDs()">🚉 พระโขนง (E8)</button>
-     <button class="qs-opt" onclick="quickSearch('อ่อนนุช BTS');closeQsDDs()">🚉 อ่อนนุช (E9)</button>
-     <button class="qs-opt" onclick="quickSearch('บางจาก BTS');closeQsDDs()">🚉 บางจาก (E10)</button>
-     <button class="qs-opt" onclick="quickSearch('ปุณณวิถี BTS');closeQsDDs()">🚉 ปุณณวิถี (E11)</button>
-     <button class="qs-opt" onclick="quickSearch('อุดมสุข BTS');closeQsDDs()">🚉 อุดมสุข (E12)</button>
-     <button class="qs-opt" onclick="quickSearch('บางนา BTS');closeQsDDs()">🚉 บางนา (E13)</button>
-     <button class="qs-opt" onclick="quickSearch('แบริ่ง BTS');closeQsDDs()">🚉 แบริ่ง (E14)</button>
-     <button class="qs-opt" onclick="quickSearch('สำโรง BTS');closeQsDDs()">🚉 สำโรง (E15)</button>
-     <button class="qs-opt" onclick="quickSearch('ปู่เจ้า BTS');closeQsDDs()">🚉 ปู่เจ้า (E16)</button>
-     <button class="qs-opt" onclick="quickSearch('ช้างเอราวัณ BTS');closeQsDDs()">🚉 ช้างเอราวัณ (E17)</button>
-     <button class="qs-opt" onclick="quickSearch('โรงเรียนนายเรือ BTS');closeQsDDs()">🚉 โรงเรียนนายเรือ (E18)</button>
-     <button class="qs-opt" onclick="quickSearch('ปากน้ำ BTS');closeQsDDs()">🚉 ปากน้ำ (E19)</button>
-     <button class="qs-opt" onclick="quickSearch('ศรีนครินทร์ BTS');closeQsDDs()">🚉 ศรีนครินทร์ (E20)</button>
-     <button class="qs-opt" onclick="quickSearch('แพรกษา BTS');closeQsDDs()">🚉 แพรกษา (E21)</button>
-     <button class="qs-opt" onclick="quickSearch('สายลวด BTS');closeQsDDs()">🚉 สายลวด (E22)</button>
-     <button class="qs-opt" onclick="quickSearch('เคหะฯ BTS');closeQsDDs()">🚉 เคหะฯ (E23)</button>
-     <div class="qs-dd-sec" style="color:#0a8a3a">🟢 BTS สายสีลม (W1, S1–S12) · 13 สถานี</div>
-     <button class="qs-opt" onclick="quickSearch('สนามกีฬาแห่งชาติ BTS');closeQsDDs()">🚉 สนามกีฬาแห่งชาติ (W1)</button>
-     <button class="qs-opt" onclick="quickSearch('ราชดำริ BTS');closeQsDDs()">🚉 ราชดำริ (S1)</button>
-     <button class="qs-opt" onclick="quickSearch('ศาลาแดง BTS');closeQsDDs()">🚉 ศาลาแดง (S2)</button>
-     <button class="qs-opt" onclick="quickSearch('ช่องนนทรี BTS');closeQsDDs()">🚉 ช่องนนทรี (S3)</button>
-     <button class="qs-opt" onclick="quickSearch('เซนต์หลุยส์ BTS');closeQsDDs()">🚉 เซนต์หลุยส์ (S4)</button>
-     <button class="qs-opt" onclick="quickSearch('สุรศักดิ์ BTS');closeQsDDs()">🚉 สุรศักดิ์ (S5)</button>
-     <button class="qs-opt" onclick="quickSearch('สะพานตากสิน BTS');closeQsDDs()">🚉 สะพานตากสิน (S6)</button>
-     <button class="qs-opt" onclick="quickSearch('กรุงธนบุรี BTS');closeQsDDs()">🚉 กรุงธนบุรี (S7)</button>
-     <button class="qs-opt" onclick="quickSearch('วงเวียนใหญ่ BTS');closeQsDDs()">🚉 วงเวียนใหญ่ (S8)</button>
-     <button class="qs-opt" onclick="quickSearch('โพธิ์นิมิตร BTS');closeQsDDs()">🚉 โพธิ์นิมิตร (S9)</button>
-     <button class="qs-opt" onclick="quickSearch('ตลาดพลู BTS');closeQsDDs()">🚉 ตลาดพลู (S10)</button>
-     <button class="qs-opt" onclick="quickSearch('วุฒากาศ BTS');closeQsDDs()">🚉 วุฒากาศ (S11)</button>
-     <button class="qs-opt" onclick="quickSearch('บางหว้า BTS');closeQsDDs()">🚉 บางหว้า (S12)</button>
-     <div class="qs-dd-sec" style="color:#c8922a">🟤 BTS สายสีทอง · 3 สถานี (กรุงธนบุรี–คลองสาน)</div>
-     <button class="qs-opt" onclick="quickSearch('กรุงธนบุรี สีทอง BTS');closeQsDDs()">🚉 กรุงธนบุรี (G1)</button>
-     <button class="qs-opt" onclick="quickSearch('เจริญนคร BTS สีทอง');closeQsDDs()">🚉 เจริญนคร (G2)</button>
-     <button class="qs-opt" onclick="quickSearch('คลองสาน BTS สีทอง');closeQsDDs()">🚉 คลองสาน (G3)</button>
-     <div class="qs-dd-sec" style="color:#cc2200">🔴 SRT สายสีแดงเข้ม · 10 สถานี (กลางกรุงเทพอภิวัฒน์–รังสิต)</div>
-     <button class="qs-opt" onclick="quickSearch('กลางกรุงเทพอภิวัฒน์ SRT');closeQsDDs()">🚇 กลางกรุงเทพอภิวัฒน์ (RN01)</button>
-     <button class="qs-opt" onclick="quickSearch('จตุจักร SRT สีแดง');closeQsDDs()">🚇 จตุจักร (RN02)</button>
-     <button class="qs-opt" onclick="quickSearch('วัดเสมียนนารี SRT');closeQsDDs()">🚇 วัดเสมียนนารี (RN03)</button>
-     <button class="qs-opt" onclick="quickSearch('บางเขน SRT');closeQsDDs()">🚇 บางเขน (RN04)</button>
-     <button class="qs-opt" onclick="quickSearch('ทุ่งสองห้อง SRT');closeQsDDs()">🚇 ทุ่งสองห้อง (RN05)</button>
-     <button class="qs-opt" onclick="quickSearch('หลักสี่ SRT');closeQsDDs()">🚇 หลักสี่ (RN06)</button>
-     <button class="qs-opt" onclick="quickSearch('การเคหะ SRT');closeQsDDs()">🚇 การเคหะ (RN07)</button>
-     <button class="qs-opt" onclick="quickSearch('ดอนเมือง SRT');closeQsDDs()">🚇 ดอนเมือง (RN08)</button>
-     <button class="qs-opt" onclick="quickSearch('หลักหก SRT');closeQsDDs()">🚇 หลักหก (RN09)</button>
-     <button class="qs-opt" onclick="quickSearch('รังสิต SRT');closeQsDDs()">🚇 รังสิต (RN10)</button>
-     <div class="qs-dd-sec" style="color:#cc6644">🔴 SRT สายสีแดงอ่อน · 4 สถานี (กลางกรุงเทพอภิวัฒน์–ตลิ่งชัน)</div>
-     <button class="qs-opt" onclick="quickSearch('กลางกรุงเทพอภิวัฒน์ SRT ตลิ่งชัน');closeQsDDs()">🚇 กลางกรุงเทพอภิวัฒน์ (RW01)</button>
-     <button class="qs-opt" onclick="quickSearch('บางซ่อน SRT');closeQsDDs()">🚇 บางซ่อน (RW02)</button>
-     <button class="qs-opt" onclick="quickSearch('บางบำหรุ SRT');closeQsDDs()">🚇 บางบำหรุ (RW05)</button>
-     <button class="qs-opt" onclick="quickSearch('ตลิ่งชัน SRT');closeQsDDs()">🚇 ตลิ่งชัน (RW06)</button>
-     <div class="qs-dd-sec" style="color:#555">✈️ Airport Rail Link (ARL) · 8 สถานี (สุวรรณภูมิ–พญาไท)</div>
-     <button class="qs-opt" onclick="quickSearch('สุวรรณภูมิ ARL');closeQsDDs()">🚈 สุวรรณภูมิ (A1)</button>
-     <button class="qs-opt" onclick="quickSearch('ลาดกระบัง ARL');closeQsDDs()">🚈 ลาดกระบัง (A2)</button>
-     <button class="qs-opt" onclick="quickSearch('บ้านทับช้าง ARL');closeQsDDs()">🚈 บ้านทับช้าง (A3)</button>
-     <button class="qs-opt" onclick="quickSearch('หัวหมาก ARL');closeQsDDs()">🚈 หัวหมาก (A4)</button>
-     <button class="qs-opt" onclick="quickSearch('รามคำแหง ARL');closeQsDDs()">🚈 รามคำแหง (A5)</button>
-     <button class="qs-opt" onclick="quickSearch('มักกะสัน ARL');closeQsDDs()">🚈 มักกะสัน (A6)</button>
-     <button class="qs-opt" onclick="quickSearch('ราชปรารภ ARL');closeQsDDs()">🚈 ราชปรารภ (A7)</button>
-     <button class="qs-opt" onclick="quickSearch('พญาไท ARL');closeQsDDs()">🚈 พญาไท (A8)</button>
-    </div>
+    <div class="qs-dd-panel" id="qs-bts-dd"><!-- rendered by renderTransitButtons() --></div>
    </div>
    <!-- 🚇 MRT -->
    <div class="qs-group qs-group-transit" id="qs-group-mrt">
     <button class="qs-dd-btn" onclick="toggleQsDD('qs-mrt-dd',this)" data-panel="qs-mrt-dd">
      <span class="qs-icon">🚇</span> MRT <i class="fas fa-chevron-down chevdown"></i>
     </button>
-    <div class="qs-dd-panel" id="qs-mrt-dd">
-     <div class="qs-dd-sec" style="color:#1a5fb4">🔵 MRT สายน้ำเงิน · 38 สถานี (ท่าพระ–หลักสอง วงแหวน)</div>
-     <button class="qs-opt" onclick="quickSearch('หลักสอง MRT');closeQsDDs()">🚇 หลักสอง (BL38)</button>
-     <button class="qs-opt" onclick="quickSearch('บางแค MRT');closeQsDDs()">🚇 บางแค (BL37)</button>
-     <button class="qs-opt" onclick="quickSearch('ภาษีเจริญ MRT');closeQsDDs()">🚇 ภาษีเจริญ (BL36)</button>
-     <button class="qs-opt" onclick="quickSearch('เพชรเกษม 48 MRT');closeQsDDs()">🚇 เพชรเกษม 48 (BL35)</button>
-     <button class="qs-opt" onclick="quickSearch('บางหว้า MRT');closeQsDDs()">🚇 บางหว้า (BL34)</button>
-     <button class="qs-opt" onclick="quickSearch('บางไผ่ MRT');closeQsDDs()">🚇 บางไผ่ (BL33)</button>
-     <button class="qs-opt" onclick="quickSearch('ท่าพระ MRT');closeQsDDs()">🚇 ท่าพระ (BL01)</button>
-     <button class="qs-opt" onclick="quickSearch('อิสรภาพ MRT');closeQsDDs()">🚇 อิสรภาพ (BL32)</button>
-     <button class="qs-opt" onclick="quickSearch('สนามไชย MRT');closeQsDDs()">🚇 สนามไชย (BL31)</button>
-     <button class="qs-opt" onclick="quickSearch('สามยอด MRT');closeQsDDs()">🚇 สามยอด (BL30)</button>
-     <button class="qs-opt" onclick="quickSearch('วัดมังกร MRT');closeQsDDs()">🚇 วัดมังกร (BL29)</button>
-     <button class="qs-opt" onclick="quickSearch('หัวลำโพง MRT');closeQsDDs()">🚇 หัวลำโพง (BL28)</button>
-     <button class="qs-opt" onclick="quickSearch('สามย่าน MRT');closeQsDDs()">🚇 สามย่าน (BL27)</button>
-     <button class="qs-opt" onclick="quickSearch('สีลม MRT');closeQsDDs()">🚇 สีลม (BL26)</button>
-     <button class="qs-opt" onclick="quickSearch('ลุมพินี MRT');closeQsDDs()">🚇 ลุมพินี (BL25)</button>
-     <button class="qs-opt" onclick="quickSearch('คลองเตย MRT');closeQsDDs()">🚇 คลองเตย (BL24)</button>
-     <button class="qs-opt" onclick="quickSearch('ศูนย์การประชุมแห่งชาติสิริกิติ์ MRT');closeQsDDs()">🚇 ศูนย์ฯ สิริกิติ์ (BL23)</button>
-     <button class="qs-opt" onclick="quickSearch('สุขุมวิท MRT');closeQsDDs()">🚇 สุขุมวิท (BL22)</button>
-     <button class="qs-opt" onclick="quickSearch('เพชรบุรี MRT');closeQsDDs()">🚇 เพชรบุรี (BL21)</button>
-     <button class="qs-opt" onclick="quickSearch('พระราม 9 MRT');closeQsDDs()">🚇 พระราม 9 (BL20)</button>
-     <button class="qs-opt" onclick="quickSearch('ศูนย์วัฒนธรรม MRT');closeQsDDs()">🚇 ศูนย์วัฒนธรรมฯ (BL19)</button>
-     <button class="qs-opt" onclick="quickSearch('ห้วยขวาง MRT');closeQsDDs()">🚇 ห้วยขวาง (BL18)</button>
-     <button class="qs-opt" onclick="quickSearch('สุทธิสาร MRT');closeQsDDs()">🚇 สุทธิสาร (BL17)</button>
-     <button class="qs-opt" onclick="quickSearch('รัชดาภิเษก MRT');closeQsDDs()">🚇 รัชดาภิเษก (BL16)</button>
-     <button class="qs-opt" onclick="quickSearch('ลาดพร้าว MRT');closeQsDDs()">🚇 ลาดพร้าว (BL15)</button>
-     <button class="qs-opt" onclick="quickSearch('พหลโยธิน MRT');closeQsDDs()">🚇 พหลโยธิน (BL14)</button>
-     <button class="qs-opt" onclick="quickSearch('สวนจตุจักร MRT');closeQsDDs()">🚇 สวนจตุจักร (BL13)</button>
-     <button class="qs-opt" onclick="quickSearch('กำแพงเพชร MRT');closeQsDDs()">🚇 กำแพงเพชร (BL12)</button>
-     <button class="qs-opt" onclick="quickSearch('บางซื่อ MRT');closeQsDDs()">🚇 บางซื่อ (BL11)</button>
-     <button class="qs-opt" onclick="quickSearch('เตาปูน MRT');closeQsDDs()">🚇 เตาปูน (BL10)</button>
-     <button class="qs-opt" onclick="quickSearch('บางโพ MRT');closeQsDDs()">🚇 บางโพ (BL09)</button>
-     <button class="qs-opt" onclick="quickSearch('บางอ้อ MRT');closeQsDDs()">🚇 บางอ้อ (BL08)</button>
-     <button class="qs-opt" onclick="quickSearch('บางพลัด MRT');closeQsDDs()">🚇 บางพลัด (BL07)</button>
-     <button class="qs-opt" onclick="quickSearch('สิรินธร MRT');closeQsDDs()">🚇 สิรินธร (BL06)</button>
-     <button class="qs-opt" onclick="quickSearch('บางยี่ขัน MRT');closeQsDDs()">🚇 บางยี่ขัน (BL05)</button>
-     <button class="qs-opt" onclick="quickSearch('บางขุนนนท์ MRT');closeQsDDs()">🚇 บางขุนนนท์ (BL04)</button>
-     <button class="qs-opt" onclick="quickSearch('ไฟฉาย MRT');closeQsDDs()">🚇 ไฟฉาย (BL03)</button>
-     <button class="qs-opt" onclick="quickSearch('จรัญฯ 13 MRT');closeQsDDs()">🚇 จรัญฯ 13 (BL02)</button>
-     <div class="qs-dd-sec" style="color:#7b3fa3">🟣 MRT สายสีม่วง · 16 สถานี (เตาปูน–คลองบางไผ่)</div>
-     <button class="qs-opt" onclick="quickSearch('คลองบางไผ่ MRT สีม่วง');closeQsDDs()">🚇 คลองบางไผ่ (PP01)</button>
-     <button class="qs-opt" onclick="quickSearch('ตลาดบางใหญ่ MRT');closeQsDDs()">🚇 ตลาดบางใหญ่ (PP02)</button>
-     <button class="qs-opt" onclick="quickSearch('สามแยกบางใหญ่ MRT');closeQsDDs()">🚇 สามแยกบางใหญ่ (PP03)</button>
-     <button class="qs-opt" onclick="quickSearch('บางพลู MRT');closeQsDDs()">🚇 บางพลู (PP04)</button>
-     <button class="qs-opt" onclick="quickSearch('บางรักใหญ่ MRT');closeQsDDs()">🚇 บางรักใหญ่ (PP05)</button>
-     <button class="qs-opt" onclick="quickSearch('บางรักน้อยท่าอิฐ MRT');closeQsDDs()">🚇 บางรักน้อยท่าอิฐ (PP06)</button>
-     <button class="qs-opt" onclick="quickSearch('ไทรม้า MRT');closeQsDDs()">🚇 ไทรม้า (PP07)</button>
-     <button class="qs-opt" onclick="quickSearch('สะพานพระนั่งเกล้า MRT');closeQsDDs()">🚇 สะพานพระนั่งเกล้า (PP08)</button>
-     <button class="qs-opt" onclick="quickSearch('แยกนนทบุรี 1 MRT');closeQsDDs()">🚇 แยกนนทบุรี 1 (PP09)</button>
-     <button class="qs-opt" onclick="quickSearch('บางกระสอ MRT');closeQsDDs()">🚇 บางกระสอ (PP10)</button>
-     <button class="qs-opt" onclick="quickSearch('ศูนย์ราชการนนทบุรี MRT');closeQsDDs()">🚇 ศูนย์ราชการนนทบุรี (PP11)</button>
-     <button class="qs-opt" onclick="quickSearch('กระทรวงสาธารณสุข MRT');closeQsDDs()">🚇 กระทรวงสาธารณสุข (PP12)</button>
-     <button class="qs-opt" onclick="quickSearch('แยกติวานนท์ MRT');closeQsDDs()">🚇 แยกติวานนท์ (PP13)</button>
-     <button class="qs-opt" onclick="quickSearch('วงศ์สว่าง MRT');closeQsDDs()">🚇 วงศ์สว่าง (PP14)</button>
-     <button class="qs-opt" onclick="quickSearch('บางซ่อน MRT');closeQsDDs()">🚇 บางซ่อน (PP15)</button>
-     <button class="qs-opt" onclick="quickSearch('เตาปูน MRT สีม่วง');closeQsDDs()">🚇 เตาปูน (PP16)</button>
-     <div class="qs-dd-sec" style="color:#d63384">🩷 MRT สายสีชมพู · 30 สถานี (ศูนย์ราชการนนทบุรี–มีนบุรี)</div>
-     <button class="qs-opt" onclick="quickSearch('ศูนย์ราชการนนทบุรี MRT สีชมพู');closeQsDDs()">🚇 ศูนย์ราชการนนทบุรี (PK01)</button>
-     <button class="qs-opt" onclick="quickSearch('แคราย MRT สีชมพู');closeQsDDs()">🚇 แคราย (PK02)</button>
-     <button class="qs-opt" onclick="quickSearch('สนามบินน้ำ MRT');closeQsDDs()">🚇 สนามบินน้ำ (PK03)</button>
-     <button class="qs-opt" onclick="quickSearch('สามัคคี MRT');closeQsDDs()">🚇 สามัคคี (PK04)</button>
-     <button class="qs-opt" onclick="quickSearch('กรมชลประทาน MRT');closeQsDDs()">🚇 กรมชลประทาน (PK05)</button>
-     <button class="qs-opt" onclick="quickSearch('แยกปากเกร็ด MRT');closeQsDDs()">🚇 แยกปากเกร็ด (PK06)</button>
-     <button class="qs-opt" onclick="quickSearch('เลี่ยงเมืองปากเกร็ด MRT');closeQsDDs()">🚇 เลี่ยงเมืองปากเกร็ด (PK07)</button>
-     <button class="qs-opt" onclick="quickSearch('แจ้งวัฒนะ-ปากเกร็ด 28 MRT');closeQsDDs()">🚇 แจ้งวัฒนะ-ปากเกร็ด 28 (PK08)</button>
-     <button class="qs-opt" onclick="quickSearch('ศรีรัช MRT');closeQsDDs()">🚇 ศรีรัช (PK09)</button>
-     <button class="qs-opt" onclick="quickSearch('เมืองทองธานี MRT');closeQsDDs()">🚇 เมืองทองธานี (PK10)</button>
-     <button class="qs-opt" onclick="quickSearch('แจ้งวัฒนะ 14 MRT');closeQsDDs()">🚇 แจ้งวัฒนะ 14 (PK11)</button>
-     <button class="qs-opt" onclick="quickSearch('ศูนย์ราชการเฉลิมพระเกียรติ MRT');closeQsDDs()">🚇 ศูนย์ราชการเฉลิมพระเกียรติ (PK12)</button>
-     <button class="qs-opt" onclick="quickSearch('โทรคมนาคมแห่งชาติ MRT');closeQsDDs()">🚇 โทรคมนาคมแห่งชาติ (PK13)</button>
-     <button class="qs-opt" onclick="quickSearch('หลักสี่ MRT สีชมพู');closeQsDDs()">🚇 หลักสี่ (PK14)</button>
-     <button class="qs-opt" onclick="quickSearch('ราชภัฏพระนคร MRT');closeQsDDs()">🚇 ราชภัฏพระนคร (PK15)</button>
-     <button class="qs-opt" onclick="quickSearch('วัดพระศรีมหาธาตุ MRT สีชมพู');closeQsDDs()">🚇 วัดพระศรีมหาธาตุ (PK16)</button>
-     <button class="qs-opt" onclick="quickSearch('รามอินทรา 3 MRT');closeQsDDs()">🚇 รามอินทรา 3 (PK17)</button>
-     <button class="qs-opt" onclick="quickSearch('ลาดปลาเค้า MRT');closeQsDDs()">🚇 ลาดปลาเค้า (PK18)</button>
-     <button class="qs-opt" onclick="quickSearch('รามอินทรา กม. 4 MRT');closeQsDDs()">🚇 รามอินทรา กม. 4 (PK19)</button>
-     <button class="qs-opt" onclick="quickSearch('มัยลาภ MRT');closeQsDDs()">🚇 มัยลาภ (PK20)</button>
-     <button class="qs-opt" onclick="quickSearch('วัชรพล MRT');closeQsDDs()">🚇 วัชรพล (PK21)</button>
-     <button class="qs-opt" onclick="quickSearch('รามอินทรา กม. 6 MRT');closeQsDDs()">🚇 รามอินทรา กม. 6 (PK22)</button>
-     <button class="qs-opt" onclick="quickSearch('คู้บอน MRT');closeQsDDs()">🚇 คู้บอน (PK23)</button>
-     <button class="qs-opt" onclick="quickSearch('รามอินทรา กม. 9 MRT');closeQsDDs()">🚇 รามอินทรา กม. 9 (PK24)</button>
-     <button class="qs-opt" onclick="quickSearch('วงแหวนรามอินทรา MRT');closeQsDDs()">🚇 วงแหวนรามอินทรา (PK25)</button>
-     <button class="qs-opt" onclick="quickSearch('นพรัตน์ MRT');closeQsDDs()">🚇 นพรัตน์ (PK26)</button>
-     <button class="qs-opt" onclick="quickSearch('บางชัน MRT');closeQsDDs()">🚇 บางชัน (PK27)</button>
-     <button class="qs-opt" onclick="quickSearch('เศรษฐบุตรบำเพ็ญ MRT');closeQsDDs()">🚇 เศรษฐบุตรบำเพ็ญ (PK28)</button>
-     <button class="qs-opt" onclick="quickSearch('ตลาดมีนบุรี MRT');closeQsDDs()">🚇 ตลาดมีนบุรี (PK29)</button>
-     <button class="qs-opt" onclick="quickSearch('มีนบุรี MRT สีชมพู');closeQsDDs()">🚇 มีนบุรี (PK30)</button>
-     <div class="qs-dd-sec" style="color:#c8960a">🟡 MRT สายสีเหลือง · 23 สถานี (ลาดพร้าว–สำโรง)</div>
-     <button class="qs-opt" onclick="quickSearch('ลาดพร้าว MRT สีเหลือง');closeQsDDs()">🚇 ลาดพร้าว (YL01)</button>
-     <button class="qs-opt" onclick="quickSearch('ภาวนา MRT สีเหลือง');closeQsDDs()">🚇 ภาวนา (YL02)</button>
-     <button class="qs-opt" onclick="quickSearch('โชคชัย 4 MRT');closeQsDDs()">🚇 โชคชัย 4 (YL03)</button>
-     <button class="qs-opt" onclick="quickSearch('ลาดพร้าว 71 MRT');closeQsDDs()">🚇 ลาดพร้าว 71 (YL04)</button>
-     <button class="qs-opt" onclick="quickSearch('ลาดพร้าว 83 MRT');closeQsDDs()">🚇 ลาดพร้าว 83 (YL05)</button>
-     <button class="qs-opt" onclick="quickSearch('มหาดไทย MRT สีเหลือง');closeQsDDs()">🚇 มหาดไทย (YL06)</button>
-     <button class="qs-opt" onclick="quickSearch('ลาดพร้าว 101 MRT');closeQsDDs()">🚇 ลาดพร้าว 101 (YL07)</button>
-     <button class="qs-opt" onclick="quickSearch('บางกะปิ MRT สีเหลือง');closeQsDDs()">🚇 บางกะปิ (YL08)</button>
-     <button class="qs-opt" onclick="quickSearch('แยกลำสาลี MRT');closeQsDDs()">🚇 แยกลำสาลี (YL09)</button>
-     <button class="qs-opt" onclick="quickSearch('ศรีกรีฑา MRT');closeQsDDs()">🚇 ศรีกรีฑา (YL10)</button>
-     <button class="qs-opt" onclick="quickSearch('หัวหมาก MRT สีเหลือง');closeQsDDs()">🚇 หัวหมาก (YL11)</button>
-     <button class="qs-opt" onclick="quickSearch('กลันตัน MRT');closeQsDDs()">🚇 กลันตัน (YL12)</button>
-     <button class="qs-opt" onclick="quickSearch('ศรีนุช MRT');closeQsDDs()">🚇 ศรีนุช (YL13)</button>
-     <button class="qs-opt" onclick="quickSearch('ศรีนครินทร์ 38 MRT');closeQsDDs()">🚇 ศรีนครินทร์ 38 (YL14)</button>
-     <button class="qs-opt" onclick="quickSearch('สวนหลวง ร.9 MRT');closeQsDDs()">🚇 สวนหลวง ร.9 (YL15)</button>
-     <button class="qs-opt" onclick="quickSearch('ศรีอุดม MRT');closeQsDDs()">🚇 ศรีอุดม (YL16)</button>
-     <button class="qs-opt" onclick="quickSearch('ศรีเอี่ยม MRT');closeQsDDs()">🚇 ศรีเอี่ยม (YL17)</button>
-     <button class="qs-opt" onclick="quickSearch('ศรีลาซาล MRT');closeQsDDs()">🚇 ศรีลาซาล (YL18)</button>
-     <button class="qs-opt" onclick="quickSearch('ศรีแบริ่ง MRT');closeQsDDs()">🚇 ศรีแบริ่ง (YL19)</button>
-     <button class="qs-opt" onclick="quickSearch('ศรีด่าน MRT');closeQsDDs()">🚇 ศรีด่าน (YL20)</button>
-     <button class="qs-opt" onclick="quickSearch('ศรีเทพา MRT');closeQsDDs()">🚇 ศรีเทพา (YL21)</button>
-     <button class="qs-opt" onclick="quickSearch('ทิพวัล MRT');closeQsDDs()">🚇 ทิพวัล (YL22)</button>
-     <button class="qs-opt" onclick="quickSearch('สำโรง MRT สีเหลือง');closeQsDDs()">🚇 สำโรง (YL23)</button>
-    </div>
+    <div class="qs-dd-panel" id="qs-mrt-dd"><!-- rendered by renderTransitButtons() --></div>
    </div>
    </div><!-- end qs-transit-wrap -->
    <!-- 🎓 มหาวิทยาลัย removed -->
@@ -3757,7 +3554,7 @@ function closeGmapPopup(){
 
       <div class="highlight-box">
         <strong>📧 ฝ่ายกฎหมาย:</strong> legal@matchdoor.co<br>
-        <strong>📞 โทร:</strong> 061-589-xxxx<br>
+        <strong>📞 โทร:</strong> 061-589-7459<br>
         <strong>📍 ที่อยู่:</strong> 123 ถนนสุขุมวิท แขวงคลองเตย กรุงเทพฯ 10110
       </div>
       <p style="font-size:11px;margin-top:12px;opacity:.6">อัปเดตล่าสุด: มกราคม 2568 | อ้างอิง: ป.พ.พ., พ.ร.บ.คุ้มครองผู้บริโภค พ.ศ. 2522, พ.ร.บ.ว่าด้วยธุรกรรมทางอิเล็กทรอนิกส์ พ.ศ. 2544</p>
@@ -3940,7 +3737,7 @@ const C = {
   LINE:'@matchdoor',                  // 🔧 [CONFIG-14] LINE ID
   FB:'https://facebook.com/matchdoor.official', // 🔧 [CONFIG-15] Facebook URL
   YT:'https://www.youtube.com/embed/VUQfT3gNT3g?si=WDXL3fAOPfFaeVFb', // 🔧 [CONFIG-16] YouTube embed URL
-  COPYRIGHT:'© 2569 Matchdoor — สงวนลิขสิทธิ์' // 🔧 [CONFIG-17] ข้อความ copyright
+  COPYRIGHT:'© ' + new Date().getFullYear() + ' Matchdoor — สงวนลิขสิทธิ์' // 🔧 [CONFIG-17] ข้อความ copyright (dynamic year ค.ศ.)
 };
 
 // 🖼️ SUPABASE STORAGE HELPER
@@ -8646,7 +8443,18 @@ function animateCounter(el, target, duration=1600) {
 }
 
 function triggerPageCounters(pageId) {
+  // ถ้าข้อมูลจริงพร้อมแล้ว ให้ syncAllStats() จัดการตัวเลขแทน
+  // เพื่อป้องกัน data-target mock ใน HTML ทับตัวเลขจริงจาก Supabase
+  if(window._dataReady && typeof syncAllStats === 'function') {
+    syncAllStats();
+    return;
+  }
   setTimeout(() => {
+    // double-check อีกครั้งหลัง timeout — อาจ loadData เสร็จระหว่างรอ
+    if(window._dataReady && typeof syncAllStats === 'function') {
+      syncAllStats();
+      return;
+    }
     const page = document.getElementById('page-' + pageId);
     if(!page) return;
     page.querySelectorAll('.suf-num[data-target]').forEach(el => {
@@ -8662,6 +8470,13 @@ function initCounterObserver() {
   const obs = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if(!entry.isIntersecting) return;
+      // ถ้าข้อมูลจริงพร้อมแล้ว ให้ syncAllStats() จัดการแทน
+      // ป้องกัน Observer ยิง data-target mock ทับตัวเลขจริงจาก Supabase
+      if(window._dataReady && typeof syncAllStats === 'function') {
+        obs.disconnect();
+        syncAllStats();
+        return;
+      }
       const card = entry.target;
       card.querySelectorAll('.suf-num[data-target]').forEach(el => {
         const target = parseInt(el.getAttribute('data-target'), 10);
@@ -9347,7 +9162,7 @@ const UI_TEXT = {
     /* footer province links */
     'ft.prov.bkk':'กรุงเทพฯ','ft.prov.nnt':'นนทบุรี','ft.prov.ptm':'ปทุมธานี',
     'ft.prov.smk':'สมุทรปราการ','ft.prov.cbl':'ชลบุรี','ft.prov.pkt':'ภูเก็ต',
-    'ft.copy':'© 2569 Matchdoor. สงวนลิขสิทธิ์ทุกประการ',
+    'ft.copy':'© ' + new Date().getFullYear() + ' Matchdoor. สงวนลิขสิทธิ์ทุกประการ',
     /* deposit / wish forms */
     'form.dep.title':'ฝากทรัพย์กับเรา','form.dep.sub':'กรอกข้อมูลเบื้องต้น ทีมงานติดต่อกลับโดยเร็ว',
     'form.wish.title':'ฝากความต้องการซื้ออสังหา','form.wish.sub':'บอกรายละเอียดที่ต้องการ เราจะหาให้',
@@ -9554,7 +9369,7 @@ const UI_TEXT = {
     'ft.area.ladprao':'Lat Phrao','ft.area.rama9':'Rama 9','ft.area.bangna':'Bang Na',
     'ft.prov.bkk':'Bangkok','ft.prov.nnt':'Nonthaburi','ft.prov.ptm':'Pathum Thani',
     'ft.prov.smk':'Samut Prakan','ft.prov.cbl':'Chon Buri','ft.prov.pkt':'Phuket',
-    'ft.copy':'© 2026 Matchdoor. All Rights Reserved.',
+    'ft.copy':'© ' + new Date().getFullYear() + ' Matchdoor. All Rights Reserved.',
     'form.dep.title':'List Your Property','form.dep.sub':'Fill in basic info — our team will contact you shortly',
     'form.wish.title':'Property Wishlist','form.wish.sub':'Tell us what you need and we\'ll find it',
     'form.name':'Full Name *','form.phone':'Phone *','form.lineid':'Line ID',
@@ -9742,7 +9557,7 @@ const UI_TEXT = {
     'ft.area.ladprao':'拉披劳','ft.area.rama9':'拉玛9','ft.area.bangna':'邦纳',
     'ft.prov.bkk':'曼谷','ft.prov.nnt':'暖武里','ft.prov.ptm':'巴吞他尼',
     'ft.prov.smk':'北榄坡','ft.prov.cbl':'春武里','ft.prov.pkt':'普吉',
-    'ft.copy':'© 2026 Matchdoor. 版权所有。',
+    'ft.copy':'© ' + new Date().getFullYear() + ' Matchdoor. 版权所有。',
     'form.dep.title':'委托房产','form.dep.sub':'填写基本信息，我们将尽快联系您',
     'form.wish.title':'购房意向登记','form.wish.sub':'告诉我们您的需求，我们来为您寻找',
     'form.name':'姓名 *','form.phone':'电话 *','form.lineid':'Line ID',
@@ -9930,7 +9745,7 @@ const UI_TEXT = {
     'ft.area.ladprao':'ラープラーオ','ft.area.rama9':'ラマ9','ft.area.bangna':'バンナー',
     'ft.prov.bkk':'バンコク','ft.prov.nnt':'ノンタブリー','ft.prov.ptm':'パトゥムターニー',
     'ft.prov.smk':'サムットプラーカーン','ft.prov.cbl':'チョンブリー','ft.prov.pkt':'プーケット',
-    'ft.copy':'© 2026 Matchdoor. All Rights Reserved.',
+    'ft.copy':'© ' + new Date().getFullYear() + ' Matchdoor. All Rights Reserved.',
     'form.dep.title':'物件登録','form.dep.sub':'基本情報をご入力ください。担当者よりご連絡いたします',
     'form.wish.title':'購入希望登録','form.wish.sub':'ご希望の条件をお知らせください。物件を探します',
     'form.name':'氏名 *','form.phone':'電話番号 *','form.lineid':'Line ID',
@@ -12692,64 +12507,103 @@ function resetAdvFilter(){
 
   <!-- Footer for listings page -->
   <!-- ══ SEO RICH CONTENT — Google Index ══════════════════════════════════
-       เนื้อหา HTML ที่ Google Crawler อ่านได้จริง — keyword density สูง กรุงเทพ + รถไฟฟ้า -->
+       Generated by JS from SEO_RICH_CONTENT_DATA array — แก้ไขที่ array เดียว
+       ไม่ต้อง hardcode HTML ซ้ำซ้อนกับ quick-search panel -->
   <div id="listings-seo-rich-content" style="max-width:1320px;margin:0 auto;padding:32px 20px 0">
-    <section aria-label="อสังหาริมทรัพย์ในกรุงเทพตามสายรถไฟฟ้า" style="background:#fff;border-radius:16px;border:1.5px solid var(--bd);padding:28px;margin-bottom:24px">
+    <section id="seo-rich-section" aria-label="อสังหาริมทรัพย์ในกรุงเทพตามสายรถไฟฟ้า" style="background:#fff;border-radius:16px;border:1.5px solid var(--bd);padding:28px;margin-bottom:24px">
       <h2 style="font-size:18px;font-weight:800;color:var(--p);margin-bottom:6px;font-family:'Kanit',sans-serif">
         <i class="fas fa-train" style="color:#0a8a3a"></i> อสังหาริมทรัพย์ใกล้รถไฟฟ้า BTS MRT กรุงเทพ
       </h2>
       <p style="font-size:13px;color:var(--tx2);margin-bottom:16px;line-height:1.7">ค้นหา<strong>บ้าน คอนโด</strong>ใกล้รถไฟฟ้าในกรุงเทพทุกสาย ทั้ง BTS สายสุขุมวิท BTS สายสีลม MRT สายสีน้ำเงิน MRT สายสีม่วง Airport Rail Link และ SRT สายสีแดง เลือกทำเลที่ใช่ เดินทางสะดวก</p>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px">
-        <div>
-          <h3 style="font-size:12px;font-weight:800;color:#0a8a3a;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">🟢 BTS สายสุขุมวิท ยอดนิยม</h3>
-          <ul style="list-style:none;display:flex;flex-direction:column;gap:4px">
-            <li><a href="/listings?q=อโศก BTS" onclick="event.preventDefault();listingsQuickSearch('อโศก BTS')" style="font-size:12px;color:var(--p);text-decoration:none;display:flex;align-items:center;gap:4px" title="คอนโดใกล้ BTS อโศก"><i class="fas fa-train" style="color:#0a8a3a;font-size:10px;width:12px"></i> คอนโดใกล้ BTS อโศก</a></li>
-            <li><a href="/listings?q=ทองหล่อ BTS" onclick="event.preventDefault();listingsQuickSearch('ทองหล่อ BTS')" style="font-size:12px;color:var(--p);text-decoration:none;display:flex;align-items:center;gap:4px" title="คอนโดใกล้ BTS ทองหล่อ"><i class="fas fa-train" style="color:#0a8a3a;font-size:10px;width:12px"></i> คอนโดใกล้ BTS ทองหล่อ</a></li>
-            <li><a href="/listings?q=พร้อมพงษ์ BTS" onclick="event.preventDefault();listingsQuickSearch('พร้อมพงษ์ BTS')" style="font-size:12px;color:var(--p);text-decoration:none;display:flex;align-items:center;gap:4px" title="คอนโดสุขุมวิท BTS พร้อมพงษ์"><i class="fas fa-train" style="color:#0a8a3a;font-size:10px;width:12px"></i> คอนโดสุขุมวิท BTS พร้อมพงษ์</a></li>
-            <li><a href="/listings?q=เอกมัย BTS" onclick="event.preventDefault();listingsQuickSearch('เอกมัย BTS')" style="font-size:12px;color:var(--p);text-decoration:none;display:flex;align-items:center;gap:4px" title="คอนโดใกล้ BTS เอกมัย"><i class="fas fa-train" style="color:#0a8a3a;font-size:10px;width:12px"></i> คอนโดใกล้ BTS เอกมัย</a></li>
-            <li><a href="/listings?q=อ่อนนุช BTS" onclick="event.preventDefault();listingsQuickSearch('อ่อนนุช BTS')" style="font-size:12px;color:var(--p);text-decoration:none;display:flex;align-items:center;gap:4px" title="คอนโดใกล้ BTS อ่อนนุช"><i class="fas fa-train" style="color:#0a8a3a;font-size:10px;width:12px"></i> คอนโดใกล้ BTS อ่อนนุช</a></li>
-            <li><a href="/listings?q=สยาม BTS" onclick="event.preventDefault();listingsQuickSearch('สยาม BTS')" style="font-size:12px;color:var(--p);text-decoration:none;display:flex;align-items:center;gap:4px" title="คอนโดใกล้ BTS สยาม"><i class="fas fa-train" style="color:#0a8a3a;font-size:10px;width:12px"></i> คอนโดใกล้ BTS สยาม</a></li>
-          </ul>
-        </div>
-        <div>
-          <h3 style="font-size:12px;font-weight:800;color:#1a5fb4;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">🔵 MRT สายสีน้ำเงิน</h3>
-          <ul style="list-style:none;display:flex;flex-direction:column;gap:4px">
-            <li><a href="/listings?q=พระราม 9 MRT" onclick="event.preventDefault();listingsQuickSearch('พระราม 9')" style="font-size:12px;color:var(--p);text-decoration:none;display:flex;align-items:center;gap:4px" title="คอนโดพระราม 9 MRT"><i class="fas fa-subway" style="color:#1a5fb4;font-size:10px;width:12px"></i> คอนโดพระราม 9 MRT</a></li>
-            <li><a href="/listings?q=รัชดา MRT" onclick="event.preventDefault();listingsQuickSearch('รัชดา MRT')" style="font-size:12px;color:var(--p);text-decoration:none;display:flex;align-items:center;gap:4px" title="คอนโดรัชดา MRT"><i class="fas fa-subway" style="color:#1a5fb4;font-size:10px;width:12px"></i> คอนโดรัชดา MRT</a></li>
-            <li><a href="/listings?q=ลาดพร้าว MRT" onclick="event.preventDefault();listingsQuickSearch('ลาดพร้าว MRT')" style="font-size:12px;color:var(--p);text-decoration:none;display:flex;align-items:center;gap:4px" title="บ้านลาดพร้าว MRT"><i class="fas fa-subway" style="color:#1a5fb4;font-size:10px;width:12px"></i> บ้านลาดพร้าว MRT</a></li>
-            <li><a href="/listings?q=สุขุมวิท MRT" onclick="event.preventDefault();listingsQuickSearch('สุขุมวิท MRT')" style="font-size:12px;color:var(--p);text-decoration:none;display:flex;align-items:center;gap:4px" title="คอนโดสุขุมวิท MRT"><i class="fas fa-subway" style="color:#1a5fb4;font-size:10px;width:12px"></i> คอนโดสุขุมวิท MRT</a></li>
-            <li><a href="/listings?q=จตุจักร MRT" onclick="event.preventDefault();listingsQuickSearch('จตุจักร MRT')" style="font-size:12px;color:var(--p);text-decoration:none;display:flex;align-items:center;gap:4px" title="บ้านจตุจักร MRT"><i class="fas fa-subway" style="color:#1a5fb4;font-size:10px;width:12px"></i> บ้านจตุจักร MRT</a></li>
-            <li><a href="/listings?q=สีลม MRT" onclick="event.preventDefault();listingsQuickSearch('สีลม MRT')" style="font-size:12px;color:var(--p);text-decoration:none;display:flex;align-items:center;gap:4px" title="คอนโดสีลม MRT"><i class="fas fa-subway" style="color:#1a5fb4;font-size:10px;width:12px"></i> คอนโดสีลม MRT</a></li>
-          </ul>
-        </div>
-        <div>
-          <h3 style="font-size:12px;font-weight:800;color:#C8922A;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">🏘️ ทำเลยอดนิยม กรุงเทพ</h3>
-          <ul style="list-style:none;display:flex;flex-direction:column;gap:4px">
-            <li><a href="/listings?q=สุขุมวิท" onclick="event.preventDefault();listingsQuickSearch('สุขุมวิท')" style="font-size:12px;color:var(--p);text-decoration:none;display:flex;align-items:center;gap:4px" title="ขายบ้านคอนโดสุขุมวิท"><i class="fas fa-map-marker-alt" style="color:var(--a);font-size:10px;width:12px"></i> คอนโดสุขุมวิท</a></li>
-            <li><a href="/listings?q=สาทร" onclick="event.preventDefault();listingsQuickSearch('สาทร')" style="font-size:12px;color:var(--p);text-decoration:none;display:flex;align-items:center;gap:4px" title="ขายบ้านคอนโดสาทร"><i class="fas fa-map-marker-alt" style="color:var(--a);font-size:10px;width:12px"></i> คอนโดสาทร</a></li>
-            <li><a href="/listings?q=พระโขนง" onclick="event.preventDefault();listingsQuickSearch('พระโขนง')" style="font-size:12px;color:var(--p);text-decoration:none;display:flex;align-items:center;gap:4px" title="คอนโดพระโขนง"><i class="fas fa-map-marker-alt" style="color:var(--a);font-size:10px;width:12px"></i> คอนโดพระโขนง</a></li>
-            <li><a href="/listings?q=บางนา" onclick="event.preventDefault();listingsQuickSearch('บางนา')" style="font-size:12px;color:var(--p);text-decoration:none;display:flex;align-items:center;gap:4px" title="บ้านบางนา"><i class="fas fa-map-marker-alt" style="color:var(--a);font-size:10px;width:12px"></i> บ้านบางนา</a></li>
-            <li><a href="/listings?q=ลาดพร้าว" onclick="event.preventDefault();listingsQuickSearch('ลาดพร้าว')" style="font-size:12px;color:var(--p);text-decoration:none;display:flex;align-items:center;gap:4px" title="บ้านลาดพร้าว"><i class="fas fa-map-marker-alt" style="color:var(--a);font-size:10px;width:12px"></i> บ้านลาดพร้าว</a></li>
-            <li><a href="/listings?q=รัชดา" onclick="event.preventDefault();listingsQuickSearch('รัชดา')" style="font-size:12px;color:var(--p);text-decoration:none;display:flex;align-items:center;gap:4px" title="คอนโดรัชดาภิเษก"><i class="fas fa-map-marker-alt" style="color:var(--a);font-size:10px;width:12px"></i> คอนโดรัชดา</a></li>
-          </ul>
-        </div>
-        <div>
-          <h3 style="font-size:12px;font-weight:800;color:#C0392B;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">🏠 ประเภทที่อยู่อาศัย</h3>
-          <ul style="list-style:none;display:flex;flex-direction:column;gap:4px">
-            <li><a href="/listings?type=คอนโด" onclick="event.preventDefault();listingsFilterByType('คอนโด')" style="font-size:12px;color:var(--p);text-decoration:none;display:flex;align-items:center;gap:4px" title="ขายคอนโดกรุงเทพ"><i class="fas fa-city" style="color:#3D7A55;font-size:10px;width:12px"></i> ขายคอนโดกรุงเทพ</a></li>
-            <li><a href="/listings?type=บ้านเดี่ยว" onclick="event.preventDefault();listingsFilterByType('บ้านเดี่ยว')" style="font-size:12px;color:var(--p);text-decoration:none;display:flex;align-items:center;gap:4px" title="ขายบ้านเดี่ยวกรุงเทพ"><i class="fas fa-house-user" style="color:#C8922A;font-size:10px;width:12px"></i> ขายบ้านเดี่ยวกรุงเทพ</a></li>
-            <li><a href="/listings?type=ทาวน์โฮม" onclick="event.preventDefault();listingsFilterByType('ทาวน์โฮม')" style="font-size:12px;color:var(--p);text-decoration:none;display:flex;align-items:center;gap:4px" title="ขายทาวน์โฮมกรุงเทพ"><i class="fas fa-building" style="color:#1B3A6B;font-size:10px;width:12px"></i> ขายทาวน์โฮมกรุงเทพ</a></li>
-            <li><a href="/listings?type=ที่ดิน" onclick="event.preventDefault();listingsFilterByType('ที่ดิน')" style="font-size:12px;color:var(--p);text-decoration:none;display:flex;align-items:center;gap:4px" title="ขายที่ดินกรุงเทพ"><i class="fas fa-map" style="color:#E67E22;font-size:10px;width:12px"></i> ขายที่ดินกรุงเทพ</a></li>
-            <li><a href="/listings?tx=RENT" onclick="event.preventDefault();listingsFilterTx('RENT')" style="font-size:12px;color:var(--p);text-decoration:none;display:flex;align-items:center;gap:4px" title="เช่าคอนโดกรุงเทพ"><i class="fas fa-key" style="color:#7B4FBF;font-size:10px;width:12px"></i> เช่าคอนโดกรุงเทพ</a></li>
-            <li><a href="/listings?tx=BUY" onclick="event.preventDefault();listingsFilterTx('BUY')" style="font-size:12px;color:var(--p);text-decoration:none;display:flex;align-items:center;gap:4px" title="ซื้อบ้านกรุงเทพ"><i class="fas fa-tag" style="color:#1B3A6B;font-size:10px;width:12px"></i> ซื้อบ้านกรุงเทพ</a></li>
-          </ul>
-        </div>
-      </div>
+      <div id="seo-rich-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px"></div>
     </section>
-
   </div>
   <div class="sub-page-footer"></div>
 </div>
+<script>
+/* ══ SEO RICH CONTENT DATA ═══════════════════════════════════════════════
+   Single source of truth — แก้ไขที่นี่ที่เดียว ทั้ง SEO section จะ sync
+   อัตโนมัติ เพิ่มสถานีหรือทำเลใหม่เพียงแค่เพิ่ม entry ใน array นี้
+   ════════════════════════════════════════════════════════════════════════ */
+var SEO_RICH_CONTENT_DATA = [
+  {
+    heading: '🟢 BTS สายสุขุมวิท ยอดนิยม',
+    color: '#0a8a3a',
+    items: [
+      { label: 'คอนโดใกล้ BTS อโศก',          q: 'อโศก BTS',       icon: 'fa-train',        ic: '#0a8a3a', type: 'q' },
+      { label: 'คอนโดใกล้ BTS ทองหล่อ',       q: 'ทองหล่อ BTS',    icon: 'fa-train',        ic: '#0a8a3a', type: 'q' },
+      { label: 'คอนโดสุขุมวิท BTS พร้อมพงษ์', q: 'พร้อมพงษ์ BTS',  icon: 'fa-train',        ic: '#0a8a3a', type: 'q' },
+      { label: 'คอนโดใกล้ BTS เอกมัย',        q: 'เอกมัย BTS',     icon: 'fa-train',        ic: '#0a8a3a', type: 'q' },
+      { label: 'คอนโดใกล้ BTS อ่อนนุช',       q: 'อ่อนนุช BTS',    icon: 'fa-train',        ic: '#0a8a3a', type: 'q' },
+      { label: 'คอนโดใกล้ BTS สยาม',          q: 'สยาม BTS',       icon: 'fa-train',        ic: '#0a8a3a', type: 'q' }
+    ]
+  },
+  {
+    heading: '🔵 MRT สายสีน้ำเงิน',
+    color: '#1a5fb4',
+    items: [
+      { label: 'คอนโดพระราม 9 MRT',  q: 'พระราม 9',     icon: 'fa-subway', ic: '#1a5fb4', type: 'q' },
+      { label: 'คอนโดรัชดา MRT',     q: 'รัชดา MRT',    icon: 'fa-subway', ic: '#1a5fb4', type: 'q' },
+      { label: 'บ้านลาดพร้าว MRT',   q: 'ลาดพร้าว MRT', icon: 'fa-subway', ic: '#1a5fb4', type: 'q' },
+      { label: 'คอนโดสุขุมวิท MRT',  q: 'สุขุมวิท MRT', icon: 'fa-subway', ic: '#1a5fb4', type: 'q' },
+      { label: 'บ้านจตุจักร MRT',    q: 'จตุจักร MRT',  icon: 'fa-subway', ic: '#1a5fb4', type: 'q' },
+      { label: 'คอนโดสีลม MRT',      q: 'สีลม MRT',     icon: 'fa-subway', ic: '#1a5fb4', type: 'q' }
+    ]
+  },
+  {
+    heading: '🏘️ ทำเลยอดนิยม กรุงเทพ',
+    color: '#C8922A',
+    items: [
+      { label: 'คอนโดสุขุมวิท', q: 'สุขุมวิท', icon: 'fa-map-marker-alt', ic: 'var(--a)', type: 'q' },
+      { label: 'คอนโดสาทร',     q: 'สาทร',     icon: 'fa-map-marker-alt', ic: 'var(--a)', type: 'q' },
+      { label: 'คอนโดพระโขนง', q: 'พระโขนง',  icon: 'fa-map-marker-alt', ic: 'var(--a)', type: 'q' },
+      { label: 'บ้านบางนา',     q: 'บางนา',    icon: 'fa-map-marker-alt', ic: 'var(--a)', type: 'q' },
+      { label: 'บ้านลาดพร้าว', q: 'ลาดพร้าว', icon: 'fa-map-marker-alt', ic: 'var(--a)', type: 'q' },
+      { label: 'คอนโดรัชดา',   q: 'รัชดา',    icon: 'fa-map-marker-alt', ic: 'var(--a)', type: 'q' }
+    ]
+  },
+  {
+    heading: '🏠 ประเภทที่อยู่อาศัย',
+    color: '#C0392B',
+    items: [
+      { label: 'ขายคอนโดกรุงเทพ',     q: 'คอนโด',    icon: 'fa-city',       ic: '#3D7A55', type: 'propType' },
+      { label: 'ขายบ้านเดี่ยวกรุงเทพ', q: 'บ้านเดี่ยว',icon: 'fa-house-user', ic: '#C8922A', type: 'propType' },
+      { label: 'ขายทาวน์โฮมกรุงเทพ',  q: 'ทาวน์โฮม', icon: 'fa-building',   ic: '#1B3A6B', type: 'propType' },
+      { label: 'ขายที่ดินกรุงเทพ',     q: 'ที่ดิน',   icon: 'fa-map',        ic: '#E67E22', type: 'propType' },
+      { label: 'เช่าคอนโดกรุงเทพ',    q: 'RENT',     icon: 'fa-key',        ic: '#7B4FBF', type: 'tx' },
+      { label: 'ซื้อบ้านกรุงเทพ',      q: 'BUY',      icon: 'fa-tag',        ic: '#1B3A6B', type: 'tx' }
+    ]
+  }
+];
+
+(function renderSeoRichContent() {
+  var grid = document.getElementById('seo-rich-grid');
+  if (!grid) return;
+  var ls = 'font-size:12px;color:var(--p);text-decoration:none;display:flex;align-items:center;gap:4px';
+  grid.innerHTML = SEO_RICH_CONTENT_DATA.map(function(group) {
+    var links = group.items.map(function(item) {
+      var href, fn;
+      if (item.type === 'q') {
+        href = '/listings?q=' + encodeURIComponent(item.q);
+        fn   = "listingsQuickSearch('" + item.q.replace(/'/g,"\\'") + "')";
+      } else if (item.type === 'propType') {
+        href = '/listings?type=' + encodeURIComponent(item.q);
+        fn   = "listingsFilterByType('" + item.q.replace(/'/g,"\\'") + "')";
+      } else {
+        href = '/listings?tx=' + item.q;
+        fn   = "listingsFilterTx('" + item.q + "')";
+      }
+      return '<li><a href="' + href + '" onclick="event.preventDefault();' + fn + '" style="' + ls + '" title="' + item.label + '">'
+        + '<i class="fas ' + item.icon + '" style="color:' + item.ic + ';font-size:10px;width:12px"></i> ' + item.label + '</a></li>';
+    }).join('');
+    return '<div>'
+      + '<h3 style="font-size:12px;font-weight:800;color:' + group.color + ';margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">' + group.heading + '</h3>'
+      + '<ul style="list-style:none;display:flex;flex-direction:column;gap:4px">' + links + '</ul>'
+      + '</div>';
+  }).join('');
+})();
+</script>
+
 
 <!-- ===== SEO DRAWER (mobile ≤768px) ===== -->
 <div class="seo-drawer-overlay" id="seo-drawer-overlay" onclick="closeSeoDrawer()"></div>
@@ -12762,15 +12616,6 @@ function resetAdvFilter(){
 </div>
 
 <!-- ===== DRAG-TO-DISMISS: Bottom Sheets ===== -->
-<style>
-/* drag handle cursor */
-.adv-sheet-drag,.qs-mob-sheet-drag{cursor:grab}
-.adv-sheet-drag:active,.qs-mob-sheet-drag:active{cursor:grabbing}
-/* apply-modal on mobile: draggable */
-@media(max-width:600px){
-  .apply-modal{touch-action:pan-x}
-}
-</style>
 <script>
 (function(){
   /* ────────────────────────────────────────────────────
@@ -12939,6 +12784,245 @@ function resetAdvFilter(){
     <button class="adv-apply-btn" onclick="applyAdvFilter()"><i class="fas fa-search"></i> ค้นหาผลลัพธ์</button>
   </div>
 </div>
+
+<!-- Supabase: defer แทน async — โหลดหลัง HTML parse เสร็จ ไม่มี race condition กับ initSB() -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+
+<script>
+/* ─── Transit Station Data ────────────────────────────────────────────────
+   ข้อมูลสถานี BTS / SRT / ARL / MRT แบบ array
+   โครงสร้าง: { sec, color }  = หัวข้อส่วน
+              { q, label, icon } = ปุ่มสถานี  (icon ไม่ระบุ = 🚉)
+   ──────────────────────────────────────────────────────────────────────── */
+const TRANSIT_BTS = [
+  {sec:'🟢 BTS สายสุขุมวิท — เหนือ (N1–N24) · 24 สถานี', color:'#0a8a3a'},
+  {q:'ราชเทวี BTS',label:'ราชเทวี (N1)'},
+  {q:'พญาไท BTS',label:'พญาไท (N2)'},
+  {q:'อนุสาวรีย์ชัยสมรภูมิ BTS',label:'อนุสาวรีย์ฯ (N3)'},
+  {q:'สนามเป้า BTS',label:'สนามเป้า (N4)'},
+  {q:'อารีย์ BTS',label:'อารีย์ (N5)'},
+  {q:'สะพานควาย BTS',label:'สะพานควาย (N7)'},
+  {q:'หมอชิต BTS',label:'หมอชิต (N8)'},
+  {q:'ห้าแยกลาดพร้าว BTS',label:'ห้าแยกลาดพร้าว (N9)'},
+  {q:'พหลโยธิน 24 BTS',label:'พหลโยธิน 24 (N10)'},
+  {q:'รัชโยธิน BTS',label:'รัชโยธิน (N11)'},
+  {q:'เสนานิคม BTS',label:'เสนานิคม (N12)'},
+  {q:'มหาวิทยาลัยเกษตรศาสตร์ BTS',label:'ม.เกษตรศาสตร์ (N13)'},
+  {q:'กรมป่าไม้ BTS',label:'กรมป่าไม้ (N14)'},
+  {q:'บางบัว BTS',label:'บางบัว (N15)'},
+  {q:'กรมทหารราบที่ 11 BTS',label:'กรมทหารราบที่ 11 (N16)'},
+  {q:'วัดพระศรีมหาธาตุ BTS',label:'วัดพระศรีมหาธาตุ (N17)'},
+  {q:'พหลโยธิน 59 BTS',label:'พหลโยธิน 59 (N18)'},
+  {q:'สายหยุด BTS',label:'สายหยุด (N19)'},
+  {q:'สะพานใหม่ BTS',label:'สะพานใหม่ (N20)'},
+  {q:'โรงพยาบาลภูมิพลอดุลยเดช BTS',label:'รพ.ภูมิพลอดุลยเดช (N21)'},
+  {q:'พิพิธภัณฑ์กองทัพอากาศ BTS',label:'พิพิธภัณฑ์กองทัพอากาศ (N22)'},
+  {q:'แยก คปอ. BTS',label:'แยก คปอ. (N23)'},
+  {q:'คูคต BTS',label:'คูคต (N24)'},
+  {sec:'🟢 BTS สายสุขุมวิท — กลาง & ตะวันออก (CEN–E23) · 24 สถานี', color:'#0a8a3a'},
+  {q:'สยาม BTS',label:'สยาม (CEN)'},
+  {q:'ชิดลม BTS',label:'ชิดลม (E1)'},
+  {q:'เพลินจิต BTS',label:'เพลินจิต (E2)'},
+  {q:'นานา BTS',label:'นานา (E3)'},
+  {q:'อโศก BTS',label:'อโศก (E4)'},
+  {q:'พร้อมพงษ์ BTS',label:'พร้อมพงษ์ (E5)'},
+  {q:'ทองหล่อ BTS',label:'ทองหล่อ (E6)'},
+  {q:'เอกมัย BTS',label:'เอกมัย (E7)'},
+  {q:'พระโขนง BTS',label:'พระโขนง (E8)'},
+  {q:'อ่อนนุช BTS',label:'อ่อนนุช (E9)'},
+  {q:'บางจาก BTS',label:'บางจาก (E10)'},
+  {q:'ปุณณวิถี BTS',label:'ปุณณวิถี (E11)'},
+  {q:'อุดมสุข BTS',label:'อุดมสุข (E12)'},
+  {q:'บางนา BTS',label:'บางนา (E13)'},
+  {q:'แบริ่ง BTS',label:'แบริ่ง (E14)'},
+  {q:'สำโรง BTS',label:'สำโรง (E15)'},
+  {q:'ปู่เจ้า BTS',label:'ปู่เจ้า (E16)'},
+  {q:'ช้างเอราวัณ BTS',label:'ช้างเอราวัณ (E17)'},
+  {q:'โรงเรียนนายเรือ BTS',label:'โรงเรียนนายเรือ (E18)'},
+  {q:'ปากน้ำ BTS',label:'ปากน้ำ (E19)'},
+  {q:'ศรีนครินทร์ BTS',label:'ศรีนครินทร์ (E20)'},
+  {q:'แพรกษา BTS',label:'แพรกษา (E21)'},
+  {q:'สายลวด BTS',label:'สายลวด (E22)'},
+  {q:'เคหะฯ BTS',label:'เคหะฯ (E23)'},
+  {sec:'🟢 BTS สายสีลม (W1, S1–S12) · 13 สถานี', color:'#0a8a3a'},
+  {q:'สนามกีฬาแห่งชาติ BTS',label:'สนามกีฬาแห่งชาติ (W1)'},
+  {q:'ราชดำริ BTS',label:'ราชดำริ (S1)'},
+  {q:'ศาลาแดง BTS',label:'ศาลาแดง (S2)'},
+  {q:'ช่องนนทรี BTS',label:'ช่องนนทรี (S3)'},
+  {q:'เซนต์หลุยส์ BTS',label:'เซนต์หลุยส์ (S4)'},
+  {q:'สุรศักดิ์ BTS',label:'สุรศักดิ์ (S5)'},
+  {q:'สะพานตากสิน BTS',label:'สะพานตากสิน (S6)'},
+  {q:'กรุงธนบุรี BTS',label:'กรุงธนบุรี (S7)'},
+  {q:'วงเวียนใหญ่ BTS',label:'วงเวียนใหญ่ (S8)'},
+  {q:'โพธิ์นิมิตร BTS',label:'โพธิ์นิมิตร (S9)'},
+  {q:'ตลาดพลู BTS',label:'ตลาดพลู (S10)'},
+  {q:'วุฒากาศ BTS',label:'วุฒากาศ (S11)'},
+  {q:'บางหว้า BTS',label:'บางหว้า (S12)'},
+  {sec:'🟤 BTS สายสีทอง · 3 สถานี (กรุงธนบุรี–คลองสาน)', color:'#c8922a'},
+  {q:'กรุงธนบุรี สีทอง BTS',label:'กรุงธนบุรี (G1)'},
+  {q:'เจริญนคร BTS สีทอง',label:'เจริญนคร (G2)'},
+  {q:'คลองสาน BTS สีทอง',label:'คลองสาน (G3)'},
+  {sec:'🔴 SRT สายสีแดงเข้ม · 10 สถานี (กลางกรุงเทพอภิวัฒน์–รังสิต)', color:'#cc2200', icon:'🚇'},
+  {q:'กลางกรุงเทพอภิวัฒน์ SRT',label:'กลางกรุงเทพอภิวัฒน์ (RN01)', icon:'🚇'},
+  {q:'จตุจักร SRT สีแดง',label:'จตุจักร (RN02)', icon:'🚇'},
+  {q:'วัดเสมียนนารี SRT',label:'วัดเสมียนนารี (RN03)', icon:'🚇'},
+  {q:'บางเขน SRT',label:'บางเขน (RN04)', icon:'🚇'},
+  {q:'ทุ่งสองห้อง SRT',label:'ทุ่งสองห้อง (RN05)', icon:'🚇'},
+  {q:'หลักสี่ SRT',label:'หลักสี่ (RN06)', icon:'🚇'},
+  {q:'การเคหะ SRT',label:'การเคหะ (RN07)', icon:'🚇'},
+  {q:'ดอนเมือง SRT',label:'ดอนเมือง (RN08)', icon:'🚇'},
+  {q:'หลักหก SRT',label:'หลักหก (RN09)', icon:'🚇'},
+  {q:'รังสิต SRT',label:'รังสิต (RN10)', icon:'🚇'},
+  {sec:'🔴 SRT สายสีแดงอ่อน · 4 สถานี (กลางกรุงเทพอภิวัฒน์–ตลิ่งชัน)', color:'#cc6644', icon:'🚇'},
+  {q:'กลางกรุงเทพอภิวัฒน์ SRT ตลิ่งชัน',label:'กลางกรุงเทพอภิวัฒน์ (RW01)', icon:'🚇'},
+  {q:'บางซ่อน SRT',label:'บางซ่อน (RW02)', icon:'🚇'},
+  {q:'บางบำหรุ SRT',label:'บางบำหรุ (RW05)', icon:'🚇'},
+  {q:'ตลิ่งชัน SRT',label:'ตลิ่งชัน (RW06)', icon:'🚇'},
+  {sec:'✈️ Airport Rail Link (ARL) · 8 สถานี (สุวรรณภูมิ–พญาไท)', color:'#555', icon:'🚈'},
+  {q:'สุวรรณภูมิ ARL',label:'สุวรรณภูมิ (A1)', icon:'🚈'},
+  {q:'ลาดกระบัง ARL',label:'ลาดกระบัง (A2)', icon:'🚈'},
+  {q:'บ้านทับช้าง ARL',label:'บ้านทับช้าง (A3)', icon:'🚈'},
+  {q:'หัวหมาก ARL',label:'หัวหมาก (A4)', icon:'🚈'},
+  {q:'รามคำแหง ARL',label:'รามคำแหง (A5)', icon:'🚈'},
+  {q:'มักกะสัน ARL',label:'มักกะสัน (A6)', icon:'🚈'},
+  {q:'ราชปรารภ ARL',label:'ราชปรารภ (A7)', icon:'🚈'},
+  {q:'พญาไท ARL',label:'พญาไท (A8)', icon:'🚈'},
+];
+
+const TRANSIT_MRT = [
+  {sec:'🔵 MRT สายน้ำเงิน · 38 สถานี (ท่าพระ–หลักสอง วงแหวน)', color:'#1a5fb4'},
+  {q:'หลักสอง MRT',label:'หลักสอง (BL38)'},
+  {q:'บางแค MRT',label:'บางแค (BL37)'},
+  {q:'ภาษีเจริญ MRT',label:'ภาษีเจริญ (BL36)'},
+  {q:'เพชรเกษม 48 MRT',label:'เพชรเกษม 48 (BL35)'},
+  {q:'บางหว้า MRT',label:'บางหว้า (BL34)'},
+  {q:'บางไผ่ MRT',label:'บางไผ่ (BL33)'},
+  {q:'ท่าพระ MRT',label:'ท่าพระ (BL01)'},
+  {q:'อิสรภาพ MRT',label:'อิสรภาพ (BL32)'},
+  {q:'สนามไชย MRT',label:'สนามไชย (BL31)'},
+  {q:'สามยอด MRT',label:'สามยอด (BL30)'},
+  {q:'วัดมังกร MRT',label:'วัดมังกร (BL29)'},
+  {q:'หัวลำโพง MRT',label:'หัวลำโพง (BL28)'},
+  {q:'สามย่าน MRT',label:'สามย่าน (BL27)'},
+  {q:'สีลม MRT',label:'สีลม (BL26)'},
+  {q:'ลุมพินี MRT',label:'ลุมพินี (BL25)'},
+  {q:'คลองเตย MRT',label:'คลองเตย (BL24)'},
+  {q:'ศูนย์การประชุมแห่งชาติสิริกิติ์ MRT',label:'ศูนย์ฯ สิริกิติ์ (BL23)'},
+  {q:'สุขุมวิท MRT',label:'สุขุมวิท (BL22)'},
+  {q:'เพชรบุรี MRT',label:'เพชรบุรี (BL21)'},
+  {q:'พระราม 9 MRT',label:'พระราม 9 (BL20)'},
+  {q:'ศูนย์วัฒนธรรม MRT',label:'ศูนย์วัฒนธรรมฯ (BL19)'},
+  {q:'ห้วยขวาง MRT',label:'ห้วยขวาง (BL18)'},
+  {q:'สุทธิสาร MRT',label:'สุทธิสาร (BL17)'},
+  {q:'รัชดาภิเษก MRT',label:'รัชดาภิเษก (BL16)'},
+  {q:'ลาดพร้าว MRT',label:'ลาดพร้าว (BL15)'},
+  {q:'พหลโยธิน MRT',label:'พหลโยธิน (BL14)'},
+  {q:'สวนจตุจักร MRT',label:'สวนจตุจักร (BL13)'},
+  {q:'กำแพงเพชร MRT',label:'กำแพงเพชร (BL12)'},
+  {q:'บางซื่อ MRT',label:'บางซื่อ (BL11)'},
+  {q:'เตาปูน MRT',label:'เตาปูน (BL10)'},
+  {q:'บางโพ MRT',label:'บางโพ (BL09)'},
+  {q:'บางอ้อ MRT',label:'บางอ้อ (BL08)'},
+  {q:'บางพลัด MRT',label:'บางพลัด (BL07)'},
+  {q:'สิรินธร MRT',label:'สิรินธร (BL06)'},
+  {q:'บางยี่ขัน MRT',label:'บางยี่ขัน (BL05)'},
+  {q:'บางขุนนนท์ MRT',label:'บางขุนนนท์ (BL04)'},
+  {q:'ไฟฉาย MRT',label:'ไฟฉาย (BL03)'},
+  {q:'จรัญฯ 13 MRT',label:'จรัญฯ 13 (BL02)'},
+  {sec:'🟣 MRT สายสีม่วง · 16 สถานี (เตาปูน–คลองบางไผ่)', color:'#7b3fa3'},
+  {q:'คลองบางไผ่ MRT สีม่วง',label:'คลองบางไผ่ (PP01)'},
+  {q:'ตลาดบางใหญ่ MRT',label:'ตลาดบางใหญ่ (PP02)'},
+  {q:'สามแยกบางใหญ่ MRT',label:'สามแยกบางใหญ่ (PP03)'},
+  {q:'บางพลู MRT',label:'บางพลู (PP04)'},
+  {q:'บางรักใหญ่ MRT',label:'บางรักใหญ่ (PP05)'},
+  {q:'บางรักน้อยท่าอิฐ MRT',label:'บางรักน้อยท่าอิฐ (PP06)'},
+  {q:'ไทรม้า MRT',label:'ไทรม้า (PP07)'},
+  {q:'สะพานพระนั่งเกล้า MRT',label:'สะพานพระนั่งเกล้า (PP08)'},
+  {q:'แยกนนทบุรี 1 MRT',label:'แยกนนทบุรี 1 (PP09)'},
+  {q:'บางกระสอ MRT',label:'บางกระสอ (PP10)'},
+  {q:'ศูนย์ราชการนนทบุรี MRT',label:'ศูนย์ราชการนนทบุรี (PP11)'},
+  {q:'กระทรวงสาธารณสุข MRT',label:'กระทรวงสาธารณสุข (PP12)'},
+  {q:'แยกติวานนท์ MRT',label:'แยกติวานนท์ (PP13)'},
+  {q:'วงศ์สว่าง MRT',label:'วงศ์สว่าง (PP14)'},
+  {q:'บางซ่อน MRT',label:'บางซ่อน (PP15)'},
+  {q:'เตาปูน MRT สีม่วง',label:'เตาปูน (PP16)'},
+  {sec:'🩷 MRT สายสีชมพู · 30 สถานี (ศูนย์ราชการนนทบุรี–มีนบุรี)', color:'#d63384'},
+  {q:'ศูนย์ราชการนนทบุรี MRT สีชมพู',label:'ศูนย์ราชการนนทบุรี (PK01)'},
+  {q:'แคราย MRT สีชมพู',label:'แคราย (PK02)'},
+  {q:'สนามบินน้ำ MRT',label:'สนามบินน้ำ (PK03)'},
+  {q:'สามัคคี MRT',label:'สามัคคี (PK04)'},
+  {q:'กรมชลประทาน MRT',label:'กรมชลประทาน (PK05)'},
+  {q:'แยกปากเกร็ด MRT',label:'แยกปากเกร็ด (PK06)'},
+  {q:'เลี่ยงเมืองปากเกร็ด MRT',label:'เลี่ยงเมืองปากเกร็ด (PK07)'},
+  {q:'แจ้งวัฒนะ-ปากเกร็ด 28 MRT',label:'แจ้งวัฒนะ-ปากเกร็ด 28 (PK08)'},
+  {q:'ศรีรัช MRT',label:'ศรีรัช (PK09)'},
+  {q:'เมืองทองธานี MRT',label:'เมืองทองธานี (PK10)'},
+  {q:'แจ้งวัฒนะ 14 MRT',label:'แจ้งวัฒนะ 14 (PK11)'},
+  {q:'ศูนย์ราชการเฉลิมพระเกียรติ MRT',label:'ศูนย์ราชการเฉลิมพระเกียรติ (PK12)'},
+  {q:'โทรคมนาคมแห่งชาติ MRT',label:'โทรคมนาคมแห่งชาติ (PK13)'},
+  {q:'หลักสี่ MRT สีชมพู',label:'หลักสี่ (PK14)'},
+  {q:'ราชภัฏพระนคร MRT',label:'ราชภัฏพระนคร (PK15)'},
+  {q:'วัดพระศรีมหาธาตุ MRT สีชมพู',label:'วัดพระศรีมหาธาตุ (PK16)'},
+  {q:'รามอินทรา 3 MRT',label:'รามอินทรา 3 (PK17)'},
+  {q:'ลาดปลาเค้า MRT',label:'ลาดปลาเค้า (PK18)'},
+  {q:'รามอินทรา กม. 4 MRT',label:'รามอินทรา กม. 4 (PK19)'},
+  {q:'มัยลาภ MRT',label:'มัยลาภ (PK20)'},
+  {q:'วัชรพล MRT',label:'วัชรพล (PK21)'},
+  {q:'รามอินทรา กม. 6 MRT',label:'รามอินทรา กม. 6 (PK22)'},
+  {q:'คู้บอน MRT',label:'คู้บอน (PK23)'},
+  {q:'รามอินทรา กม. 9 MRT',label:'รามอินทรา กม. 9 (PK24)'},
+  {q:'วงแหวนรามอินทรา MRT',label:'วงแหวนรามอินทรา (PK25)'},
+  {q:'นพรัตน์ MRT',label:'นพรัตน์ (PK26)'},
+  {q:'บางชัน MRT',label:'บางชัน (PK27)'},
+  {q:'เศรษฐบุตรบำเพ็ญ MRT',label:'เศรษฐบุตรบำเพ็ญ (PK28)'},
+  {q:'ตลาดมีนบุรี MRT',label:'ตลาดมีนบุรี (PK29)'},
+  {q:'มีนบุรี MRT สีชมพู',label:'มีนบุรี (PK30)'},
+  {sec:'🟡 MRT สายสีเหลือง · 23 สถานี (ลาดพร้าว–สำโรง)', color:'#c8960a'},
+  {q:'ลาดพร้าว MRT สีเหลือง',label:'ลาดพร้าว (YL01)'},
+  {q:'ภาวนา MRT สีเหลือง',label:'ภาวนา (YL02)'},
+  {q:'โชคชัย 4 MRT',label:'โชคชัย 4 (YL03)'},
+  {q:'ลาดพร้าว 71 MRT',label:'ลาดพร้าว 71 (YL04)'},
+  {q:'ลาดพร้าว 83 MRT',label:'ลาดพร้าว 83 (YL05)'},
+  {q:'มหาดไทย MRT สีเหลือง',label:'มหาดไทย (YL06)'},
+  {q:'ลาดพร้าว 101 MRT',label:'ลาดพร้าว 101 (YL07)'},
+  {q:'บางกะปิ MRT สีเหลือง',label:'บางกะปิ (YL08)'},
+  {q:'แยกลำสาลี MRT',label:'แยกลำสาลี (YL09)'},
+  {q:'ศรีกรีฑา MRT',label:'ศรีกรีฑา (YL10)'},
+  {q:'หัวหมาก MRT สีเหลือง',label:'หัวหมาก (YL11)'},
+  {q:'กลันตัน MRT',label:'กลันตัน (YL12)'},
+  {q:'ศรีนุช MRT',label:'ศรีนุช (YL13)'},
+  {q:'ศรีนครินทร์ 38 MRT',label:'ศรีนครินทร์ 38 (YL14)'},
+  {q:'สวนหลวง ร.9 MRT',label:'สวนหลวง ร.9 (YL15)'},
+  {q:'ศรีอุดม MRT',label:'ศรีอุดม (YL16)'},
+  {q:'ศรีเอี่ยม MRT',label:'ศรีเอี่ยม (YL17)'},
+  {q:'ศรีลาซาล MRT',label:'ศรีลาซาล (YL18)'},
+  {q:'ศรีแบริ่ง MRT',label:'ศรีแบริ่ง (YL19)'},
+  {q:'ศรีด่าน MRT',label:'ศรีด่าน (YL20)'},
+  {q:'ศรีเทพา MRT',label:'ศรีเทพา (YL21)'},
+  {q:'ทิพวัล MRT',label:'ทิพวัล (YL22)'},
+  {q:'สำโรง MRT สีเหลือง',label:'สำโรง (YL23)'},
+];
+
+function _renderTransitItems(items, defaultIcon) {
+  return items.map(function(item) {
+    if (item.sec) {
+      return '<div class="qs-dd-sec" style="color:' + item.color + '">' + item.sec + '</div>';
+    }
+    var icon = item.icon || defaultIcon;
+    var q = item.q.replace(/'/g, "\\'");
+    return '<button class="qs-opt" onclick="quickSearch(\'' + q + '\');closeQsDDs()">' + icon + ' ' + item.label + '</button>';
+  }).join('\n');
+}
+
+function renderTransitButtons() {
+  var btsPan = document.getElementById('qs-bts-dd');
+  if (btsPan) btsPan.innerHTML = _renderTransitItems(TRANSIT_BTS, '🚉');
+  var mrtPan = document.getElementById('qs-mrt-dd');
+  if (mrtPan) mrtPan.innerHTML = _renderTransitItems(TRANSIT_MRT, '🚇');
+}
+
+document.addEventListener('DOMContentLoaded', renderTransitButtons);
+</script>
 
 <!-- Supabase: defer แทน async — โหลดหลัง HTML parse เสร็จ ไม่มี race condition กับ initSB() -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
