@@ -268,6 +268,14 @@ a,button,input,select,textarea,
 .prop-card,.cat-card,.price-card,.blog-card,.gal-card,.agent-card,
 [onclick],[role="button"]{touch-action:manipulation}
 
+/* ══ MAP IFRAME TOUCH FIX — เลื่อนดูแผนที่ด้วย 1 นิ้ว, ซูมด้วย 2 นิ้ว ══ */
+iframe#listings-google-map,
+iframe#gmap-popup-iframe,
+#m-map iframe,
+#m-map-btn-wrap iframe{
+  touch-action:pan-x pan-y!important;
+}
+
 /* ══ FIX GLOBAL: body.modal-open สำหรับทุก device ══
    ใช้ overflow:hidden เท่านั้น — ห้ามใช้ position:fixed บน body เด็ดขาด
    เพราะ position:fixed บน body ทำให้ iOS/iPad ต้อง recalculate layout ทั้งหน้า
@@ -3324,9 +3332,9 @@ footer::after{
     </div>
     <div style="flex:1;overflow:hidden;min-height:480px">
       <iframe id="gmap-popup-iframe"
-        src="https://www.google.com/maps/d/embed?mid=1Bn_8_mJg2S9Lxp0sM85ZA6K0FDVZIHc&ehbc=2E312F&noprof=1"
+        src="https://www.google.com/maps/d/embed?mid=1z39rekBQwIHBp5BneTY-wZmJGQcIEVk&ehbc=2E312F&noprof=1"
         width="100%" height="100%"
-        style="border:none;display:block;min-height:480px"
+        style="border:none;display:block;min-height:480px;touch-action:pan-x pan-y"
         loading="lazy"
         allowfullscreen
         title="แผนที่ประกาศ Matchdoor">
@@ -6395,7 +6403,7 @@ function openModal(id){
       const mapContainer=$('m-map');
       if(mapContainer){
         const _mapLoc=encodeURIComponent(p.location);
-        mapContainer.innerHTML=`<div id="m-map-btn-wrap" style="margin-bottom:0"><button onclick="document.getElementById('m-map-btn-wrap').innerHTML='<iframe src=\\'https://maps.google.com/maps?q=${_mapLoc}&z=13&output=embed\\' width=\\'100%\\' height=\\'220\\' style=\\'border:0;border-radius:12px;display:block\\' allowfullscreen loading=\\'lazy\\'></iframe>'" style="display:flex;align-items:center;gap:8px;width:100%;background:var(--lt);color:var(--tx2);border:1.5px solid var(--bd);border-radius:12px;padding:13px 18px;cursor:pointer;font-size:14px;font-weight:700;font-family:inherit" onmouseover="this.style.borderColor='var(--a)';this.style.color='var(--p)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--tx2)'"><i class="fas fa-map-marked-alt" style="font-size:18px;color:var(--a);opacity:.9"></i><span>แตะเพื่อดูแผนที่</span><i class="fas fa-chevron-down" style="margin-left:auto;font-size:12px;opacity:.5"></i></button></div>`;
+        mapContainer.innerHTML=`<div id="m-map-btn-wrap" style="margin-bottom:0"><button onclick="document.getElementById('m-map-btn-wrap').innerHTML='<iframe src=\\'https://maps.google.com/maps?q=${_mapLoc}&z=13&output=embed\\' width=\\'100%\\' height=\\'220\\' style=\\'border:0;border-radius:12px;display:block;touch-action:pan-x pan-y\\' allowfullscreen loading=\\'lazy\\'></iframe>'" style="display:flex;align-items:center;gap:8px;width:100%;background:var(--lt);color:var(--tx2);border:1.5px solid var(--bd);border-radius:12px;padding:13px 18px;cursor:pointer;font-size:14px;font-weight:700;font-family:inherit" onmouseover="this.style.borderColor='var(--a)';this.style.color='var(--p)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--tx2)'"><i class="fas fa-map-marked-alt" style="font-size:18px;color:var(--a);opacity:.9"></i><span>แตะเพื่อดูแผนที่</span><i class="fas fa-chevron-down" style="margin-left:auto;font-size:12px;opacity:.5"></i></button></div>`;
       }
 
       // 360
@@ -12449,7 +12457,7 @@ function resetAdvFilter(){
         <button onclick="toggleListingsMapPanel()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer"><i class="fas fa-times"></i> ปิด</button>
       </div>
       <div style="border-radius:14px;overflow:hidden;border:2px solid rgba(200,146,42,.3);height:420px;position:relative">
-        <iframe id="listings-google-map" data-deferred-src="https://www.google.com/maps/d/u/0/embed?mid=1z39rekBQwIHBp5BneTY-wZmJGQcIEVk&ehbc=2E312F" width="100%" height="100%" style="border:0;display:block" allowfullscreen></iframe>
+        <iframe id="listings-google-map" data-deferred-src="https://www.google.com/maps/d/u/0/embed?mid=1z39rekBQwIHBp5BneTY-wZmJGQcIEVk&ehbc=2E312F" width="100%" height="100%" style="border:0;display:block;touch-action:pan-x pan-y" allowfullscreen></iframe>
         <div style="position:absolute;bottom:12px;right:12px;background:rgba(10,22,40,.85);color:#fff;font-size:11px;padding:6px 12px;border-radius:8px;backdrop-filter:blur(8px)">
           <i class="fas fa-info-circle" style="color:var(--a)"></i> กดที่ปักหมุดในแผนที่เพื่อกรองข้อมูล
         </div>
