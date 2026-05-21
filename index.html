@@ -1490,6 +1490,63 @@ footer::after{
 /* seo-toggle-btn: part of float-wrap flow on mobile — override fixed positioning */
 .seo-toggle-btn{display:none;background:linear-gradient(135deg,var(--p),#2a5298);color:#fff;border:none;border-radius:50%;width:46px;height:46px;font-size:16px;cursor:pointer;box-shadow:0 4px 16px rgba(27,58,107,.35);align-items:center;justify-content:center;transition:.2s}
 .seo-toggle-btn[data-page="listings"],.seo-toggle-btn[data-page="home"]{display:flex}
+/* ── Profile FAB button ── */
+.profile-fab-btn{display:flex;background:linear-gradient(135deg,#1a7a4a,#2ea66c);color:#fff;border:none;border-radius:50%;width:46px;height:46px;font-size:17px;cursor:pointer;box-shadow:0 4px 16px rgba(26,122,74,.38);align-items:center;justify-content:center;transition:.2s;position:relative}
+.profile-fab-btn:hover{transform:scale(1.07);box-shadow:0 6px 22px rgba(26,122,74,.45)}
+.profile-fab-btn .pfab-av{font-size:13px;font-weight:700;width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;border:2px solid rgba(255,255,255,.6)}
+/* My Account page */
+.my-account-wrap{max-width:860px;margin:0 auto;padding:32px 16px 60px}
+.ma-hero{background:linear-gradient(135deg,var(--p) 0%,#2a5298 60%,#1a7a4a 100%);border-radius:20px;padding:32px 28px;margin-bottom:28px;color:#fff;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.ma-av-ring{width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,.18);border:3px solid rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:700;flex-shrink:0;color:#fff}
+.ma-hero-info{flex:1;min-width:0}
+.ma-hero-name{font-size:22px;font-weight:700;margin-bottom:4px}
+.ma-hero-email{font-size:13px;opacity:.8;margin-bottom:12px;word-break:break-all}
+.ma-hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.18);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600}
+/* ── Dev Bypass Button (temp — remove before production) ── */
+.ma-dev-bypass-btn{position:absolute;top:14px;right:14px;display:flex;align-items:center;gap:6px;padding:7px 13px;border-radius:10px;border:1.5px dashed rgba(255,220,0,.7);background:rgba(0,0,0,.35);color:#ffd700;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.4px;backdrop-filter:blur(4px);transition:.18s;z-index:10;white-space:nowrap}
+.ma-dev-bypass-btn:hover{background:rgba(255,200,0,.18);border-color:#ffd700;transform:scale(1.04)}
+.ma-dev-bypass-btn.active{background:rgba(255,200,0,.22);border-color:#ffd700;box-shadow:0 0 12px rgba(255,215,0,.35)}
+.ma-dev-bypass-btn i{font-size:12px}
+.ma-dev-banner{display:flex;align-items:center;gap:8px;background:linear-gradient(90deg,rgba(255,193,7,.12),rgba(255,193,7,.06));border:1.5px dashed rgba(255,193,7,.55);border-radius:10px;padding:9px 14px;margin-bottom:16px;font-size:12px;font-weight:600;color:#92650a}
+.ma-tab-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:24px;background:#fff;border-radius:14px;padding:6px;box-shadow:0 2px 12px rgba(27,58,107,.08);border:1.5px solid var(--bd)}
+.ma-tab{flex:1;min-width:80px;padding:9px 8px;border:none;background:transparent;border-radius:10px;font-size:12px;font-weight:600;color:var(--tx2);cursor:pointer;transition:.18s;display:flex;flex-direction:column;align-items:center;gap:3px;white-space:nowrap}
+.ma-tab i{font-size:15px}
+.ma-tab.active{background:var(--p);color:#fff;box-shadow:0 2px 8px rgba(27,58,107,.22)}
+.ma-tab:not(.active):hover{background:var(--lt);color:var(--p)}
+.ma-panel{display:none}
+.ma-panel.active{display:block}
+.ma-section{background:#fff;border-radius:16px;padding:20px;margin-bottom:16px;border:1.5px solid var(--bd);box-shadow:0 2px 10px rgba(27,58,107,.05)}
+.ma-section-title{font-size:14px;font-weight:700;color:var(--p);margin-bottom:16px;display:flex;align-items:center;gap:8px;padding-bottom:10px;border-bottom:1.5px solid var(--lt)}
+.ma-field{margin-bottom:14px}
+.ma-field label{font-size:12px;font-weight:600;color:var(--tx2);display:block;margin-bottom:5px}
+.ma-field input{width:100%;border:1.5px solid var(--bd);border-radius:10px;padding:10px 14px;font-size:14px;font-family:inherit;color:var(--tx);transition:.18s;background:#fff}
+.ma-field input:focus{outline:none;border-color:var(--p);box-shadow:0 0 0 3px rgba(27,58,107,.08)}
+.ma-save-btn{background:linear-gradient(135deg,var(--p),#2a5298);color:#fff;border:none;border-radius:10px;padding:11px 24px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px;transition:.18s}
+.ma-save-btn:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(27,58,107,.3)}
+.ma-logout-btn{background:linear-gradient(135deg,#e05,#c00040);color:#fff;border:none;border-radius:10px;padding:11px 24px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px;transition:.18s;margin-top:10px}
+.ma-logout-btn:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(204,0,64,.3)}
+.ma-empty{text-align:center;padding:40px 20px;color:var(--tx2)}
+.ma-empty i{font-size:40px;color:var(--bd);margin-bottom:12px;display:block}
+.ma-empty p{font-size:14px;margin-bottom:16px}
+.ma-empty-btn{background:var(--p);color:#fff;border:none;border-radius:10px;padding:10px 22px;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+/* Login prompt on my-account page */
+.ma-login-prompt{text-align:center;padding:60px 20px;max-width:440px;margin:0 auto}
+.ma-login-prompt .ma-lp-icon{font-size:56px;color:var(--p);margin-bottom:20px;display:block}
+.ma-login-prompt h2{font-size:22px;font-weight:700;color:var(--tx);margin-bottom:10px}
+.ma-login-prompt p{font-size:14px;color:var(--tx2);margin-bottom:24px;line-height:1.7}
+.ma-login-prompt .ma-lp-btns{display:flex;flex-direction:column;gap:10px;align-items:center}
+.ma-lp-btn{width:100%;max-width:300px;padding:13px 24px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;border:none;display:flex;align-items:center;justify-content:center;gap:9px;transition:.18s}
+.ma-lp-btn-primary{background:linear-gradient(135deg,var(--p),#2a5298);color:#fff;box-shadow:0 4px 14px rgba(27,58,107,.28)}
+.ma-lp-btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(27,58,107,.38)}
+.ma-lp-btn-ghost{background:#fff;color:var(--p);border:2px solid var(--p)}
+.ma-lp-btn-ghost:hover{background:var(--lt)}
+.ma-lp-skip{margin-top:8px;font-size:12px;color:var(--gr);background:none;border:none;cursor:pointer;text-decoration:underline}
+@media(max-width:600px){
+  .ma-hero{padding:22px 18px;gap:14px}
+  .ma-tab{min-width:60px;font-size:11px;padding:8px 5px}
+  .ma-tab i{font-size:14px}
+  .my-account-wrap{padding:20px 10px 50px}
+}
 .float-grp{position:relative;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
 .float-items{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
 .float-items.hide{display:none}
@@ -2795,6 +2852,7 @@ footer::after{
 
 <div class="float-wrap">
  <button class="float-top" id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="เลื่อนขึ้นบนสุด"><i class="fas fa-arrow-up"></i></button>
+ <button class="profile-fab-btn" id="profile-fab-btn" onclick="onProfileFabClick()" title="บัญชีของฉัน" data-i18n-title="fab.profile.title"><i class="fas fa-user-circle"></i></button>
  <button class="seo-toggle-btn" id="seo-toggle-btn" data-page="home" onclick="openSeoDrawer()" title="ค้นหาด้วย SEO"><i class="fas fa-list-alt"></i></button>
  <div class="float-grp">
   <div class="float-items hide" id="float-items">
@@ -3401,11 +3459,28 @@ function closeGmapPopup(){
 }
 </script>
 
+<!-- ===== MY ACCOUNT PAGE ===== -->
+<div class="page" id="page-my-account">
+  <div class="page-hero" style="background:linear-gradient(135deg,var(--p) 0%,#2a5298 60%,#1a7a4a 100%);min-height:140px;display:flex;align-items:center;position:relative">
+    <div class="page-hero-content" style="padding:24px 20px">
+      <button class="back-btn" onclick="showPage('home')"><i class="fas fa-arrow-left"></i> <span data-i18n="ph.ma.back">กลับหน้าหลัก</span></button>
+      <h1 style="margin-top:10px"><i class="fas fa-user-circle"></i> <span data-i18n="ph.ma.h1">บัญชีของฉัน</span></h1>
+    </div>
+    <button class="ma-dev-bypass-btn" id="ma-dev-bypass-btn" onclick="_toggleMaDevBypass()" title="Dev Preview — คลิกเพื่อดูหน้าโดยไม่ต้อง Login (ลบทิ้งก่อน production)">
+      <i class="fas fa-flask"></i> <span id="ma-dev-bypass-lbl">DEV Preview</span>
+    </button>
+  </div>
+  <div class="my-account-wrap" id="my-account-content">
+    <!-- Filled by renderMyAccount() -->
+    <div class="ma-empty" style="padding:80px 20px"><i class="fas fa-spinner fa-spin"></i></div>
+  </div>
+</div>
+
 <div class="ov" id="srv-modal" onclick="if(event.target===this)_closeModal('srv-modal')"><div class="modal"><div class="mhd"><h2 id="srv-title2"></h2><span class="mclose" onclick="_closeModal('srv-modal')">×</span></div><div class="mbody" id="srv-body"></div></div></div>
 <div class="ov" id="blog-modal" onclick="if(event.target===this)_closeModal('blog-modal')"><div class="modal"><div class="mhd"><h2 id="blog-title"></h2><span class="mclose" onclick="_closeModal('blog-modal')">×</span></div><div class="mbody" id="blog-body"></div></div></div>
 <div class="ov" id="port-modal" onclick="if(event.target===this)_closeModal('port-modal')"><div class="modal"><div class="mhd"><h2 id="port-title"></h2><span class="mclose" onclick="_closeModal('port-modal')">×</span></div><div class="mbody" id="port-body"></div></div></div>
 <div class="ov" id="ag-modal" onclick="if(event.target===this)_closeModal('ag-modal')"><div class="modal"><div class="mhd"><h2 id="ag-title"></h2><span class="mclose" onclick="_closeModal('ag-modal')">×</span></div><div class="mbody" id="ag-body"></div></div></div>
-<div class="ov" id="login-modal" onclick="if(event.target===this)_closeModal('login-modal')"><div class="modal" style="max-width:400px"><div class="mhd"><h2><i class="fas fa-sign-in-alt" style="color:var(--p)"></i> เข้าสู่ระบบ</h2><span class="mclose" onclick="_closeModal('login-modal')">×</span></div><div class="mbody"><p style="margin-bottom:16px;color:var(--tx2);font-size:13px">กรุณาเข้าสู่ระบบก่อนส่งข้อมูลฝากทรัพย์หรือฝากความต้องการ</p><div class="login-btns"><button class="login-provider" onclick="loginWith('google')"><i class="fab fa-google" style="color:#DB4437"></i> เข้าสู่ระบบด้วย Google</button><button class="login-provider" onclick="loginWith('facebook')"><i class="fab fa-facebook" style="color:var(--fb)"></i> เข้าสู่ระบบด้วย Facebook</button></div><div class="login-sep">หรือ</div><div class="login-toggle"><button id="lt-pw-btn" class="active" onclick="setLoginTab('pw')">รหัสผ่าน</button><button id="lt-magic-btn" onclick="setLoginTab('magic')">Magic Link</button></div><input class="login-field" type="email" id="login-email" placeholder="อีเมล"><div id="lt-pw-section"><input class="login-field" type="password" id="login-pw" placeholder="รหัสผ่าน"><div style="text-align:right;margin-top:-4px;margin-bottom:10px"><button class="auth-link" onclick="resetPassword()">ลืมรหัสผ่าน?</button></div><button class="btn-sub" onclick="loginEmail()"><i class="fas fa-sign-in-alt"></i> เข้าสู่ระบบ</button></div><div id="lt-magic-section" style="display:none"><p class="magic-notice">เราจะส่งลิงก์เข้าสู่ระบบไปที่อีเมลโดยไม่ต้องใช้รหัสผ่าน</p><button class="btn-sub" onclick="loginMagicLink()"><i class="fas fa-magic"></i> ส่ง Magic Link</button></div><div style="margin-top:12px;text-align:center;font-size:12px">ยังไม่มีบัญชี? <a href="#" onclick="showSignup()" style="color:var(--a)">สมัครสมาชิก</a></div></div></div></div>
+<div class="ov" id="login-modal" onclick="if(event.target===this)_closeModal('login-modal')"><div class="modal" style="max-width:400px"><div class="mhd"><h2><i class="fas fa-sign-in-alt" style="color:var(--p)"></i> เข้าสู่ระบบ</h2><span class="mclose" onclick="_closeModal('login-modal')">×</span></div><div class="mbody"><p style="margin-bottom:16px;color:var(--tx2);font-size:13px">กรุณาเข้าสู่ระบบก่อนส่งข้อมูลฝากทรัพย์หรือฝากความต้องการ</p><div class="login-btns"><button class="login-provider" onclick="loginWith('google')"><i class="fab fa-google" style="color:#DB4437"></i> เข้าสู่ระบบด้วย Google</button><button class="login-provider" onclick="loginWith('facebook')"><i class="fab fa-facebook" style="color:var(--fb)"></i> เข้าสู่ระบบด้วย Facebook</button></div><div class="login-sep">หรือ</div><div class="login-toggle"><button id="lt-pw-btn" class="active" onclick="setLoginTab('pw')">รหัสผ่าน</button><button id="lt-magic-btn" onclick="setLoginTab('magic')">Magic Link</button></div><input class="login-field" type="email" id="login-email" placeholder="อีเมล"><div id="lt-pw-section"><input class="login-field" type="password" id="login-pw" placeholder="รหัสผ่าน"><div style="text-align:right;margin-top:-4px;margin-bottom:10px"><button class="auth-link" onclick="resetPassword()">ลืมรหัสผ่าน?</button></div><button class="btn-sub" onclick="loginEmail()"><i class="fas fa-sign-in-alt"></i> เข้าสู่ระบบ</button></div><div id="lt-magic-section" style="display:none"><p class="magic-notice">เราจะส่งลิงก์เข้าสู่ระบบไปที่อีเมลโดยไม่ต้องใช้รหัสผ่าน</p><button class="btn-sub" onclick="loginMagicLink()"><i class="fas fa-magic"></i> ส่ง Magic Link</button></div><div style="margin-top:12px;text-align:center;font-size:12px">ยังไม่มีบัญชี? <a href="#" onclick="showSignup()" style="color:var(--a)">สมัครสมาชิก</a></div><div style="margin-top:10px;text-align:center"><button class="auth-link" style="font-size:12px;color:var(--gr)" onclick="_closeModal('login-modal');showPage('listings')"><i class="fas fa-search"></i> <span id="login-modal-browse-lbl">ดูประกาศก่อน ไม่ต้อง Login</span></button></div></div></div></div>
 <div class="ov" id="signup-modal" onclick="if(event.target===this)_closeModal('signup-modal')"><div class="modal" style="max-width:400px"><div class="mhd"><h2><i class="fas fa-user-plus" style="color:var(--p)"></i> สมัครสมาชิก</h2><span class="mclose" onclick="_closeModal('signup-modal')">×</span></div><div class="mbody"><div class="login-btns"><button class="login-provider" onclick="loginWith('google')"><i class="fab fa-google" style="color:#DB4437"></i> สมัครด้วย Google</button><button class="login-provider" onclick="loginWith('facebook')"><i class="fab fa-facebook" style="color:var(--fb)"></i> สมัครด้วย Facebook</button></div><div class="login-sep">หรือสมัครด้วยอีเมล</div><input class="login-field" type="email" id="su-email" placeholder="อีเมล"><input class="login-field" type="password" id="su-pw" placeholder="รหัสผ่าน (อย่างน้อย 6 ตัว)"><button class="btn-sub" onclick="signupEmail()"><i class="fas fa-user-plus"></i> สมัครสมาชิก</button><div style="margin-top:12px;text-align:center;font-size:12px">มีบัญชีแล้ว? <a href="#" onclick="showLogin()" style="color:var(--a)">เข้าสู่ระบบ</a></div></div></div></div>
 <!-- Reset Password Modal -->
 <div class="ov" id="reset-pw-modal" onclick="if(event.target===this)_closeModal('reset-pw-modal')"><div class="modal" style="max-width:400px"><div class="mhd"><h2><i class="fas fa-key" style="color:var(--p)"></i> ตั้งรหัสผ่านใหม่</h2><span class="mclose" onclick="_closeModal('reset-pw-modal')">×</span></div><div class="mbody"><p style="margin-bottom:16px;color:var(--tx2);font-size:13px">กรอกรหัสผ่านใหม่ของคุณ (อย่างน้อย 6 ตัวอักษร)</p><input class="login-field" type="password" id="newpw-1" placeholder="รหัสผ่านใหม่"><input class="login-field" type="password" id="newpw-2" placeholder="ยืนยันรหัสผ่านใหม่"><button class="btn-sub" onclick="confirmResetPassword()"><i class="fas fa-check"></i> บันทึกรหัสผ่านใหม่</button></div></div></div>
@@ -4104,9 +4179,16 @@ function initAuthListener(){
       _closeModal('login-modal');
       _closeModal('signup-modal');
       toast('เข้าสู่ระบบสำเร็จ ✅');
+      // If user came from my-account FAB, navigate to my-account page
+      if(document.getElementById('page-my-account')?.classList.contains('active')){
+        renderMyAccount();
+      }
     }
     if(_event === 'SIGNED_OUT'){
       toast('ออกจากระบบเรียบร้อย');
+      if(document.getElementById('page-my-account')?.classList.contains('active')){
+        renderMyAccount();
+      }
     }
     if(_event === 'PASSWORD_RECOVERY'){
       // เปิด modal ตั้งรหัสผ่านใหม่ทันที
@@ -4135,6 +4217,8 @@ function renderAuthUI(){
   if(elD)elD.innerHTML=html;
   /* re-bind close-on-outside-click after innerHTML swap */
   _bindUserMenuDismiss();
+  /* sync profile FAB icon */
+  _updateProfileFab();
 }
 function toggleUserMenu(e){
   e.stopPropagation();
@@ -4164,6 +4248,238 @@ function openProfileModal(){
   if(emailEl) emailEl.textContent=user.email||'';
   if(nameEl) nameEl.value=user.user_metadata?.display_name||'';
   _openModal('profile-modal');
+}
+
+/* ── Profile FAB button handler ── */
+function onProfileFabClick(){
+  if(user){
+    showPage('my-account');
+  } else {
+    // show login modal with a note that they can also browse without login
+    _openModal('login-modal-from-fab');
+    if(document.getElementById('login-modal-from-fab')) return;
+    // Fallback: just open login modal and show skip option
+    _openMyAccountGuestPrompt();
+  }
+}
+function _openMyAccountGuestPrompt(){
+  // Show guest-friendly login prompt via my-account page
+  showPage('my-account');
+}
+/* ── Update profile FAB icon based on auth state ── */
+function _updateProfileFab(){
+  const btn = document.getElementById('profile-fab-btn');
+  if(!btn) return;
+  if(user){
+    const init = (user.email||'U')[0].toUpperCase();
+    btn.innerHTML = `<div class="pfab-av">${sanitize(init)}</div>`;
+    btn.title = ui('fab.profile.title')||'บัญชีของฉัน';
+  } else {
+    btn.innerHTML = '<i class="fas fa-user-circle"></i>';
+    btn.title = ui('fab.profile.title')||'เข้าสู่ระบบ / บัญชีของฉัน';
+  }
+}
+/* ── My Account page renderer ── */
+/* ── Dev Bypass: toggle preview mode without login (TEMP — remove before production) ── */
+window._maDevBypass = false;
+function _toggleMaDevBypass(){
+  window._maDevBypass = !window._maDevBypass;
+  renderMyAccount();
+}
+
+function renderMyAccount(){
+  const wrap = document.getElementById('my-account-content');
+  if(!wrap) return;
+  const t = (key) => {
+    const e = I18N_DICT[key]; if(e) return e[_lang]||e['th']||key;
+    return ui(key)||key;
+  };
+  // ── Dev bypass state: update button appearance ──
+  const bypassBtn = document.getElementById('ma-dev-bypass-btn');
+  const bypassLbl = document.getElementById('ma-dev-bypass-lbl');
+  const isDevMode = !!window._maDevBypass;
+  if(bypassBtn) bypassBtn.classList.toggle('active', isDevMode);
+  if(bypassLbl) bypassLbl.textContent = isDevMode ? 'DEV: ON' : 'DEV Preview';
+
+  if(!user && !isDevMode){
+    // Show login prompt
+    wrap.innerHTML = `
+    <div class="ma-login-prompt">
+      <i class="fas fa-door-open ma-lp-icon"></i>
+      <h2>${sanitize(t('ma.login.prompt.h'))}</h2>
+      <p>${sanitize(t('ma.login.prompt.p'))}</p>
+      <div class="ma-lp-btns">
+        <button class="ma-lp-btn ma-lp-btn-primary" onclick="_openModal('login-modal')">
+          <i class="fas fa-sign-in-alt"></i> ${sanitize(t('ma.login.btn'))}
+        </button>
+        <button class="ma-lp-btn ma-lp-btn-ghost" onclick="showPage('home')">
+          <i class="fas fa-home"></i> ${sanitize(t('ma.guest.btn'))}
+        </button>
+        <button class="ma-lp-skip" onclick="showPage('home');setTimeout(()=>{const sb=document.querySelector('.search-box');if(sb)sb.scrollIntoView({behavior:'smooth',block:'center'});},200)">
+          <i class="fas fa-search"></i> ${_lang==='en'?'Search listings without signing in':_lang==='cn'?'不登录直接搜索':_lang==='ja'?'ログインせず検索':'ค้นหาประกาศโดยไม่ต้อง Login'}
+        </button>
+      </div>
+    </div>`;
+    return;
+  }
+  // ── Resolve user data (real or mock for dev mode) ──
+  const _u = user || {
+    email: 'dev@matchdoor.co',
+    created_at: new Date(Date.now() - 30*24*3600*1000).toISOString(),
+    user_metadata: { display_name: 'Dev Preview', phone: '081-234-5678', line_id: '@devpreview' }
+  };
+  // Logged in (or dev bypass) — render full dashboard
+  const init = (_u.email||'U')[0].toUpperCase();
+  const dispName = sanitize(_u.user_metadata?.display_name || _u.email?.split('@')[0] || 'User');
+  const email = sanitize(_u.email||'');
+  const joinDate = _u.created_at ? new Date(_u.created_at).toLocaleDateString(_lang==='th'?'th-TH':_lang==='ja'?'ja-JP':_lang==='cn'?'zh-CN':'en-US',{year:'numeric',month:'long'}) : '';
+  const favCount = (typeof favs!=='undefined' ? favs : []).length;
+  const devBanner = isDevMode ? `<div class="ma-dev-banner"><i class="fas fa-flask"></i> DEV MODE — ดูหน้านี้โดยไม่ต้อง Login (ข้อมูลเป็น mock) กดปุ่ม "DEV: ON" ที่ banner อีกครั้งเพื่อปิด</div>` : '';
+  wrap.innerHTML = `
+  ${devBanner}
+  <div class="ma-hero">
+    <div class="ma-av-ring">${init}</div>
+    <div class="ma-hero-info">
+      <div class="ma-hero-name">${dispName}</div>
+      <div class="ma-hero-email">${email}</div>
+      <div class="ma-hero-badge"><i class="fas fa-check-circle"></i> ${isDevMode?'⚗️ Dev Preview':(_lang==='en'?'Verified Member':_lang==='cn'?'已验证会员':_lang==='ja'?'認証済み':'สมาชิกที่ยืนยันแล้ว')}</div>
+      ${joinDate?`<div style="font-size:11px;opacity:.65;margin-top:6px">${sanitize(t('ma.member.since'))} ${joinDate}</div>`:''}
+    </div>
+  </div>
+  <div class="ma-tab-bar" id="ma-tab-bar">
+    <button class="ma-tab active" data-tab="profile" onclick="_maTab('profile',this)"><i class="fas fa-user"></i> ${sanitize(t('ma.tab.profile'))}</button>
+    <button class="ma-tab" data-tab="favs" onclick="_maTab('favs',this)"><i class="fas fa-heart"></i> ${sanitize(t('ma.tab.favs'))} ${favCount?`<span style="background:var(--a);color:#fff;border-radius:20px;padding:1px 6px;font-size:10px">${favCount}</span>`:''}</button>
+    <button class="ma-tab" data-tab="listings" onclick="_maTab('listings',this)"><i class="fas fa-building"></i> ${sanitize(t('ma.tab.listings'))}</button>
+    <button class="ma-tab" data-tab="requests" onclick="_maTab('requests',this)"><i class="fas fa-file-alt"></i> ${sanitize(t('ma.tab.requests'))}</button>
+    <button class="ma-tab" data-tab="history" onclick="_maTab('history',this)"><i class="fas fa-history"></i> ${sanitize(t('ma.tab.history'))}</button>
+  </div>
+  <!-- Profile panel -->
+  <div class="ma-panel active" id="ma-panel-profile">
+    <div class="ma-section">
+      <div class="ma-section-title"><i class="fas fa-user-edit"></i> ${sanitize(t('ma.profile.title'))}</div>
+      <div class="ma-field">
+        <label>${sanitize(t('ma.profile.name'))}</label>
+        <input type="text" id="ma-display-name" value="${dispName}" placeholder="${sanitize(t('ma.profile.name'))}">
+      </div>
+      <div class="ma-field">
+        <label>${sanitize(t('ma.profile.email'))}</label>
+        <input type="email" value="${email}" disabled style="background:var(--lt);color:var(--gr);cursor:default">
+      </div>
+      <div class="ma-field">
+        <label>${sanitize(t('ma.profile.phone'))}</label>
+        <input type="tel" id="ma-phone" value="${sanitize(_u.user_metadata?.phone||'')}" placeholder="0812345678">
+      </div>
+      <div class="ma-field">
+        <label>${sanitize(t('ma.profile.line'))}</label>
+        <input type="text" id="ma-line-id" value="${sanitize(_u.user_metadata?.line_id||'')}" placeholder="@yourlineid">
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px">
+        <button class="ma-save-btn" onclick="${isDevMode?'alert(\"Dev mode: บันทึกจริงไม่ได้ ต้อง Login ก่อนครับ 🙏\")':'_maSaveProfile()'}">
+          <i class="fas fa-save"></i> ${sanitize(t('ma.profile.save'))}${isDevMode?' (Dev)':''}
+        </button>
+        ${!isDevMode?`<button class="ma-logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> ${sanitize(t('ma.profile.logout'))}</button>`:''}
+      </div>
+    </div>
+  </div>
+  <!-- Favorites panel -->
+  <div class="ma-panel" id="ma-panel-favs">
+    <div class="ma-section">
+      <div class="ma-section-title"><i class="fas fa-heart"></i> ${sanitize(t('ma.tab.favs'))}</div>
+      ${_maFavHtml(t)}
+    </div>
+  </div>
+  <!-- Listings panel -->
+  <div class="ma-panel" id="ma-panel-listings">
+    <div class="ma-section">
+      <div class="ma-section-title"><i class="fas fa-building"></i> ${sanitize(t('ma.tab.listings'))}</div>
+      ${_maEmptyPanel('fa-building',t('ma.listings.empty'),'fa-plus-circle',t('ma.listings.add'),"toggleDD('dd-dep')")}
+    </div>
+  </div>
+  <!-- Requests panel -->
+  <div class="ma-panel" id="ma-panel-requests">
+    <div class="ma-section">
+      <div class="ma-section-title"><i class="fas fa-file-alt"></i> ${sanitize(t('ma.tab.requests'))}</div>
+      ${_maEmptyPanel('fa-file-alt',t('ma.requests.empty'),'fa-search',_lang==='en'?'Browse listings':_lang==='cn'?'浏览房源':_lang==='ja'?'物件を探す':'ค้นหาประกาศ',"showPage('listings')")}
+    </div>
+  </div>
+  <!-- History panel -->
+  <div class="ma-panel" id="ma-panel-history">
+    <div class="ma-section">
+      <div class="ma-section-title"><i class="fas fa-history"></i> ${sanitize(t('ma.tab.history'))}</div>
+      ${_maHistoryHtml(t)}
+    </div>
+  </div>`;
+}
+function _maTab(name, el){
+  document.querySelectorAll('#ma-tab-bar .ma-tab').forEach(b=>b.classList.remove('active'));
+  if(el) el.classList.add('active');
+  document.querySelectorAll('#my-account-content .ma-panel').forEach(p=>p.classList.remove('active'));
+  const panel = document.getElementById('ma-panel-'+name);
+  if(panel) panel.classList.add('active');
+}
+function _maEmptyPanel(icon, msg, btnIcon, btnLabel, btnAction){
+  return `<div class="ma-empty">
+    <i class="fas ${icon}"></i>
+    <p>${sanitize(msg)}</p>
+    <button class="ma-empty-btn" onclick="${btnAction}"><i class="fas ${btnIcon}"></i> ${sanitize(btnLabel)}</button>
+  </div>`;
+}
+function _maFavHtml(t){
+  const myFavs = (typeof favs!=='undefined' ? favs : []);
+  if(!myFavs.length) return `<div class="ma-empty"><i class="fas fa-heart-broken"></i><p>${sanitize(t('ma.favs.empty'))}</p><button class="ma-empty-btn" onclick="showPage('listings')"><i class="fas fa-search"></i> ${sanitize(t('ma.favs.browse'))}</button></div>`;
+  const allProps = (typeof props!=='undefined' ? props : []);
+  const favProps = myFavs.map(id=>allProps.find(p=>String(p.id)===String(id))).filter(Boolean);
+  if(!favProps.length) return `<div class="ma-empty"><i class="fas fa-heart-broken"></i><p>${sanitize(t('ma.favs.empty'))}</p><button class="ma-empty-btn" onclick="showPage('listings')"><i class="fas fa-search"></i> ${sanitize(t('ma.favs.browse'))}</button></div>`;
+  return `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px">${
+    favProps.slice(0,12).map(p=>{
+      const photo = (p.photos||[])[0]||'';
+      const priceStr = p.price>=1e6?(p.price/1e6).toFixed(1)+'M':p.price?.toLocaleString()||'—';
+      return `<div style="border:1.5px solid var(--bd);border-radius:12px;overflow:hidden;cursor:pointer;transition:.15s" onclick="openModal('${p.id}')">
+        ${photo?`<img src="${photo}" style="width:100%;height:140px;object-fit:cover;display:block" loading="lazy">`:`<div style="height:140px;background:var(--lt);display:flex;align-items:center;justify-content:center;font-size:32px">🏠</div>`}
+        <div style="padding:10px 12px">
+          <div style="font-size:13px;font-weight:600;color:var(--tx);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${sanitize(p.title||'')}</div>
+          <div style="font-size:12px;color:var(--gr)">${sanitize(p.location||'')}</div>
+          <div style="font-size:14px;font-weight:700;color:var(--p);margin-top:4px">${priceStr} ฿</div>
+        </div>
+      </div>`;
+    }).join('')
+  }</div>`;
+}
+function _maHistoryHtml(t){
+  // Use view history stored in localStorage
+  let hist = [];
+  try { hist = JSON.parse(localStorage.getItem('md_view_history')||'[]'); } catch(e){}
+  if(!hist.length) return `<div class="ma-empty"><i class="fas fa-history"></i><p>${sanitize(t('ma.history.empty'))}</p></div>`;
+  const allProps = (typeof props!=='undefined' ? props : []);
+  const histProps = hist.slice(0,20).map(id=>allProps.find(p=>String(p.id)===String(id))).filter(Boolean);
+  if(!histProps.length) return `<div class="ma-empty"><i class="fas fa-history"></i><p>${sanitize(t('ma.history.empty'))}</p></div>`;
+  return `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px">${
+    histProps.map(p=>{
+      const photo = (p.photos||[])[0]||'';
+      const priceStr = p.price>=1e6?(p.price/1e6).toFixed(1)+'M':p.price?.toLocaleString()||'—';
+      return `<div style="border:1.5px solid var(--bd);border-radius:12px;overflow:hidden;cursor:pointer" onclick="openModal('${p.id}')">
+        ${photo?`<img src="${photo}" style="width:100%;height:120px;object-fit:cover;display:block" loading="lazy">`:`<div style="height:120px;background:var(--lt);display:flex;align-items:center;justify-content:center;font-size:28px">🏠</div>`}
+        <div style="padding:10px 12px">
+          <div style="font-size:12px;font-weight:600;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${sanitize(p.title||'')}</div>
+          <div style="font-size:13px;font-weight:700;color:var(--p);margin-top:3px">${priceStr} ฿</div>
+        </div>
+      </div>`;
+    }).join('')
+  }</div>`;
+}
+async function _maSaveProfile(){
+  if(!user||!sb) return;
+  const name = document.getElementById('ma-display-name')?.value.trim()||'';
+  const phone = document.getElementById('ma-phone')?.value.trim()||'';
+  const lineId = document.getElementById('ma-line-id')?.value.trim()||'';
+  const btn = document.querySelector('#ma-panel-profile .ma-save-btn');
+  if(btn){btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i>';}
+  const {error} = await sb.auth.updateUser({data:{display_name:name,phone,line_id:lineId}});
+  if(btn){btn.disabled=false;btn.innerHTML=`<i class="fas fa-save"></i> ${ui('ma.profile.save')||'บันทึก'}`;}
+  if(error){ toast('เกิดข้อผิดพลาด: '+error.message,true); return; }
+  toast('บันทึกข้อมูลสำเร็จ ✅');
+  await checkAuth();
+  renderMyAccount();
 }
 function updateFormBtns(){ const logged=!!user; const deps=[['dep-btn','submitDep','form.dep.submit'],['wish-btn','submitWish','form.wish.submit']]; deps.forEach(([id,fn,labelKey])=>{ const b=$(id); if(!b)return; if(logged){ b.innerHTML=`<i class="fas fa-paper-plane btn-icon"></i><span class="btn-spinner"></span> ${sanitize(ui(labelKey))}`; b.onclick=window[fn]; } else{ b.innerHTML='<i class="fas fa-lock btn-icon"></i><span class="btn-spinner"></span> '+sanitize(ui('form.login')); b.onclick=()=>_openModal('login-modal'); } }); }
 async function loginWith(p){
@@ -5011,6 +5327,7 @@ const PAGE_ROUTES = {
   'portfolio':  { path: '/portfolio',  title: 'ผลงานปิดดีลอสังหาฯ กรุงเทพ — Matchdoor',                     desc: 'ผลงานอสังหาริมทรัพย์กรุงเทพที่ Matchdoor ปิดดีลสำเร็จ บ้าน คอนโด ใกล้ BTS MRT พร้อมรีวิวจากลูกค้าจริง' },
   'favorites':  { path: '/favorites',  title: 'รายการโปรดอสังหาฯ — Matchdoor',                                       desc: 'อสังหาริมทรัพย์กรุงเทพที่คุณบันทึกไว้ใน Matchdoor บ้าน คอนโด ที่ดิน ใกล้ BTS MRT' },
   'careers':    { path: '/careers',    title: 'สมัครงานตัวแทนอสังหาฯ กรุงเทพ — Matchdoor',                desc: 'เปิดรับสมัครตัวแทนอสังหาริมทรัพย์กรุงเทพ รายได้ดี ทำงานอิสระ ร่วมทีม Matchdoor' },
+  'my-account': { path: '/my-account', title: 'บัญชีของฉัน — Matchdoor',                                 desc: 'จัดการโปรไฟล์ รายการโปรด และประกาศของคุณบน Matchdoor' },
 };
 
 // Section → filter context for "buy" / "rent" sub-pages
@@ -5281,6 +5598,9 @@ function _silentShowPage(name, skipScrollTop) {
       animateCounter($('ag-agent-cnt'),   agents.length);
     }, 200);
   }
+  else if (name === 'my-account') {
+    renderMyAccount();
+  }
   // seo-toggle-btn: แสดงบนหน้า home และ listings เท่านั้น
   const _seoBtn = document.getElementById('seo-toggle-btn');
   if(_seoBtn) _seoBtn.setAttribute('data-page', (name === 'listings' || name === 'home') ? name : 'other');
@@ -5319,6 +5639,7 @@ function _initRouteFromUrl() {
     '/favorites': 'favorites', '/careers': 'careers',
     '/buy': 'home', '/rent': 'home',
     '/listings': 'listings',
+    '/my-account': 'my-account',
   };
   const targetPage = sectionMap[path];
   if (targetPage) {
@@ -6436,6 +6757,14 @@ function openModal(id){
   const p=props.find(x=>String(x.id)==String(id));
   if(!p)return;
   const a=agents.find(x=>x.id===p.agentId);
+  // ── Track view history ──
+  try{
+    let h=JSON.parse(localStorage.getItem('md_view_history')||'[]');
+    h=h.filter(x=>String(x)!==String(id));
+    h.unshift(String(id));
+    if(h.length>50) h=h.slice(0,50);
+    localStorage.setItem('md_view_history',JSON.stringify(h));
+  }catch(e){}
 
   // ── bump generation + abort ทันที — หยุด batch idle ที่กำลัง render listings อยู่ ──
   if(typeof window._listingsRenderGen !== 'undefined') {
@@ -9221,6 +9550,36 @@ const LANG_META = {
   ja: { flag:'🇯🇵', code:'日本語' },
 };
 const I18N_DICT = {
+  /* ── MY ACCOUNT ── */
+  'ph.ma.back':        {th:'กลับหน้าหลัก',      en:'Back to Home',      cn:'返回首页',   ja:'ホームへ'},
+  'ph.ma.h1':          {th:'บัญชีของฉัน',        en:'My Account',        cn:'我的账户',   ja:'マイアカウント'},
+  'ma.tab.profile':    {th:'โปรไฟล์',            en:'Profile',           cn:'个人资料',   ja:'プロフィール'},
+  'ma.tab.favs':       {th:'รายการโปรด',         en:'Saved',             cn:'收藏',       ja:'お気に入り'},
+  'ma.tab.listings':   {th:'ประกาศของฉัน',       en:'My Listings',       cn:'我的房源',   ja:'掲載中'},
+  'ma.tab.requests':   {th:'คำขอซื้อ/เช่า',      en:'Requests',          cn:'购买/租赁',  ja:'リクエスト'},
+  'ma.tab.history':    {th:'ประวัติดู',           en:'History',           cn:'浏览记录',   ja:'閲覧履歴'},
+  'ma.tab.alerts':     {th:'แจ้งเตือน',           en:'Alerts',            cn:'提醒',       ja:'通知'},
+  'ma.profile.title':  {th:'ข้อมูลส่วนตัว',      en:'Personal Info',     cn:'个人信息',   ja:'個人情報'},
+  'ma.profile.name':   {th:'ชื่อที่แสดง',         en:'Display Name',      cn:'显示名称',   ja:'表示名'},
+  'ma.profile.phone':  {th:'เบอร์โทรศัพท์',      en:'Phone Number',      cn:'电话号码',   ja:'電話番号'},
+  'ma.profile.line':   {th:'LINE ID',             en:'LINE ID',           cn:'LINE ID',    ja:'LINE ID'},
+  'ma.profile.email':  {th:'อีเมล',               en:'Email',             cn:'邮箱',       ja:'メール'},
+  'ma.profile.save':   {th:'บันทึกข้อมูล',        en:'Save Changes',      cn:'保存更改',   ja:'保存する'},
+  'ma.profile.logout': {th:'ออกจากระบบ',          en:'Sign Out',          cn:'退出登录',   ja:'ログアウト'},
+  'ma.favs.empty':     {th:'ยังไม่มีรายการโปรด', en:'No saved listings', cn:'暂无收藏',   ja:'保存なし'},
+  'ma.favs.browse':    {th:'เรียกดูประกาศ',       en:'Browse Listings',   cn:'浏览房源',   ja:'物件を探す'},
+  'ma.listings.empty': {th:'ยังไม่มีประกาศ',      en:'No listings yet',   cn:'暂无房源',   ja:'掲載なし'},
+  'ma.listings.add':   {th:'ฝากทรัพย์กับเรา',    en:'List a Property',   cn:'发布房源',   ja:'物件を登録'},
+  'ma.requests.empty': {th:'ยังไม่มีคำขอ',        en:'No requests yet',   cn:'暂无请求',   ja:'リクエストなし'},
+  'ma.history.empty':  {th:'ยังไม่มีประวัติ',     en:'No history yet',    cn:'暂无记录',   ja:'履歴なし'},
+  'ma.alerts.empty':   {th:'ยังไม่มีการแจ้งเตือน',en:'No alerts set',     cn:'暂无提醒',   ja:'通知なし'},
+  'ma.coming.soon':    {th:'เร็วๆ นี้',           en:'Coming soon',       cn:'即将推出',   ja:'近日公開'},
+  'ma.member.since':   {th:'สมาชิกตั้งแต่',       en:'Member since',      cn:'加入时间',   ja:'登録日'},
+  'ma.login.prompt.h': {th:'เข้าสู่ระบบเพื่อดูบัญชีของคุณ', en:'Sign in to view your account', cn:'登录查看您的账户', ja:'アカウントを表示するにはログイン'},
+  'ma.login.prompt.p': {th:'จัดการโปรไฟล์ รายการโปรด และประกาศของคุณ ได้ในที่เดียว', en:'Manage your profile, saved listings, and property postings in one place.', cn:'在一处管理您的个人资料、收藏和房源。', ja:'プロフィール、保存済み物件、掲載物件を一か所で管理できます。'},
+  'ma.login.btn':      {th:'เข้าสู่ระบบ',         en:'Sign In',           cn:'登录',       ja:'ログイン'},
+  'ma.guest.btn':      {th:'เข้าชมเว็บก่อน',      en:'Continue browsing', cn:'先浏览网站',  ja:'そのまま閲覧'},
+  'fab.profile.title': {th:'บัญชีของฉัน',         en:'My Account',        cn:'我的账户',   ja:'マイアカウント'},
   /* ── NAV ── */
   'nav.new':        {th:'มาใหม่',     en:'New',           cn:'最新',      ja:'新着'},
   'nav.hot':        {th:'Hot',         en:'Hot',           cn:'热门',      ja:'人気'},
@@ -10744,6 +11103,13 @@ function applyLang(){
     // ── Re-render SEO sidebar type buttons so language updates (House/Townhome/Condo etc.) ──
     if(typeof renderListingsSeoSidebar==='function') renderListingsSeoSidebar();
   })();
+  // ── Profile FAB title ──
+  _updateProfileFab();
+  // ── Login modal browse label ──
+  const lmBrowseLbl = document.getElementById('login-modal-browse-lbl');
+  if(lmBrowseLbl) lmBrowseLbl.textContent = _lang==='en'?'Browse listings without signing in':_lang==='cn'?'不登录直接浏览':_lang==='ja'?'ログインせず閲覧':'ดูประกาศก่อน ไม่ต้อง Login';
+  // ── Re-render my-account page if active ──
+  if(document.getElementById('page-my-account')?.classList.contains('active') && typeof renderMyAccount==='function') renderMyAccount();
 }
 function openApplyModal(type){
   closeAllDD();
