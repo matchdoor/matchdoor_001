@@ -6851,7 +6851,7 @@ function clearFavs(){
   toast('ล้างรายการโปรดแล้ว ❤️');
 }
 function updateFavUI(){ const c=favs.length;$('fav-badge').textContent=c;$('fav-count-pill').textContent=c; }
-function renderFavDropdown(){ const el=$('fav-list'); const fp=props.filter(p=>favs.includes(String(p.id))); if(!fp.length){el.innerHTML='<div class="fav-empty"><i class="far fa-heart"></i><p>ยังไม่มีรายการโปรด</p></div>';return;} el.innerHTML=fp.slice(0,5).map(p=>`<div class="fav-item" onclick="openModal('${p.id}');closeAllDD()"><div class="fav-img">${p.photos?.[0]?`<img src="${p.photos[0]}" loading="lazy">`:(p.icon||typeIcon(p.type))}</div><div class="fav-info"><div class="fav-title">${_st}</div><div class="fav-loc"><i class="fas fa-map-marker-alt"></i> ${_sl}</div><div class="fav-price">${fmtPrice(p.price,p.tx)}</div></div><div class="fav-rm" onclick="event.stopPropagation();toggleFav('${p.id}')"><i class="fas fa-times"></i></div></div>`).join(''); if(fp.length>5)el.innerHTML+=`<div style="text-align:center;padding:10px;color:var(--gr);font-size:12px">และอีก ${fp.length-5} รายการ</div>`; }
+function renderFavDropdown(){ const el=$('fav-list'); const fp=props.filter(p=>favs.includes(String(p.id))); if(!fp.length){el.innerHTML='<div class="fav-empty"><i class="far fa-heart"></i><p>ยังไม่มีรายการโปรด</p></div>';return;} el.innerHTML=fp.slice(0,5).map(p=>{ const _st=sanitize(p.title||''); const _sl=sanitize(p.location||''); return `<div class="fav-item" onclick="openModal('${p.id}');closeAllDD()"><div class="fav-img">${p.photos?.[0]?`<img src="${p.photos[0]}" loading="lazy">`:(p.icon||typeIcon(p.type))}</div><div class="fav-info"><div class="fav-title">${_st}</div><div class="fav-loc"><i class="fas fa-map-marker-alt"></i> ${_sl}</div><div class="fav-price">${fmtPrice(p.price,p.tx)}</div></div><div class="fav-rm" onclick="event.stopPropagation();toggleFav('${p.id}')"><i class="fas fa-times"></i></div></div>`; }).join(''); if(fp.length>5)el.innerHTML+=`<div style="text-align:center;padding:10px;color:var(--gr);font-size:12px">และอีก ${fp.length-5} รายการ</div>`; }
 function animFavCounters(total, buy, rent) {
   animateCounter($('fav-total'), total, 1200);
   animateCounter($('fav-buy'),   buy,   1200);
@@ -7437,7 +7437,7 @@ function renderPortfolio(filter){ let list=port; if(filter!=='all'){if(filter===
     imgHtml=p.icon||typeIcon(p.type);
   }
   const ribbonLabel = p.status==='SOLD' ? ui('ph.port.sold') : ui('ph.port.rented');
-  return `<div class="gal-card" onclick='showPortDetail(${JSON.stringify(p)})'><div class="gal-img">${imgHtml}<div class="ribbon ${p.status==='SOLD'?'r-sold':'r-rent'}">${ribbonLabel}</div></div><div class="gal-body"><div class="gal-price">${fmtPrice(p.price,p.status==='RENTED'?'RENT':'BUY')}</div><div style="font-size:13px;font-weight:600">${p.title}</div><div style="font-size:11px;color:var(--gr)">${p.location}</div></div></div>`;
+  return `<div class="gal-card" onclick='showPortDetail(${JSON.stringify(p)})'><div class="gal-img">${imgHtml}<div class="ribbon ${p.status==='SOLD'?'r-sold':'r-rent'}">${ribbonLabel}</div></div><div class="gal-body"><div class="gal-price">${fmtPrice(p.price,p.status==='RENTED'?'RENT':'BUY')}</div><div style="font-size:13px;font-weight:600">${sanitize(p.title||'')}</div><div style="font-size:11px;color:var(--gr)">${sanitize(p.location||'')}</div></div></div>`;
 }).join(''):'<div class="empty" style="grid-column:1/-1"><i class="fas fa-search"></i><p>ไม่พบรายการ</p></div>';
 setTimeout(initAllCardSwipes, 100); }
 function filterPort(f,el){ $$('.gf').forEach(b=>b.classList.remove('active')); if(el)el.classList.add('active'); renderPortfolio(f); }
@@ -7463,7 +7463,7 @@ function showPortDetail(p){
       <span class="ptag" style="background:${sc}22;border-color:${sc}55;color:${sc}">${st}</span>
     </div>
     <div style="background:var(--bg);padding:12px 16px;border-radius:10px;margin-bottom:14px">
-      <div style="margin-bottom:6px"><strong>${ui('ph.port.label.loc')}:</strong> ${p.location}</div>
+      <div style="margin-bottom:6px"><strong>${ui('ph.port.label.loc')}:</strong> ${sanitize(p.location||'')}</div>
       <div style="margin-bottom:6px"><strong>${ui('ph.port.label.price')}:</strong> ${fmtPrice(p.price,p.status==='RENTED'?'RENT':'BUY')}</div>
       <div><strong>${ui('ph.port.label.date')}:</strong> ${p.date}</div>
     </div>
@@ -7526,8 +7526,8 @@ function showAgentDetail(a){
           <div class="nearby-mini-img">${p.photos?.[0]?`<img src="${p.photos[0]}" loading="lazy">`:`<span style="font-size:22px">${p.icon||typeIcon(p.type)}</span>`}</div>
           <div class="nearby-mini-body">
             <div class="nearby-mini-price">${fmtPrice(p.price,p.tx)}</div>
-            <div class="nearby-mini-title">${p.title}</div>
-            <div class="nearby-mini-loc"><i class="fas fa-map-marker-alt"></i> ${p.location}</div>
+            <div class="nearby-mini-title">${sanitize(p.title||'')}</div>
+            <div class="nearby-mini-loc"><i class="fas fa-map-marker-alt"></i> ${sanitize(p.location||'')}</div>
           </div>
         </div>`).join('')}
       </div>
@@ -8035,8 +8035,8 @@ function initAutocomplete() {
     list.innerHTML = matches.map(p=>`
       <div class="ac-item" onclick="selectAC('${p.id}','${p.title.replace(/'/g,"\\'")}','${(p.location||'').replace(/'/g,"\\'")}')">
         <span style="font-size:16px">${typeIcon(p.type)}</span>
-        <span>${highlight(p.title,kw)}</span>
-        <span class="ac-sub">${p.location||''}</span>
+        <span>${highlight(sanitize(p.title||''),kw)}</span>
+        <span class="ac-sub">${sanitize(p.location||'')}</span>
       </div>`).join('');
     list.style.display='block';
   }, 300);
@@ -8075,8 +8075,8 @@ function initListingsAutocomplete() {
         list.innerHTML = matches.map(p=>`
           <div class="ac-item" onclick="selectLsAC('${p.id}','${p.title.replace(/'/g,"\\'")}','${(p.location||'').replace(/'/g,"\\'")}')">
             <span style="font-size:15px">${typeIcon(p.type)}</span>
-            <span>${highlight(p.title,kw)}</span>
-            <span class="ac-sub">${p.location||''}</span>
+            <span>${highlight(sanitize(p.title||''),kw)}</span>
+            <span class="ac-sub">${sanitize(p.location||'')}</span>
           </div>`).join('');
         list.style.display='block';
       }, 280);
@@ -8691,8 +8691,8 @@ function renderRecCarousel() {
       </div>
       <div class="rec-card-body">
         <div class="rec-card-price">${fmtPrice(p.price,p.tx)}</div>
-        <div class="rec-card-title">${p.title}</div>
-        <div class="rec-card-loc"><i class="fas fa-map-marker-alt"></i> ${p.location||p.province||''}</div>
+        <div class="rec-card-title">${sanitize(p.title||'')}</div>
+        <div class="rec-card-loc"><i class="fas fa-map-marker-alt"></i> ${sanitize(p.location||p.province||'')}</div>
       </div>
     </div>`;
   }).join('');
@@ -8859,8 +8859,8 @@ async function renderNearbyProps(prop, container) {
             <div class="nearby-mini-img">${img ? `<img src="${img}" loading="lazy">` : typeIcon(np.type)}</div>
             <div class="nearby-mini-body">
               <div class="nearby-mini-price">${fmtPrice(np.price,np.tx)}</div>
-              <div class="nearby-mini-title">${np.title}</div>
-              <div class="nearby-mini-loc"><i class="fas fa-map-marker-alt"></i> ${np.location||''}</div>
+              <div class="nearby-mini-title">${sanitize(np.title||'')}</div>
+              <div class="nearby-mini-loc"><i class="fas fa-map-marker-alt"></i> ${sanitize(np.location||'')}</div>
             </div>
           </div>`;
         }).join('')}
@@ -9233,8 +9233,8 @@ function renderGalleryCarousel() {
       </div>
       <div class="gc-card-body">
         <div class="gc-card-price">${fmtPrice(p.price, p.tx)}</div>
-        <div class="gc-card-title">${p.title}</div>
-        <div class="gc-card-loc"><i class="fas fa-map-marker-alt"></i> ${p.location||p.province||''}</div>
+        <div class="gc-card-title">${sanitize(p.title||'')}</div>
+        <div class="gc-card-loc"><i class="fas fa-map-marker-alt"></i> ${sanitize(p.location||p.province||'')}</div>
       </div>
     </div>`;
   }).join('');
@@ -11467,8 +11467,8 @@ function renderHomePortfolio(){
       </div>
       <div class="blog-body">
         <span class="blog-cat">${p.type||'อสังหาฯ'}</span>
-        <div class="blog-title">${p.title}</div>
-        <div class="blog-meta"><i class="fas fa-map-marker-alt"></i> ${p.location||'—'} · ${p.date||''}</div>
+        <div class="blog-title">${sanitize(p.title||'')}</div>
+        <div class="blog-meta"><i class="fas fa-map-marker-alt"></i> ${sanitize(p.location||'—')} · ${sanitize(p.date||'')}</div>
         <div style="margin-top:6px;font-size:13px;font-weight:700;color:var(--a)">฿${Number(p.price||0).toLocaleString()}</div>
         ${p.review?`<div style="margin-top:6px;font-size:11px;color:var(--tx2);font-style:italic;border-left:2px solid var(--bd);padding-left:8px">"${p.review}"</div>`:''}
       </div>
@@ -14099,7 +14099,7 @@ async function _renderAdminPanel(panel){
       <div class="admin-section-head"><div class="admin-section-title"><i class="fas fa-trophy"></i> Portfolio ปิดดีล (${allPort.length})</div><button class="admin-btn admin-btn-primary" onclick="adminAddPortfolio()"><i class="fas fa-plus"></i> เพิ่มผลงาน</button></div>
       <table class="admin-table"><thead><tr><th>ชื่อทรัพย์</th><th>ราคาปิดดีล</th><th>Agent</th><th>วันที่ปิด</th><th>Action</th></tr></thead>
       <tbody>${(allPort.length?allPort:[{title:'ตัวอย่าง: Ashton Asoke',price:8500000,agent:'คุณ A',date:'2025-01'}]).map(p=>`<tr>
-        <td><strong style="color:#fff">${p.title||'-'}</strong></td>
+        <td><strong style="color:#fff">${sanitize(p.title||'-')}</strong></td>
         <td style="color:#c8922a;font-weight:700">${p.price?'฿'+(p.price/1e6).toFixed(1)+'M':'-'}</td>
         <td style="color:rgba(255,255,255,.6)">${p.agent||'-'}</td>
         <td style="font-size:12px;color:rgba(255,255,255,.4)">${p.date||p.closed_at||'-'}</td>
@@ -14166,7 +14166,7 @@ function _adminPropsTable(data){
   if(!data||!data.length) return '<div class="admin-empty"><i class="fas fa-inbox"></i><p>ไม่มีข้อมูล</p></div>';
   return `<table class="admin-table"><thead><tr><th>ชื่อทรัพย์</th><th>ประเภท</th><th>ราคา</th><th>จังหวัด</th><th>สถานะ</th><th>Action</th></tr></thead>
   <tbody>${data.map(p=>`<tr>
-    <td style="max-width:180px"><strong style="color:#fff;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.title||'-'}</strong><span style="font-size:11px;color:rgba(255,255,255,.3)">#${p.id||'-'}</span></td>
+    <td style="max-width:180px"><strong style="color:#fff;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${sanitize(p.title||'-')}</strong><span style="font-size:11px;color:rgba(255,255,255,.3)">#${p.id||'-'}</span></td>
     <td><span class="admin-badge admin-badge-active" style="font-size:10px">${p.type||'-'}</span></td>
     <td style="color:#c8922a;font-weight:700;white-space:nowrap">${p.price?'฿'+(p.price>=1e6?(p.price/1e6).toFixed(1)+'M':p.price.toLocaleString()):'-'}</td>
     <td style="font-size:12px;color:rgba(255,255,255,.5)">${p.province||'-'}</td>
