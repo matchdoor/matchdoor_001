@@ -254,6 +254,8 @@
 <noscript><link rel="stylesheet"
   href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
   crossorigin="anonymous"></noscript>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" defer></script>
 <!-- Supabase: โหลดแบบ defer — ป้องกัน race condition กับ initSB() (ย้ายไปก่อน </body> แล้ว) -->
 <!-- ═══ Cloudflare Turnstile (Invisible CAPTCHA) ═══════════════════════════
      ⚠️ แทน data-sitekey ด้วย Turnstile Site Key จาก Cloudflare Dashboard
@@ -369,10 +371,62 @@ a,button,input,select,textarea,
 
 /* ══ MAP IFRAME TOUCH FIX — เลื่อนดูแผนที่ด้วย 1 นิ้ว, ซูมด้วย 2 นิ้ว ══ */
 iframe#listings-google-map,
-iframe#gmap-popup-iframe,
 #m-map iframe,
-#m-map-btn-wrap iframe{
+#m-map-btn-wrap iframe,
+iframe#gmap-inline-iframe{
   touch-action:pan-x pan-y!important;
+}
+#popup-leaflet-map{
+  touch-action:pan-x pan-y!important;
+}
+
+/* ══ MATCHDOOR INTERACTIVE MAP — Airbnb-style Leaflet Map ══ */
+#md-map-panel{display:none;background:#0A1628;border-bottom:2px solid rgba(200,146,42,.3)}
+#md-map-panel.open{display:block}
+#md-map-wrap{position:relative;border-radius:14px;overflow:hidden;border:2px solid rgba(200,146,42,.25);height:500px}
+@media(max-width:768px){#md-map-wrap{height:360px}}
+#md-leaflet-map{width:100%;height:100%}
+.md-map-price-pin{background:var(--p);color:#fff;padding:5px 9px;border-radius:20px;font-size:12px;font-weight:700;white-space:nowrap;box-shadow:0 2px 8px rgba(27,58,107,.45);border:2px solid rgba(255,255,255,.25);cursor:pointer;transition:.15s;line-height:1}
+.md-map-price-pin:hover,.md-map-price-pin.active{background:var(--a);color:#1a1a2e;transform:scale(1.1);z-index:1000!important;border-color:#fff}
+.md-map-price-pin.rent-pin{background:#3D7A55}
+.md-map-price-pin.rent-pin:hover,.md-map-price-pin.rent-pin.active{background:var(--a);color:#1a1a2e}
+.leaflet-popup-content-wrapper{background:#fff;border-radius:14px!important;box-shadow:0 8px 32px rgba(27,58,107,.28)!important;padding:0!important;overflow:hidden;border:1.5px solid rgba(200,146,42,.2)}
+.leaflet-popup-content{margin:0!important;width:260px!important}
+.leaflet-popup-tip-container{display:none}
+.md-popup-img{width:100%;height:140px;object-fit:cover;display:block}
+.md-popup-img-ph{width:100%;height:140px;background:linear-gradient(135deg,#1B3A6B,#0F2548);display:flex;align-items:center;justify-content:center;font-size:36px}
+.md-popup-body{padding:10px 12px 12px}
+.md-popup-type{font-size:10px;font-weight:700;color:var(--p);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.md-popup-title{font-size:13px;font-weight:700;color:#1A1A2E;line-height:1.3;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.md-popup-loc{font-size:11px;color:#8A8070;display:flex;align-items:center;gap:4px;margin-bottom:6px}
+.md-popup-price{font-size:17px;font-weight:800;color:var(--p)}
+.md-popup-specs{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap}
+.md-popup-spec{font-size:11px;color:#4A4438;display:flex;align-items:center;gap:3px}
+.md-popup-btn{display:block;margin-top:8px;background:linear-gradient(135deg,var(--a),var(--a2));color:#1A1A2E;border:none;border-radius:8px;padding:7px 0;font-size:12px;font-weight:700;cursor:pointer;width:100%;text-align:center}
+.md-map-filter-bar{display:flex;align-items:center;gap:8px;padding:10px 0 0;flex-wrap:wrap}
+.md-map-fchip{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid rgba(255,255,255,.2);color:rgba(255,255,255,.8);background:rgba(255,255,255,.08);transition:.15s}
+.md-map-fchip:hover,.md-map-fchip.active{background:var(--a);color:#1A1A2E;border-color:var(--a)}
+.md-map-count{font-size:12px;color:rgba(255,255,255,.5);margin-left:auto}
+.leaflet-control-attribution{display:none!important}
+.leaflet-control-zoom a{background:#1B3A6B!important;color:#fff!important;border-color:rgba(200,146,42,.3)!important}
+.leaflet-control-zoom a:hover{background:var(--a)!important;color:#1A1A2E!important}
+
+/* ══ INLINE MAP PANEL — sliding panel inside all-modal ══ */
+#gmap-inline-panel{
+  overflow:hidden;
+  max-height:0;
+  transition:max-height .45s cubic-bezier(.32,1,.56,1), opacity .35s ease;
+  opacity:0;
+  border-radius:14px;
+  margin-bottom:0;
+}
+#gmap-inline-panel.map-open{
+  max-height:520px;
+  opacity:1;
+  margin-bottom:16px;
+}
+@media(max-width:600px){
+  #gmap-inline-panel.map-open{ max-height:380px; }
 }
 
 /* ══ FIX GLOBAL: body.modal-open สำหรับทุก device ══
@@ -843,6 +897,273 @@ nav{
 }
 /* modal wide ยังคงไว้สำหรับ all-modal และอื่นๆ ที่ต้องการกว้าง */
 .modal.wide{max-width:1000px;width:95vw;max-height:92vh}
+
+/* ══ ALL-MODAL: header polish when map is open ══ */
+#all-modal.map-layout .mhd{
+  background:linear-gradient(135deg,#0d1e3a 0%,#1B3A6B 100%);
+  border-bottom:2px solid rgba(200,146,42,.35);
+}
+#all-modal.map-layout .mhd h2{color:#fff}
+#all-modal.map-layout .mclose{color:rgba(255,255,255,.65)}
+#all-modal.map-layout .mclose:hover{color:#C8922A}
+
+/* ══ ALL-MODAL MAP-OPEN: side-by-side layout on desktop/tablet landscape ══ */
+@media(min-width:769px){
+  #all-modal.map-layout .modal.wide{
+    max-width:1400px;
+    width:96vw;
+    max-height:92vh;
+    box-shadow:0 32px 80px rgba(10,22,40,.55),0 0 0 1px rgba(200,146,42,.18)!important;
+    overflow:hidden;
+  }
+  #all-modal.map-layout .modal.wide .mbody{
+    display:flex;
+    flex-direction:row;
+    gap:0;
+    padding:0;
+    overflow:hidden;
+    height:calc(92vh - 57px);
+    max-height:none;
+  }
+  /* ── Left: map column ── */
+  #all-modal.map-layout #all-body-map-col{
+    width:45%;
+    flex-shrink:0;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    background:#0A1628;
+    box-shadow:inset -1px 0 0 rgba(200,146,42,.2),inset -4px 0 16px rgba(0,0,0,.2);
+  }
+  /* ── Right: cards column ── */
+  #all-modal.map-layout #all-body-cards-col{
+    flex:1;
+    min-width:0;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior:contain;
+    padding:16px 18px 20px;
+    background:#F8F5F0;
+  }
+  /* gmap panel fills map column */
+  #all-modal.map-layout #gmap-inline-panel{
+    max-height:none!important;
+    opacity:1!important;
+    margin-bottom:0!important;
+    border-radius:0!important;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    flex:1;
+    min-height:0;
+    height:100%;
+  }
+  #all-modal.map-layout #gmap-inline-panel .popup-map-inner{
+    display:flex;
+    flex-direction:column;
+    flex:1;
+    min-height:0;
+    height:100%;
+  }
+  /* map leaflet wrap fills remaining space */
+  #all-modal.map-layout .popup-map-leaflet-wrap{
+    flex:1!important;
+    min-height:0!important;
+    margin:0!important;
+    border-radius:0!important;
+    border:none!important;
+    border-top:1px solid rgba(200,146,42,.14)!important;
+  }
+  #all-modal.map-layout #popup-leaflet-map{
+    width:100%!important;
+    height:100%!important;
+    min-height:0!important;
+    border-radius:0!important;
+  }
+  /* cards grid: 2 cols */
+  #all-modal.map-layout #modal-prop-grid{
+    grid-template-columns:repeat(2,1fr)!important;
+    gap:12px!important;
+  }
+  #all-modal.map-layout #modal-pg-wrap{padding-bottom:10px}
+}
+
+/* ══ Mobile/portrait: stacked (unchanged) ══ */
+@media(max-width:768px){
+  #all-body-map-col,#all-body-cards-col{width:100%!important}
+  #all-body-cards-col{padding:0;background:#fff}
+  #all-modal.map-layout .mhd{background:#fff;border-bottom:1.5px solid var(--lt)}
+  #all-modal.map-layout .mhd h2{color:var(--tx)}
+  #all-modal.map-layout .mclose{color:var(--gr)}
+}
+
+/* ══ Popup map header toolbar classes ══ */
+.popup-map-inner{
+  background:#0A1628;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  height:100%;
+  flex:1;
+  min-height:0;
+}
+.popup-map-header{
+  background:linear-gradient(180deg,#0f2040 0%,#0A1628 100%);
+  padding:12px 16px 0;
+  flex-shrink:0;
+  border-bottom:1px solid rgba(200,146,42,.12);
+}
+.popup-map-title-row{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:10px;gap:8px;flex-wrap:wrap;
+}
+.popup-map-title{
+  color:#fff;font-size:13px;font-weight:700;
+  font-family:'Kanit',sans-serif;
+  display:flex;align-items:center;gap:8px;
+}
+.popup-map-title i{color:#C8922A;font-size:15px}
+.popup-map-pin-count{
+  font-size:11px;font-weight:400;color:rgba(255,255,255,.45);
+  background:rgba(255,255,255,.07);
+  padding:2px 8px;border-radius:20px;
+  border:1px solid rgba(255,255,255,.1);
+}
+.popup-map-actions{display:flex;align-items:center;gap:6px}
+.popup-map-action-btn{
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.13);
+  color:rgba(255,255,255,.75);
+  border-radius:7px;
+  padding:5px 11px;
+  font-size:11px;font-weight:600;
+  cursor:pointer;
+  display:flex;align-items:center;gap:5px;
+  transition:background .15s,border-color .15s,color .15s;
+  font-family:inherit;
+  white-space:nowrap;
+}
+.popup-map-action-btn:hover{
+  background:rgba(200,146,42,.18);
+  border-color:rgba(200,146,42,.4);
+  color:#e6a830;
+}
+.popup-map-action-btn.close-btn:hover{
+  background:rgba(239,68,68,.14);
+  border-color:rgba(239,68,68,.28);
+  color:#f87171;
+}
+.popup-map-chips-row{
+  display:flex;align-items:center;gap:7px;
+  padding-bottom:10px;
+}
+/* ══ Modal Advanced Filter Bar ══ */
+.modal-adv-filter-bar{
+  background:linear-gradient(135deg,#f8faff 0%,#f2f5fb 100%);
+  border:1.5px solid #dde4f0;
+  border-radius:14px;
+  padding:12px 14px 10px;
+  margin-bottom:12px;
+  display:flex;flex-direction:column;gap:9px;
+  box-shadow:0 2px 12px rgba(27,58,107,.06);
+}
+.modal-adv-filter-row1{
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+}
+.modal-adv-filter-row2{
+  display:flex;align-items:center;gap:7px;flex-wrap:wrap;
+}
+.modal-adv-search-wrap{
+  flex:1;min-width:160px;max-width:280px;
+  position:relative;
+  display:flex;align-items:center;
+}
+.modal-adv-search-wrap i{
+  position:absolute;left:9px;color:#9ba8bb;font-size:12px;pointer-events:none;
+}
+.modal-adv-search-input{
+  width:100%;padding:6px 10px 6px 28px;
+  border:1.5px solid #dde3ee;border-radius:9px;
+  font-size:12px;color:var(--tx);background:#fff;outline:none;
+  transition:border-color .15s,box-shadow .15s;
+}
+.modal-adv-search-input:focus{border-color:var(--a);box-shadow:0 0 0 3px rgba(200,146,42,.12)}
+.modal-adv-search-input::placeholder{color:#b0b8cc}
+.modal-adv-select{
+  padding:6px 22px 6px 9px;border:1.5px solid #dde3ee;border-radius:9px;
+  font-size:12px;color:var(--tx);background:#fff;outline:none;cursor:pointer;
+  min-width:90px;max-width:150px;
+  transition:border-color .15s,box-shadow .15s;
+  appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239ba8bb'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 7px center;
+  flex-shrink:0;
+}
+.modal-adv-select:focus{border-color:var(--a);box-shadow:0 0 0 3px rgba(200,146,42,.12)}
+.modal-adv-select:not(:disabled):hover{border-color:#b0bccc}
+.modal-adv-filter-btn{
+  padding:6px 13px;background:var(--p);color:#fff;border:none;border-radius:9px;
+  font-size:12px;font-weight:700;cursor:pointer;
+  display:flex;align-items:center;gap:5px;white-space:nowrap;flex-shrink:0;
+  transition:opacity .15s,transform .1s;
+  box-shadow:0 2px 8px rgba(27,58,107,.18);
+}
+.modal-adv-filter-btn:hover{opacity:.88;transform:translateY(-1px)}
+.modal-adv-reset-btn{
+  padding:6px 11px;background:#fff;color:#9ba8bb;border:1.5px solid #dde3ee;border-radius:9px;
+  font-size:12px;font-weight:600;cursor:pointer;
+  display:flex;align-items:center;gap:4px;white-space:nowrap;flex-shrink:0;
+  transition:all .15s;
+}
+.modal-adv-reset-btn:hover{border-color:#c0cadb;color:var(--tx)}
+.modal-adv-map-btn{
+  padding:6px 12px;background:linear-gradient(135deg,#C8922A,#e6a830);color:#1A1A2E;border:none;border-radius:9px;
+  font-size:12px;font-weight:700;cursor:pointer;
+  display:flex;align-items:center;gap:5px;white-space:nowrap;flex-shrink:0;
+  box-shadow:0 2px 8px rgba(200,146,42,.28);transition:opacity .15s,transform .1s;
+}
+.modal-adv-map-btn:hover{opacity:.88;transform:translateY(-1px)}
+.modal-adv-result-count{
+  font-size:11px;color:#6e7e96;font-weight:600;white-space:nowrap;
+  background:#eef2f9;padding:3px 9px;border-radius:20px;
+  border:1px solid #dde3ee;
+}
+.popup-map-count-badge{
+  margin-left:auto;
+  font-size:11px;color:rgba(255,255,255,.4);
+  background:rgba(255,255,255,.05);
+  padding:2px 9px;border-radius:20px;
+  border:1px solid rgba(255,255,255,.08);
+}
+
+/* ══ Cards column toolbar ══ */
+.modal-cards-toolbar{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:8px;flex-wrap:nowrap;
+  background:#fff;
+  border-radius:12px;
+  padding:10px 14px;
+  margin-bottom:14px;
+  border:1.5px solid #EDE8DF;
+  box-shadow:0 2px 8px rgba(27,58,107,.06);
+}
+.modal-cards-toolbar-left{flex-shrink:0}
+.modal-cards-toolbar-right{
+  display:flex;align-items:center;gap:8px;flex-shrink:0;margin-left:auto;
+}
+
+/* ══ Prop cards in map-layout mode: subtle shadow + hover ══ */
+#all-modal.map-layout #modal-prop-grid .prop-card{
+  box-shadow:0 2px 10px rgba(27,58,107,.08)!important;
+  border:1.5px solid #EDE8DF;
+  background:#fff;
+  transition:box-shadow .18s,transform .18s;
+}
+#all-modal.map-layout #modal-prop-grid .prop-card:hover{
+  box-shadow:0 6px 24px rgba(27,58,107,.14)!important;
+  transform:translateY(-2px);
+}
+
 .mhd{padding:16px 20px;border-bottom:1.5px solid var(--lt);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#fff;z-index:10}
 .mhd h2{font-size:16px;font-weight:700}
 .mclose{font-size:22px;cursor:pointer;color:var(--gr);line-height:1}
@@ -1312,7 +1633,9 @@ footer{background:linear-gradient(135deg,#2d2650 0%,#3d3373 100%);color:rgba(255
 .pb-rent{background:rgba(139,68,172,.9);color:#fff}
 .pb-buy{background:rgba(15,52,96,.85);color:#fff}
 .prop-fav{position:absolute;top:10px;right:10px;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.92);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10;transition:.2s;color:var(--gr)}
-.prop-fav:hover,.prop-fav.favorited{background:var(--red);color:#fff}
+.prop-fav:hover{background:var(--red);color:#fff}
+.prop-fav.favorited{background:#ff4d8b;color:#fff;border:none}
+.prop-fav.favorited i{filter:drop-shadow(0 0 4px rgba(255,77,139,.6))}
 .prop-days{position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,.6);color:#fff;font-size:10px;padding:3px 9px;border-radius:20px}
 .prop-body{padding:14px}
 .prop-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
@@ -3625,43 +3948,411 @@ footer::after{
 <div class="ov" id="prop-modal" onclick="closeModal(event)"><div class="modal"><div class="mhd"><h2 id="m-title"></h2><div style="display:flex;align-items:center;gap:8px"><button onclick="event.stopPropagation();(function(){const url=location.href;if(navigator.share)navigator.share({title:document.title,url});else navigator.clipboard?.writeText(url).then(()=>toast('คัดลอก URL แล้ว ✅'));})()" style="width:34px;height:34px;border-radius:50%;background:var(--lt);border:1.5px solid var(--bd);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--p);font-size:14px" title="แชร์"><i class="fas fa-share-nodes"></i></button><button id="m-fav-btn" onclick="event.stopPropagation();toggleModalFav()" class="modal-fav-btn" title="เพิ่มรายการโปรด"><i class="far fa-heart"></i></button><span class="mclose" onclick="event.stopPropagation();closeModal()">×</span></div></div><div class="mbody"><div class="mslider-wrap"><div class="mslider"><div class="slides" id="slides"></div></div><button class="sarr prev" onclick="slide(-1)"><i class="fas fa-chevron-left"></i></button><button class="sarr next" onclick="slide(1)"><i class="fas fa-chevron-right"></i></button><div class="sdots" id="sdots"></div></div><div id="m-tags" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px"></div><div class="modal-price" id="m-price"></div><div class="modal-loc" id="m-loc"></div><div class="specs" id="m-specs"></div><div id="m-extras"></div><div class="agent-box" id="m-agent"><div class="ag-av" id="m-ag-av"></div><div><div id="m-ag-name" style="font-weight:700"></div><div id="m-ag-role" style="font-size:12px;color:var(--gr)"></div></div></div><div class="modal-desc" id="m-desc"></div><div id="m-chips" style="margin-bottom:10px"></div><div id="m-map" style="margin-bottom:16px"></div><div id="m-360-wrap" style="margin-bottom:16px"><button id="m-360-toggle-btn" onclick="toggle360()" style="display:flex;align-items:center;gap:8px;width:100%;background:linear-gradient(135deg,#0f1e3a,#1b3a6b);color:#fff;border:none;border-radius:12px;padding:13px 18px;cursor:pointer;font-size:14px;font-weight:700;font-family:inherit;transition:.2s" onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'"><i class="fas fa-street-view" style="font-size:18px;opacity:.9"></i><span id="m-360-label">มุมมอง 360°</span><span class="tour360-badge">Virtual Tour</span><i id="m-360-chevron" class="fas fa-chevron-down" style="margin-left:auto;font-size:12px;opacity:.7;transition:transform .3s"></i></button><div id="m-360-viewer-wrap" style="display:none;margin-top:8px"><div id="m-360-viewer" class="tour360-viewer"><canvas id="tour360-canvas"></canvas><div class="tour360-hint"><i class="fas fa-hand-pointer"></i> <span id="m-drag-hint">ลากเพื่อหมุน</span></div><button class="tour360-close" onclick="toggle360()"><i class="fas fa-times"></i></button></div></div></div><div id="m-nearby" style="margin-bottom:14px"></div><div class="cta-row"><a class="btn-cta cta-ln" id="m-ln" href="#" target="_blank"><i class="fab fa-line"></i> <span id="m-ln-label">แชท Line</span></a><a class="btn-cta cta-tel" id="m-tel" href="#"><i class="fas fa-mobile-alt"></i> <span id="m-tel-label">โทรสอบถาม</span></a></div></div></div></div>
 <div class="ov" id="all-modal" onclick="if(event.target===this){if(window._allModalParentType){var _pt=window._allModalParentType;window._allModalParentType=null;openAllModal(_pt);}else{_closeModal('all-modal');window._modalCurrentType=null;}}"><div class="modal wide"><div class="mhd"><h2 id="all-title2"></h2><span class="mclose" onclick="if(window._allModalParentType){var _pt=window._allModalParentType;window._allModalParentType=null;openAllModal(_pt);}else{_closeModal('all-modal');window._modalCurrentType=null;}">×</span></div><div class="mbody" id="all-body" style="max-height:75vh;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain"></div></div></div>
 <!-- ===== GOOGLE MY MAPS POPUP (เปิดทับ all-modal) ===== -->
-<div id="gmap-popup-overlay" onclick="closeGmapPopup()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:10500;align-items:center;justify-content:center;padding:16px;box-sizing:border-box">
-  <div onclick="event.stopPropagation()" style="background:#fff;border-radius:16px;overflow:hidden;width:100%;max-width:900px;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(0,0,0,.4)">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:linear-gradient(135deg,#1B3A6B,#2a5298);color:#fff;flex-shrink:0">
-      <div style="display:flex;align-items:center;gap:10px">
-        <i class="fas fa-map-marked-alt" style="font-size:18px;color:#C8922A"></i>
-        <span style="font-weight:700;font-size:15px;font-family:'Kanit',sans-serif">แผนที่ประกาศ Matchdoor</span>
-      </div>
-      <button onclick="closeGmapPopup()" style="background:rgba(255,255,255,.18);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:.2s" onmouseover="this.style.background='rgba(255,255,255,.32)'" onmouseout="this.style.background='rgba(255,255,255,.18)'">×</button>
-    </div>
-    <div style="flex:1;overflow:hidden;min-height:480px">
-      <iframe id="gmap-popup-iframe"
-        src="https://www.google.com/maps/d/embed?mid=1z39rekBQwIHBp5BneTY-wZmJGQcIEVk&ehbc=2E312F&noprof=1"
-        width="100%" height="100%"
-        style="border:none;display:block;min-height:480px;touch-action:pan-x pan-y"
-        loading="lazy"
-        allowfullscreen
-        title="แผนที่ประกาศ Matchdoor">
-      </iframe>
-    </div>
-    <div style="padding:10px 18px;background:#f8f9fa;border-top:1px solid #e5e7eb;font-size:11px;color:#6b7280;display:flex;align-items:center;gap:6px;flex-shrink:0">
-      <i class="fas fa-info-circle" style="color:#C8922A"></i>
-      ปิดหน้าต่างแผนที่นี้เพื่อกลับไปดูรายการประกาศ
-    </div>
-  </div>
-</div>
+<!-- ===== GOOGLE MY MAPS INLINE PANEL — injected dynamically into all-modal ===== -->
 <script>
+var _gmapPanelOpen = false;
+var _popupLeafletMap = null;
+var _popupLeafletMarkers = [];
+var _popupLeafletInitDone = false;
+var _popupMapTxFilter = 'ALL';
+
 function openGmapPopup(){
-  const el = document.getElementById('gmap-popup-overlay');
-  if(el){ el.style.display='flex'; document.body.style.overflow='hidden'; }
+  const panel = document.getElementById('gmap-inline-panel');
+  if(!panel) return;
+  if(!_gmapPanelOpen){
+    panel.classList.add('map-open');
+    _gmapPanelOpen = true;
+    const isDesktop = window.matchMedia('(min-width:769px)').matches;
+    if(isDesktop){
+      const allModal = document.getElementById('all-modal');
+      const allBody  = document.getElementById('all-body');
+      if(allModal) allModal.classList.add('map-layout');
+      if(allBody) allBody.removeAttribute('style');
+    }
+    setTimeout(function(){
+      _initPopupLeafletMap();
+      setTimeout(function(){
+        if(_popupLeafletMap) _popupLeafletMap.invalidateSize();
+      }, 320);
+    }, 80);
+  } else {
+    closeGmapPopup();
+  }
 }
 function closeGmapPopup(){
-  const el = document.getElementById('gmap-popup-overlay');
-  if(el){ el.style.display='none'; }
-  // คืน scroll ให้ all-modal body เท่านั้น (ไม่ปิด all-modal)
-  const allBody = document.getElementById('all-body');
-  if(allBody) allBody.style.overflow='';
-  // ไม่ต้อง restore body overflow เพราะ all-modal ยังเปิดอยู่
+  const panel = document.getElementById('gmap-inline-panel');
+  if(panel){ panel.classList.remove('map-open'); }
+  _gmapPanelOpen = false;
+  const allModal = document.getElementById('all-modal');
+  const allBody  = document.getElementById('all-body');
+  if(allModal) allModal.classList.remove('map-layout');
+  if(allBody) allBody.setAttribute('style','max-height:75vh;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain');
+}
+function _initPopupLeafletMap(){
+  if(typeof L === 'undefined'){ setTimeout(_initPopupLeafletMap, 300); return; }
+  var mapEl = document.getElementById('popup-leaflet-map');
+  if(!mapEl) return;
+  if(_popupLeafletInitDone && _popupLeafletMap){
+    _popupLeafletMap.invalidateSize();
+    _popupRefreshMarkers();
+    return;
+  }
+  _popupLeafletInitDone = true;
+  _popupLeafletMap = L.map('popup-leaflet-map', {
+    center: [13.7563, 100.5018],
+    zoom: 11,
+    zoomControl: true,
+    attributionControl: false
+  });
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+    maxZoom: 19,
+    subdomains: 'abcd'
+  }).addTo(_popupLeafletMap);
+  _popupRefreshMarkers();
+  setTimeout(function(){
+    var hint = document.getElementById('popup-map-hint');
+    if(hint) hint.style.opacity = '0';
+  }, 4000);
+}
+function _popupRefreshMarkers(){
+  if(!_popupLeafletMap) return;
+  _popupLeafletMarkers.forEach(function(m){ _popupLeafletMap.removeLayer(m.layer); });
+  _popupLeafletMarkers = [];
+  var data = (typeof _listingsBaseData !== 'undefined' && _listingsBaseData.length)
+    ? _listingsBaseData
+    : (typeof props !== 'undefined' ? props : (typeof MOCK !== 'undefined' ? MOCK.props : []));
+  if(!data || !data.length) return;
+  var filtered = _popupMapTxFilter === 'ALL' ? data : data.filter(function(p){ return p.tx === _popupMapTxFilter; });
+  var countEl = document.getElementById('popup-map-showing-count');
+  if(countEl) countEl.textContent = filtered.length + ' ประกาศ';
+  var pinEl = document.getElementById('popup-map-pin-count');
+  if(pinEl) pinEl.textContent = '— ' + filtered.length + ' รายการ';
+  var bounds = [];
+  filtered.forEach(function(p){
+    var coords = (typeof _mdGetCoords === 'function') ? _mdGetCoords(p) : [13.7563, 100.5018];
+    bounds.push(coords);
+    var isRent = p.tx === 'RENT';
+    var priceLabel = isRent
+      ? '฿' + (p.price >= 1000 ? Math.round(p.price/1000) + 'K' : p.price.toLocaleString()) + '/ด.'
+      : (p.price >= 1e6 ? '฿' + (p.price/1e6).toFixed(1).replace(/\.?0+$/,'') + 'M' : '฿' + Math.round(p.price/1000) + 'K');
+    var pinClass = 'md-map-price-pin' + (isRent ? ' rent-pin' : '');
+    var icon = L.divIcon({ className: '', html: '<div class="' + pinClass + '">' + priceLabel + '</div>', iconSize: null, iconAnchor: [0,0] });
+    var marker = L.marker(coords, { icon: icon, zIndexOffset: 0 });
+    var imgHtml = (p.photos && p.photos[0])
+      ? '<img class="md-popup-img" src="' + p.photos[0] + '" loading="lazy" alt="' + (p.title||'') + '">'
+      : '<div class="md-popup-img-ph">' + (({'บ้านเดี่ยว':'🏡','คอนโด':'🏢','ทาวน์โฮม':'🏘️','ที่ดิน':'🗺️','อาคารพาณิชย์':'🏪','วิลล่า':'🌅'})[p.type] || '🏠') + '</div>';
+    var txBadge = isRent ? '<span style="background:#3D7A55;color:#fff;font-size:9px;padding:2px 7px;border-radius:10px;font-weight:700;margin-left:6px">เช่า</span>' : '<span style="background:var(--p);color:#fff;font-size:9px;padding:2px 7px;border-radius:10px;font-weight:700;margin-left:6px">ขาย</span>';
+    var specsHtml = '';
+    if(p.bed) specsHtml += '<span class="md-popup-spec"><i class="fas fa-bed"></i>' + p.bed + '</span>';
+    if(p.bath) specsHtml += '<span class="md-popup-spec"><i class="fas fa-bath"></i>' + p.bath + '</span>';
+    if(p.area) specsHtml += '<span class="md-popup-spec"><i class="fas fa-ruler-combined"></i>' + p.area + 'ตร.ม.</span>';
+    var popupHtml = '<div>' + imgHtml +
+      '<div class="md-popup-body">' +
+        '<div class="md-popup-type">' + (p.type||'อสังหาฯ') + txBadge + '</div>' +
+        '<div class="md-popup-title">' + (p.title||'') + '</div>' +
+        '<div class="md-popup-loc"><i class="fas fa-map-marker-alt" style="color:var(--a);font-size:10px"></i> ' + (p.location||p.province||'กรุงเทพฯ') + '</div>' +
+        '<div class="md-popup-price">' + (isRent ? '฿' + p.price.toLocaleString() + '/เดือน' : (p.price>=1e6 ? '฿'+(p.price/1e6).toFixed(2).replace(/\.?0+$/,'')+'M' : '฿'+p.price.toLocaleString())) + '</div>' +
+        (specsHtml ? '<div class="md-popup-specs">' + specsHtml + '</div>' : '') +
+        '<button class="md-popup-btn" onclick="if(typeof openModal===\'function\') openModal(\'' + p.id + '\')"><i class="fas fa-eye"></i> ดูรายละเอียด</button>' +
+      '</div>' +
+    '</div>';
+    marker.bindPopup(popupHtml, { maxWidth: 260, minWidth: 260, offset: [130, 40] });
+    marker.on('click', function(){
+      _popupLeafletMarkers.forEach(function(m){ if(m.el) m.el.classList.remove('active'); });
+      var pinEl2 = marker.getElement();
+      if(pinEl2){ var d = pinEl2.querySelector('.md-map-price-pin'); if(d) d.classList.add('active'); }
+    });
+    marker.addTo(_popupLeafletMap);
+    _popupLeafletMarkers.push({ layer: marker, prop: p });
+  });
+  if(bounds.length){
+    try {
+      if(bounds.length === 1) _popupLeafletMap.setView(bounds[0], 14);
+      else _popupLeafletMap.fitBounds(bounds, { padding: [40,40] });
+    } catch(e) {}
+  }
+}
+function popupMapFilterTx(tx, btn){
+  _popupMapTxFilter = tx;
+  document.querySelectorAll('.popup-map-fchip').forEach(function(c){ c.classList.remove('active'); });
+  if(btn) btn.classList.add('active');
+  _popupRefreshMarkers();
+  // ── Sync cards grid on the right to match the map filter ──
+  if(window._modalTypeData){
+    // snapshot full unfiltered data on first filter action
+    if(!window._modalTypeData._allData){
+      window._modalTypeData._allData = [...window._modalTypeData.data];
+    }
+    var base = window._modalTypeData._allData;
+    var filtered = tx === 'ALL' ? [...base] : base.filter(function(p){ return p.tx === tx; });
+    window._modalTypeData.data = filtered;
+    window._modalTypeData.currentPage = 1;
+    if(window._modalRenderPage) window._modalRenderPage(filtered, 1);
+    // scroll cards column back to top
+    var cardsCol = document.getElementById('all-body-cards-col');
+    if(cardsCol) cardsCol.scrollTop = 0;
+    var allBody = document.getElementById('all-body');
+    if(allBody) allBody.scrollTop = 0;
+  }
+}
+function popupMapFitAll(){
+  if(!_popupLeafletMap || !_popupLeafletMarkers.length) return;
+  var bounds = _popupLeafletMarkers.map(function(m){ return m.layer.getLatLng(); });
+  try { _popupLeafletMap.fitBounds(bounds, {padding:[40,40]}); } catch(e) {}
+}
+
+/* ══ popup map combined filter (tx + type + province + price) ══ */
+function popupMapFilterAll(){
+  var txSel = document.getElementById('popup-map-tx-sel');
+  var typSel = document.getElementById('popup-map-type-sel');
+  var provSel = document.getElementById('popup-map-prov-sel');
+  var priceSel = document.getElementById('popup-map-price-sel');
+  var kwEl = document.getElementById('popup-map-kw');
+  var tx = txSel ? txSel.value : 'ALL';
+  var typ = typSel ? typSel.value : '';
+  var prov = provSel ? provSel.value : '';
+  var maxPrice = priceSel ? Number(priceSel.value||0) : 0;
+  var kw = kwEl ? kwEl.value.toLowerCase() : '';
+  _popupMapTxFilter = tx;
+  _popupRefreshMarkersFiltered(tx, typ, prov, maxPrice, kw);
+  // sync cards
+  if(window._modalTypeData){
+    if(!window._modalTypeData._allData) window._modalTypeData._allData = [...window._modalTypeData.data];
+    var base = window._modalTypeData._allData;
+    var filtered = base.filter(function(p){
+      if(kw){ var hay=((p.title||'')+' '+(p.location||'')+' '+(p.province||'')).toLowerCase(); if(hay.indexOf(kw)===-1) return false; }
+      if(tx !== 'ALL' && p.tx !== tx) return false;
+      if(typ && p.type && p.type.indexOf(typ) === -1) return false;
+      if(prov && p.province && p.province.indexOf(prov) === -1 && (p.location||'').indexOf(prov) === -1) return false;
+      if(maxPrice && p.price && p.price > maxPrice) return false;
+      return true;
+    });
+    window._modalTypeData.data = filtered;
+    window._modalTypeData.currentPage = 1;
+    if(window._modalRenderPage) window._modalRenderPage(filtered, 1);
+    var cardsCol = document.getElementById('all-body-cards-col');
+    if(cardsCol) cardsCol.scrollTop = 0;
+  }
+}
+function popupMapResetFilters(){
+  var ids = ['popup-map-tx-sel','popup-map-type-sel','popup-map-prov-sel','popup-map-price-sel'];
+  ids.forEach(function(id){ var el = document.getElementById(id); if(el) el.value = el.options[0].value; });
+  _popupMapTxFilter = 'ALL';
+  _popupRefreshMarkers();
+  if(window._modalTypeData && window._modalTypeData._allData){
+    window._modalTypeData.data = [...window._modalTypeData._allData];
+    window._modalTypeData.currentPage = 1;
+    if(window._modalRenderPage) window._modalRenderPage(window._modalTypeData.data, 1);
+  }
+}
+function _popupRefreshMarkersFiltered(tx, typ, prov, maxPrice, kw){
+  if(!_popupLeafletMap) return;
+  _popupLeafletMarkers.forEach(function(m){ _popupLeafletMap.removeLayer(m.layer); });
+  _popupLeafletMarkers = [];
+  var data = (typeof _listingsBaseData !== 'undefined' && _listingsBaseData.length)
+    ? _listingsBaseData
+    : (typeof props !== 'undefined' ? props : (typeof MOCK !== 'undefined' ? MOCK.props : []));
+  if(!data || !data.length) return;
+  var filtered = data.filter(function(p){
+    if(kw){ var hay=((p.title||'')+' '+(p.location||'')+' '+(p.province||'')).toLowerCase(); if(hay.indexOf(kw)===-1) return false; }
+    if(tx && tx !== 'ALL' && p.tx !== tx) return false;
+    if(typ && p.type && p.type.indexOf(typ) === -1) return false;
+    if(prov && p.province && p.province.indexOf(prov) === -1 && (p.location||'').indexOf(prov) === -1) return false;
+    if(maxPrice && p.price && p.price > maxPrice) return false;
+    return true;
+  });
+  var countEl = document.getElementById('popup-map-showing-count');
+  if(countEl) countEl.textContent = filtered.length + ' ประกาศ';
+  var pinEl = document.getElementById('popup-map-pin-count');
+  if(pinEl) pinEl.textContent = '— ' + filtered.length + ' รายการ';
+  var bounds = [];
+  filtered.forEach(function(p){
+    var coords = (typeof _mdGetCoords === 'function') ? _mdGetCoords(p) : [13.7563, 100.5018];
+    bounds.push(coords);
+    var isRent = p.tx === 'RENT';
+    var priceLabel = isRent
+      ? '฿' + (p.price >= 1000 ? Math.round(p.price/1000) + 'K' : p.price.toLocaleString()) + '/ด.'
+      : (p.price >= 1e6 ? '฿' + (p.price/1e6).toFixed(1).replace(/\.?0+$/,'') + 'M' : '฿' + Math.round(p.price/1000) + 'K');
+    var pinClass = 'md-map-price-pin' + (isRent ? ' rent-pin' : '');
+    var icon = L.divIcon({ className: '', html: '<div class="' + pinClass + '">' + priceLabel + '</div>', iconSize: null, iconAnchor: [0,0] });
+    var marker = L.marker(coords, { icon: icon, zIndexOffset: 0 });
+    var imgHtml = (p.photos && p.photos[0])
+      ? '<img class="md-popup-img" src="' + p.photos[0] + '" loading="lazy" alt="' + (p.title||'') + '">'
+      : '<div class="md-popup-img-ph">' + (({'บ้านเดี่ยว':'🏡','คอนโด':'🏢','ทาวน์โฮม':'🏘️','ที่ดิน':'🗺️','อาคารพาณิชย์':'🏪','วิลล่า':'🌅'})[p.type] || '🏠') + '</div>';
+    var txBadge = isRent ? '<span style="background:#3D7A55;color:#fff;font-size:9px;padding:2px 7px;border-radius:10px;font-weight:700;margin-left:6px">เช่า</span>' : '<span style="background:var(--p);color:#fff;font-size:9px;padding:2px 7px;border-radius:10px;font-weight:700;margin-left:6px">ขาย</span>';
+    var specsHtml = '';
+    if(p.bed) specsHtml += '<span class="md-popup-spec"><i class="fas fa-bed"></i>' + p.bed + '</span>';
+    if(p.bath) specsHtml += '<span class="md-popup-spec"><i class="fas fa-bath"></i>' + p.bath + '</span>';
+    if(p.area) specsHtml += '<span class="md-popup-spec"><i class="fas fa-ruler-combined"></i>' + p.area + 'ตร.ม.</span>';
+    var popupHtml = '<div>' + imgHtml +
+      '<div class="md-popup-body">' +
+        '<div class="md-popup-type">' + (p.type||'อสังหาฯ') + txBadge + '</div>' +
+        '<div class="md-popup-title">' + (p.title||'') + '</div>' +
+        '<div class="md-popup-loc"><i class="fas fa-map-marker-alt" style="color:var(--a);font-size:10px"></i> ' + (p.location||p.province||'กรุงเทพฯ') + '</div>' +
+        '<div class="md-popup-price">' + (isRent ? '฿' + p.price.toLocaleString() + '/เดือน' : (p.price>=1e6 ? '฿'+(p.price/1e6).toFixed(2).replace(/\.?0+$/,'')+'M' : '฿'+p.price.toLocaleString())) + '</div>' +
+        (specsHtml ? '<div class="md-popup-specs">' + specsHtml + '</div>' : '') +
+        '<button class="md-popup-btn" onclick="if(typeof openModal===\'function\') openModal(\'' + p.id + '\')"><i class="fas fa-eye"></i> ดูรายละเอียด</button>' +
+      '</div>' +
+    '</div>';
+    marker.bindPopup(popupHtml, { maxWidth: 260, minWidth: 260, offset: [130, 40] });
+    marker.on('click', function(){
+      _popupLeafletMarkers.forEach(function(m){ if(m.el) m.el.classList.remove('active'); });
+      var pinEl2 = marker.getElement();
+      if(pinEl2){ var d = pinEl2.querySelector('.md-map-price-pin'); if(d) d.classList.add('active'); }
+    });
+    marker.addTo(_popupLeafletMap);
+    _popupLeafletMarkers.push({ layer: marker, prop: p });
+  });
+  if(bounds.length){
+    try {
+      if(bounds.length === 1) _popupLeafletMap.setView(bounds[0], 14);
+      else _popupLeafletMap.fitBounds(bounds, { padding: [40,40] });
+    } catch(e) {}
+  }
+}
+
+/* ══ Modal advanced filter (cards panel) ══ */
+function modalAdvFilter(type){
+  if(!window._modalTypeData) return;
+  var kw       = (document.getElementById('modal-adv-kw')||{}).value||'';
+  var tx       = (document.getElementById('modal-adv-tx')||{}).value||'';
+  var typ      = (document.getElementById('modal-adv-proptype')||{}).value||'';
+  var prov     = (document.getElementById('modal-adv-province')||{}).value||'';
+  var minPrice = Number((document.getElementById('modal-adv-minprice')||{}).value||0);
+  var maxPrice = Number((document.getElementById('modal-adv-maxprice')||{}).value||0);
+  var minBed   = Number((document.getElementById('modal-adv-bed')||{}).value||0);
+  var minBath  = Number((document.getElementById('modal-adv-bath')||{}).value||0);
+  var minArea  = Number((document.getElementById('modal-adv-minarea')||{}).value||0);
+  var bts      = (document.getElementById('modal-adv-bts')||{}).value||'';
+  var furn     = (document.getElementById('modal-adv-furniture')||{}).value||'';
+  var sort     = (document.getElementById('modal-adv-sort')||{}).value||'default';
+
+  if(!window._modalTypeData._allData) window._modalTypeData._allData = [...window._modalTypeData.data];
+  var base = window._modalTypeData._allData;
+
+  function matchProp(p){
+    if(kw){ var k=kw.toLowerCase(); var hay=((p.title||'')+' '+(p.location||'')+' '+(p.province||'')+' '+(p.district||'')).toLowerCase(); if(hay.indexOf(k)===-1) return false; }
+    if(tx && p.tx !== tx) return false;
+    if(typ && p.type && p.type.indexOf(typ)===-1) return false;
+    if(prov){
+      var loc=(p.province||'')+' '+(p.location||'')+' '+(p.district||'');
+      if(loc.indexOf(prov)===-1) return false;
+    }
+    if(minPrice && p.price && p.price < minPrice) return false;
+    if(maxPrice && p.price && p.price > maxPrice) return false;
+    if(minBed && (p.bed||0) < minBed) return false;
+    if(minBath && (p.bath||0) < minBath) return false;
+    if(minArea && (p.area||0) < minArea) return false;
+    if(bts){
+      var tags=JSON.stringify(p).toLowerCase();
+      var btsMap={bts:'bts',mrt:'mrt',arl:'airport link'};
+      if(tags.indexOf(btsMap[bts]||bts)===-1) return false;
+    }
+    if(furn){
+      var desc=((p.furniture||p.desc||p.detail||JSON.stringify(p))||'').toLowerCase();
+      if(desc.indexOf(furn.toLowerCase())===-1) return false;
+    }
+    return true;
+  }
+
+  var filtered = base.filter(matchProp);
+  var sorted = (typeof sortListings === 'function') ? sortListings(filtered, sort) : filtered;
+  window._modalTypeData.data = sorted;
+  window._modalTypeData.currentPage = 1;
+  var countEl = document.getElementById('modal-adv-count');
+  if(countEl) countEl.textContent = 'พบ ' + sorted.length + ' รายการ';
+  if(window._modalRenderPage) window._modalRenderPage(sorted, 1);
+  var bd = document.getElementById('all-body'); if(bd) bd.scrollTop = 0;
+
+  // ── Sync แผนที่ฝั่งซ้าย ──
+  _modalSyncMap(sorted, tx, typ, prov, minPrice, maxPrice, minBed, minBath, minArea, bts, furn, kw);
+}
+
+function _modalSyncMap(filteredProps, tx, typ, prov, minPrice, maxPrice, minBed, minBath, minArea, bts, furn, kw){
+  if(!_popupLeafletMap || !_popupLeafletInitDone) return;
+  // ใช้ data set ที่ผ่าน filter แล้วไปวาด markers ใหม่
+  _popupLeafletMarkers.forEach(function(m){ try{ _popupLeafletMap.removeLayer(m.layer); }catch(e){} });
+  _popupLeafletMarkers = [];
+  var data = filteredProps || [];
+  var countEl = document.getElementById('popup-map-showing-count');
+  if(countEl) countEl.textContent = data.length + ' ประกาศ';
+  var pinEl = document.getElementById('popup-map-pin-count');
+  if(pinEl) pinEl.textContent = '— ' + data.length + ' รายการ';
+  var bounds = [];
+  data.forEach(function(p){
+    var coords = (typeof _mdGetCoords === 'function') ? _mdGetCoords(p) : [13.7563, 100.5018];
+    bounds.push(coords);
+    var isRent = p.tx === 'RENT';
+    var priceLabel = isRent
+      ? '฿' + (p.price >= 1000 ? Math.round(p.price/1000) + 'K' : p.price.toLocaleString()) + '/ด.'
+      : (p.price >= 1e6 ? '฿' + (p.price/1e6).toFixed(1).replace(/\.?0+$/,'') + 'M' : '฿' + Math.round(p.price/1000) + 'K');
+    var pinClass = 'md-map-price-pin' + (isRent ? ' rent-pin' : '');
+    var icon = L.divIcon({ className: '', html: '<div class="' + pinClass + '">' + priceLabel + '</div>', iconSize: null, iconAnchor: [0,0] });
+    var marker = L.marker(coords, { icon: icon, zIndexOffset: 0 });
+    var imgHtml = (p.photos && p.photos[0])
+      ? '<img class="md-popup-img" src="' + p.photos[0] + '" loading="lazy" alt="' + (p.title||'') + '">'
+      : '<div class="md-popup-img-ph">' + (({'บ้านเดี่ยว':'🏡','คอนโด':'🏢','ทาวน์โฮม':'🏘️','ที่ดิน':'🗺️','อาคารพาณิชย์':'🏪','วิลล่า':'🌅'})[p.type] || '🏠') + '</div>';
+    var txBadge = isRent ? '<span style="background:#3D7A55;color:#fff;font-size:9px;padding:2px 7px;border-radius:10px;font-weight:700;margin-left:6px">เช่า</span>' : '<span style="background:var(--p);color:#fff;font-size:9px;padding:2px 7px;border-radius:10px;font-weight:700;margin-left:6px">ขาย</span>';
+    var specsHtml = '';
+    if(p.bed) specsHtml += '<span class="md-popup-spec"><i class="fas fa-bed"></i>' + p.bed + '</span>';
+    if(p.bath) specsHtml += '<span class="md-popup-spec"><i class="fas fa-bath"></i>' + p.bath + '</span>';
+    if(p.area) specsHtml += '<span class="md-popup-spec"><i class="fas fa-ruler-combined"></i>' + p.area + 'ตร.ม.</span>';
+    var popupHtml = '<div>' + imgHtml +
+      '<div class="md-popup-body">' +
+        '<div class="md-popup-type">' + (p.type||'อสังหาฯ') + txBadge + '</div>' +
+        '<div class="md-popup-title">' + (p.title||'') + '</div>' +
+        '<div class="md-popup-loc"><i class="fas fa-map-marker-alt" style="color:var(--a);font-size:10px"></i> ' + (p.location||p.province||'กรุงเทพฯ') + '</div>' +
+        '<div class="md-popup-price">' + (isRent ? '฿' + p.price.toLocaleString() + '/เดือน' : (p.price>=1e6 ? '฿'+(p.price/1e6).toFixed(2).replace(/\.?0+$/,'')+'M' : '฿'+p.price.toLocaleString())) + '</div>' +
+        (specsHtml ? '<div class="md-popup-specs">' + specsHtml + '</div>' : '') +
+        '<button class="md-popup-btn" onclick="if(typeof openModal===\'function\') openModal(\'' + p.id + '\')"><i class="fas fa-eye"></i> ดูรายละเอียด</button>' +
+      '</div></div>';
+    marker.bindPopup(popupHtml, { maxWidth: 260, minWidth: 260, offset: [130, 40] });
+    marker.on('click', function(){
+      _popupLeafletMarkers.forEach(function(m){ if(m.el) m.el.classList.remove('active'); });
+      var pinEl2 = marker.getElement();
+      if(pinEl2){ var d = pinEl2.querySelector('.md-map-price-pin'); if(d) d.classList.add('active'); }
+    });
+    marker.addTo(_popupLeafletMap);
+    _popupLeafletMarkers.push({ layer: marker, prop: p });
+  });
+  if(bounds.length){
+    try{
+      if(bounds.length === 1) _popupLeafletMap.setView(bounds[0], 14);
+      else _popupLeafletMap.fitBounds(bounds, { padding: [40,40] });
+    }catch(e){}
+  }
+  // Sync dropdowns ในแผนที่ให้ตรงกับ filter bar ฝั่งขวา
+  var mapSels = { 'popup-map-tx-sel': tx||'ALL', 'popup-map-type-sel': typ, 'popup-map-prov-sel': prov, 'popup-map-price-sel': maxPrice ? String(maxPrice) : '' };
+  Object.keys(mapSels).forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) el.value = mapSels[id];
+  });
+  var mapKw = document.getElementById('popup-map-kw');
+  if(mapKw) mapKw.value = kw||'';
+}
+
+function modalAdvReset(type){
+  var ids = ['modal-adv-kw','modal-adv-tx','modal-adv-proptype','modal-adv-province',
+             'modal-adv-minprice','modal-adv-maxprice','modal-adv-bed','modal-adv-bath',
+             'modal-adv-minarea','modal-adv-bts','modal-adv-furniture'];
+  ids.forEach(function(id){
+    var el = document.getElementById(id);
+    if(!el) return;
+    if(el.tagName === 'SELECT') el.value = el.options[0].value;
+    else el.value = '';
+  });
+  var sortEl = document.getElementById('modal-adv-sort');
+  if(sortEl) sortEl.value = 'default';
+  var countEl = document.getElementById('modal-adv-count');
+  if(countEl) countEl.textContent = '';
+  if(window._modalTypeData && window._modalTypeData._allData){
+    window._modalTypeData.data = [...window._modalTypeData._allData];
+    window._modalTypeData.currentPage = 1;
+    if(window._modalRenderPage) window._modalRenderPage(window._modalTypeData.data, 1);
+    // reset map
+    _modalSyncMap(window._modalTypeData._allData, '', '', '', 0, 0, 0, 0, 0, '', '', '');
+  }
+  var bd = document.getElementById('all-body'); if(bd) bd.scrollTop = 0;
 }
 </script>
 
@@ -4666,6 +5357,13 @@ function renderMyAccount(){
         </button>
         ${!isDevMode?`<button class="ma-logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> ${sanitize(t('ma.profile.logout'))}</button>`:''}
       </div>
+      <div style="margin-top:18px;padding-top:18px;border-top:1.5px solid var(--lt)">
+        <div style="font-size:13px;font-weight:700;color:var(--p);margin-bottom:10px"><i class="fas fa-home" style="color:var(--a)"></i> ${sanitize(t('ma.listings.add')||'ฝากทรัพย์กับเรา')}</div>
+        <p style="font-size:12px;color:var(--tx2);margin-bottom:12px">ต้องการฝากขาย/ให้เช่าทรัพย์? กดปุ่มด้านล่างเพื่อกรอกข้อมูล</p>
+        <button onclick="openDepositModal()" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--p),#2a5298);color:#fff;border:none;border-radius:10px;padding:11px 22px;font-size:13px;font-weight:700;cursor:pointer;transition:.2s;box-shadow:0 4px 14px rgba(27,58,107,.25)" onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">
+          <i class="fas fa-tag"></i> ${sanitize(t('nav.deposit')||'ฝากทรัพย์')}
+        </button>
+      </div>
     </div>
   </div>
   <!-- Favorites panel -->
@@ -4679,7 +5377,7 @@ function renderMyAccount(){
   <div class="ma-panel" id="ma-panel-listings">
     <div class="ma-section">
       <div class="ma-section-title"><i class="fas fa-building"></i> ${sanitize(t('ma.tab.listings'))}</div>
-      ${_maEmptyPanel('fa-building',t('ma.listings.empty'),'fa-plus-circle',t('ma.listings.add'),"toggleDD('dd-dep')")}
+      ${_maEmptyPanel('fa-building',t('ma.listings.empty'),'fa-plus-circle',t('ma.listings.add'),"openDepositModal()")}
     </div>
   </div>
   <!-- Requests panel -->
@@ -5233,6 +5931,10 @@ function afterLoad(){
   // SEO sidebar: defer ไว้ทีหลัง ไม่บล็อก listings grid
   const _idleQ = window.requestIdleCallback || (cb=>setTimeout(cb,300));
   _idleQ(()=>{ if(typeof renderListingsSeoSidebar === 'function') renderListingsSeoSidebar(); window._lsSeoSidebarRendered = true; });
+  // Refresh interactive map if open
+  if(typeof mdMapRefreshMarkers === 'function' && _mdMapInitDone) {
+    setTimeout(mdMapRefreshMarkers, 100);
+  }
   // ── render listings ถ้าหน้านั้น active อยู่ ──────────────────────
   window._pendingListingsInit = false;
   window._listingsDataReady = true;
@@ -6954,21 +7656,270 @@ function openListingsAdvFilter() {
 function toggleListingsMapPanel() {
   const panel = document.getElementById('listings-map-panel');
   if(!panel) return;
-  const isShown = panel.style.display !== 'none';
-  panel.style.display = isShown ? 'none' : 'block';
+  const mdPanel = document.getElementById('md-map-panel');
+  const isShown = mdPanel ? mdPanel.style.display !== 'none' && mdPanel.style.display !== '' : panel.style.display !== 'none';
+  
+  if(mdPanel) {
+    mdPanel.style.display = isShown ? 'none' : 'block';
+  } else {
+    panel.style.display = isShown ? 'none' : 'block';
+  }
+  
   const btn = document.getElementById('listings-map-toggle-btn');
   if(btn) {
     btn.innerHTML = isShown
-      ? '<i class="fas fa-map-marked-alt"></i> ค้นหาด้วยแผนที่'
-      : '<i class="fas fa-times"></i> ปิดแผนที่';
+      ? '<i class="fas fa-map-marked-alt"></i> <span class="ls-map-btn-label">ค้นหาด้วยแผนที่</span>'
+      : '<i class="fas fa-times"></i> <span class="ls-map-btn-label">ปิดแผนที่</span>';
   }
-  // Lazy load iframe เฉพาะครั้งแรกที่เปิด — ไม่โหลด Google Maps จนกว่า user จะกดเปิด
-  if(!isShown){
-    const iframe = document.getElementById('listings-google-map');
-    if(iframe && !iframe.getAttribute('src') && iframe.dataset.deferredSrc){
-      iframe.src = iframe.dataset.deferredSrc;
-    }
+  
+  // Init Leaflet map first time it opens
+  if(!isShown) {
+    setTimeout(function(){ mdMapInit(); }, 80);
   }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   MATCHDOOR INTERACTIVE MAP — Leaflet + OpenStreetMap
+   Airbnb/FazWaz style: price pins, popups, filter chips
+   ════════════════════════════════════════════════════════════════ */
+var _mdMap = null;
+var _mdMapMarkers = [];
+var _mdMapTxFilter = 'ALL';
+var _mdMapInitDone = false;
+
+// Location → LatLng lookup (Bangkok areas)
+var _mdLocationCoords = {
+  'อโศก':           [13.7360, 100.5601],
+  'อโศก กรุงเทพฯ': [13.7360, 100.5601],
+  'สุขุมวิท':       [13.7310, 100.5585],
+  'สุขุมวิท กรุงเทพฯ':[13.7310,100.5585],
+  'ทองหล่อ':        [13.7281, 100.5792],
+  'เอกมัย':         [13.7239, 100.5862],
+  'พร้อมพงษ์':      [13.7278, 100.5695],
+  'สาทร':           [13.7226, 100.5268],
+  'สาทร กรุงเทพฯ':  [13.7226, 100.5268],
+  'สีลม':           [13.7272, 100.5299],
+  'สีลม กรุงเทพฯ':  [13.7272, 100.5299],
+  'รัชดา':          [13.7640, 100.5698],
+  'รัชดา กรุงเทพฯ': [13.7640, 100.5698],
+  'พระราม 9':       [13.7566, 100.5679],
+  'พระราม 9 กรุงเทพฯ':[13.7566,100.5679],
+  'ลาดพร้าว':       [13.8008, 100.5741],
+  'ลาดพร้าว กรุงเทพฯ':[13.8008,100.5741],
+  'จตุจักร':        [13.8197, 100.5604],
+  'จตุจักร กรุงเทพฯ':[13.8197,100.5604],
+  'พระโขนง':        [13.7019, 100.5997],
+  'พระโขนง กรุงเทพฯ':[13.7019,100.5997],
+  'บางนา':          [13.6717, 100.6087],
+  'บางนา กรุงเทพฯ': [13.6717, 100.6087],
+  'อ่อนนุช':        [13.7163, 100.5983],
+  'ลาดกระบัง':      [13.7274, 100.7488],
+  'ลาดกระบัง กรุงเทพฯ':[13.7274,100.7488],
+  'ปากเกร็ด':       [13.9214, 100.4964],
+  'ปากเกร็ด นนทบุรี':[13.9214,100.4964],
+  'นนทบุรี':        [13.8594, 100.5115],
+  'บางละมุง':       [12.9298, 100.8795],
+  'บางละมุง ชลบุรี':[12.9298,100.8795],
+  'ชลบุรี':         [13.3611, 100.9847],
+  'ลาดยาว':         [13.8441, 100.5601],
+  'ลาดยาว กรุงเทพฯ':[13.8441,100.5601],
+  'พระราม 2':       [13.6719, 100.4754],
+  'พระราม 2 ซอย 40':[13.6719,100.4754],
+  'ร่มเกล้า':       [13.7680, 100.7090],
+  'ร่มเกล้า กรุงเทพฯ':[13.7680,100.7090],
+  'กรุงเทพฯ':       [13.7563, 100.5018],
+  'กรุงเทพมหานคร':  [13.7563, 100.5018],
+  'สยาม':           [13.7455, 100.5336],
+  'ชิดลม':          [13.7445, 100.5490],
+  'ราชเทวี':        [13.7540, 100.5355],
+  'พญาไท':          [13.7620, 100.5362],
+  'หมอชิต':         [13.8022, 100.5533],
+  'อารีย์':         [13.7741, 100.5418],
+  'บางซื่อ':        [13.8022, 100.5366],
+  'ห้วยขวาง':       [13.7751, 100.5774],
+  'ดินแดง':         [13.7649, 100.5693],
+  'ห้วยขวาง กรุงเทพฯ':[13.7751,100.5774],
+  'เตาปูน':         [13.8049, 100.5233],
+  'สะพานควาย':      [13.7822, 100.5487],
+  'วังหิน':         [13.8419, 100.6160],
+  'ลาดพร้าว 71':    [13.7997, 100.5830],
+};
+
+function _mdGetCoords(p) {
+  var loc = (p.location || '').trim();
+  var prov = (p.province || '').trim();
+  
+  // Try full location first
+  if(_mdLocationCoords[loc]) return _mdLocationCoords[loc];
+  
+  // Try location without trailing words
+  var locParts = loc.split(' ');
+  for(var i = locParts.length; i > 0; i--) {
+    var key = locParts.slice(0,i).join(' ');
+    if(_mdLocationCoords[key]) return _mdLocationCoords[key];
+  }
+  
+  // Try province
+  if(_mdLocationCoords[prov]) return _mdLocationCoords[prov];
+  
+  // Default: Bangkok center + small jitter
+  return [13.7563 + (Math.random()-0.5)*0.08, 100.5018 + (Math.random()-0.5)*0.12];
+}
+
+function mdMapInit() {
+  if(typeof L === 'undefined') {
+    // Leaflet not loaded yet — wait and retry
+    setTimeout(mdMapInit, 300);
+    return;
+  }
+  
+  var mapEl = document.getElementById('md-leaflet-map');
+  if(!mapEl) return;
+  
+  // Already init — just refresh markers
+  if(_mdMapInitDone && _mdMap) {
+    mdMapRefreshMarkers();
+    return;
+  }
+  
+  _mdMapInitDone = true;
+  
+  _mdMap = L.map('md-leaflet-map', {
+    center: [13.7563, 100.5018],
+    zoom: 11,
+    zoomControl: true,
+    attributionControl: false
+  });
+  
+  // Dark-themed tile layer matching Matchdoor's navy brand
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+    maxZoom: 19,
+    subdomains: 'abcd'
+  }).addTo(_mdMap);
+  
+  mdMapRefreshMarkers();
+  
+  // Hide hint after 4 seconds
+  setTimeout(function(){
+    var hint = document.getElementById('md-map-hint');
+    if(hint) hint.style.opacity = '0';
+  }, 4000);
+}
+
+function mdMapRefreshMarkers() {
+  if(!_mdMap) return;
+  
+  // Clear old markers
+  _mdMapMarkers.forEach(function(m){ _mdMap.removeLayer(m.layer); });
+  _mdMapMarkers = [];
+  
+  // Get data
+  var data = (typeof _listingsBaseData !== 'undefined' && _listingsBaseData.length) 
+    ? _listingsBaseData 
+    : (typeof props !== 'undefined' ? props : (typeof MOCK !== 'undefined' ? MOCK.props : []));
+  
+  if(!data || !data.length) return;
+  
+  // Filter by TX
+  var filtered = _mdMapTxFilter === 'ALL' ? data : data.filter(function(p){ return p.tx === _mdMapTxFilter; });
+  
+  // Update count
+  var countEl = document.getElementById('md-map-showing-count');
+  if(countEl) countEl.textContent = filtered.length + ' ประกาศ';
+  
+  var pinEl = document.getElementById('md-map-pin-count');
+  if(pinEl) pinEl.textContent = '— ' + filtered.length + ' รายการ';
+  
+  var bounds = [];
+  
+  filtered.forEach(function(p) {
+    var coords = _mdGetCoords(p);
+    bounds.push(coords);
+    
+    var isRent = p.tx === 'RENT';
+    var priceLabel = isRent
+      ? '฿' + (p.price >= 1000 ? Math.round(p.price/1000) + 'K' : p.price.toLocaleString()) + '/ด.'
+      : (p.price >= 1e6 ? '฿' + (p.price/1e6).toFixed(1).replace(/\.?0+$/,'') + 'M' : '฿' + Math.round(p.price/1000) + 'K');
+    
+    var pinClass = 'md-map-price-pin' + (isRent ? ' rent-pin' : '');
+    
+    var icon = L.divIcon({
+      className: '',
+      html: '<div class="' + pinClass + '">' + priceLabel + '</div>',
+      iconSize: null,
+      iconAnchor: [0, 0]
+    });
+    
+    var marker = L.marker(coords, { icon: icon, zIndexOffset: 0 });
+    
+    // Build popup HTML
+    var imgHtml = (p.photos && p.photos[0])
+      ? '<img class="md-popup-img" src="' + p.photos[0] + '" loading="lazy" alt="' + (p.title||'') + '">'
+      : '<div class="md-popup-img-ph">' + (({'บ้านเดี่ยว':'🏡','คอนโด':'🏢','ทาวน์โฮม':'🏘️','ที่ดิน':'🗺️','อาคารพาณิชย์':'🏪','วิลล่า':'🌅'})[p.type] || '🏠') + '</div>';
+    
+    var txBadge = isRent ? '<span style="background:#3D7A55;color:#fff;font-size:9px;padding:2px 7px;border-radius:10px;font-weight:700;margin-left:6px">เช่า</span>' : '<span style="background:var(--p);color:#fff;font-size:9px;padding:2px 7px;border-radius:10px;font-weight:700;margin-left:6px">ขาย</span>';
+    
+    var specsHtml = '';
+    if(p.bed) specsHtml += '<span class="md-popup-spec"><i class="fas fa-bed"></i>' + p.bed + '</span>';
+    if(p.bath) specsHtml += '<span class="md-popup-spec"><i class="fas fa-bath"></i>' + p.bath + '</span>';
+    if(p.area) specsHtml += '<span class="md-popup-spec"><i class="fas fa-ruler-combined"></i>' + p.area + 'ตร.ม.</span>';
+    
+    var popupHtml = '<div>' + imgHtml + 
+      '<div class="md-popup-body">' +
+        '<div class="md-popup-type">' + (p.type||'อสังหาฯ') + txBadge + '</div>' +
+        '<div class="md-popup-title">' + (p.title||'') + '</div>' +
+        '<div class="md-popup-loc"><i class="fas fa-map-marker-alt" style="color:var(--a);font-size:10px"></i> ' + (p.location||p.province||'กรุงเทพฯ') + '</div>' +
+        '<div class="md-popup-price">' + (isRent ? '฿' + p.price.toLocaleString() + '/เดือน' : (p.price>=1e6 ? '฿'+(p.price/1e6).toFixed(2).replace(/\.?0+$/,'')+'M' : '฿'+p.price.toLocaleString())) + '</div>' +
+        (specsHtml ? '<div class="md-popup-specs">' + specsHtml + '</div>' : '') +
+        '<button class="md-popup-btn" onclick="if(typeof openModal===\'function\') openModal(\'' + p.id + '\')"><i class="fas fa-eye"></i> ดูรายละเอียด</button>' +
+      '</div>' +
+    '</div>';
+    
+    marker.bindPopup(popupHtml, {
+      maxWidth: 260,
+      minWidth: 260,
+      offset: [130, 40]
+    });
+    
+    marker.on('click', function() {
+      // Highlight pin
+      _mdMapMarkers.forEach(function(m){ 
+        if(m.el) m.el.classList.remove('active'); 
+      });
+      var pinEl2 = marker.getElement();
+      if(pinEl2) {
+        var d = pinEl2.querySelector('.md-map-price-pin');
+        if(d) d.classList.add('active');
+      }
+    });
+    
+    marker.addTo(_mdMap);
+    _mdMapMarkers.push({ layer: marker, prop: p });
+  });
+  
+  // Fit map to markers
+  if(bounds.length) {
+    try {
+      if(bounds.length === 1) {
+        _mdMap.setView(bounds[0], 14);
+      } else {
+        _mdMap.fitBounds(bounds, { padding: [40,40] });
+      }
+    } catch(e) {}
+  }
+}
+
+function mdMapFilterTx(tx, btn) {
+  _mdMapTxFilter = tx;
+  document.querySelectorAll('.md-map-fchip').forEach(function(c){ c.classList.remove('active'); });
+  if(btn) btn.classList.add('active');
+  mdMapRefreshMarkers();
+}
+
+function mdMapFitAll() {
+  if(!_mdMap || !_mdMapMarkers.length) return;
+  var bounds = _mdMapMarkers.map(function(m){ return m.layer.getLatLng(); });
+  try { _mdMap.fitBounds(bounds, {padding:[40,40]}); } catch(e) {}
 }
 
 function renderListingsSeoSidebar() {
@@ -7288,31 +8239,28 @@ function openModal(id){
         chipContainer.innerHTML=chipHtml;
       }
 
-      // Map button (lazy)
+      // ══ Map section — Leaflet mini-map in modal (Airbnb-style) ══
       const mapContainer=$('m-map');
       if(mapContainer){
-        const _mapLocSafe = encodeURIComponent(p.location);
-        const _mapWrap = document.createElement('div');
-        _mapWrap.id = 'm-map-btn-wrap';
-        _mapWrap.style.marginBottom = '0';
-        const _mapBtn = document.createElement('button');
-        _mapBtn.style.cssText = 'display:flex;align-items:center;gap:8px;width:100%;background:var(--lt);color:var(--tx2);border:1.5px solid var(--bd);border-radius:12px;padding:13px 18px;cursor:pointer;font-size:14px;font-weight:700;font-family:inherit';
-        _mapBtn.addEventListener('mouseover', function(){ this.style.borderColor='var(--a)'; this.style.color='var(--p)'; });
-        _mapBtn.addEventListener('mouseout', function(){ this.style.borderColor='var(--bd)'; this.style.color='var(--tx2)'; });
-        _mapBtn.innerHTML = '<i class="fas fa-map-marked-alt" style="font-size:18px;color:var(--a);opacity:.9"></i><span>แตะเพื่อดูแผนที่</span><i class="fas fa-chevron-down" style="margin-left:auto;font-size:12px;opacity:.5"></i>';
-        _mapBtn.addEventListener('click', function(){
-          const iframe = document.createElement('iframe');
-          iframe.src = `https://maps.google.com/maps?q=${_mapLocSafe}&z=13&output=embed`;
-          iframe.width = '100%'; iframe.height = '220';
-          iframe.style.cssText = 'border:0;border-radius:12px;display:block;touch-action:pan-x pan-y';
-          iframe.setAttribute('allowfullscreen','');
-          iframe.loading = 'lazy';
-          const wrap = document.getElementById('m-map-btn-wrap');
-          if(wrap) wrap.replaceWith(iframe);
+        const _coords = _mdGetCoords ? _mdGetCoords(p) : [13.7563 + (Math.random()-0.5)*0.05, 100.5018 + (Math.random()-0.5)*0.08];
+        mapContainer.innerHTML = '<div id="m-mini-map-btn-wrap" style="border:1.5px solid var(--bd);border-radius:12px;overflow:hidden;cursor:pointer;transition:.2s" onmouseover="this.style.borderColor=\'var(--a)\'" onmouseout="this.style.borderColor=\'var(--bd)\'"><div style="display:flex;align-items:center;gap:10px;padding:13px 18px;background:var(--lt)"><i class="fas fa-map-marked-alt" style="font-size:18px;color:var(--a)"></i><div><div style="font-size:14px;font-weight:700;color:var(--p)">ดูตำแหน่งบนแผนที่</div><div style="font-size:12px;color:var(--gr)">' + (p.location||p.province||'กรุงเทพฯ') + '</div></div><i class="fas fa-chevron-down" style="margin-left:auto;font-size:12px;color:var(--gr)"></i></div></div>';
+        const _btn = mapContainer.querySelector('#m-mini-map-btn-wrap');
+        if(_btn) _btn.addEventListener('click', function(){
+          this.style.display='none';
+          const _miniMapDiv = document.createElement('div');
+          _miniMapDiv.id = 'm-modal-mini-map';
+          _miniMapDiv.style.cssText = 'height:240px;border-radius:12px;overflow:hidden;border:1.5px solid var(--bd)';
+          mapContainer.appendChild(_miniMapDiv);
+          // init leaflet mini map
+          if(typeof L !== 'undefined'){
+            const _mm = L.map('m-modal-mini-map', {center:_coords, zoom:14, zoomControl:false, attributionControl:false});
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{maxZoom:19,subdomains:'abcd'}).addTo(_mm);
+            const _priceStr = (p.tx==='RENT') ? ('฿'+p.price.toLocaleString()+'/เดือน') : (p.price>=1e6?'฿'+(p.price/1e6).toFixed(1).replace(/\.?0+$/,'')+'M':'฿'+Math.round(p.price/1000)+'K');
+            const _pinIcon = L.divIcon({className:'',html:'<div class="md-map-price-pin active' + (p.tx==='RENT'?' rent-pin':'') + '">' + _priceStr + '</div>',iconSize:null,iconAnchor:[0,0]});
+            L.marker(_coords,{icon:_pinIcon}).addTo(_mm);
+            setTimeout(function(){ _mm.invalidateSize(); }, 100);
+          }
         });
-        _mapWrap.appendChild(_mapBtn);
-        mapContainer.innerHTML = '';
-        mapContainer.appendChild(_mapWrap);
       }
 
       // 360
@@ -7528,35 +8476,224 @@ function openAllModal(type){
   const _viewAllBtn = type!=='all'
     ? `<button onclick="window._allModalParentType='${type}';openAllModal('all')" style="padding:7px 14px;background:var(--p);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:5px;flex-shrink:0"><i class="fas fa-list"></i> ${ui('modal.viewall')}</button>`
     : (window._allModalParentType ? `<button onclick="var _pt=window._allModalParentType;window._allModalParentType=null;openAllModal(_pt)" style="padding:7px 14px;background:var(--lt);color:var(--p);border:1.5px solid var(--bd);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:5px;flex-shrink:0"><i class="fas fa-arrow-left"></i> กลับ</button>` : '');
-  const sortHtml=`<div style="margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--bd)">
-    <!-- Single row: view-all (left) + map btn + sort (right) — all inline -->
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:nowrap">
-      <div style="flex-shrink:0">${_viewAllBtn}</div>
-      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:auto">
-        <button onclick="openGmapPopup()" style="padding:6px 10px;background:linear-gradient(135deg,#C8922A,#e6a830);color:#1A1A2E;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:4px;box-shadow:0 2px 8px rgba(200,146,42,.3);flex-shrink:0" onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'"><i class="fas fa-map-marked-alt"></i> ${ui('modal.map.btn')}</button>
-        <select class="sort-select" onchange="modalSortChange(this,'${type}')" style="min-width:80px;max-width:110px;font-size:12px;padding:6px 6px">
-          <option value="default">${ui('modal.sort.rec')}</option>
-          <option value="price_asc">${ui('modal.sort.asc')}</option>
-          <option value="price_desc">${ui('modal.sort.desc')}</option>
-          <option value="newest">${ui('modal.sort.new')}</option>
-          <option value="oldest">${ui('modal.sort.old')}</option>
-          <option value="alpha">${ui('modal.sort.alpha')}</option>
-        </select>
+  const sortHtml=`<div class="modal-adv-filter-bar">
+    <!-- Row 1: Search + ซื้อ/เช่า + ประเภท + ปุ่มดูแผนที่ -->
+    <div class="modal-adv-filter-row1">
+      <div class="modal-adv-search-wrap">
+        <i class="fas fa-search"></i>
+        <input class="modal-adv-search-input" id="modal-adv-kw" placeholder="ค้นหา ชื่อโครงการ ทำเล..." oninput="modalAdvFilter('${type}')">
       </div>
+      <select class="modal-adv-select" id="modal-adv-tx" onchange="modalAdvFilter('${type}')">
+        <option value="">ทั้งหมด</option>
+        <option value="BUY">ซื้อ</option>
+        <option value="RENT">เช่า</option>
+      </select>
+      <select class="modal-adv-select" id="modal-adv-proptype" onchange="modalAdvFilter('${type}')">
+        <option value="">ประเภทอสังหา</option>
+        <option value="คอนโด">คอนโด</option>
+        <option value="บ้านเดี่ยว">บ้านเดี่ยว</option>
+        <option value="ทาวน์โฮม">ทาวน์โฮม</option>
+        <option value="ที่ดิน">ที่ดิน</option>
+        <option value="อาคารพาณิชย์">อาคารพาณิชย์</option>
+        <option value="โรงแรม">โรงแรม</option>
+        <option value="รีสอร์ท">รีสอร์ท</option>
+      </select>
+      <button class="modal-adv-map-btn" onclick="openGmapPopup()"><i class="fas fa-map-marked-alt"></i> ${ui('modal.map.btn')}</button>
+    </div>
+    <!-- Row 2: จังหวัด + ราคา + ห้องนอน + ห้องน้ำ -->
+    <div class="modal-adv-filter-row2">
+      <select class="modal-adv-select" id="modal-adv-province" onchange="modalAdvFilter('${type}')">
+        <option value="">📍 จังหวัด</option>
+        <option value="กรุงเทพ">กรุงเทพมหานคร</option>
+        <option value="นนทบุรี">นนทบุรี</option>
+        <option value="ปทุมธานี">ปทุมธานี</option>
+        <option value="สมุทรปราการ">สมุทรปราการ</option>
+        <option value="เชียงใหม่">เชียงใหม่</option>
+        <option value="ชลบุรี">ชลบุรี</option>
+        <option value="ภูเก็ต">ภูเก็ต</option>
+        <option value="ขอนแก่น">ขอนแก่น</option>
+        <option value="กาญจนบุรี">กาญจนบุรี</option>
+        <option value="ระยอง">ระยอง</option>
+        <option value="ตราด">ตราด</option>
+        <option value="สุราษฎร์ธานี">สุราษฎร์ธานี</option>
+      </select>
+      <select class="modal-adv-select" id="modal-adv-minprice" onchange="modalAdvFilter('${type}')">
+        <option value="">ราคาขั้นต่ำ</option>
+        <option value="500000">500,000+</option>
+        <option value="1000000">1 ล้าน+</option>
+        <option value="3000000">3 ล้าน+</option>
+        <option value="5000000">5 ล้าน+</option>
+        <option value="10000000">10 ล้าน+</option>
+        <option value="30000000">30 ล้าน+</option>
+      </select>
+      <select class="modal-adv-select" id="modal-adv-maxprice" onchange="modalAdvFilter('${type}')">
+        <option value="">ราคาสูงสุด</option>
+        <option value="1000000">ไม่เกิน 1 ล้าน</option>
+        <option value="3000000">ไม่เกิน 3 ล้าน</option>
+        <option value="5000000">ไม่เกิน 5 ล้าน</option>
+        <option value="10000000">ไม่เกิน 10 ล้าน</option>
+        <option value="20000000">ไม่เกิน 20 ล้าน</option>
+        <option value="50000000">ไม่เกิน 50 ล้าน</option>
+        <option value="100000000">ไม่เกิน 100 ล้าน</option>
+      </select>
+      <select class="modal-adv-select" id="modal-adv-bed" onchange="modalAdvFilter('${type}')">
+        <option value="">🛏 ห้องนอน</option>
+        <option value="1">1 ห้อง+</option>
+        <option value="2">2 ห้อง+</option>
+        <option value="3">3 ห้อง+</option>
+        <option value="4">4 ห้อง+</option>
+        <option value="5">5 ห้อง+</option>
+      </select>
+      <select class="modal-adv-select" id="modal-adv-bath" onchange="modalAdvFilter('${type}')">
+        <option value="">🚿 ห้องน้ำ</option>
+        <option value="1">1 ห้อง+</option>
+        <option value="2">2 ห้อง+</option>
+        <option value="3">3 ห้อง+</option>
+        <option value="4">4 ห้อง+</option>
+      </select>
+    </div>
+    <!-- Row 3: พื้นที่ + BTS/MRT + เฟอร์นิเจอร์ + sort + actions -->
+    <div class="modal-adv-filter-row2" style="border-top:1px solid #e8edf5;padding-top:8px;margin-top:2px">
+      <select class="modal-adv-select" id="modal-adv-minarea" onchange="modalAdvFilter('${type}')">
+        <option value="">📐 พื้นที่ขั้นต่ำ</option>
+        <option value="25">25 ตร.ม.+</option>
+        <option value="50">50 ตร.ม.+</option>
+        <option value="80">80 ตร.ม.+</option>
+        <option value="100">100 ตร.ม.+</option>
+        <option value="200">200 ตร.ม.+</option>
+        <option value="500">500 ตร.ม.+</option>
+      </select>
+      <select class="modal-adv-select" id="modal-adv-bts" onchange="modalAdvFilter('${type}')">
+        <option value="">🚇 BTS / MRT</option>
+        <option value="bts">ใกล้ BTS</option>
+        <option value="mrt">ใกล้ MRT</option>
+        <option value="arl">ใกล้ Airport Link</option>
+      </select>
+      <select class="modal-adv-select" id="modal-adv-furniture" onchange="modalAdvFilter('${type}')">
+        <option value="">🛋 เฟอร์นิเจอร์</option>
+        <option value="เฟอร์ครบ">เฟอร์ครบ</option>
+        <option value="เฟอร์บางส่วน">เฟอร์บางส่วน</option>
+        <option value="ไม่มีเฟอร์">ไม่มีเฟอร์</option>
+      </select>
+      <select class="modal-adv-select" id="modal-adv-sort" onchange="modalAdvFilter('${type}')">
+        <option value="default">${ui('modal.sort.rec')}</option>
+        <option value="price_asc">${ui('modal.sort.asc')}</option>
+        <option value="price_desc">${ui('modal.sort.desc')}</option>
+        <option value="newest">${ui('modal.sort.new')}</option>
+        <option value="oldest">${ui('modal.sort.old')}</option>
+        <option value="alpha">${ui('modal.sort.alpha')}</option>
+      </select>
+      <button class="modal-adv-filter-btn" onclick="modalAdvFilter('${type}')"><i class="fas fa-filter"></i> กรอง</button>
+      <button class="modal-adv-reset-btn" onclick="modalAdvReset('${type}')"><i class="fas fa-undo"></i> รีเซ็ต</button>
+      <span class="modal-adv-result-count" id="modal-adv-count"></span>
+      ${_viewAllBtn ? '<div style="margin-left:auto">'+_viewAllBtn+'</div>' : ''}
     </div>
   </div>`;
   t.textContent=title;
-  b.innerHTML=sortHtml
+  // reset map state on each open
+  _gmapPanelOpen = false;
+  _popupLeafletInitDone = false;
+  _popupMapTxFilter = 'ALL';
+  if(_popupLeafletMap){ try{ _popupLeafletMap.remove(); }catch(e){} _popupLeafletMap = null; _popupLeafletMarkers = []; }
+  // clear cached snapshot so filter starts fresh with new modal data
+  if(window._modalTypeData) window._modalTypeData._allData = null;
+  const _inlineMapHtml = `<div id="gmap-inline-panel">
+    <div class="popup-map-inner">
+      <div class="popup-map-header">
+        <div class="popup-map-title-row">
+          <div class="popup-map-title">
+            <i class="fas fa-map-marked-alt"></i>
+            แผนที่ประกาศอสังหาริมทรัพย์
+            <span class="popup-map-pin-count" id="popup-map-pin-count"></span>
+          </div>
+          <div class="popup-map-actions">
+            <button class="popup-map-action-btn" onclick="popupMapFitAll()">
+              <i class="fas fa-compress-arrows-alt"></i> รวมทั้งหมด
+            </button>
+            <button class="popup-map-action-btn close-btn" onclick="closeGmapPopup()">
+              <i class="fas fa-times"></i> ปิด
+            </button>
+          </div>
+        </div>
+        <div style="padding:6px 0 4px;display:flex;align-items:center;gap:7px">
+          <div class="modal-adv-search-wrap" style="flex:1;max-width:280px">
+            <i class="fas fa-search"></i>
+            <input class="modal-adv-search-input" id="popup-map-kw" placeholder="ค้นหา ชื่อโครงการ ทำเล..." oninput="popupMapFilterAll()" style="background:rgba(255,255,255,.92)">
+          </div>
+        </div>
+        <div class="popup-map-chips-row" style="flex-wrap:wrap;gap:7px;padding-bottom:10px;align-items:center">
+          <select class="modal-adv-select" id="popup-map-tx-sel" onchange="popupMapFilterAll()" style="background:#fff;color:var(--tx);border-color:rgba(255,255,255,.25);font-size:12px;min-width:90px">
+            <option value="ALL">ทั้งหมด</option>
+            <option value="BUY">ซื้อ</option>
+            <option value="RENT">เช่า</option>
+          </select>
+          <select class="modal-adv-select" id="popup-map-type-sel" onchange="popupMapFilterAll()" style="background:#fff;color:var(--tx);border-color:rgba(255,255,255,.25);font-size:12px;min-width:110px">
+            <option value="">ประเภทอสังหา</option>
+            <option value="คอนโด">คอนโด</option>
+            <option value="บ้านเดี่ยว">บ้านเดี่ยว</option>
+            <option value="ทาวน์โฮม">ทาวน์โฮม</option>
+            <option value="ที่ดิน">ที่ดิน</option>
+            <option value="อาคารพาณิชย์">อาคารพาณิชย์</option>
+            <option value="โรงแรม">โรงแรม</option>
+            <option value="รีสอร์ท">รีสอร์ท</option>
+          </select>
+          <select class="modal-adv-select" id="popup-map-prov-sel" onchange="popupMapFilterAll()" style="background:#fff;color:var(--tx);border-color:rgba(255,255,255,.25);font-size:12px;min-width:110px">
+            <option value="">จังหวัด</option>
+            <option value="กรุงเทพ">กรุงเทพฯ</option>
+            <option value="นนทบุรี">นนทบุรี</option>
+            <option value="ปทุมธานี">ปทุมธานี</option>
+            <option value="สมุทรปราการ">สมุทรปราการ</option>
+            <option value="เชียงใหม่">เชียงใหม่</option>
+            <option value="ชลบุรี">ชลบุรี</option>
+            <option value="ภูเก็ต">ภูเก็ต</option>
+            <option value="กาญจนบุรี">กาญจนบุรี</option>
+            <option value="ตราด">ตราด</option>
+            <option value="ระยอง">ระยอง</option>
+          </select>
+          <select class="modal-adv-select" id="popup-map-price-sel" onchange="popupMapFilterAll()" style="background:#fff;color:var(--tx);border-color:rgba(255,255,255,.25);font-size:12px;min-width:130px">
+            <option value="">ราคาสูงสุด</option>
+            <option value="1000000">ไม่เกิน 1 ล้าน</option>
+            <option value="3000000">ไม่เกิน 3 ล้าน</option>
+            <option value="5000000">ไม่เกิน 5 ล้าน</option>
+            <option value="10000000">ไม่เกิน 10 ล้าน</option>
+            <option value="20000000">ไม่เกิน 20 ล้าน</option>
+            <option value="50000000">ไม่เกิน 50 ล้าน</option>
+            <option value="100000000">ไม่เกิน 100 ล้าน</option>
+          </select>
+          <button class="modal-adv-filter-btn" onclick="popupMapFilterAll()" style="padding:6px 12px;font-size:12px"><i class="fas fa-filter"></i> กรอง</button>
+          <button class="modal-adv-reset-btn" onclick="popupMapResetFilters()" style="padding:6px 10px;font-size:12px"><i class="fas fa-undo"></i> รีเซ็ต</button>
+          <span class="popup-map-count-badge" id="popup-map-showing-count"></span>
+        </div>
+      </div>
+      <div class="popup-map-leaflet-wrap" style="position:relative;flex:1;min-height:0;margin:0 14px 14px;border-radius:10px;overflow:hidden;border:1.5px solid rgba(200,146,42,.2)">
+        <div id="popup-leaflet-map" style="width:100%;height:100%;min-height:380px"></div>
+        <div id="popup-map-hint" style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);background:rgba(10,22,40,.88);color:#fff;font-size:11px;padding:6px 14px;border-radius:20px;pointer-events:none;white-space:nowrap;z-index:500;transition:opacity .4s">
+          <i class="fas fa-hand-pointer" style="color:#C8922A"></i> แตะปักหมุดเพื่อดูรายละเอียด
+        </div>
+      </div>
+    </div>
+  </div>`;
+  b.innerHTML=`<div id="all-body-map-col">`
+    +_inlineMapHtml
+    +`</div>`
+    +`<div id="all-body-cards-col">`
+    +sortHtml
     +`<div class="prop-grid" id="modal-prop-grid"></div>`
-    +`<div class="pagination" id="modal-pg-wrap" style="display:none"><div class="pg-info" id="modal-pg-info"></div><div class="pg-controls" id="modal-pg-controls"></div></div>`;
+    +`<div class="pagination" id="modal-pg-wrap" style="display:none"><div class="pg-info" id="modal-pg-info"></div><div class="pg-controls" id="modal-pg-controls"></div></div>`
+    +`</div>`;
   _modalRenderPage(window._modalTypeData.data, 1);
   _openModal('all-modal'); b.scrollTop=0;
 }
 
 function modalSortChange(sel, type) {
   if(!window._modalTypeData) return;
+  // sort applies to the current view (filtered or full)
   const sorted = sortListings([...window._modalTypeData.data], sel.value);
   window._modalTypeData.data = sorted;
+  // also sort the _allData snapshot so tx-filter re-apply keeps new sort order
+  if(window._modalTypeData._allData){
+    window._modalTypeData._allData = sortListings([...window._modalTypeData._allData], sel.value);
+  }
   window._modalTypeData.currentPage = 1;
   if(window._modalRenderPage) window._modalRenderPage(sorted, 1);
 }
@@ -7976,6 +9113,101 @@ function setupUpload(){ const dz=$('dropzone'), fi=$('d-photo'); if(!dz)return; 
 function handleFiles(files){ const nf=Array.from(files).filter(f=>f.type.startsWith('image/')); if(uploads.length+nf.length>5){toast('อัปโหลดได้สูงสุด 5 รูป',true);return;} for(const f of nf)if(f.size>5*1024*1024){toast(`รูป ${sanitize(f.name)} ใหญ่เกิน 5MB`,true);return;} uploads.push(...nf); renderPrev(); }
 function renderPrev(){ $('prev-grid').innerHTML=uploads.map((f,i)=>`<div class="prev-item"><img src="${URL.createObjectURL(f)}"><div class="prev-rm" onclick="rmPhoto(${i})"><i class="fas fa-times"></i></div></div>`).join(''); }
 window.rmPhoto=i=>{uploads.splice(i,1);renderPrev();};
+
+/* ── openDepositModal — เปิด modal ฝากทรัพย์ (เหมือนกับ header dropdown) ── */
+function openDepositModal(){
+  // close my-account page modal if open (optional: keep it or close)
+  const existingMod = document.getElementById('deposit-modal');
+  if(existingMod) existingMod.remove();
+  const mo = document.createElement('div');
+  mo.className='ov'; mo.id='deposit-modal';
+  mo.style.cssText='display:flex;z-index:3300';
+  mo.innerHTML=`<div class="modal" style="max-width:520px">
+    <div class="mhd">
+      <h2><i class="fas fa-home" style="color:var(--a)"></i> ฝากทรัพย์กับเรา</h2>
+      <span class="mclose" onclick="document.getElementById('deposit-modal').remove()">×</span>
+    </div>
+    <div class="mbody">
+      <p style="font-size:13px;color:var(--tx2);margin-bottom:16px">กรอกข้อมูลเบื้องต้น ทีมงานติดต่อกลับโดยเร็ว</p>
+      <div id="dep-modal-form">
+        <div class="frow"><div class="fg"><label>ชื่อ-นามสกุล *</label><input id="dm-name" placeholder="ชื่อของคุณ"></div><div class="fg"><label>เบอร์โทร *</label><input type="tel" id="dm-phone" placeholder="08X-XXX-XXXX"></div></div>
+        <div class="frow"><div class="fg"><label>ประเภท</label><select id="dm-type"><option value="">-- เลือก --</option><option>บ้านเดี่ยว</option><option>ทาวน์โฮม</option><option>คอนโด</option><option>อาคารพาณิชย์</option><option>ที่ดิน</option></select></div><div class="fg"><label>ราคา (บาท)</label><input type="number" id="dm-price" placeholder="3500000"></div></div>
+        <div class="frow"><div class="fg"><label>จังหวัด</label><input id="dm-prov" placeholder="กรุงเทพฯ"></div><div class="fg"><label>ต้องการ</label><select id="dm-tx"><option value="ขาย">ขาย</option><option value="เช่า">ให้เช่า</option></select></div></div>
+        <div class="frow full"><div class="fg"><label>รายละเอียด</label><textarea id="dm-detail" rows="2" placeholder="ขนาด ทำเล จำนวนห้อง..." style="resize:none"></textarea></div></div>
+        <div class="fg"><label>อัปโหลดรูป (สูงสุด 5 รูป)</label>
+          <div class="dropzone" id="dm-dropzone" onclick="document.getElementById('dm-photo').click()">
+            <div class="dz-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+            <div style="font-size:13px">ลากวาง หรือคลิกเพื่อเลือกรูป</div>
+            <div style="font-size:11px;color:var(--gr)">JPG/PNG ขนาดสูงสุด 5MB</div>
+          </div>
+          <input type="file" id="dm-photo" multiple accept="image/*" style="display:none" onchange="handleDepModalFiles(this.files)">
+          <div class="preview-grid" id="dm-prev-grid"></div>
+        </div>
+        <div class="consent-row">
+          <input type="checkbox" id="dm-consent">
+          <label for="dm-consent">ฉันยินยอมให้ Matchdoor เก็บและใช้ข้อมูลส่วนบุคคลรวมถึงรูปภาพทรัพย์ เพื่อบริการฝากทรัพย์ ตาม<a href="javascript:void(0)" onclick="openPrivacyModal();event.stopPropagation()">นโยบายความเป็นส่วนตัว</a></label>
+        </div>
+        <div class="consent-err" id="dm-consent-err" style="display:none">⚠️ กรุณายินยอมก่อนส่งข้อมูล</div>
+        <button class="btn-sub" id="dep-modal-btn" onclick="submitDepModal()" style="margin-top:10px"><i class="fas fa-lock btn-icon"></i><span class="btn-spinner"></span> <span id="dep-modal-btn-text">ส่งข้อมูลฝากทรัพย์</span></button>
+      </div>
+      <div class="form-ok" id="dep-modal-ok" style="display:none"><i class="fas fa-check-circle"></i><div>ส่งข้อมูลสำเร็จ!</div></div>
+    </div>
+  </div>`;
+  mo.onclick = function(e){ if(e.target===mo) mo.remove(); };
+  document.body.appendChild(mo);
+  // setup drag-drop for modal upload
+  const dz = document.getElementById('dm-dropzone');
+  if(dz){
+    ['dragenter','dragover','dragleave','drop'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();e.stopPropagation();}));
+    dz.addEventListener('dragenter',()=>dz.classList.add('dragover'));
+    dz.addEventListener('dragleave',()=>dz.classList.remove('dragover'));
+    dz.addEventListener('drop',e=>{dz.classList.remove('dragover');handleDepModalFiles(e.dataTransfer.files);});
+  }
+  // pre-fill name/phone from user profile if logged in
+  if(typeof user !== 'undefined' && user){
+    const nm = document.getElementById('dm-name');
+    if(nm && !nm.value && user.user_metadata?.full_name) nm.value = user.user_metadata.full_name;
+    const ph = document.getElementById('dm-phone');
+    if(ph && !ph.value){
+      const _meta = typeof _userMeta !== 'undefined' ? _userMeta : {};
+      if(_meta.phone) ph.value = _meta.phone;
+    }
+  }
+}
+window._dmUploads = [];
+function handleDepModalFiles(files){
+  const nf = Array.from(files).filter(f=>f.type.startsWith('image/'));
+  if(window._dmUploads.length+nf.length>5){toast('อัปโหลดได้สูงสุด 5 รูป',true);return;}
+  for(const f of nf)if(f.size>5*1024*1024){toast(`รูป ${sanitize(f.name)} ใหญ่เกิน 5MB`,true);return;}
+  window._dmUploads.push(...nf);
+  const grid = document.getElementById('dm-prev-grid');
+  if(grid) grid.innerHTML = window._dmUploads.map((f,i)=>`<div class="prev-item"><img src="${URL.createObjectURL(f)}"><div class="prev-rm" onclick="window._dmUploads.splice(${i},1);handleDepModalFiles([])"><i class="fas fa-times"></i></div></div>`).join('');
+}
+async function submitDepModal(){
+  const name = document.getElementById('dm-name')?.value.trim();
+  const phone = document.getElementById('dm-phone')?.value.trim();
+  const type = document.getElementById('dm-type')?.value;
+  const price = document.getElementById('dm-price')?.value;
+  const prov = document.getElementById('dm-prov')?.value.trim();
+  const tx = document.getElementById('dm-tx')?.value;
+  const detail = document.getElementById('dm-detail')?.value.trim();
+  const consent = document.getElementById('dm-consent')?.checked;
+  const consentErr = document.getElementById('dm-consent-err');
+  if(!name||!phone){toast('กรุณากรอกชื่อและเบอร์โทร',true);return;}
+  if(!consent){if(consentErr)consentErr.style.display='block';return;}
+  if(consentErr)consentErr.style.display='none';
+  // reuse existing submitDep logic: pre-fill main form fields then call submitDep
+  const _setVal=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v||'';};
+  _setVal('d-name',name);_setVal('d-phone',phone);_setVal('d-type',type);
+  _setVal('d-price',price);_setVal('d-prov',prov);_setVal('d-tx',tx);_setVal('d-detail',detail);
+  const dc=document.getElementById('d-consent');if(dc)dc.checked=true;
+  // copy uploads
+  if(window._dmUploads.length){uploads=[...window._dmUploads];renderPrev();}
+  // close modal and trigger main submit
+  document.getElementById('deposit-modal')?.remove();
+  window._dmUploads=[];
+  await submitDep();
+}
 
 async function submitDep(){
   // ── Layer 1: Client-side cooldown ─────────────────────────────
@@ -13509,21 +14741,39 @@ function resetAdvFilter(){
     </div>
   </div>
 
-  <!-- Map Panel (Google My Maps) -->
-  <div id="listings-map-panel" style="display:none;background:#0A1628;border-bottom:2px solid rgba(200,146,42,.3)">
-    <div style="max-width:1320px;margin:0 auto;padding:0 20px 16px">
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0 8px">
-        <div style="color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px"><i class="fas fa-map-marked-alt" style="color:var(--a)"></i> แผนที่อสังหาริมทรัพย์ <span style="font-size:11px;opacity:.6;font-weight:400">— กดที่ pin บนแผนที่เพื่อกรองผลลัพธ์</span></div>
-        <button onclick="toggleListingsMapPanel()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer"><i class="fas fa-times"></i> ปิด</button>
-      </div>
-      <div style="border-radius:14px;overflow:hidden;border:2px solid rgba(200,146,42,.3);height:420px;position:relative">
-        <iframe id="listings-google-map" data-deferred-src="https://www.google.com/maps/d/u/0/embed?mid=1z39rekBQwIHBp5BneTY-wZmJGQcIEVk&ehbc=2E312F" width="100%" height="100%" style="border:0;display:block;touch-action:pan-x pan-y" allowfullscreen></iframe>
-        <div style="position:absolute;bottom:12px;right:12px;background:rgba(10,22,40,.85);color:#fff;font-size:11px;padding:6px 12px;border-radius:8px;backdrop-filter:blur(8px)">
-          <i class="fas fa-info-circle" style="color:var(--a)"></i> กดที่ปักหมุดในแผนที่เพื่อกรองข้อมูล
+  <!-- ══ MATCHDOOR INTERACTIVE MAP PANEL — Airbnb-style Leaflet ══ -->
+  <div id="listings-map-panel" class="md-map-panel-outer">
+    <div id="md-map-panel" style="background:#0A1628;border-bottom:2px solid rgba(200,146,42,.3)">
+      <div style="max-width:1320px;margin:0 auto;padding:0 20px 16px">
+        <!-- Header -->
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0 8px;flex-wrap:wrap;gap:8px">
+          <div style="color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px">
+            <i class="fas fa-map-marked-alt" style="color:var(--a)"></i> แผนที่ประกาศอสังหาริมทรัพย์
+            <span id="md-map-pin-count" style="font-size:11px;opacity:.6;font-weight:400"></span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <button onclick="mdMapFitAll()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:6px;padding:5px 12px;font-size:11px;cursor:pointer;display:flex;align-items:center;gap:5px"><i class="fas fa-compress-arrows-alt"></i> รวมทั้งหมด</button>
+            <button onclick="toggleListingsMapPanel()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer"><i class="fas fa-times"></i> ปิด</button>
+          </div>
         </div>
+        <!-- Filter chips -->
+        <div class="md-map-filter-bar" id="md-map-filter-bar">
+          <button class="md-map-fchip active" data-tx="ALL" onclick="mdMapFilterTx('ALL',this)">ทั้งหมด</button>
+          <button class="md-map-fchip" data-tx="BUY" onclick="mdMapFilterTx('BUY',this)">ซื้อ</button>
+          <button class="md-map-fchip" data-tx="RENT" onclick="mdMapFilterTx('RENT',this)">เช่า</button>
+          <span class="md-map-count" id="md-map-showing-count"></span>
+        </div>
+        <!-- Map container -->
+        <div id="md-map-wrap" style="margin-top:10px">
+          <div id="md-leaflet-map"></div>
+          <!-- Tooltip hint -->
+          <div id="md-map-hint" style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);background:rgba(10,22,40,.88);color:#fff;font-size:11px;padding:6px 14px;border-radius:20px;pointer-events:none;white-space:nowrap;z-index:500;transition:opacity .4s">
+            <i class="fas fa-hand-pointer" style="color:var(--a)"></i> แตะปักหมุดเพื่อดูรายละเอียด
+          </div>
+        </div>
+        <!-- Active location chips from map click -->
+        <div style="display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap" id="map-filter-chips"></div>
       </div>
-      <!-- Location filter from map -->
-      <div style="display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap" id="map-filter-chips"></div>
     </div>
   </div>
 
