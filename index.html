@@ -3960,8 +3960,8 @@ function closeGmapPopup(){
 // 🔧 จุด CONFIG ทั้งหมด — แก้ไขตรงนี้ที่เดียว
 const C = {
   // --- [1] Supabase Project ---
-  SUPABASE_URL:'https://wbwwfrrbcpwuvccgwlwz.supabase.co', // 🔧 [CONFIG-1] Supabase Project URL
-  SUPABASE_KEY:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indid3dmcnJiY3B3dXZjY2d3bHd6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNTk3ODYsImV4cCI6MjA5NDkzNTc4Nn0.e-_KYJsCc7vHWhhqUrZSIcQvTP9tN4Dap9h75rF7HuQ', // 🔧 [CONFIG-2] Supabase Anon/Public Key เท่านั้น!
+  SUPABASE_URL:'https://cmyuivnrjwyqqwsdxbpw.supabase.co', // 🔧 [CONFIG-1] Supabase Project URL
+  SUPABASE_KEY:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNteXVpdm5yand5cXF3c2R4YnB3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0MjUxMzEsImV4cCI6MjA5NTAwMTEzMX0.na_PSr7LsXjnqxBQbWaBm071dOVfcEdz9N2btVSXeOk', // 🔧 [CONFIG-2] Supabase Anon/Public Key เท่านั้น!
 
   // --- [2] Supabase Storage ---
   STORAGE_BUCKET: 'matchdoor-assets', // 🔧 [CONFIG-3] ชื่อ Storage Bucket หลัก
@@ -4284,7 +4284,16 @@ async function filterProperties(filters={}){
   if(error){ console.error('[filterProperties]',error); return null; }
   return data||[];
 }
-async function checkAuth(){ if(!sb) return; const {data:{user:u}}=await sb.auth.getUser(); user=u||null; renderAuthUI(); updateFormBtns(); }
+async function checkAuth(){
+  if(!sb) return;
+  const {data:{user:u}} = await sb.auth.getUser();
+  user = u||null;
+  // [v13] โหลดโปรไฟล์จาก user_profiles table ทุกครั้งที่ auth state เปลี่ยน
+  _cachedUserProfile = null;
+  if(user) await _loadUserProfile(true);
+  renderAuthUI();
+  updateFormBtns();
+}
 
 // Listen for auth state changes (handles OAuth redirect callbacks too)
 function initAuthListener(){
@@ -4405,6 +4414,30 @@ function _toggleMaDevBypass(){
   renderMyAccount();
 }
 
+// ── [v13] ดึงข้อมูล user_profiles จาก DB — merge กับ auth.user_metadata ──
+// เรียกครั้งแรกหลัง login และหลังบันทึกโปรไฟล์
+let _cachedUserProfile = null;
+async function _loadUserProfile(forceRefresh){
+  if(!user||!sb) return null;
+  if(_cachedUserProfile && !forceRefresh) return _cachedUserProfile;
+  try {
+    const { data } = await sb
+      .from('user_profiles')
+      .select('display_name,phone,line_id,avatar_url')
+      .eq('user_id', user.id)
+      .single();
+    if(data){
+      // merge ลง user_metadata เพื่อให้ renderAuthUI / renderMyAccount ใช้ได้เลย
+      user.user_metadata = user.user_metadata || {};
+      if(data.display_name) user.user_metadata.display_name = data.display_name;
+      if(data.phone)        user.user_metadata.phone        = data.phone;
+      if(data.line_id)      user.user_metadata.line_id      = data.line_id;
+      _cachedUserProfile = data;
+    }
+  } catch(e){ /* silent — ใช้ auth.user_metadata เดิมแทน */ }
+  return _cachedUserProfile;
+}
+
 function renderMyAccount(){
   const wrap = document.getElementById('my-account-content');
   if(!wrap) return;
@@ -4441,14 +4474,18 @@ function renderMyAccount(){
     return;
   }
   // ── Resolve user data (real or mock for dev mode) ──
+  // [v13] ถ้ามี _cachedUserProfile ให้ใช้ข้อมูลจาก DB แทน auth.user_metadata ล้วนๆ
+  const _profile = _cachedUserProfile;
   const _u = user || {
     email: 'dev@matchdoor.co',
     created_at: new Date(Date.now() - 30*24*3600*1000).toISOString(),
     user_metadata: { display_name: 'Dev Preview', phone: '081-234-5678', line_id: '@devpreview' }
   };
+  // merge profile DB → user_metadata (กัน race condition)
+  const _meta = { ...(_u.user_metadata||{}), ...(_profile||{}) };
   // Logged in (or dev bypass) — render full dashboard
   const init = (_u.email||'U')[0].toUpperCase();
-  const dispName = sanitize(_u.user_metadata?.display_name || _u.email?.split('@')[0] || 'User');
+  const dispName = sanitize(_meta.display_name || _u.email?.split('@')[0] || 'User');
   const email = sanitize(_u.email||'');
   const joinDate = _u.created_at ? new Date(_u.created_at).toLocaleDateString(_lang==='th'?'th-TH':_lang==='ja'?'ja-JP':_lang==='cn'?'zh-CN':'en-US',{year:'numeric',month:'long'}) : '';
   const favCount = (typeof favs!=='undefined' ? favs : []).length;
@@ -4485,11 +4522,11 @@ function renderMyAccount(){
       </div>
       <div class="ma-field">
         <label>${sanitize(t('ma.profile.phone'))}</label>
-        <input type="tel" id="ma-phone" value="${sanitize(_u.user_metadata?.phone||'')}" placeholder="0812345678">
+        <input type="tel" id="ma-phone" value="${sanitize(_meta.phone||'')}" placeholder="0812345678">
       </div>
       <div class="ma-field">
         <label>${sanitize(t('ma.profile.line'))}</label>
-        <input type="text" id="ma-line-id" value="${sanitize(_u.user_metadata?.line_id||'')}" placeholder="@yourlineid">
+        <input type="text" id="ma-line-id" value="${sanitize(_meta.line_id||'')}" placeholder="@yourlineid">
       </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px">
         <button class="ma-save-btn" onclick="${isDevMode?'alert(\"Dev mode: บันทึกจริงไม่ได้ ต้อง Login ก่อนครับ 🙏\")':'_maSaveProfile()'}">
@@ -4587,14 +4624,28 @@ function _maHistoryHtml(t){
 }
 async function _maSaveProfile(){
   if(!user||!sb) return;
-  const name = document.getElementById('ma-display-name')?.value.trim()||'';
-  const phone = document.getElementById('ma-phone')?.value.trim()||'';
+  const name   = document.getElementById('ma-display-name')?.value.trim()||'';
+  const phone  = document.getElementById('ma-phone')?.value.trim()||'';
   const lineId = document.getElementById('ma-line-id')?.value.trim()||'';
   const btn = document.querySelector('#ma-panel-profile .ma-save-btn');
   if(btn){btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i>';}
+
+  // 1) อัปเดต auth.users metadata (เดิม) — trigger DB จะ sync user_profiles อัตโนมัติ
   const {error} = await sb.auth.updateUser({data:{display_name:name,phone,line_id:lineId}});
+  if(error){
+    if(btn){btn.disabled=false;btn.innerHTML=`<i class="fas fa-save"></i> ${ui('ma.profile.save')||'บันทึก'}`;}
+    toast('เกิดข้อผิดพลาด: '+error.message,true); return;
+  }
+
+  // 2) upsert ลง user_profiles โดยตรง (รองรับกรณี trigger ยังไม่ทำงาน)
+  try {
+    await sb.from('user_profiles').upsert(
+      { user_id: user.id, display_name: name, phone, line_id: lineId, updated_at: new Date().toISOString() },
+      { onConflict: 'user_id' }
+    );
+  } catch(e){ /* silent — trigger จะ sync ให้เองอยู่แล้ว */ }
+
   if(btn){btn.disabled=false;btn.innerHTML=`<i class="fas fa-save"></i> ${ui('ma.profile.save')||'บันทึก'}`;}
-  if(error){ toast('เกิดข้อผิดพลาด: '+error.message,true); return; }
   toast('บันทึกข้อมูลสำเร็จ ✅');
   await checkAuth();
   renderMyAccount();
@@ -4722,17 +4773,26 @@ async function saveProfile(){
   if(!displayName){ toast('กรุณากรอกชื่อที่แสดง',true); return; }
   const btn = document.querySelector('#profile-modal .btn-sub');
   if(btn){ btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> กำลังบันทึก...'; }
+
+  // 1) อัปเดต auth.users metadata
   const {error} = await sb.auth.updateUser({ data: { display_name: displayName } });
   if(btn){ btn.disabled=false; btn.innerHTML='<i class="fas fa-save"></i> บันทึก'; }
-  if(error) toast('เกิดข้อผิดพลาด: ' + error.message, true);
-  else {
-    // อัปเดต user object local แล้ว re-render nav
-    user.user_metadata = user.user_metadata || {};
-    user.user_metadata.display_name = displayName;
-    renderAuthUI();
-    toast('บันทึกชื่อสำเร็จ ✅');
-    _closeModal('profile-modal');
-  }
+  if(error){ toast('เกิดข้อผิดพลาด: ' + error.message, true); return; }
+
+  // 2) sync user_profiles โดยตรง
+  try {
+    await sb.from('user_profiles').upsert(
+      { user_id: user.id, display_name: displayName, updated_at: new Date().toISOString() },
+      { onConflict: 'user_id' }
+    );
+  } catch(e){ /* silent */ }
+
+  // 3) อัปเดต local user object และ re-render
+  user.user_metadata = user.user_metadata || {};
+  user.user_metadata.display_name = displayName;
+  renderAuthUI();
+  toast('บันทึกชื่อสำเร็จ ✅');
+  _closeModal('profile-modal');
 }
 
 const MOCK = {
@@ -11356,7 +11416,7 @@ function handleApplyFile(input, btnId, labelId, defaultLabel){
 }
 
 // ── Submit ──
-function submitApply(type){
+async function submitApply(type){
   const prefix = type==='agent'?'aa':'ao';
   const consent = document.getElementById(prefix+'-consent');
   const consentErr = document.getElementById(prefix+'-consent-err');
@@ -11365,17 +11425,88 @@ function submitApply(type){
     setTimeout(()=>{ if(consentErr) consentErr.style.display='none'; }, 3500);
     return;
   }
-  // Generate ref number
-  const ref = 'MD-'+(type==='agent'?'AG':'JB')+'-'+Date.now().toString().slice(-6);
+
+  // ── รวบรวม field ที่ใช้ร่วมกัน ──
+  const fullName  = (document.getElementById(prefix+'-name')?.value||'').trim();
+  const phone     = (document.getElementById(prefix+'-phone')?.value||'').trim();
+  const email     = (document.getElementById(prefix+'-email')?.value||'').trim();
+  const province  = (document.getElementById(prefix+'-province')?.value||'').trim();
+  const motivation= (document.getElementById(prefix+'-motivation')?.value||'').trim();
+
+  if(!fullName||!phone||!email){
+    toast('กรุณากรอกชื่อ เบอร์โทร และอีเมลให้ครบถ้วน',true); return;
+  }
+
+  // ── Disable ปุ่ม / แสดง spinner ──
+  const submitBtn = document.querySelector(
+    `.apply-overlay[id*="${type==='agent'?'agent':'other'}"] .btn-sub, `+
+    `[onclick="submitApply('${type}')"]`
+  );
+  const origBtnHtml = submitBtn?.innerHTML||'';
+  if(submitBtn){ submitBtn.disabled=true; submitBtn.innerHTML='<i class="fas fa-spinner fa-spin"></i> กำลังส่ง...'; }
+
+  let ref = '';
+  try {
+    if(sb){
+      // ── เรียก Supabase RPC บันทึกลง DB จริง ──
+      if(type==='agent'){
+        const experience = (document.getElementById(prefix+'-experience')?.value||'').trim();
+        const licenseNo  = (document.getElementById(prefix+'-license')?.value||'').trim();
+        const { data, error } = await sb.rpc('submit_agent_application', {
+          p_full_name:      fullName,
+          p_phone:          phone,
+          p_email:          email,
+          p_province:       province,
+          p_experience:     experience,
+          p_license_no:     licenseNo,
+          p_area_expertise: [],
+          p_motivation:     motivation,
+          p_consent_given:  true
+        });
+        if(error) throw error;
+        ref = data?.ref_no || ('MD-AG-'+Date.now().toString().slice(-6));
+      } else {
+        const position    = (document.getElementById(prefix+'-position')?.value||'').trim();
+        const education   = (document.getElementById(prefix+'-education')?.value||'').trim();
+        const expYrs      = parseInt(document.getElementById(prefix+'-exp-yrs')?.value||'0',10)||0;
+        const currentJob  = (document.getElementById(prefix+'-current-job')?.value||'').trim();
+        const salaryExpect= parseFloat(document.getElementById(prefix+'-salary')?.value||'0')||0;
+        const { data, error } = await sb.rpc('submit_job_application', {
+          p_full_name:      fullName,
+          p_phone:          phone,
+          p_email:          email,
+          p_province:       province,
+          p_position:       position,
+          p_education:      education,
+          p_experience_yrs: expYrs,
+          p_current_job:    currentJob,
+          p_salary_expect:  salaryExpect,
+          p_motivation:     motivation,
+          p_consent_given:  true
+        });
+        if(error) throw error;
+        ref = data?.ref_no || ('MD-JB-'+Date.now().toString().slice(-6));
+      }
+    } else {
+      // Fallback เมื่อ Supabase ยังไม่ configured — สร้าง ref ชั่วคราว
+      ref = 'MD-'+(type==='agent'?'AG':'JB')+'-'+Date.now().toString().slice(-6);
+    }
+  } catch(err){
+    if(submitBtn){ submitBtn.disabled=false; submitBtn.innerHTML=origBtnHtml; }
+    toast('เกิดข้อผิดพลาด: '+(err.message||'กรุณาลองใหม่อีกครั้ง'),true);
+    return;
+  }
+
+  // ── แสดง ref_no และเปลี่ยนไป success screen ──
   const refEl = document.getElementById(prefix+'-ref-no');
   if(refEl) refEl.textContent = ref;
-  // Hide form, show success
   const content = document.getElementById('apply-'+(type==='agent'?'agent':'other')+'-content');
-  const ok = document.getElementById('apply-'+(type==='agent'?'agent':'other')+'-ok');
+  const ok      = document.getElementById('apply-'+(type==='agent'?'agent':'other')+'-ok');
   if(content) content.style.display='none';
-  if(ok) ok.style.display='block';
+  if(ok)      ok.style.display='block';
   document.body.style.removeProperty('overflow');
-  showToast('✅ ส่งใบสมัครสำเร็จ!');
+  toast('✅ ส่งใบสมัครสำเร็จ! เลข Ref: '+ref);
+  if(submitBtn){ submitBtn.disabled=false; submitBtn.innerHTML=origBtnHtml; }
 }
 
 (function initLang(){
@@ -14004,16 +14135,64 @@ async function _renderAdminPanel(panel){
   ];
 
   if(panel==='dashboard'){
-    const pending = allProps.filter(p=>p.status==='pending'||!p.status).length;
+    // [v13] ดึง v_dashboard_summary จาก Supabase สำหรับตัวเลขที่แม่นยำ
+    let dashSummary = null;
+    if(!_adminDevMode && sb){
+      try {
+        const { data } = await sb.from('v_dashboard_summary').select('*').single();
+        if(data) dashSummary = data;
+      } catch(e){ /* fallback to local count */ }
+    }
+
+    const pending   = dashSummary?.pending_properties ?? allProps.filter(p=>p.status==='pending'||!p.status).length;
+    const newReqs   = dashSummary?.new_requests       ?? buyRequests.filter(r=>r.status==='new'||r.status==='ใหม่').length;
+    const agentApps = dashSummary?.new_agent_apps     ?? 0;
+    const jobApps   = dashSummary?.new_job_apps       ?? 0;
+    const activeNotifs = dashSummary?.active_notifications ?? 0;
+    const totalUsers   = dashSummary?.total_users     ?? 0;
+
     document.getElementById('admin-pending-badge').textContent = pending||0;
-    const totalVal = allProps.reduce((s,p)=>s+(p.price||0),0);
-    const fmtVal = totalVal>=1e9?(totalVal/1e9).toFixed(1)+'B':(totalVal/1e6).toFixed(0)+'M';
+    const totalVal = dashSummary
+      ? (dashSummary.for_sale||0) * 5000000   // ประมาณ — ใช้ allProps ถ้าได้
+      : allProps.reduce((s,p)=>s+(p.price||0),0);
+    const realTotalVal = allProps.length ? allProps.reduce((s,p)=>s+(p.price||0),0) : totalVal;
+    const fmtVal = realTotalVal>=1e9?(realTotalVal/1e9).toFixed(1)+'B':(realTotalVal/1e6).toFixed(0)+'M';
     el.innerHTML = devBanner + `
     <div class="admin-stats-grid">
-      <div class="admin-stat-card"><div class="admin-stat-icon" style="background:rgba(200,146,42,.15);color:#c8922a"><i class="fas fa-building"></i></div><div class="admin-stat-num">${allProps.length}</div><div class="admin-stat-label">ประกาศทั้งหมด</div><div class="admin-stat-change up"><i class="fas fa-arrow-up"></i> ${pending} รอการอนุมัติ</div></div>
-      <div class="admin-stat-card"><div class="admin-stat-icon" style="background:rgba(74,144,226,.15);color:#4a90e2"><i class="fas fa-file-alt"></i></div><div class="admin-stat-num">${buyRequests.length}</div><div class="admin-stat-label">Buy Requests</div><div class="admin-stat-change up"><i class="fas fa-circle" style="font-size:7px"></i> ${buyRequests.filter(r=>r.status==='new').length} ใหม่</div></div>
-      <div class="admin-stat-card"><div class="admin-stat-icon" style="background:rgba(46,204,113,.15);color:#2ecc71"><i class="fas fa-users"></i></div><div class="admin-stat-num">${allAgents.length}</div><div class="admin-stat-label">Agents</div><div class="admin-stat-change up"><i class="fas fa-check"></i> Active ทั้งหมด</div></div>
-      <div class="admin-stat-card"><div class="admin-stat-icon" style="background:rgba(231,76,60,.15);color:#e74c3c"><i class="fas fa-baht-sign"></i></div><div class="admin-stat-num">฿${fmtVal}</div><div class="admin-stat-label">มูลค่ารวม</div><div class="admin-stat-change up"><i class="fas fa-trophy"></i> ${allPort.length} ปิดดีล</div></div>
+      <div class="admin-stat-card"><div class="admin-stat-icon" style="background:rgba(200,146,42,.15);color:#c8922a"><i class="fas fa-building"></i></div><div class="admin-stat-num">${dashSummary?.total_properties??allProps.length}</div><div class="admin-stat-label">ประกาศทั้งหมด</div><div class="admin-stat-change ${pending>0?'dn':'up'}"><i class="fas fa-${pending>0?'clock':'check'}"></i> ${pending} รอการอนุมัติ</div></div>
+      <div class="admin-stat-card"><div class="admin-stat-icon" style="background:rgba(74,144,226,.15);color:#4a90e2"><i class="fas fa-file-alt"></i></div><div class="admin-stat-num">${buyRequests.length}</div><div class="admin-stat-label">Buy Requests</div><div class="admin-stat-change ${newReqs>0?'dn':'up'}"><i class="fas fa-circle" style="font-size:7px"></i> ${newReqs} ใหม่</div></div>
+      <div class="admin-stat-card"><div class="admin-stat-icon" style="background:rgba(46,204,113,.15);color:#2ecc71"><i class="fas fa-users"></i></div><div class="admin-stat-num">${dashSummary?.total_agents??allAgents.length}</div><div class="admin-stat-label">Agents</div><div class="admin-stat-change up"><i class="fas fa-check"></i> Active ทั้งหมด</div></div>
+      <div class="admin-stat-card"><div class="admin-stat-icon" style="background:rgba(231,76,60,.15);color:#e74c3c"><i class="fas fa-baht-sign"></i></div><div class="admin-stat-num">฿${fmtVal}</div><div class="admin-stat-label">มูลค่ารวม</div><div class="admin-stat-change up"><i class="fas fa-trophy"></i> ${dashSummary?.total_deals??allPort.length} ปิดดีล</div></div>
+    </div>
+    <!-- [v13] แถว badges เพิ่มเติม — Users, Applications, Notifications -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px">
+      <div class="admin-stat-card" style="padding:14px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="admin-stat-icon" style="background:rgba(155,89,182,.15);color:#9b59b6;margin-bottom:0;width:34px;height:34px;font-size:14px"><i class="fas fa-user-circle"></i></div>
+          <div>
+            <div style="font-size:20px;font-weight:800;color:#fff">${totalUsers}</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.4)">Users ทั้งหมด</div>
+          </div>
+        </div>
+      </div>
+      <div class="admin-stat-card" style="padding:14px;cursor:pointer" onclick="adminNav('applications',null)" title="ดูใบสมัคร">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="admin-stat-icon" style="background:rgba(52,152,219,.15);color:#3498db;margin-bottom:0;width:34px;height:34px;font-size:14px"><i class="fas fa-user-tie"></i></div>
+          <div>
+            <div style="font-size:20px;font-weight:800;color:#fff">${agentApps + jobApps}</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.4)">ใบสมัครใหม่ <span style="color:#c8922a">(${agentApps} ตัวแทน / ${jobApps} งาน)</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="admin-stat-card" style="padding:14px;cursor:pointer" onclick="adminNav('notifications',null)" title="จัดการ Notifications">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="admin-stat-icon" style="background:rgba(241,196,15,.15);color:#f1c40f;margin-bottom:0;width:34px;height:34px;font-size:14px"><i class="fas fa-bell"></i></div>
+          <div>
+            <div style="font-size:20px;font-weight:800;color:#fff">${activeNotifs}</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.4)">Notifications active</div>
+          </div>
+        </div>
+      </div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
       <div class="admin-section">
@@ -14138,27 +14317,51 @@ async function _renderAdminPanel(panel){
 
   else if(panel==='notifications'){
     el.innerHTML = devBanner + `
-    <div class="admin-section" style="max-width:640px">
-      <div class="admin-section-head"><div class="admin-section-title"><i class="fas fa-bell"></i> ส่ง Broadcast Notification</div></div>
-      <div class="admin-notification-form">
-        <label style="font-size:12px;color:rgba(255,255,255,.4);margin-bottom:6px;display:block">หัวข้อ</label>
-        <input class="admin-notif-input" id="notif-title" placeholder="เช่น: อสังหาฯ ใหม่! คอนโดใกล้ BTS อโศก">
-        <label style="font-size:12px;color:rgba(255,255,255,.4);margin-bottom:6px;display:block">ข้อความ</label>
-        <textarea class="admin-notif-textarea" id="notif-body" placeholder="รายละเอียด notification ที่ต้องการส่งให้ users ทั้งหมด..."></textarea>
-        <label style="font-size:12px;color:rgba(255,255,255,.4);margin-bottom:6px;display:block">ส่งถึง</label>
-        <select class="admin-filter-select" id="notif-target" style="width:100%;padding:10px;margin-bottom:16px;border-radius:8px">
-          <option value="all">ผู้ใช้ทั้งหมด</option>
-          <option value="active">ผู้ใช้ที่ active (30 วัน)</option>
-          <option value="buyers">ผู้ที่ส่ง buy request</option>
-        </select>
-        <button class="admin-btn admin-btn-primary" style="width:100%;padding:12px;font-size:14px" onclick="adminSendNotification()">
-          <i class="fas fa-paper-plane"></i> ส่ง Notification
-        </button>
-        <p style="margin-top:12px;font-size:11px;color:rgba(255,255,255,.25);text-align:center">
-          <i class="fas fa-info-circle"></i> ระบบ Notification ต้องเชื่อมต่อ Supabase Realtime + Push API
-        </p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start">
+      <!-- ฟอร์มส่ง Notification -->
+      <div class="admin-section" style="max-width:100%">
+        <div class="admin-section-head"><div class="admin-section-title"><i class="fas fa-paper-plane"></i> ส่ง Broadcast Notification</div></div>
+        <div class="admin-notification-form">
+          <label style="font-size:12px;color:rgba(255,255,255,.4);margin-bottom:6px;display:block">หัวข้อ *</label>
+          <input class="admin-notif-input" id="notif-title" placeholder="เช่น: อสังหาฯ ใหม่! คอนโดใกล้ BTS อโศก">
+          <label style="font-size:12px;color:rgba(255,255,255,.4);margin-bottom:6px;display:block">ข้อความ *</label>
+          <textarea class="admin-notif-textarea" id="notif-body" placeholder="รายละเอียด notification ที่ต้องการส่งให้ users ทั้งหมด..."></textarea>
+          <label style="font-size:12px;color:rgba(255,255,255,.4);margin-bottom:6px;display:block">ประเภท</label>
+          <select class="admin-filter-select" id="notif-type" style="width:100%;padding:10px;margin-bottom:10px;border-radius:8px">
+            <option value="info">📢 ทั่วไป (info)</option>
+            <option value="promo">🎉 โปรโมชัน (promo)</option>
+            <option value="success">✅ ข่าวดี (success)</option>
+            <option value="warning">⚠️ แจ้งเตือน (warning)</option>
+            <option value="urgent">🚨 เร่งด่วน (urgent)</option>
+          </select>
+          <label style="font-size:12px;color:rgba(255,255,255,.4);margin-bottom:6px;display:block">ส่งถึง</label>
+          <select class="admin-filter-select" id="notif-target" style="width:100%;padding:10px;margin-bottom:10px;border-radius:8px">
+            <option value="all">ผู้ใช้ทั้งหมด (รวม guest)</option>
+            <option value="logged_in">เฉพาะผู้ที่ Login แล้ว</option>
+          </select>
+          <label style="font-size:12px;color:rgba(255,255,255,.4);margin-bottom:6px;display:block">Link เมื่อกด (ไม่บังคับ)</label>
+          <input class="admin-notif-input" id="notif-action-url" placeholder="เช่น /listings หรือ /careers">
+          <button class="admin-btn admin-btn-primary" style="width:100%;padding:12px;font-size:14px;margin-top:6px" onclick="adminSendNotification()">
+            <i class="fas fa-paper-plane"></i> ส่ง Notification
+          </button>
+          <p style="margin-top:10px;font-size:11px;color:rgba(255,255,255,.25);text-align:center">
+            <i class="fas fa-database"></i> บันทึกลง <code style="color:rgba(200,146,42,.7)">site_notifications</code> + Supabase Realtime
+          </p>
+        </div>
+      </div>
+      <!-- ประวัติ Notifications ล่าสุด -->
+      <div class="admin-section" style="max-width:100%">
+        <div class="admin-section-head">
+          <div class="admin-section-title"><i class="fas fa-history"></i> ประวัติ Notifications</div>
+          <button class="admin-btn admin-btn-ghost" style="font-size:11px;padding:5px 10px" onclick="_renderNotifHistory()"><i class="fas fa-sync"></i> Refresh</button>
+        </div>
+        <div id="admin-notif-history">
+          <div style="text-align:center;padding:30px;color:rgba(255,255,255,.3)"><i class="fas fa-spinner fa-spin"></i> กำลังโหลด...</div>
+        </div>
       </div>
     </div>`;
+    // โหลดประวัติทันทีหลัง render
+    _renderNotifHistory();
   }
 }
 
@@ -14379,39 +14582,109 @@ async function adminUpdateRequest(id, status){
 }
 function adminContactRequest(id, phone, contact){ window.open('tel:'+phone,'_self'); }
 async function adminSendNotification(){
-  const t=document.getElementById('notif-title').value.trim();
-  const b=document.getElementById('notif-body').value.trim();
-  if(!t||!b){ toast('กรุณากรอกหัวข้อและข้อความ'); return; }
+  const title  = document.getElementById('notif-title').value.trim();
+  const body   = document.getElementById('notif-body').value.trim();
+  const target = document.getElementById('notif-target')?.value || 'all';
+  const type   = document.getElementById('notif-type')?.value   || 'info';
+  const actionUrl = document.getElementById('notif-action-url')?.value.trim() || '';
+
+  if(!title||!body){ toast('กรุณากรอกหัวข้อและข้อความ',true); return; }
+
+  // ── ปุ่ม loading state ──
+  const btn = document.querySelector('[onclick="adminSendNotification()"]');
+  const origHtml = btn?.innerHTML||'';
+  if(btn){ btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> กำลังส่ง...'; }
+
   if(!_adminDevMode && sb){
     try{
-      // บันทึก notification ลงใน site_notifications table (ถ้ามี) หรือ broadcast via Supabase Realtime
-      // ปัจจุบัน: บันทึกลง site_config หรือ log ใน admin_notifications ถ้ามี table
-      // Fallback: แสดง toast success และ log ใน console
-      // ถ้าต้องการ push notification จริง ให้ deploy Supabase Edge Function: broadcast-notification
-      const fnUrl = `${(C.SUPABASE_URL||'').replace(/\/$/,'')}/functions/v1/broadcast-notification`;
-      const res = await fetch(fnUrl, {
-        method:'POST',
-        headers:{'Content-Type':'application/json','Authorization':`Bearer ${C.SUPABASE_KEY}`},
-        body:JSON.stringify({title:t, body:b, sent_by:_adminUser?.email, sent_at:new Date().toISOString()})
-      });
-      if(res.ok){
-        toast('📢 Notification ส่งแล้ว! ✅');
-      } else {
-        // Edge Function ยังไม่ได้ deploy — fallback graceful
-        console.warn('Broadcast function not available, notification logged only');
-        toast('📢 บันทึก Notification แล้ว (deploy Edge Function เพื่อส่งจริง)');
-      }
+      // [v13] บันทึกลง site_notifications table จริง
+      // Supabase Realtime จะ broadcast ให้ clients ที่ subscribe อยู่อัตโนมัติ
+      const payload = {
+        title,
+        body,
+        type,
+        target: target === 'active' ? 'logged_in' : (target === 'buyers' ? 'logged_in' : target),
+        action_url:   actionUrl || null,
+        is_published: true,
+        created_by:   _adminUser?.id || null
+      };
+      const { error } = await sb.from('site_notifications').insert(payload);
+      if(error) throw error;
+
+      toast('📢 Notification ส่งและบันทึกแล้ว ✅');
     }catch(e){
-      // Network error หรือ function ไม่ได้ deploy — graceful fallback
-      toast('📢 Notification บันทึกแล้ว (เชื่อมต่อ Edge Function เพื่อส่ง push จริง)');
+      toast('เกิดข้อผิดพลาด: '+(e.message||'กรุณาลองใหม่'),true);
+      if(btn){ btn.disabled=false; btn.innerHTML=origHtml; }
+      return;
     }
   } else {
-    toast('DEV: Notification "'+t+'" (ไม่ได้ส่งจริงใน dev mode)');
+    toast('DEV: Notification "'+title+'" (ไม่ได้ส่งจริงใน dev mode)');
   }
+
+  // ── reset form ──
   document.getElementById('notif-title').value='';
   document.getElementById('notif-body').value='';
+  if(document.getElementById('notif-action-url')) document.getElementById('notif-action-url').value='';
+  if(btn){ btn.disabled=false; btn.innerHTML=origHtml; }
+
+  // ── refresh รายการ notifications ──
+  if(!_adminDevMode) _renderNotifHistory();
 }
 function adminRefreshData(){ adminNav(_adminCurrentPanel, document.querySelector('.admin-nav-item.active')); toast('🔄 Refresh แล้ว'); }
+
+// [v13] โหลดและแสดงประวัติ site_notifications ใน Admin panel
+async function _renderNotifHistory(){
+  const container = document.getElementById('admin-notif-history');
+  if(!container) return;
+  if(_adminDevMode || !sb){
+    container.innerHTML = '<div style="padding:20px;color:rgba(255,255,255,.3);font-size:12px;text-align:center">DEV MODE — ไม่แสดงข้อมูลจริง</div>';
+    return;
+  }
+  container.innerHTML = '<div style="text-align:center;padding:30px;color:rgba(255,255,255,.3)"><i class="fas fa-spinner fa-spin"></i></div>';
+  try {
+    const { data, error } = await sb
+      .from('site_notifications')
+      .select('id,title,body,type,target,is_published,created_at,action_url')
+      .order('created_at', { ascending: false })
+      .limit(20);
+    if(error) throw error;
+    if(!data||!data.length){
+      container.innerHTML = '<div class="admin-empty"><i class="fas fa-bell-slash"></i><p>ยังไม่มี Notification</p></div>';
+      return;
+    }
+    const typeIcon = {info:'📢',promo:'🎉',success:'✅',warning:'⚠️',urgent:'🚨'};
+    const targetLabel = {all:'ทุกคน',logged_in:'Login แล้ว',specific_user:'เฉพาะ user'};
+    container.innerHTML = data.map(n=>`
+      <div style="border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:12px 14px;margin-bottom:10px;background:rgba(255,255,255,.02)">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px">
+          <div style="font-size:13px;font-weight:600;color:#fff">${typeIcon[n.type]||'📢'} ${sanitize(n.title)}</div>
+          <div style="display:flex;gap:6px;flex-shrink:0">
+            <span style="font-size:10px;padding:2px 8px;border-radius:20px;background:rgba(200,146,42,.15);color:#c8922a">${targetLabel[n.target]||n.target}</span>
+            ${n.is_published
+              ?'<span style="font-size:10px;padding:2px 8px;border-radius:20px;background:rgba(46,204,113,.15);color:#2ecc71">เผยแพร่</span>'
+              :'<span style="font-size:10px;padding:2px 8px;border-radius:20px;background:rgba(231,76,60,.15);color:#e74c3c">ซ่อน</span>'}
+          </div>
+        </div>
+        <div style="font-size:12px;color:rgba(255,255,255,.45);margin-bottom:6px">${sanitize(n.body)}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="font-size:11px;color:rgba(255,255,255,.25)">${n.created_at?new Date(n.created_at).toLocaleString('th-TH'):'-'}</div>
+          <button onclick="_adminDeleteNotif('${n.id}')" style="background:rgba(231,76,60,.1);color:#e74c3c;border:1px solid rgba(231,76,60,.2);border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer"><i class="fas fa-trash"></i> ลบ</button>
+        </div>
+      </div>`).join('');
+  } catch(e){
+    container.innerHTML = `<div style="padding:20px;color:#e74c3c;font-size:12px">โหลดไม่สำเร็จ: ${sanitize(e.message)}</div>`;
+  }
+}
+
+// [v13] ลบ notification จาก admin panel
+async function _adminDeleteNotif(notifId){
+  if(!sb||!notifId) return;
+  if(!confirm('ลบ Notification นี้?')) return;
+  const { error } = await sb.from('site_notifications').delete().eq('id', notifId);
+  if(error){ toast('ลบไม่สำเร็จ: '+error.message,true); return; }
+  toast('ลบ Notification แล้ว ✅');
+  _renderNotifHistory();
+}
 
 // ── Route สำหรับ admin page ──
 (function(){
