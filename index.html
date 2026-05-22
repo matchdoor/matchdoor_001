@@ -940,15 +940,14 @@ nav{
   }
   #all-modal{align-items:flex-end}
   #all-modal-filter-sticky{padding:8px 12px}
-  #all-modal-filter-sticky .modal-adv-filter-bar{padding:8px 10px;gap:6px}
-  #all-modal-filter-sticky .modal-adv-filter-row1,
-  #all-modal-filter-sticky .modal-adv-filter-row2{gap:6px}
-  #all-modal-filter-sticky .modal-adv-search-wrap{min-width:0;flex:1}
-  #all-modal-filter-sticky .modal-adv-select{min-width:80px;font-size:12px;padding:6px 8px;padding-right:20px}
+  #all-modal-filter-sticky .modal-adv-filter-bar{padding:7px 8px;gap:5px}
+  #all-modal-filter-sticky .modal-adv-filter-row1{gap:5px}
+  #all-modal-filter-sticky .modal-adv-search-wrap{min-width:0;flex:1 1 100%}
+  #all-modal-filter-sticky .modal-adv-select{min-width:0;font-size:11.5px;padding:6px 6px;padding-right:20px}
   #all-modal-filter-sticky .modal-adv-search-input{font-size:12px;padding:6px 8px 6px 26px}
-  #all-modal-filter-sticky .modal-adv-filter-btn,
-  #all-modal-filter-sticky .modal-adv-reset-btn,
-  #all-modal-filter-sticky .modal-adv-map-btn{padding:6px 10px;font-size:12px}
+  #all-modal-filter-sticky .modal-adv-reset-btn{padding:6px 10px;font-size:12px}
+  #all-modal-hdr-actions .modal-adv-map-btn{padding:5px 10px;font-size:11.5px}
+  #all-modal-hdr-actions button{padding:5px 10px;font-size:11.5px}
 }
 
 /* ══ ALL-MODAL: header polish when map is open ══ */
@@ -959,6 +958,10 @@ nav{
 #all-modal.map-layout .mhd h2{color:#fff}
 #all-modal.map-layout .mclose{color:rgba(255,255,255,.65)}
 #all-modal.map-layout .mclose:hover{color:#C8922A}
+#all-modal.map-layout #all-modal-hdr-actions button[style*="background:var(--p)"],
+#all-modal.map-layout #all-modal-hdr-actions button[style*="background:var(--lt)"]{
+  opacity:.9;
+}
 #all-modal.map-layout #all-modal-filter-sticky{
   background:linear-gradient(135deg,#0d1e3a 0%,#1B3A6B 100%);
   border-bottom:1px solid rgba(200,146,42,.2);
@@ -973,6 +976,11 @@ nav{
   background:rgba(255,255,255,.1);
   border-color:rgba(255,255,255,.18);
   color:#fff;
+}
+#all-modal.map-layout #all-modal-filter-sticky .modal-adv-select option,
+#all-modal.map-layout #all-modal-filter-sticky .modal-adv-select optgroup{
+  background:#fff;
+  color:#1B3A6B;
 }
 #all-modal.map-layout #all-modal-filter-sticky .modal-adv-search-input::placeholder{color:rgba(255,255,255,.45)}
 
@@ -1133,18 +1141,18 @@ nav{
   background:#f4f6fb;
   border:1.5px solid #e2e8f0;
   border-radius:12px;
-  padding:10px 12px;
+  padding:8px 10px;
   margin-bottom:12px;
-  display:flex;flex-direction:column;gap:8px;
+  display:flex;flex-direction:column;gap:6px;
 }
 .modal-adv-filter-row1{
-  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  display:flex;align-items:center;gap:6px;flex-wrap:wrap;
 }
 .modal-adv-filter-row2{
-  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  display:flex;align-items:center;gap:6px;flex-wrap:wrap;
 }
 .modal-adv-search-wrap{
-  flex:1;min-width:140px;
+  flex:1;min-width:130px;
   position:relative;
   display:flex;align-items:center;
 }
@@ -1162,11 +1170,16 @@ nav{
 .modal-adv-select{
   padding:7px 10px;border:1.5px solid #dde3ee;border-radius:9px;
   font-size:12.5px;color:var(--tx);background:#fff;outline:none;cursor:pointer;
-  min-width:100px;max-width:140px;
+  min-width:0;width:auto;
   transition:border-color .15s;
   appearance:none;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239ba8bb'/%3E%3C/svg%3E");
   background-repeat:no-repeat;background-position:right 8px center;padding-right:24px;
+}
+.modal-adv-select option,
+.modal-adv-select optgroup{
+  background:#fff;
+  color:#1B3A6B;
 }
 .modal-adv-select:focus{border-color:var(--a)}
 .modal-adv-filter-btn{
@@ -1190,6 +1203,44 @@ nav{
   box-shadow:0 2px 8px rgba(200,146,42,.28);transition:opacity .15s;
 }
 .modal-adv-map-btn:hover{opacity:.85}
+/* Header actions: map + viewall buttons beside × */
+#all-modal-hdr-actions{
+  display:flex;align-items:center;gap:7px;flex-shrink:0;margin-left:auto;margin-right:8px;
+}
+#all-modal-hdr-actions .modal-adv-map-btn{
+  box-shadow:none;
+}
+
+/* ══ Sort select in modal header (beside × button) ══ */
+.modal-hdr-sort-select{
+  padding:5px 28px 5px 10px;
+  border:1.5px solid var(--bd);
+  border-radius:8px;
+  font-size:12px;
+  font-weight:600;
+  font-family:inherit;
+  color:var(--tx);
+  background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%231B3A6B'/%3E%3C/svg%3E") no-repeat right 9px center;
+  -webkit-appearance:none;appearance:none;
+  cursor:pointer;
+  transition:.18s;
+  max-width:140px;
+  flex-shrink:0;
+}
+.modal-hdr-sort-select:focus{outline:none;border-color:var(--a);box-shadow:0 0 0 2px rgba(200,146,42,.15)}
+.modal-hdr-sort-select:hover{border-color:var(--a)}
+
+/* Dark header (map-layout) */
+#all-modal.map-layout #all-modal-hdr-actions .modal-hdr-sort-select{
+  background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%231B3A6B'/%3E%3C/svg%3E") no-repeat right 9px center;
+  color:var(--tx);
+  border-color:rgba(200,146,42,.5);
+}
+
+@media(max-width:600px){
+  .modal-hdr-sort-select{max-width:110px;font-size:11px;padding:4px 22px 4px 8px}
+}
+
 .modal-adv-result-count{
   font-size:11.5px;color:#8894aa;margin-left:auto;white-space:nowrap;
 }
@@ -1229,8 +1280,8 @@ nav{
   transform:translateY(-2px);
 }
 
-.mhd{padding:16px 20px;border-bottom:1.5px solid var(--lt);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#fff;z-index:10}
-.mhd h2{font-size:16px;font-weight:700}
+.mhd{padding:14px 16px;border-bottom:1.5px solid var(--lt);display:flex;justify-content:flex-start;align-items:center;gap:8px;position:sticky;top:0;background:#fff;z-index:10}
+.mhd h2{font-size:16px;font-weight:700;flex-shrink:0}
 .mclose{font-size:22px;cursor:pointer;color:var(--gr);line-height:1}
 .mbody{padding:20px;overflow-y:auto}
 .mslider-wrap{position:relative;margin-bottom:14px}
@@ -1470,17 +1521,20 @@ footer{background:linear-gradient(135deg,#2d2650 0%,#3d3373 100%);color:rgba(255
 
 /* Desktop dropdown */
 .adv-filter-panel{
-  display:none;position:fixed;
+  display:none;position:fixed!important;
   background:#fff;border-radius:18px;
   box-shadow:0 28px 70px rgba(0,0,0,.35),0 2px 12px rgba(0,0,0,.15);
   border:1.5px solid rgba(200,146,42,.3);
-  z-index:3500;width:500px;max-width:95vw;
+  z-index:3500;width:560px;max-width:96vw;
+  max-height:88vh;
   padding:0;overflow:hidden;
   pointer-events:auto;
   animation:advPopupIn .22s cubic-bezier(.34,1.4,.64,1);
-  top:50%;left:50%;transform:translate(-50%,-50%);
+  top:50%!important;left:50%!important;
+  transform:translate(-50%,-50%)!important;
+  bottom:auto!important;right:auto!important;
 }
-@keyframes advPopupIn{from{opacity:0;transform:translate(-50%,-48%) scale(.97)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+@keyframes advPopupIn{from{opacity:0;transform:translate(-50%,-48%) scale(.97)!important}to{opacity:1;transform:translate(-50%,-50%) scale(1)!important}}
 /* Desktop overlay behind popup */
 .adv-desktop-overlay{display:none;position:fixed;inset:0;background:rgba(10,22,40,.45);z-index:3490}
 .adv-desktop-overlay.open{display:block}
@@ -1490,7 +1544,10 @@ footer{background:linear-gradient(135deg,#2d2650 0%,#3d3373 100%);color:rgba(255
 .adv-filter-panel.open{display:block}
 .adv-fp-hd{padding:16px 20px 12px;background:linear-gradient(135deg,#0A1628,#1B3A6B);color:#fff;display:flex;align-items:center;justify-content:space-between}
 .adv-fp-hd h3{font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px}
-.adv-fp-body{padding:14px 18px;max-height:62vh;overflow-y:auto}
+.adv-fp-body{padding:14px 18px;max-height:72vh;overflow-y:auto}
+.adv-fp-body-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+.adv-fp-body-grid .adv-fp-section{margin-bottom:14px}
+.adv-fp-section-full{grid-column:1/-1}
 .adv-fp-section{margin-bottom:16px}
 .adv-fp-sec-title{font-size:13px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;padding-bottom:5px;border-bottom:1px solid #f0ece4}
 .adv-range-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
@@ -3496,7 +3553,7 @@ footer::after{
    <div class="sf">
     <div class="ac-wrap"><label><i class="fas fa-search"></i> คำค้นหา</label><input id="s-kw" placeholder="ชื่อโครงการ ทำเล..." autocomplete="off" oninput="debouncedSearch()"><div class="ac-list" id="ac-list" style="display:none"></div></div>
     <div><label><i class="fas fa-building"></i> ประเภท</label><select id="s-type"><option value="">ทุกประเภท</option><option value="บ้านเดี่ยว">บ้านเดี่ยว</option><option value="ทาวน์โฮม">ทาวน์โฮม</option><option value="คอนโด">คอนโด</option><option value="อาคารพาณิชย์">อาคารพาณิชย์</option><option value="ที่ดิน">ที่ดิน</option><option value="วิลล่า">วิลล่า</option><option value="รีสอร์ท">รีสอร์ท</option><option value="โรงแรม">โรงแรม</option></select></div>
-    <div><label><i class="fas fa-map-marker-alt"></i> จังหวัด / ทำเล</label><select id="s-prov"><option value="">ทุกทำเล</option></select></div>
+    <div><label><i class="fas fa-map-marker-alt"></i> จังหวัด</label><select id="s-prov"><option value="">ทุกจังหวัด</option></select></div>
     <div><label><i class="fas fa-tag"></i> ราคาต่ำสุด</label><select id="s-min" onchange="updatePriceMax()" style="width:100%;padding:10px 12px;border:1.5px solid rgba(200,146,42,.4);border-radius:10px;font-size:13px;color:#1a2744;background:rgba(255,255,255,0.95);font-weight:600"></select></div>
     <div><label><i class="fas fa-tag"></i> ราคาสูงสุด</label><select id="s-max" style="width:100%;padding:10px 12px;border:1.5px solid rgba(200,146,42,.4);border-radius:10px;font-size:13px;color:#1a2744;background:rgba(255,255,255,0.95);font-weight:600"></select></div>
     <button class="btn-search" onclick="doSearch()"><i class="fas fa-search"></i> ค้นหา</button>
@@ -4011,7 +4068,7 @@ footer::after{
 </div>
 
 <div class="ov" id="prop-modal" onclick="closeModal(event)"><div class="modal"><div class="mhd"><h2 id="m-title"></h2><div style="display:flex;align-items:center;gap:8px"><button onclick="event.stopPropagation();(function(){const url=location.href;if(navigator.share)navigator.share({title:document.title,url});else navigator.clipboard?.writeText(url).then(()=>toast('คัดลอก URL แล้ว ✅'));})()" style="width:34px;height:34px;border-radius:50%;background:var(--lt);border:1.5px solid var(--bd);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--p);font-size:14px" title="แชร์"><i class="fas fa-share-nodes"></i></button><button id="m-fav-btn" onclick="event.stopPropagation();toggleModalFav()" class="modal-fav-btn" title="เพิ่มรายการโปรด"><i class="far fa-heart"></i></button><span class="mclose" onclick="event.stopPropagation();closeModal()">×</span></div></div><div class="mbody"><div class="mslider-wrap"><div class="mslider"><div class="slides" id="slides"></div></div><button class="sarr prev" onclick="slide(-1)"><i class="fas fa-chevron-left"></i></button><button class="sarr next" onclick="slide(1)"><i class="fas fa-chevron-right"></i></button><div class="sdots" id="sdots"></div></div><div id="m-tags" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px"></div><div class="modal-price" id="m-price"></div><div class="modal-loc" id="m-loc"></div><div class="specs" id="m-specs"></div><div id="m-extras"></div><div class="agent-box" id="m-agent"><div class="ag-av" id="m-ag-av"></div><div><div id="m-ag-name" style="font-weight:700"></div><div id="m-ag-role" style="font-size:12px;color:var(--gr)"></div></div></div><div class="modal-desc" id="m-desc"></div><div id="m-chips" style="margin-bottom:10px"></div><div id="m-map" style="margin-bottom:16px"></div><div id="m-360-wrap" style="margin-bottom:16px"><button id="m-360-toggle-btn" onclick="toggle360()" style="display:flex;align-items:center;gap:8px;width:100%;background:linear-gradient(135deg,#0f1e3a,#1b3a6b);color:#fff;border:none;border-radius:12px;padding:13px 18px;cursor:pointer;font-size:14px;font-weight:700;font-family:inherit;transition:.2s" onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'"><i class="fas fa-street-view" style="font-size:18px;opacity:.9"></i><span id="m-360-label">มุมมอง 360°</span><span class="tour360-badge">Virtual Tour</span><i id="m-360-chevron" class="fas fa-chevron-down" style="margin-left:auto;font-size:12px;opacity:.7;transition:transform .3s"></i></button><div id="m-360-viewer-wrap" style="display:none;margin-top:8px"><div id="m-360-viewer" class="tour360-viewer"><canvas id="tour360-canvas"></canvas><div class="tour360-hint"><i class="fas fa-hand-pointer"></i> <span id="m-drag-hint">ลากเพื่อหมุน</span></div><button class="tour360-close" onclick="toggle360()"><i class="fas fa-times"></i></button></div></div></div><div id="m-nearby" style="margin-bottom:14px"></div><div class="cta-row"><a class="btn-cta cta-ln" id="m-ln" href="#" target="_blank"><i class="fab fa-line"></i> <span id="m-ln-label">แชท Line</span></a><a class="btn-cta cta-tel" id="m-tel" href="#"><i class="fas fa-mobile-alt"></i> <span id="m-tel-label">โทรสอบถาม</span></a></div></div></div></div>
-<div class="ov" id="all-modal" onclick="if(event.target===this){if(window._allModalParentType){var _pt=window._allModalParentType;window._allModalParentType=null;openAllModal(_pt);}else{_closeModal('all-modal');window._modalCurrentType=null;}}"><div class="modal wide"><div class="mhd"><h2 id="all-title2"></h2><span class="mclose" onclick="if(window._allModalParentType){var _pt=window._allModalParentType;window._allModalParentType=null;openAllModal(_pt);}else{_closeModal('all-modal');window._modalCurrentType=null;}">×</span></div><div id="all-modal-filter-sticky"></div><div class="mbody" id="all-body" style="overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain"></div></div></div>
+<div class="ov" id="all-modal" onclick="if(event.target===this){if(window._allModalParentType){var _pt=window._allModalParentType;window._allModalParentType=null;openAllModal(_pt);}else{_closeModal('all-modal');window._modalCurrentType=null;}}"><div class="modal wide"><div class="mhd"><h2 id="all-title2"></h2><div id="all-modal-hdr-actions" style="display:flex;align-items:center;gap:7px;flex-shrink:0"></div><span class="mclose" onclick="if(window._allModalParentType){var _pt=window._allModalParentType;window._allModalParentType=null;openAllModal(_pt);}else{_closeModal('all-modal');window._modalCurrentType=null;}">×</span></div><div id="all-modal-filter-sticky"></div><div class="mbody" id="all-body" style="overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain"></div></div></div>
 <!-- ===== GOOGLE MY MAPS POPUP (เปิดทับ all-modal) ===== -->
 <!-- ===== GOOGLE MY MAPS INLINE PANEL — injected dynamically into all-modal ===== -->
 <script>
@@ -4179,11 +4236,13 @@ function popupMapFilterAll(){
   var typSel = document.getElementById('popup-map-type-sel');
   var provSel = document.getElementById('popup-map-prov-sel');
   var priceSel = document.getElementById('popup-map-price-sel');
+  var priceMinSel = document.getElementById('popup-map-price-min-sel');
   var kwEl = document.getElementById('popup-map-kw');
   var tx = txSel ? txSel.value : 'ALL';
   var typ = typSel ? typSel.value : '';
   var prov = provSel ? provSel.value : '';
   var maxPrice = priceSel ? Number(priceSel.value||0) : 0;
+  var minPrice = priceMinSel ? Number(priceMinSel.value||0) : 0;
   var kw = kwEl ? kwEl.value.toLowerCase() : '';
   _popupMapTxFilter = tx;
 
@@ -4202,7 +4261,9 @@ function popupMapFilterAll(){
     if(kw){ var hay=((p.title||'')+' '+(p.location||'')+' '+(p.province||'')).toLowerCase(); if(hay.indexOf(kw)===-1) return false; }
     if(tx && tx !== 'ALL' && p.tx !== tx) return false;
     if(typ && p.type && p.type.indexOf(typ) === -1) return false;
+    if(area && (p.location||'').indexOf(area) === -1 && (p.title||'').indexOf(area) === -1 && (p.desc||'').indexOf(area) === -1) return false;
     if(prov && p.province && p.province.indexOf(prov) === -1 && (p.location||'').indexOf(prov) === -1) return false;
+    if(minPrice && p.price && p.price < minPrice) return false;
     if(maxPrice && p.price && p.price > maxPrice) return false;
     return true;
   });
@@ -4230,13 +4291,17 @@ function popupMapFilterAll(){
   if(txCard) txCard.value = (tx==='BUY'||tx==='RENT') ? tx : '';
   var typCard = document.getElementById('modal-adv-proptype');
   if(typCard) typCard.value = typ||'';
+  var areaCard = document.getElementById('modal-adv-area');
+  if(areaCard) areaCard.value = '';
   var provCard = document.getElementById('modal-adv-province');
   if(provCard) provCard.value = prov||'';
   var priceCard = document.getElementById('modal-adv-maxprice');
   if(priceCard) priceCard.value = maxPrice ? String(maxPrice) : '';
+  var priceMinCard = document.getElementById('modal-adv-minprice');
+  if(priceMinCard) priceMinCard.value = minPrice ? String(minPrice) : '';
 }
 function popupMapResetFilters(){
-  var ids = ['popup-map-tx-sel','popup-map-type-sel','popup-map-prov-sel','popup-map-price-sel'];
+  var ids = ['popup-map-tx-sel','popup-map-type-sel','popup-map-prov-sel','popup-map-price-sel','popup-map-price-min-sel'];
   ids.forEach(function(id){ var el = document.getElementById(id); if(el) el.value = el.options[0].value; });
   var kwEl = document.getElementById('popup-map-kw');
   if(kwEl) kwEl.value = '';
@@ -4253,7 +4318,7 @@ function popupMapResetFilters(){
     _popupRefreshMarkers();
   }
   // Reset cards panel selects too
-  ['modal-adv-kw','modal-adv-tx','modal-adv-proptype','modal-adv-province','modal-adv-maxprice'].forEach(function(id){
+  ['modal-adv-kw','modal-adv-tx','modal-adv-proptype','modal-adv-area','modal-adv-province','modal-adv-minprice','modal-adv-maxprice'].forEach(function(id){
     var el = document.getElementById(id);
     if(!el) return;
     if(el.tagName === 'SELECT') el.value = el.options[0].value;
@@ -4332,9 +4397,13 @@ function modalAdvFilter(type){
   var kw = (document.getElementById('modal-adv-kw')||{}).value||'';
   var tx = (document.getElementById('modal-adv-tx')||{}).value||'';
   var typ = (document.getElementById('modal-adv-proptype')||{}).value||'';
+  var area = (document.getElementById('modal-adv-area')||{}).value||'';
   var prov = (document.getElementById('modal-adv-province')||{}).value||'';
+  var minPrice = Number((document.getElementById('modal-adv-minprice')||{}).value||0);
   var maxPrice = Number((document.getElementById('modal-adv-maxprice')||{}).value||0);
   var sort = (document.getElementById('modal-adv-sort')||{}).value||'default';
+  // extra filter
+  var ef = window._modalExtraFilter || {};
   if(!window._modalTypeData._allData) window._modalTypeData._allData = [...window._modalTypeData.data];
   var base = window._modalTypeData._allData;
   var filtered = base.filter(function(p){
@@ -4346,7 +4415,23 @@ function modalAdvFilter(type){
     if(tx && p.tx !== tx) return false;
     if(typ && p.type && p.type.indexOf(typ) === -1) return false;
     if(prov && p.province && p.province.indexOf(prov) === -1 && (p.location||'').indexOf(prov) === -1) return false;
+    if(minPrice && p.price && p.price < minPrice) return false;
     if(maxPrice && p.price && p.price > maxPrice) return false;
+    // extra filters
+    if(ef.minBed && Number(p.bedrooms||p.beds||p.bed||0) < Number(ef.minBed)) return false;
+    if(ef.minBath && Number(p.bathrooms||p.baths||p.bath||0) < Number(ef.minBath)) return false;
+    if(ef.minArea && Number(p.area||p.usable_area||0) < Number(ef.minArea)) return false;
+    if(ef.minPrice && p.price && p.price < Number(ef.minPrice)) return false;
+    if(ef.maxPrice && p.price && p.price > Number(ef.maxPrice)) return false;
+    if(ef.loc){var locH=((p.location||'')+(p.province||'')+(p.title||'')+(p.desc||'')).toLowerCase();if(locH.indexOf(ef.loc.toLowerCase())===-1) return false;}
+    if(ef.bts){var btsH=((p.bts||'')+(p.location||'')+(p.transit||'')+(p.desc||'')).toLowerCase();if(btsH.indexOf(ef.bts.toLowerCase())===-1) return false;}
+    if(ef.mrt){var mrtH=((p.mrt||'')+(p.location||'')+(p.transit||'')+(p.desc||'')).toLowerCase();if(mrtH.indexOf(ef.mrt.toLowerCase())===-1) return false;}
+    if(ef.uni){var uniH=((p.location||'')+(p.desc||'')).toLowerCase();if(uniH.indexOf(ef.uni.toLowerCase())===-1) return false;}
+    if(ef.features && ef.features.length){
+      var feat = (p.features||p.amenities||[]);
+      var featStr = (typeof feat === 'string') ? feat : feat.join(' ');
+      if(!ef.features.every(function(f){ return featStr.indexOf(f)!==-1; })) return false;
+    }
     return true;
   });
   var sorted = (typeof sortListings === 'function') ? sortListings(filtered, sort) : filtered;
@@ -4356,14 +4441,14 @@ function modalAdvFilter(type){
   if(countEl) countEl.textContent = 'พบ ' + sorted.length + ' รายการ';
   if(window._modalRenderPage) window._modalRenderPage(sorted, 1);
   var bd = document.getElementById('all-body'); if(bd) bd.scrollTop = 0;
-  // ── Sync filter values to map panel selects & refresh map markers ──
-  if(_gmapPanelOpen && _popupLeafletMap){
-    _syncMapSelectsFromCards(kw, tx, typ, prov, maxPrice);
+  // ── Sync filter values to map panel selects & refresh map markers (always if map exists) ──
+  if(_popupLeafletMap){
+    _syncMapSelectsFromCards(kw, tx, typ, prov, maxPrice, minPrice);
     _popupRefreshMarkersFromData(sorted);
   }
 }
 function modalAdvReset(type){
-  var ids = ['modal-adv-kw','modal-adv-tx','modal-adv-proptype','modal-adv-province','modal-adv-maxprice'];
+  var ids = ['modal-adv-kw','modal-adv-tx','modal-adv-proptype','modal-adv-area','modal-adv-province','modal-adv-minprice','modal-adv-maxprice'];
   ids.forEach(function(id){
     var el = document.getElementById(id);
     if(!el) return;
@@ -4374,6 +4459,8 @@ function modalAdvReset(type){
   if(sortEl) sortEl.value = 'default';
   var countEl = document.getElementById('modal-adv-count');
   if(countEl) countEl.textContent = '';
+  // clear extra filter
+  window._modalExtraFilter = {};
   if(window._modalTypeData && window._modalTypeData._allData){
     window._modalTypeData.data = [...window._modalTypeData._allData];
     window._modalTypeData.currentPage = 1;
@@ -4388,7 +4475,7 @@ function modalAdvReset(type){
 }
 
 /* ── Helper: sync map panel select values to match cards filter ── */
-function _syncMapSelectsFromCards(kw, tx, typ, prov, maxPrice){
+function _syncMapSelectsFromCards(kw, tx, typ, prov, maxPrice, minPrice){
   var kwEl = document.getElementById('popup-map-kw');
   if(kwEl) kwEl.value = kw||'';
   var txEl = document.getElementById('popup-map-tx-sel');
@@ -4399,6 +4486,8 @@ function _syncMapSelectsFromCards(kw, tx, typ, prov, maxPrice){
   if(provEl) provEl.value = prov||'';
   var priceEl = document.getElementById('popup-map-price-sel');
   if(priceEl) priceEl.value = maxPrice ? String(maxPrice) : '';
+  var priceMinEl = document.getElementById('popup-map-price-min-sel');
+  if(priceMinEl) priceMinEl.value = minPrice ? String(minPrice) : '';
   _popupMapTxFilter = (tx==='BUY'||tx==='RENT') ? tx : 'ALL';
 }
 
@@ -6115,13 +6204,92 @@ function _renderHomeGrids(){
   }
 }
 
+// ── ราคา preset กระชับ (ซื้อ-ขาย และ เช่า) ──
+// ── ชุดราคาแบบรวม (ใช้กับทุก dropdown — ไม่แบ่งซื้อ/เช่า) ──
+const PRICE_UNIFIED_OPTS = [
+  {v:5000,      label:'5,000'},
+  {v:10000,     label:'10,000'},
+  {v:15000,     label:'15,000'},
+  {v:20000,     label:'20,000'},
+  {v:25000,     label:'25,000'},
+  {v:30000,     label:'30,000'},
+  {v:35000,     label:'35,000'},
+  {v:40000,     label:'40,000'},
+  {v:45000,     label:'45,000'},
+  {v:50000,     label:'50,000'},
+  {v:60000,     label:'60,000'},
+  {v:70000,     label:'70,000'},
+  {v:80000,     label:'80,000'},
+  {v:90000,     label:'90,000'},
+  {v:100000,    label:'100K'},
+  {v:150000,    label:'150K'},
+  {v:200000,    label:'200K'},
+  {v:300000,    label:'300K'},
+  {v:400000,    label:'400K'},
+  {v:500000,    label:'500K'},
+  {v:600000,    label:'600K'},
+  {v:700000,    label:'700K'},
+  {v:800000,    label:'800K'},
+  {v:900000,    label:'900K'},
+  {v:1000000,   label:'1M'},
+  {v:2000000,   label:'2M'},
+  {v:3000000,   label:'3M'},
+  {v:4000000,   label:'4M'},
+  {v:5000000,   label:'5M'},
+  {v:6000000,   label:'6M'},
+  {v:7000000,   label:'7M'},
+  {v:8000000,   label:'8M'},
+  {v:9000000,   label:'9M'},
+  {v:10000000,  label:'10M'},
+  {v:15000000,  label:'15M'},
+  {v:20000000,  label:'20M'},
+  {v:25000000,  label:'25M'},
+  {v:30000000,  label:'30M'},
+  {v:40000000,  label:'40M'},
+  {v:50000000,  label:'50M'},
+  {v:60000000,  label:'60M'},
+  {v:70000000,  label:'70M'},
+  {v:80000000,  label:'80M'},
+  {v:90000000,  label:'90M'},
+  {v:100000000, label:'100M'},
+];
+// compat aliases
+const PRICE_BUY_OPTS = PRICE_UNIFIED_OPTS;
+const PRICE_RENT_OPTS = PRICE_UNIFIED_OPTS;
+// compat: PRICE_OPTS ยังใช้สำหรับ logic อื่นที่อ้างถึง
 const PRICE_OPTS=(()=>{const a=[0];for(let v=5000;v<=100000;v+=5000)a.push(v);for(let v=150000;v<=1000000;v+=50000)a.push(v);for(let v=2000000;v<=10000000;v+=1000000)a.push(v);for(let v=20000000;v<=100000000;v+=10000000)a.push(v);for(let v=200000000;v<=1000000000;v+=100000000)a.push(v);return a;})();
 function fmtOpt(v){return v===0?ui('dd.price.unlim'):v>=1e6?(v/1e6).toFixed(v%1e6===0?0:1)+' M฿':v>=1000?v/1000+'K':v.toLocaleString()+(_lang==='en'?' Baht':_lang==='cn'?' 泰铢':_lang==='ja'?' バーツ':' บาท');}
-function renderPriceOpts(){ const opts=PRICE_OPTS.map(v=>`<option value="${v}">${fmtOpt(v)}</option>`).join(''); $('s-min').innerHTML=opts; $('s-max').innerHTML=opts+`<option value="999000000">${ui('dd.price.unlim')}</option>`; $('s-max').value='999000000'; }
+function _buildPriceOpts(list, addUnlim) {
+  // min dropdown: เริ่มด้วย "ราคาต่ำสุด" (v=0), max dropdown: ลงท้ายด้วย "ราคาสูงสุด" (v=999000000)
+  if(addUnlim) {
+    // max dropdown
+    return `<option value="999000000">ราคาสูงสุด</option>`
+      + list.map(o=>`<option value="${o.v}">${o.label}</option>`).join('');
+  } else {
+    // min dropdown
+    return `<option value="0">ราคาต่ำสุด</option>`
+      + list.map(o=>`<option value="${o.v}">${o.label}</option>`).join('');
+  }
+}
+function renderPriceOpts(){
+  $('s-min').innerHTML = _buildPriceOpts(PRICE_UNIFIED_OPTS, false);
+  $('s-max').innerHTML = _buildPriceOpts(PRICE_UNIFIED_OPTS, true);
+  $('s-max').value = '999000000';
+}
+function _refreshPriceOpts(){
+  // เรียกเมื่อ tx เปลี่ยน เพื่อ swap ชุดราคา
+  const minEl = $('s-min'), maxEl = $('s-max');
+  if(!minEl||!maxEl) return;
+  const prevMin = minEl.value, prevMax = maxEl.value;
+  renderPriceOpts();
+  // คืนค่าเดิมถ้ายังมีใน list
+  if([...minEl.options].some(o=>o.value===prevMin)) minEl.value = prevMin;
+  if([...maxEl.options].some(o=>o.value===prevMax)) maxEl.value = prevMax;
+}
 function setPriceRange(val){ const parts=(val||'0|0').split('|'); const mn=parseInt(parts[0])||0; const mx=parseInt(parts[1])||999000000; $('s-min').value=String(mn); $('s-max').value=String(mx||999000000); }
 function updatePriceMax(){const min=+$('s-min').value;$$('#s-max option').forEach(o=>{o.disabled=+o.value>0&&+o.value<min;});}
 
-function setTx(t,el){ tx=t; $$('.tx-tab').forEach(b=>b.classList.remove('active')); el.classList.add('active'); const pb=$('price-buy-section'),pr=$('price-rent-section'); if(pb&&pr){ pb.style.display=t==='RENT'?'none':'block'; pr.style.display=t==='RENT'?'block':'none'; } applyFilters().catch(console.error); }
+function setTx(t,el){ tx=t; $$('.tx-tab').forEach(b=>b.classList.remove('active')); el.classList.add('active'); const pb=$('price-buy-section'),pr=$('price-rent-section'); if(pb&&pr){ pb.style.display=t==='RENT'?'none':'block'; pr.style.display=t==='RENT'?'block':'none'; } if(typeof _refreshPriceOpts==='function') _refreshPriceOpts(); applyFilters().catch(console.error); }
 function setCat(type,el){ curType=type; $$('.cat-card').forEach(c=>c.classList.remove('active')); if(el)el.classList.add('active'); applyFilters().catch(console.error); scrollToEl('all-sec'); }
 function setCatNav(t){ showPage('home'); setTimeout(()=>{curType=t;applyFilters().catch(console.error);scrollToEl('all-sec');},100); }
 function _syncTxTabs(newTx){
@@ -8585,15 +8753,31 @@ function openAllModal(type){
   // store render fn for sort changes
   window._modalRenderPage = _modalRenderPage;
 
-  // ── row 1: res-count + viewall button (mobile: side by side) ──
+  // ── header action buttons: map + viewall (injected into modal header beside ×) ──
   const _viewAllBtn = type!=='all'
-    ? `<button onclick="window._allModalParentType='${type}';openAllModal('all')" style="padding:7px 14px;background:var(--p);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:5px;flex-shrink:0"><i class="fas fa-list"></i> ${ui('modal.viewall')}</button>`
-    : (window._allModalParentType ? `<button onclick="var _pt=window._allModalParentType;window._allModalParentType=null;openAllModal(_pt)" style="padding:7px 14px;background:var(--lt);color:var(--p);border:1.5px solid var(--bd);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:5px;flex-shrink:0"><i class="fas fa-arrow-left"></i> กลับ</button>` : '');
+    ? `<button onclick="window._allModalParentType='${type}';openAllModal('all')" style="padding:6px 13px;background:var(--p);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:5px;flex-shrink:0"><i class="fas fa-list"></i> ${ui('modal.viewall')}</button>`
+    : (window._allModalParentType ? `<button onclick="var _pt=window._allModalParentType;window._allModalParentType=null;openAllModal(_pt)" style="padding:6px 13px;background:var(--lt);color:var(--p);border:1.5px solid var(--bd);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:5px;flex-shrink:0"><i class="fas fa-arrow-left"></i> กลับ</button>` : '');
+  // inject map + viewall buttons into header actions slot
+  const _hdrActions = document.getElementById('all-modal-hdr-actions');
+  if(_hdrActions){
+    const _sortSelect = `<select id="modal-adv-sort" class="modal-hdr-sort-select" onchange="modalAdvFilter('${type}')" title="เรียงลำดับ">
+        <option value="default">${ui('modal.sort.rec')}</option>
+        <option value="price_asc">${ui('modal.sort.asc')}</option>
+        <option value="price_desc">${ui('modal.sort.desc')}</option>
+        <option value="newest">${ui('modal.sort.new')}</option>
+        <option value="oldest">${ui('modal.sort.old')}</option>
+        <option value="alpha">${ui('modal.sort.alpha')}</option>
+      </select>`;
+    _hdrActions.innerHTML =
+      `<button class="modal-adv-map-btn" onclick="openGmapPopup()" style="padding:6px 12px;font-size:12px"><i class="fas fa-map-marked-alt"></i> ${ui('modal.map.btn')}</button>`
+      + (_viewAllBtn || '')
+      + _sortSelect;
+  }
   const sortHtml=`<div class="modal-adv-filter-bar">
     <div class="modal-adv-filter-row1">
-      <div class="modal-adv-search-wrap">
+      <div class="modal-adv-search-wrap" style="flex:0 1 160px;min-width:120px">
         <i class="fas fa-search"></i>
-        <input class="modal-adv-search-input" id="modal-adv-kw" placeholder="ค้นหา ชื่อโครงการ ทำเล..." oninput="modalAdvFilter('${type}')">
+        <input class="modal-adv-search-input" id="modal-adv-kw" placeholder="ชื่อโครงการ ทำเล..." oninput="modalAdvFilter('${type}')">
       </div>
       <select class="modal-adv-select" id="modal-adv-tx" onchange="modalAdvFilter('${type}')">
         <option value="">ทั้งหมด</option>
@@ -8601,7 +8785,7 @@ function openAllModal(type){
         <option value="RENT">เช่า</option>
       </select>
       <select class="modal-adv-select" id="modal-adv-proptype" onchange="modalAdvFilter('${type}')">
-        <option value="">ประเภทอสังหา</option>
+        <option value="">ทุกประเภท</option>
         <option value="คอนโด">คอนโด</option>
         <option value="บ้านเดี่ยว">บ้านเดี่ยว</option>
         <option value="ทาวน์โฮม">ทาวน์โฮม</option>
@@ -8610,45 +8794,209 @@ function openAllModal(type){
         <option value="โรงแรม">โรงแรม</option>
         <option value="รีสอร์ท">รีสอร์ท</option>
       </select>
-    </div>
-    <div class="modal-adv-filter-row2">
-      <select class="modal-adv-select" id="modal-adv-province" onchange="modalAdvFilter('${type}')" style="min-width:120px;max-width:160px">
-        <option value="">จังหวัด (ทั้งหมด)</option>
-        <option value="กรุงเทพ">กรุงเทพมหานคร</option>
+      <select class="modal-adv-select" id="modal-adv-area" onchange="modalAdvFilter('${type}')" title="ค้นหาด้วยทำเล">
+        <option value="">ทุกทำเล</option>
+        <optgroup label="📍 โซนกลางเมือง — CBD">
+        <option value="สุขุมวิท">สุขุมวิท</option>
+        <option value="สาทร">สาทร</option>
+        <option value="สีลม">สีลม</option>
+        <option value="อโศก">อโศก</option>
+        <option value="ทองหล่อ">ทองหล่อ</option>
+        <option value="เพลินจิต">เพลินจิต</option>
+        <option value="ชิดลม">ชิดลม</option>
+        <option value="ราชประสงค์">ราชประสงค์</option>
+        <option value="ลุมพินี">ลุมพินี</option>
+        <option value="วิทยุ">ถ.วิทยุ</option>
+        </optgroup>
+        <optgroup label="📍 โซนตะวันออก">
+        <option value="พระโขนง">พระโขนง</option>
+        <option value="เอกมัย">เอกมัย</option>
+        <option value="อ่อนนุช">อ่อนนุช</option>
+        <option value="บางนา">บางนา</option>
+        <option value="ลาดกระบัง">ลาดกระบัง</option>
+        <option value="มีนบุรี">มีนบุรี</option>
+        <option value="รามคำแหง">รามคำแหง</option>
+        <option value="หัวหมาก">หัวหมาก</option>
+        <option value="สุวรรณภูมิ">สุวรรณภูมิ</option>
+        </optgroup>
+        <optgroup label="📍 โซนเหนือ">
+        <option value="รัชดา">รัชดาภิเษก</option>
+        <option value="ลาดพร้าว">ลาดพร้าว</option>
+        <option value="จตุจักร">จตุจักร</option>
+        <option value="หมอชิต">หมอชิต</option>
+        <option value="พหลโยธิน">พหลโยธิน</option>
+        <option value="อารีย์">อารีย์</option>
+        <option value="สะพานควาย">สะพานควาย</option>
+        <option value="ดอนเมือง">ดอนเมือง</option>
+        <option value="พระราม 9">พระราม 9</option>
+        <option value="ห้วยขวาง">ห้วยขวาง</option>
+        </optgroup>
+        <optgroup label="📍 โซนตะวันตก & ใต้">
+        <option value="ปิ่นเกล้า">ปิ่นเกล้า</option>
+        <option value="บางแค">บางแค</option>
+        <option value="วงเวียนใหญ่">วงเวียนใหญ่</option>
+        <option value="พระราม 3">พระราม 3</option>
+        <option value="สาธุประดิษฐ์">สาธุประดิษฐ์</option>
+        <option value="ราษฎร์บูรณะ">ราษฎร์บูรณะ</option>
+        <option value="ตลิ่งชัน">ตลิ่งชัน</option>
+        <option value="บางกอกน้อย">บางกอกน้อย</option>
+        <option value="ธนบุรี">ธนบุรี</option>
+        <option value="บางบอน">บางบอน</option>
+        </optgroup>
+      </select>
+      <select class="modal-adv-select" id="modal-adv-province" onchange="modalAdvFilter('${type}')" title="ค้นหาด้วยจังหวัด">
+        <option value="">ทุกจังหวัด</option>
+        <optgroup label="🏙️ กรุงเทพฯ & ปริมณฑล">
+        <option value="กรุงเทพมหานคร">กรุงเทพมหานคร</option>
         <option value="นนทบุรี">นนทบุรี</option>
         <option value="ปทุมธานี">ปทุมธานี</option>
         <option value="สมุทรปราการ">สมุทรปราการ</option>
-        <option value="เชียงใหม่">เชียงใหม่</option>
-        <option value="ชลบุรี">ชลบุรี</option>
-        <option value="ภูเก็ต">ภูเก็ต</option>
-        <option value="ขอนแก่น">ขอนแก่น</option>
+        <option value="สมุทรสาคร">สมุทรสาคร</option>
+        <option value="นครปฐม">นครปฐม</option>
+        </optgroup>
+        <optgroup label="🌆 ภาคกลาง">
+        <option value="พระนครศรีอยุธยา">พระนครศรีอยุธยา</option>
+        <option value="อ่างทอง">อ่างทอง</option>
+        <option value="สิงห์บุรี">สิงห์บุรี</option>
+        <option value="ชัยนาท">ชัยนาท</option>
+        <option value="ลพบุรี">ลพบุรี</option>
+        <option value="สระบุรี">สระบุรี</option>
+        <option value="นครนายก">นครนายก</option>
+        <option value="สระแก้ว">สระแก้ว</option>
+        <option value="ฉะเชิงเทรา">ฉะเชิงเทรา</option>
+        <option value="สมุทรสงคราม">สมุทรสงคราม</option>
+        <option value="สุพรรณบุรี">สุพรรณบุรี</option>
         <option value="กาญจนบุรี">กาญจนบุรี</option>
+        <option value="ราชบุรี">ราชบุรี</option>
+        <option value="เพชรบุรี">เพชรบุรี</option>
+        <option value="ประจวบคีรีขันธ์">ประจวบคีรีขันธ์</option>
+        </optgroup>
+        <optgroup label="🌊 ภาคตะวันออก">
+        <option value="ชลบุรี">ชลบุรี</option>
         <option value="ระยอง">ระยอง</option>
+        <option value="จันทบุรี">จันทบุรี</option>
         <option value="ตราด">ตราด</option>
+        <option value="ปราจีนบุรี">ปราจีนบุรี</option>
+        </optgroup>
+        <optgroup label="🏔️ ภาคเหนือ">
+        <option value="เชียงใหม่">เชียงใหม่</option>
+        <option value="เชียงราย">เชียงราย</option>
+        <option value="แม่ฮ่องสอน">แม่ฮ่องสอน</option>
+        <option value="ลำพูน">ลำพูน</option>
+        <option value="ลำปาง">ลำปาง</option>
+        <option value="พะเยา">พะเยา</option>
+        <option value="แพร่">แพร่</option>
+        <option value="น่าน">น่าน</option>
+        <option value="อุตรดิตถ์">อุตรดิตถ์</option>
+        <option value="สุโขทัย">สุโขทัย</option>
+        <option value="พิษณุโลก">พิษณุโลก</option>
+        <option value="พิจิตร">พิจิตร</option>
+        <option value="กำแพงเพชร">กำแพงเพชร</option>
+        <option value="ตาก">ตาก</option>
+        <option value="นครสวรรค์">นครสวรรค์</option>
+        <option value="อุทัยธานี">อุทัยธานี</option>
+        </optgroup>
+        <optgroup label="🌾 ภาคอีสาน">
+        <option value="นครราชสีมา">นครราชสีมา</option>
+        <option value="ขอนแก่น">ขอนแก่น</option>
+        <option value="อุดรธานี">อุดรธานี</option>
+        <option value="อุบลราชธานี">อุบลราชธานี</option>
+        <option value="บึงกาฬ">บึงกาฬ</option>
+        <option value="หนองคาย">หนองคาย</option>
+        <option value="หนองบัวลำภู">หนองบัวลำภู</option>
+        <option value="เลย">เลย</option>
+        <option value="ชัยภูมิ">ชัยภูมิ</option>
+        <option value="บุรีรัมย์">บุรีรัมย์</option>
+        <option value="สุรินทร์">สุรินทร์</option>
+        <option value="ศรีสะเกษ">ศรีสะเกษ</option>
+        <option value="ยโสธร">ยโสธร</option>
+        <option value="มุกดาหาร">มุกดาหาร</option>
+        <option value="อำนาจเจริญ">อำนาจเจริญ</option>
+        <option value="ร้อยเอ็ด">ร้อยเอ็ด</option>
+        <option value="กาฬสินธุ์">กาฬสินธุ์</option>
+        <option value="มหาสารคาม">มหาสารคาม</option>
+        <option value="นครพนม">นครพนม</option>
+        <option value="สกลนคร">สกลนคร</option>
+        </optgroup>
+        <optgroup label="🌴 ภาคใต้">
         <option value="สุราษฎร์ธานี">สุราษฎร์ธานี</option>
+        <option value="ภูเก็ต">ภูเก็ต</option>
+        <option value="กระบี่">กระบี่</option>
+        <option value="พังงา">พังงา</option>
+        <option value="ระนอง">ระนอง</option>
+        <option value="ชุมพร">ชุมพร</option>
+        <option value="นครศรีธรรมราช">นครศรีธรรมราช</option>
+        <option value="พัทลุง">พัทลุง</option>
+        <option value="ตรัง">ตรัง</option>
+        <option value="สตูล">สตูล</option>
+        <option value="สงขลา">สงขลา</option>
+        <option value="ปัตตานี">ปัตตานี</option>
+        <option value="ยะลา">ยะลา</option>
+        <option value="นราธิวาส">นราธิวาส</option>
+        </optgroup>
       </select>
-      <select class="modal-adv-select" id="modal-adv-maxprice" onchange="modalAdvFilter('${type}')" style="min-width:140px;max-width:180px">
+      <select class="modal-adv-select" id="modal-adv-minprice" onchange="modalAdvFilter('${type}')">
+        <option value="">ราคาต่ำสุด</option>
+        <option value="5000">5,000</option>
+        <option value="10000">10,000</option>
+        <option value="15000">15,000</option>
+        <option value="20000">20,000</option>
+        <option value="25000">25,000</option>
+        <option value="30000">30,000</option>
+        <option value="40000">40,000</option>
+        <option value="50000">50,000</option>
+        <option value="60000">60,000</option>
+        <option value="70000">70,000</option>
+        <option value="80000">80,000</option>
+        <option value="100000">100K</option>
+        <option value="150000">150K</option>
+        <option value="200000">200K</option>
+        <option value="300000">300K</option>
+        <option value="500000">500K</option>
+        <option value="1000000">1M</option>
+        <option value="2000000">2M</option>
+        <option value="3000000">3M</option>
+        <option value="5000000">5M</option>
+        <option value="7000000">7M</option>
+        <option value="10000000">10M</option>
+        <option value="15000000">15M</option>
+        <option value="20000000">20M</option>
+        <option value="30000000">30M</option>
+        <option value="50000000">50M</option>
+        <option value="100000000">100M</option>
+      </select>
+      <select class="modal-adv-select" id="modal-adv-maxprice" onchange="modalAdvFilter('${type}')">
         <option value="">ราคาสูงสุด</option>
-        <option value="1000000">ไม่เกิน 1 ล้าน</option>
-        <option value="3000000">ไม่เกิน 3 ล้าน</option>
-        <option value="5000000">ไม่เกิน 5 ล้าน</option>
-        <option value="10000000">ไม่เกิน 10 ล้าน</option>
-        <option value="20000000">ไม่เกิน 20 ล้าน</option>
-        <option value="50000000">ไม่เกิน 50 ล้าน</option>
-        <option value="100000000">ไม่เกิน 100 ล้าน</option>
+        <option value="5000">5,000</option>
+        <option value="10000">10,000</option>
+        <option value="15000">15,000</option>
+        <option value="20000">20,000</option>
+        <option value="25000">25,000</option>
+        <option value="30000">30,000</option>
+        <option value="40000">40,000</option>
+        <option value="50000">50,000</option>
+        <option value="60000">60,000</option>
+        <option value="70000">70,000</option>
+        <option value="80000">80,000</option>
+        <option value="100000">100K</option>
+        <option value="150000">150K</option>
+        <option value="200000">200K</option>
+        <option value="300000">300K</option>
+        <option value="500000">500K</option>
+        <option value="1000000">1M</option>
+        <option value="2000000">2M</option>
+        <option value="3000000">3M</option>
+        <option value="5000000">5M</option>
+        <option value="7000000">7M</option>
+        <option value="10000000">10M</option>
+        <option value="15000000">15M</option>
+        <option value="20000000">20M</option>
+        <option value="30000000">30M</option>
+        <option value="50000000">50M</option>
+        <option value="100000000">100M</option>
       </select>
-      <select class="modal-adv-select" id="modal-adv-sort" onchange="modalAdvFilter('${type}')">
-        <option value="default">${ui('modal.sort.rec')}</option>
-        <option value="price_asc">${ui('modal.sort.asc')}</option>
-        <option value="price_desc">${ui('modal.sort.desc')}</option>
-        <option value="newest">${ui('modal.sort.new')}</option>
-        <option value="oldest">${ui('modal.sort.old')}</option>
-        <option value="alpha">${ui('modal.sort.alpha')}</option>
-      </select>
-      <button class="modal-adv-filter-btn" onclick="modalAdvFilter('${type}')"><i class="fas fa-filter"></i> กรอง</button>
-      <button class="modal-adv-reset-btn" onclick="modalAdvReset('${type}')"><i class="fas fa-undo"></i> รีเซ็ต</button>
-      <button class="modal-adv-map-btn" onclick="openGmapPopup()"><i class="fas fa-map-marked-alt"></i> ${ui('modal.map.btn')}</button>
-      ${_viewAllBtn ? _viewAllBtn : ''}
+      <button class="modal-adv-filter-btn" onclick="openModalAdvExtraFilter('${type}')" title="Filter เพิ่มเติม" style="background:#fff;color:var(--p);border:1.5px solid var(--bd);padding:7px 10px;min-width:36px"><i class="fas fa-sliders-h"></i></button>
+      <button class="modal-adv-reset-btn" onclick="modalAdvReset('${type}')" title="รีเซ็ต" style="padding:7px 10px;min-width:36px"><i class="fas fa-undo"></i></button>
     </div>
   </div>`;
   t.textContent=title;
@@ -8716,6 +9064,299 @@ function modalSortChange(sel, type) {
   }
   window._modalTypeData.currentPage = 1;
   if(window._modalRenderPage) window._modalRenderPage(sorted, 1);
+}
+
+/* ── Filter เพิ่มเติม popup (from home quick-search-bar advanced filter logic) ── */
+function openModalAdvExtraFilter(type) {
+  const existing = document.getElementById('modal-extra-filter-sheet');
+  if(existing){ existing.remove(); return; }
+  // Read current extra filter values if available
+  const _ef = window._modalExtraFilter || {};
+  const _minBed   = _ef.minBed   || '';
+  const _minBath  = _ef.minBath  || '';
+  const _minArea  = _ef.minArea  || '';
+  const _minPrice = _ef.minPrice || '';
+  const _maxPrice = _ef.maxPrice || '';
+  const _priceMode= _ef.priceMode|| 'buy';
+  const _loc      = _ef.loc      || '';
+  const _bts      = _ef.bts      || '';
+  const _mrt      = _ef.mrt      || '';
+  const _uni      = _ef.uni      || '';
+  const _features = _ef.features || [];
+  const featureList = ['เฟอร์นิเจอร์ครบ','แอร์','ที่จอดรถ','สระว่ายน้ำ','ฟิตเนส','ลิฟต์','รักษาความปลอดภัย','ส่วนกลาง'];
+
+  const mo = document.createElement('div');
+  mo.id = 'modal-extra-filter-sheet';
+  // ── Center on screen (same style as adv-filter-panel) ──
+  mo.style.cssText = 'position:fixed;inset:0;background:rgba(10,22,40,.55);z-index:11000;display:flex;align-items:center;justify-content:center;padding:16px';
+  mo.innerHTML = `
+  <div style="background:#fff;border-radius:20px;width:100%;max-width:560px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 28px 70px rgba(0,0,0,.38),0 2px 12px rgba(0,0,0,.15);border:1.5px solid rgba(200,146,42,.25);animation:advPopupIn .22s cubic-bezier(.34,1.4,.64,1)">
+    <!-- Header -->
+    <div style="padding:16px 20px 12px;background:linear-gradient(135deg,#0A1628,#1B3A6B);color:#fff;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+      <h3 style="font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px;margin:0"><i class="fas fa-sliders-h" style="color:var(--a)"></i> Filter เพิ่มเติม</h3>
+      <button onclick="document.getElementById('modal-extra-filter-sheet').remove()" style="background:none;border:none;font-size:22px;cursor:pointer;color:rgba(255,255,255,.7);line-height:1">×</button>
+    </div>
+    <!-- Body -->
+    <div style="flex:1;overflow-y:auto;padding:16px 18px">
+
+      <!-- ช่วงราคา -->
+      <div style="margin-bottom:16px">
+        <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4"><i class="fas fa-tag" style="color:var(--a)"></i> ช่วงราคา (บาท)</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <select id="mef-price-min" style="width:100%;padding:8px 10px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;background:#fff">
+            <option value="">ราคาต่ำสุด</option>
+            <option value="5000" ${_minPrice=='5000'?'selected':''}>5,000</option>
+            <option value="10000" ${_minPrice=='10000'?'selected':''}>10,000</option>
+            <option value="15000" ${_minPrice=='15000'?'selected':''}>15,000</option>
+            <option value="20000" ${_minPrice=='20000'?'selected':''}>20,000</option>
+            <option value="25000" ${_minPrice=='25000'?'selected':''}>25,000</option>
+            <option value="30000" ${_minPrice=='30000'?'selected':''}>30,000</option>
+            <option value="40000" ${_minPrice=='40000'?'selected':''}>40,000</option>
+            <option value="50000" ${_minPrice=='50000'?'selected':''}>50,000</option>
+            <option value="60000" ${_minPrice=='60000'?'selected':''}>60,000</option>
+            <option value="70000" ${_minPrice=='70000'?'selected':''}>70,000</option>
+            <option value="80000" ${_minPrice=='80000'?'selected':''}>80,000</option>
+            <option value="100000" ${_minPrice=='100000'?'selected':''}>100K</option>
+            <option value="150000" ${_minPrice=='150000'?'selected':''}>150K</option>
+            <option value="200000" ${_minPrice=='200000'?'selected':''}>200K</option>
+            <option value="300000" ${_minPrice=='300000'?'selected':''}>300K</option>
+            <option value="500000" ${_minPrice=='500000'?'selected':''}>500K</option>
+            <option value="1000000" ${_minPrice=='1000000'?'selected':''}>1M</option>
+            <option value="2000000" ${_minPrice=='2000000'?'selected':''}>2M</option>
+            <option value="3000000" ${_minPrice=='3000000'?'selected':''}>3M</option>
+            <option value="5000000" ${_minPrice=='5000000'?'selected':''}>5M</option>
+            <option value="7000000" ${_minPrice=='7000000'?'selected':''}>7M</option>
+            <option value="10000000" ${_minPrice=='10000000'?'selected':''}>10M</option>
+            <option value="15000000" ${_minPrice=='15000000'?'selected':''}>15M</option>
+            <option value="20000000" ${_minPrice=='20000000'?'selected':''}>20M</option>
+            <option value="30000000" ${_minPrice=='30000000'?'selected':''}>30M</option>
+            <option value="50000000" ${_minPrice=='50000000'?'selected':''}>50M</option>
+            <option value="100000000" ${_minPrice=='100000000'?'selected':''}>100M</option>
+          </select>
+          <select id="mef-price-max" style="width:100%;padding:8px 10px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;background:#fff">
+            <option value="">ราคาสูงสุด</option>
+            <option value="5000" ${_maxPrice=='5000'?'selected':''}>5,000</option>
+            <option value="10000" ${_maxPrice=='10000'?'selected':''}>10,000</option>
+            <option value="15000" ${_maxPrice=='15000'?'selected':''}>15,000</option>
+            <option value="20000" ${_maxPrice=='20000'?'selected':''}>20,000</option>
+            <option value="25000" ${_maxPrice=='25000'?'selected':''}>25,000</option>
+            <option value="30000" ${_maxPrice=='30000'?'selected':''}>30,000</option>
+            <option value="40000" ${_maxPrice=='40000'?'selected':''}>40,000</option>
+            <option value="50000" ${_maxPrice=='50000'?'selected':''}>50,000</option>
+            <option value="60000" ${_maxPrice=='60000'?'selected':''}>60,000</option>
+            <option value="70000" ${_maxPrice=='70000'?'selected':''}>70,000</option>
+            <option value="80000" ${_maxPrice=='80000'?'selected':''}>80,000</option>
+            <option value="100000" ${_maxPrice=='100000'?'selected':''}>100K</option>
+            <option value="150000" ${_maxPrice=='150000'?'selected':''}>150K</option>
+            <option value="200000" ${_maxPrice=='200000'?'selected':''}>200K</option>
+            <option value="300000" ${_maxPrice=='300000'?'selected':''}>300K</option>
+            <option value="500000" ${_maxPrice=='500000'?'selected':''}>500K</option>
+            <option value="1000000" ${_maxPrice=='1000000'?'selected':''}>1M</option>
+            <option value="2000000" ${_maxPrice=='2000000'?'selected':''}>2M</option>
+            <option value="3000000" ${_maxPrice=='3000000'?'selected':''}>3M</option>
+            <option value="5000000" ${_maxPrice=='5000000'?'selected':''}>5M</option>
+            <option value="7000000" ${_maxPrice=='7000000'?'selected':''}>7M</option>
+            <option value="10000000" ${_maxPrice=='10000000'?'selected':''}>10M</option>
+            <option value="15000000" ${_maxPrice=='15000000'?'selected':''}>15M</option>
+            <option value="20000000" ${_maxPrice=='20000000'?'selected':''}>20M</option>
+            <option value="30000000" ${_maxPrice=='30000000'?'selected':''}>30M</option>
+            <option value="50000000" ${_maxPrice=='50000000'?'selected':''}>50M</option>
+            <option value="100000000" ${_maxPrice=='100000000'?'selected':''}>100M</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- ทำเล/จังหวัด -->
+      <div style="margin-bottom:16px">
+        <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4"><i class="fas fa-map-marker-alt" style="color:var(--p)"></i> ทำเล / จังหวัด</div>
+        <select id="mef-loc" style="width:100%;padding:8px 10px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;background:#fff">
+          <option value="">-- เลือกทำเลยอดนิยม --</option>
+          <optgroup label="📍 โซนกลางเมือง — CBD">
+          <option value="สุขุมวิท" ${_loc=='สุขุมวิท'?'selected':''}>สุขุมวิท</option>
+          <option value="สาทร" ${_loc=='สาทร'?'selected':''}>สาทร</option>
+          <option value="สีลม" ${_loc=='สีลม'?'selected':''}>สีลม</option>
+          <option value="อโศก" ${_loc=='อโศก'?'selected':''}>อโศก</option>
+          <option value="ทองหล่อ" ${_loc=='ทองหล่อ'?'selected':''}>ทองหล่อ</option>
+          <option value="เพลินจิต" ${_loc=='เพลินจิต'?'selected':''}>เพลินจิต</option>
+          <option value="รัชดา" ${_loc=='รัชดา'?'selected':''}>รัชดาภิเษก</option>
+          <option value="ลาดพร้าว" ${_loc=='ลาดพร้าว'?'selected':''}>ลาดพร้าว</option>
+          <option value="พระราม 9" ${_loc=='พระราม 9'?'selected':''}>พระราม 9</option>
+          <option value="บางนา" ${_loc=='บางนา'?'selected':''}>บางนา</option>
+          </optgroup>
+          <optgroup label="🗺️ จังหวัด">
+          <option value="กรุงเทพมหานคร" ${_loc=='กรุงเทพมหานคร'?'selected':''}>กรุงเทพมหานคร</option>
+          <option value="นนทบุรี" ${_loc=='นนทบุรี'?'selected':''}>นนทบุรี</option>
+          <option value="ปทุมธานี" ${_loc=='ปทุมธานี'?'selected':''}>ปทุมธานี</option>
+          <option value="สมุทรปราการ" ${_loc=='สมุทรปราการ'?'selected':''}>สมุทรปราการ</option>
+          <option value="ภูเก็ต" ${_loc=='ภูเก็ต'?'selected':''}>ภูเก็ต</option>
+          <option value="เชียงใหม่" ${_loc=='เชียงใหม่'?'selected':''}>เชียงใหม่</option>
+          <option value="ชลบุรี" ${_loc=='ชลบุรี'?'selected':''}>ชลบุรี</option>
+          </optgroup>
+        </select>
+      </div>
+
+      <!-- BTS -->
+      <div style="margin-bottom:16px">
+        <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4"><i class="fas fa-train" style="color:#009900"></i> ใกล้สถานี BTS</div>
+        <select id="mef-bts" style="width:100%;padding:8px 10px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;background:#fff">
+          <option value="">ทุกจังหวัด</option>
+          <optgroup label="🚈 สายสุขุมวิท (N/E)">
+          <option value="หมอชิต" ${_bts=='หมอชิต'?'selected':''}>หมอชิต (N8)</option>
+          <option value="อารีย์" ${_bts=='อารีย์'?'selected':''}>อารีย์ (N5)</option>
+          <option value="สยาม" ${_bts=='สยาม'?'selected':''}>สยาม (CEN)</option>
+          <option value="นานา" ${_bts=='นานา'?'selected':''}>นานา (E4)</option>
+          <option value="อโศก" ${_bts=='อโศก'?'selected':''}>อโศก (E5)</option>
+          <option value="พร้อมพงษ์" ${_bts=='พร้อมพงษ์'?'selected':''}>พร้อมพงษ์ (E6)</option>
+          <option value="ทองหล่อ" ${_bts=='ทองหล่อ'?'selected':''}>ทองหล่อ (E7)</option>
+          <option value="เอกมัย" ${_bts=='เอกมัย'?'selected':''}>เอกมัย (E8)</option>
+          <option value="อ่อนนุช" ${_bts=='อ่อนนุช'?'selected':''}>อ่อนนุช (E10)</option>
+          <option value="บางนา" ${_bts=='บางนา'?'selected':''}>บางนา (E14)</option>
+          </optgroup>
+          <optgroup label="🚈 สายสีลม (S)">
+          <option value="ราชดำริ" ${_bts=='ราชดำริ'?'selected':''}>ราชดำริ (S1)</option>
+          <option value="ช่องนนทรี" ${_bts=='ช่องนนทรี'?'selected':''}>ช่องนนทรี (S2)</option>
+          <option value="สุรศักดิ์" ${_bts=='สุรศักดิ์'?'selected':''}>สุรศักดิ์ (S3)</option>
+          <option value="สะพานตากสิน" ${_bts=='สะพานตากสิน'?'selected':''}>สะพานตากสิน (S4)</option>
+          </optgroup>
+        </select>
+      </div>
+
+      <!-- MRT -->
+      <div style="margin-bottom:16px">
+        <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4"><i class="fas fa-subway" style="color:#003399"></i> ใกล้สถานี MRT</div>
+        <select id="mef-mrt" style="width:100%;padding:8px 10px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;background:#fff">
+          <option value="">ทุกสถานี BTS/SRT/ARL</option>
+          <optgroup label="🚇 สายสีน้ำเงิน (MRT)">
+          <option value="หัวลำโพง" ${_mrt=='หัวลำโพง'?'selected':''}>หัวลำโพง</option>
+          <option value="สามย่าน" ${_mrt=='สามย่าน'?'selected':''}>สามย่าน</option>
+          <option value="สีลม" ${_mrt=='สีลม'?'selected':''}>สีลม</option>
+          <option value="ลุมพินี" ${_mrt=='ลุมพินี'?'selected':''}>ลุมพินี</option>
+          <option value="คลองเตย" ${_mrt=='คลองเตย'?'selected':''}>คลองเตย</option>
+          <option value="ศูนย์วัฒนธรรม" ${_mrt=='ศูนย์วัฒนธรรม'?'selected':''}>ศูนย์วัฒนธรรม</option>
+          <option value="พระราม 9" ${_mrt=='พระราม 9'?'selected':''}>พระราม 9</option>
+          <option value="รัชดาภิเษก" ${_mrt=='รัชดาภิเษก'?'selected':''}>รัชดาภิเษก</option>
+          <option value="ลาดพร้าว" ${_mrt=='ลาดพร้าว'?'selected':''}>ลาดพร้าว</option>
+          <option value="จตุจักร" ${_mrt=='จตุจักร'?'selected':''}>จตุจักร</option>
+          </optgroup>
+        </select>
+      </div>
+
+      <!-- ใกล้มหาวิทยาลัย -->
+      <div style="margin-bottom:16px">
+        <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4"><i class="fas fa-university" style="color:#7c3aed"></i> ใกล้มหาวิทยาลัย</div>
+        <select id="mef-uni" style="width:100%;padding:8px 10px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;background:#fff">
+          <option value="">ทุกสถานี MRT/BEM</option>
+          ${['จุฬาลงกรณ์มหาวิทยาลัย','มหาวิทยาลัยธรรมศาสตร์','มหาวิทยาลัยมหิดล','มหาวิทยาลัยเกษตรศาสตร์','มหาวิทยาลัยรามคำแหง','สถาบันเทคโนโลยีพระจอมเกล้า','มหาวิทยาลัยกรุงเทพ','มหาวิทยาลัยอัสสัมชัญ'].map(u=>`<option value="${u}" ${_uni===u?'selected':''}>${u}</option>`).join('')}
+        </select>
+      </div>
+
+      <!-- ห้องนอน/ห้องน้ำ -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+        <div>
+          <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4">ห้องนอน</div>
+          <select id="mef-min-bed" style="width:100%;padding:8px 10px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;background:#fff">
+            <option value="">ไม่จำกัด</option>
+            <option value="1" ${_minBed=='1'?'selected':''}>1 ห้อง+</option>
+            <option value="2" ${_minBed=='2'?'selected':''}>2 ห้อง+</option>
+            <option value="3" ${_minBed=='3'?'selected':''}>3 ห้อง+</option>
+            <option value="4" ${_minBed=='4'?'selected':''}>4 ห้อง+</option>
+            <option value="5" ${_minBed=='5'?'selected':''}>5 ห้อง+</option>
+          </select>
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4">ห้องน้ำ</div>
+          <select id="mef-min-bath" style="width:100%;padding:8px 10px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;background:#fff">
+            <option value="">ไม่จำกัด</option>
+            <option value="1" ${_minBath=='1'?'selected':''}>1 ห้อง+</option>
+            <option value="2" ${_minBath=='2'?'selected':''}>2 ห้อง+</option>
+            <option value="3" ${_minBath=='3'?'selected':''}>3 ห้อง+</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- พื้นที่ -->
+      <div style="margin-bottom:16px">
+        <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4"><i class="fas fa-expand-arrows-alt" style="color:var(--a)"></i> พื้นที่ใช้สอย (ตร.ม.)</div>
+        <select id="mef-min-area" style="width:100%;padding:8px 10px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;background:#fff">
+          <option value="">ไม่จำกัด</option>
+          <option value="25" ${_minArea=='25'?'selected':''}>25 ตร.ม.+</option>
+          <option value="50" ${_minArea=='50'?'selected':''}>50 ตร.ม.+</option>
+          <option value="100" ${_minArea=='100'?'selected':''}>100 ตร.ม.+</option>
+          <option value="200" ${_minArea=='200'?'selected':''}>200 ตร.ม.+</option>
+          <option value="500" ${_minArea=='500'?'selected':''}>500 ตร.ม.+</option>
+        </select>
+      </div>
+
+      <!-- สิ่งอำนวยความสะดวก -->
+      <div style="margin-bottom:8px">
+        <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4"><i class="fas fa-concierge-bell" style="color:var(--a)"></i> สิ่งอำนวยความสะดวก</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">${featureList.map(f=>`<label style="display:flex;align-items:center;gap:5px;background:${_features.includes(f)?'var(--lt)':'#f5f7fc'};border:1.5px solid ${_features.includes(f)?'var(--p)':'var(--bd)'};border-radius:20px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;color:${_features.includes(f)?'var(--p)':'var(--tx)'}"><input type="checkbox" value="${f}" ${_features.includes(f)?'checked':''} style="accent-color:var(--p);width:13px;height:13px"> ${f}</label>`).join('')}</div>
+      </div>
+    </div>
+    <!-- Footer -->
+    <div style="padding:12px 18px;background:#f9f5ef;border-top:1px solid var(--bd);display:flex;gap:10px;flex-shrink:0">
+      <button onclick="modalExtraFilterClear('${type}')" style="padding:12px 18px;background:#fff;color:var(--tx2);border:1.5px solid var(--bd);border-radius:10px;font-size:14px;font-weight:700;cursor:pointer"><i class="fas fa-undo"></i> รีเซ็ต</button>
+      <button onclick="modalExtraFilterApply('${type}')" style="flex:1;padding:12px;background:linear-gradient(135deg,var(--a),var(--a2));color:#1A1A2E;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer"><i class="fas fa-search"></i> ค้นหาผลลัพธ์</button>
+    </div>
+  </div>`;
+  mo.onclick = function(e){ if(e.target===mo) mo.remove(); };
+  document.body.appendChild(mo);
+  // Apply initial price mode
+  mefSwitchPriceMode(_priceMode);
+}
+
+function mefSwitchPriceMode(mode){
+  const buyBtn = document.getElementById('mef-mode-buy');
+  const rentBtn = document.getElementById('mef-mode-rent');
+  const mo = document.getElementById('modal-extra-filter-sheet');
+  if(!mo) return;
+  const buyOpts = mo.querySelectorAll('.mef-buy-opts');
+  const rentOpts = mo.querySelectorAll('.mef-rent-opts');
+  if(mode==='buy'){
+    if(buyBtn){ buyBtn.style.background='var(--p)'; buyBtn.style.color='#fff'; buyBtn.style.borderColor='var(--p)'; }
+    if(rentBtn){ rentBtn.style.background='#f5f5f0'; rentBtn.style.color='var(--tx2)'; rentBtn.style.borderColor='var(--bd)'; }
+    buyOpts.forEach(el=>el.style.display='');
+    rentOpts.forEach(el=>el.style.display='none');
+  } else {
+    if(rentBtn){ rentBtn.style.background='var(--p)'; rentBtn.style.color='#fff'; rentBtn.style.borderColor='var(--p)'; }
+    if(buyBtn){ buyBtn.style.background='#f5f5f0'; buyBtn.style.color='var(--tx2)'; buyBtn.style.borderColor='var(--bd)'; }
+    rentOpts.forEach(el=>el.style.display='');
+    buyOpts.forEach(el=>el.style.display='none');
+  }
+}
+
+function modalExtraFilterClear(type) {
+  window._modalExtraFilter = {};
+  document.getElementById('modal-extra-filter-sheet')?.remove();
+  // re-run filter without extra conditions
+  modalAdvFilter(type);
+  // also refresh map if open
+  if(typeof _popupRefreshMarkersFromData==='function' && _popupLeafletMap && window._modalTypeData){
+    _popupRefreshMarkersFromData(window._modalTypeData.data || []);
+  }
+}
+
+function modalExtraFilterApply(type) {
+  const sheet = document.getElementById('modal-extra-filter-sheet');
+  if(!sheet) return;
+  const features = [...sheet.querySelectorAll('input[type=checkbox]:checked')].map(c=>c.value);
+  const isBuy = sheet.querySelector('#mef-mode-buy')?.style.background.includes('var(--p)') ||
+                sheet.querySelector('#mef-mode-buy')?.style.background === 'var(--p)';
+  window._modalExtraFilter = {
+    minBed:    sheet.querySelector('#mef-min-bed')?.value   || '',
+    minBath:   sheet.querySelector('#mef-min-bath')?.value  || '',
+    minArea:   sheet.querySelector('#mef-min-area')?.value  || '',
+    minPrice:  sheet.querySelector('#mef-price-min')?.value || '',
+    maxPrice:  sheet.querySelector('#mef-price-max')?.value || '',
+    priceMode: isBuy ? 'buy' : 'rent',
+    loc:       sheet.querySelector('#mef-loc')?.value       || '',
+    bts:       sheet.querySelector('#mef-bts')?.value       || '',
+    mrt:       sheet.querySelector('#mef-mrt')?.value       || '',
+    uni:       sheet.querySelector('#mef-uni')?.value       || '',
+    features
+  };
+  sheet.remove();
+  modalAdvFilter(type);
 }
 
 function srvName(s){ return s.name||''; }
@@ -9508,10 +10149,23 @@ function applyLocOpt(val) { /* disabled */ }
 function populateProvinceSelect() {
   const sp = $('s-prov');
   if(!sp) return;
-  const dbProvs = [...new Set(props.map(p=>p.province).filter(Boolean))].sort();
-  const staticProvs = ['กรุงเทพฯ','กระบี่','กาญจนบุรี','กาฬสินธุ์','กำแพงเพชร','ขอนแก่น','จันทบุรี','ฉะเชิงเทรา','ชลบุรี','ชัยนาท','ชัยภูมิ','ชุมพร','เชียงราย','เชียงใหม่','ตรัง','ตราด','ตาก','นครนายก','นครปฐม','นครพนม','นครราชสีมา','นครศรีธรรมราช','นครสวรรค์','นนทบุรี','นราธิวาส','น่าน','บึงกาฬ','บุรีรัมย์','ปทุมธานี','ประจวบคีรีขันธ์','ปราจีนบุรี','ปัตตานี','พระนครศรีอยุธยา','พะเยา','พังงา','พัทลุง','พิจิตร','พิษณุโลก','เพชรบุรี','เพชรบูรณ์','แพร่','ภูเก็ต','มหาสารคาม','มุกดาหาร','แม่ฮ่องสอน','ยโสธร','ยะลา','ร้อยเอ็ด','ระนอง','ระยอง','ราชบุรี','ลพบุรี','ลำปาง','ลำพูน','เลย','ศรีสะเกษ','สกลนคร','สงขลา','สตูล','สมุทรปราการ','สมุทรสงคราม','สมุทรสาคร','สระแก้ว','สระบุรี','สิงห์บุรี','สุโขทัย','สุพรรณบุรี','สุราษฎร์ธานี','สุรินทร์','หนองคาย','หนองบัวลำภู','อ่างทอง','อำนาจเจริญ','อุดรธานี','อุตรดิตถ์','อุทัยธานี','อุบลราชธานี'];
-  const allProvs = [...new Set([...dbProvs,...staticProvs])].sort((a,b)=>a.localeCompare(b,'th'));
-  sp.innerHTML = '<option value="">ทุกทำเล</option>' + allProvs.map(p=>`<option value="${p}">${p}</option>`).join('');
+  const provinces77 = [
+    ['🏙️ กรุงเทพฯ & ปริมณฑล', ['กรุงเทพมหานคร','นนทบุรี','ปทุมธานี','สมุทรปราการ','สมุทรสาคร','นครปฐม']],
+    ['🌆 ภาคกลาง', ['พระนครศรีอยุธยา','อ่างทอง','สิงห์บุรี','ชัยนาท','ลพบุรี','สระบุรี','นครนายก','สระแก้ว','ฉะเชิงเทรา','สมุทรสงคราม','สุพรรณบุรี','กาญจนบุรี','ราชบุรี','เพชรบุรี','ประจวบคีรีขันธ์']],
+    ['🌊 ภาคตะวันออก', ['ชลบุรี','ระยอง','จันทบุรี','ตราด','ปราจีนบุรี','ฉะเชิงเทรา','สระแก้ว']],
+    ['🏔️ ภาคเหนือ', ['เชียงใหม่','เชียงราย','แม่ฮ่องสอน','ลำพูน','ลำปาง','พะเยา','แพร่','น่าน','อุตรดิตถ์','สุโขทัย','พิษณุโลก','พิจิตร','กำแพงเพชร','ตาก','นครสวรรค์','อุทัยธานี']],
+    ['🌾 ภาคอีสาน', ['นครราชสีมา','ขอนแก่น','อุดรธานี','อุบลราชธานี','บึงกาฬ','หนองคาย','หนองบัวลำภู','เลย','ชัยภูมิ','บุรีรัมย์','สุรินทร์','ศรีสะเกษ','ยโสธร','มุกดาหาร','อำนาจเจริญ','ร้อยเอ็ด','กาฬสินธุ์','มหาสารคาม','นครพนม','สกลนคร']],
+    ['🌴 ภาคใต้', ['สุราษฎร์ธานี','ภูเก็ต','กระบี่','พังงา','ระนอง','ชุมพร','นครศรีธรรมราช','พัทลุง','ตรัง','สตูล','สงขลา','ปัตตานี','ยะลา','นราธิวาส']],
+  ];
+  let html = '<option value="">ทุกจังหวัด</option>';
+  for(const [region, provList] of provinces77){
+    html += `<optgroup label="${region}">`;
+    for(const p of provList){
+      html += `<option value="${p}">${p}</option>`;
+    }
+    html += '</optgroup>';
+  }
+  sp.innerHTML = html;
 }
 
 function debounce(fn, ms) { let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a), ms); }; }
@@ -11297,7 +11951,7 @@ const UI_TEXT = {
     /* search form */
     'sf.kw.label':'คำค้นหา','sf.kw.ph':'ชื่อโครงการ ทำเล...',
     'sf.type.label':'ประเภท','sf.type.all':'ทุกประเภท',
-    'sf.prov.label':'จังหวัด / ทำเล','sf.prov.all':'ทุกทำเล',
+    'sf.prov.label':'จังหวัด','sf.prov.all':'ทุกจังหวัด',
     'sf.min.label':'ราคาต่ำสุด','sf.max.label':'ราคาสูงสุด',
     'sf.btn':'ค้นหา','sf.btn.reset':'รีเซ็ต',
     /* quick search bar */
@@ -13204,6 +13858,32 @@ function updateLoanCalc(price){
   }).join('');
 }
 let _advActive = false;
+function switchAdvPriceMode(mode){
+  var buyOpts = document.querySelectorAll('.af-buy-opt');
+  var rentOpts = document.querySelectorAll('.af-rent-opt');
+  var buyOptgroups = document.querySelectorAll('.af-buy-opts');
+  var rentOptgroups = document.querySelectorAll('.af-rent-opts');
+  var btnBuy = document.getElementById('af-mode-buy');
+  var btnRent = document.getElementById('af-mode-rent');
+  document.getElementById('af-price-min').value = '';
+  document.getElementById('af-price-max').value = '';
+  if(mode==='rent'){
+    buyOpts.forEach(function(o){o.style.display='none';});
+    rentOpts.forEach(function(o){o.style.display='';});
+    buyOptgroups.forEach(function(g){g.style.display='none';});
+    rentOptgroups.forEach(function(g){g.style.display='';});
+    if(btnBuy){ btnBuy.style.background='#f5f5f0'; btnBuy.style.color='var(--tx2)'; btnBuy.style.borderColor='var(--bd)'; }
+    if(btnRent){ btnRent.style.background='var(--p)'; btnRent.style.color='#fff'; btnRent.style.borderColor='var(--p)'; }
+  } else {
+    buyOpts.forEach(function(o){o.style.display='';});
+    rentOpts.forEach(function(o){o.style.display='none';});
+    buyOptgroups.forEach(function(g){g.style.display='';});
+    rentOptgroups.forEach(function(g){g.style.display='none';});
+    if(btnBuy){ btnBuy.style.background='var(--p)'; btnBuy.style.color='#fff'; btnBuy.style.borderColor='var(--p)'; }
+    if(btnRent){ btnRent.style.background='#f5f5f0'; btnRent.style.color='var(--tx2)'; btnRent.style.borderColor='var(--bd)'; }
+  }
+}
+
 function toggleAdvFilter(btn){
   const isMob = window.innerWidth <= 900;
   if(isMob){ openAdvSheet(); }
@@ -13417,10 +14097,14 @@ function getAdvFilters(){
   if(furns.length) f.furniture=furns;
   if(document.getElementById('af-pets')?.checked) f.pets=true;
   const apps=[...document.querySelectorAll('.af-app:checked')].map(el=>el.value); if(apps.length) f.appliances=apps;
-  // New filters
+  // Price filters
   const pMin=document.getElementById('af-price-min'); if(pMin&&pMin.value) f.price_min=+pMin.value;
-  const pMax=document.getElementById('af-price-max'); if(pMax&&pMax.value) f.price_max=+pMax.value;
-  const prov=document.getElementById('af-province'); if(prov&&prov.value) f.province=prov.value;
+  const pMax=document.getElementById('af-price-max'); if(pMax&&pMax.value&&+pMax.value<999000000) f.price_max=+pMax.value;
+  // Province or popular location (mutual exclusion handled in UI, but check both)
+  const popLoc=document.getElementById('af-popular-loc'); 
+  const prov=document.getElementById('af-province');
+  if(popLoc&&popLoc.value) f.location_kw=popLoc.value;
+  else if(prov&&prov.value) f.province=prov.value;
   const btsVal=document.getElementById('af-bts-select')?.value; if(btsVal) f.bts=[btsVal];
   const mrtVal=document.getElementById('af-mrt-select')?.value; if(mrtVal) f.mrt=[mrtVal];
   const uniVal=document.getElementById('af-uni-select')?.value; if(uniVal) f.uni=[uniVal];
@@ -13437,7 +14121,7 @@ function countAdvFilters(f){
   if(f.pets) n++;
   if(f.appliances?.length) n++;
   if(f.price_min||f.price_max) n++;
-  if(f.province) n++;
+  if(f.province||f.location_kw) n++;
   if(f.bts?.length) n++;
   if(f.mrt?.length) n++;
   if(f.uni?.length) n++;
@@ -13485,6 +14169,7 @@ function applyAdvFilter(){
     if(f.price_min) res=res.filter(p=>p.price>=f.price_min);
     if(f.price_max) res=res.filter(p=>p.price<=f.price_max);
     if(f.province) res=res.filter(p=>(p.province||p.location||'').includes(f.province));
+    if(f.location_kw) res=res.filter(p=>((p.location||'')+(p.province||'')+(p.title||'')+(p.desc||'')).toLowerCase().includes(f.location_kw.toLowerCase()));
     if(f.bts?.length) res=res.filter(p=>f.bts.some(s=>(p.bts||p.location||p.transit||p.desc||'').toLowerCase().includes(s.toLowerCase())));
     if(f.mrt?.length) res=res.filter(p=>f.mrt.some(s=>(p.mrt||p.location||p.transit||p.desc||'').toLowerCase().includes(s.toLowerCase())));
     if(f.uni?.length) res=res.filter(p=>f.uni.some(s=>(p.location||p.desc||'').toLowerCase().includes(s.toLowerCase())));
@@ -13492,6 +14177,10 @@ function applyAdvFilter(){
     _listingsCurPage = 1;
     closeAdvFilter();
     renderListingsPage();
+    // ── Update map markers immediately if map is open ──
+    if(typeof _popupRefreshMarkersFromData==='function' && _popupLeafletMap){
+      _popupRefreshMarkersFromData(res);
+    }
     _scrollToListingsResults();
   } else {
     // ── Home page: original logic ──
@@ -13511,6 +14200,7 @@ function applyAdvFilter(){
       if(f.price_min) res=res.filter(p=>p.price>=f.price_min);
       if(f.price_max) res=res.filter(p=>p.price<=f.price_max);
       if(f.province) res=res.filter(p=>(p.province||p.location||'').includes(f.province));
+      if(f.location_kw) res=res.filter(p=>((p.location||'')+(p.province||'')+(p.title||'')+(p.desc||'')).toLowerCase().includes(f.location_kw.toLowerCase()));
       if(f.bts?.length) res=res.filter(p=>f.bts.some(s=>(p.location||p.desc||p.description||'').toLowerCase().includes(s.toLowerCase())));
       if(f.mrt?.length) res=res.filter(p=>f.mrt.some(s=>(p.location||p.desc||p.description||'').toLowerCase().includes(s.toLowerCase())));
       if(f.uni?.length) res=res.filter(p=>f.uni.some(s=>(p.location||p.desc||p.description||'').toLowerCase().includes(s.toLowerCase())));
@@ -13518,6 +14208,10 @@ function applyAdvFilter(){
       const rc=document.getElementById('res-count');
       if(rc) rc.textContent=`พบ ${res.length} รายการ`;
       if(typeof renderGrid==='function'){ renderGrid('all-grid',res.slice(0,8)); }
+      // ── Update map markers immediately if map is open ──
+      if(typeof _popupRefreshMarkersFromData==='function' && _popupLeafletMap){
+        _popupRefreshMarkersFromData(res);
+      }
       closeAdvFilter();
       scrollToEl('all-sec');
     }, 120);
@@ -13563,6 +14257,10 @@ function resetAdvFilter(){
   document.querySelectorAll('.adv-sheet-body input[type=range]').forEach(el=>{ el.value=el.getAttribute('value')||el.min; });
   document.querySelectorAll('.adv-sheet-body input[type=checkbox]').forEach(el=>{ el.checked=false; });
   document.querySelectorAll('.adv-sheet-body select').forEach(el=>{ el.value=''; });
+  // Reset popular location
+  var pl = document.getElementById('af-popular-loc'); if(pl) pl.value='';
+  // Reset price mode to buy
+  switchAdvPriceMode('buy');
   advRangeUpdate();
   const badge=document.getElementById('adv-badge');
   if(badge){ badge.textContent='0'; badge.classList.remove('show'); }
@@ -14183,37 +14881,135 @@ function resetAdvFilter(){
     <button onclick="closeAdvFilter()" style="color:rgba(255,255,255,.7);font-size:18px;background:none;border:none;cursor:pointer">×</button>
   </div>
   <div class="adv-fp-body">
-    <div class="adv-fp-section">
+  <div class="adv-fp-section">
       <div class="adv-fp-sec-title"><i class="fas fa-tag" style="color:var(--a)"></i> ช่วงราคา (บาท)</div>
       <div class="adv-select-row">
         <select id="af-price-min" style="width:100%;padding:7px 10px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;font-family:inherit" onchange="advRangeUpdate()">
           <option value="">ราคาต่ำสุด</option>
-          <option value="500000">500,000</option>
-          <option value="1000000">1,000,000</option>
-          <option value="2000000">2,000,000</option>
-          <option value="3000000">3,000,000</option>
-          <option value="5000000">5,000,000</option>
-          <option value="10000000">10,000,000</option>
-          <option value="20000000">20,000,000</option>
+          <option value="5000">5,000</option>
+          <option value="10000">10,000</option>
+          <option value="15000">15,000</option>
+          <option value="20000">20,000</option>
+          <option value="25000">25,000</option>
+          <option value="30000">30,000</option>
+          <option value="40000">40,000</option>
+          <option value="50000">50,000</option>
+          <option value="60000">60,000</option>
+          <option value="70000">70,000</option>
+          <option value="80000">80,000</option>
+          <option value="100000">100K</option>
+          <option value="150000">150K</option>
+          <option value="200000">200K</option>
+          <option value="300000">300K</option>
+          <option value="500000">500K</option>
+          <option value="1000000">1M</option>
+          <option value="2000000">2M</option>
+          <option value="3000000">3M</option>
+          <option value="5000000">5M</option>
+          <option value="7000000">7M</option>
+          <option value="10000000">10M</option>
+          <option value="15000000">15M</option>
+          <option value="20000000">20M</option>
+          <option value="30000000">30M</option>
+          <option value="50000000">50M</option>
+          <option value="100000000">100M</option>
         </select>
       </div>
       <div class="adv-select-row">
         <select id="af-price-max" style="width:100%;padding:7px 10px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;font-family:inherit" onchange="advRangeUpdate()">
-          <option value="">ราคาสูงสุด (ไม่จำกัด)</option>
-          <option value="1000000">1,000,000</option>
-          <option value="2000000">2,000,000</option>
-          <option value="3000000">3,000,000</option>
-          <option value="5000000">5,000,000</option>
-          <option value="10000000">10,000,000</option>
-          <option value="20000000">20,000,000</option>
-          <option value="50000000">50,000,000</option>
+          <option value="">ราคาสูงสุด</option>
+          <option value="5000">5,000</option>
+          <option value="10000">10,000</option>
+          <option value="15000">15,000</option>
+          <option value="20000">20,000</option>
+          <option value="25000">25,000</option>
+          <option value="30000">30,000</option>
+          <option value="40000">40,000</option>
+          <option value="50000">50,000</option>
+          <option value="60000">60,000</option>
+          <option value="70000">70,000</option>
+          <option value="80000">80,000</option>
+          <option value="100000">100K</option>
+          <option value="150000">150K</option>
+          <option value="200000">200K</option>
+          <option value="300000">300K</option>
+          <option value="500000">500K</option>
+          <option value="1000000">1M</option>
+          <option value="2000000">2M</option>
+          <option value="3000000">3M</option>
+          <option value="5000000">5M</option>
+          <option value="7000000">7M</option>
+          <option value="10000000">10M</option>
+          <option value="15000000">15M</option>
+          <option value="20000000">20M</option>
+          <option value="30000000">30M</option>
+          <option value="50000000">50M</option>
+          <option value="100000000">100M</option>
+          <option value="999000000">ราคาสูงสุด</option>
         </select>
       </div>
     </div>
     <div class="adv-fp-section">
-      <div class="adv-fp-sec-title"><i class="fas fa-map-marker-alt" style="color:var(--p)"></i> ทำเล / จังหวัด</div>
+      <div class="adv-fp-sec-title"><i class="fas fa-fire" style="color:#ff4d6d"></i> ทำเลยอดนิยม</div>
       <div class="adv-select-row">
-        <select id="af-province" style="width:100%;padding:7px 10px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;font-family:inherit">
+        <select id="af-popular-loc" style="width:100%;padding:7px 10px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;font-family:inherit" onchange="if(this.value){document.getElementById('af-province').value='';} advRangeUpdate()">
+          <option value="">-- เลือกทำเลยอดนิยม --</option>
+          <optgroup label="📍 โซนกลางเมือง — CBD">
+          <option value="สุขุมวิท">สุขุมวิท</option>
+          <option value="สาทร">สาทร</option>
+          <option value="สีลม">สีลม</option>
+          <option value="อโศก">อโศก</option>
+          <option value="ทองหล่อ">ทองหล่อ</option>
+          <option value="เพลินจิต">เพลินจิต</option>
+          <option value="ชิดลม">ชิดลม</option>
+          <option value="ราชประสงค์">ราชประสงค์</option>
+          <option value="ลุมพินี">ลุมพินี</option>
+          </optgroup>
+          <optgroup label="📍 โซนตะวันออก">
+          <option value="พระโขนง">พระโขนง</option>
+          <option value="เอกมัย">เอกมัย</option>
+          <option value="อ่อนนุช">อ่อนนุช</option>
+          <option value="บางนา">บางนา</option>
+          <option value="มีนบุรี">มีนบุรี</option>
+          <option value="รามคำแหง">รามคำแหง</option>
+          <option value="หัวหมาก">หัวหมาก</option>
+          <option value="สุวรรณภูมิ">สุวรรณภูมิ</option>
+          </optgroup>
+          <optgroup label="📍 โซนเหนือ">
+          <option value="รัชดา">รัชดาภิเษก</option>
+          <option value="ลาดพร้าว">ลาดพร้าว</option>
+          <option value="จตุจักร">จตุจักร</option>
+          <option value="หมอชิต">หมอชิต</option>
+          <option value="พหลโยธิน">พหลโยธิน</option>
+          <option value="อารีย์">อารีย์</option>
+          <option value="พระราม 9">พระราม 9</option>
+          <option value="ห้วยขวาง">ห้วยขวาง</option>
+          <option value="ดอนเมือง">ดอนเมือง</option>
+          </optgroup>
+          <optgroup label="📍 โซนตะวันตก &amp; ใต้">
+          <option value="ปิ่นเกล้า">ปิ่นเกล้า</option>
+          <option value="บางแค">บางแค</option>
+          <option value="พระราม 3">พระราม 3</option>
+          <option value="ธนบุรี">ธนบุรี</option>
+          <option value="ตลิ่งชัน">ตลิ่งชัน</option>
+          <option value="สาธุประดิษฐ์">สาธุประดิษฐ์</option>
+          </optgroup>
+          <optgroup label="🏖️ ต่างจังหวัดยอดนิยม">
+          <option value="เชียงใหม่">เชียงใหม่</option>
+          <option value="ภูเก็ต">ภูเก็ต</option>
+          <option value="พัทยา">พัทยา / ชลบุรี</option>
+          <option value="เขาใหญ่">เขาใหญ่</option>
+          <option value="หัวหิน">หัวหิน</option>
+          <option value="กาญจนบุรี">กาญจนบุรี</option>
+          <option value="เกาะสมุย">เกาะสมุย</option>
+          </optgroup>
+        </select>
+      </div>
+    </div>
+    <div class="adv-fp-section">
+      <div class="adv-fp-sec-title"><i class="fas fa-map-marker-alt" style="color:var(--p)"></i> จังหวัด (ทั้ง 77 จังหวัด)</div>
+      <div class="adv-select-row">
+        <select id="af-province" style="width:100%;padding:7px 10px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;font-family:inherit" onchange="if(this.value){document.getElementById('af-popular-loc').value='';} advRangeUpdate()">
           <option value="">ทุกจังหวัด</option>
           <option value="กรุงเทพมหานคร">กรุงเทพมหานคร</option>
           <option value="กระบี่">กระบี่</option>
@@ -14256,6 +15052,7 @@ function resetAdvFilter(){
           <option value="เพชรบุรี">เพชรบุรี</option>
           <option value="เพชรบูรณ์">เพชรบูรณ์</option>
           <option value="แพร่">แพร่</option>
+          <option value="พะเยา">พะเยา</option>
           <option value="ภูเก็ต">ภูเก็ต</option>
           <option value="มหาสารคาม">มหาสารคาม</option>
           <option value="มุกดาหาร">มุกดาหาร</option>
@@ -14705,40 +15502,100 @@ function resetAdvFilter(){
               <option value="อาคารพาณิชย์">อาคารพาณิชย์</option>
               <option value="ที่ดิน">ที่ดิน</option>
               <option value="วิลล่า">วิลล่า</option>
+              <option value="โรงแรม">โรงแรม</option>
+              <option value="รีสอร์ท">รีสอร์ท</option>
             </select>
           </div>
           <div>
             <label id="ls-label-prov" style="display:block;font-size:11px;font-weight:700;color:rgba(255,220,150,.9);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px"><i class="fas fa-map-marker-alt"></i> จังหวัด</label>
             <select id="ls-prov" style="width:100%;padding:9px 12px;border:1.5px solid rgba(255,255,255,.25);border-radius:9px;font-size:13px;color:#fff;background:rgba(20,40,80,.85);font-family:inherit" onchange="listingsInlineSearch()">
-              <option value="" id="ls-prov-all-opt">ทุกทำเล</option>
+              <option value="" id="ls-prov-all-opt">ทุกจังหวัด</option>
             </select>
           </div>
           <div>
             <label id="ls-label-min" style="display:block;font-size:11px;font-weight:700;color:rgba(255,220,150,.9);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px"><i class="fas fa-tag"></i> ราคาต่ำสุด</label>
             <select id="ls-min" style="width:100%;padding:9px 12px;border:1.5px solid rgba(255,255,255,.25);border-radius:9px;font-size:12px;color:#fff;background:rgba(20,40,80,.85);font-family:inherit" onchange="listingsInlineSearch()">
-              <option value="0">ไม่จำกัด</option>
+              <option value="0">ราคาต่ำสุด</option>
+              <option value="5000">5,000</option>
+              <option value="10000">10,000</option>
+              <option value="15000">15,000</option>
+              <option value="20000">20,000</option>
+              <option value="25000">25,000</option>
+              <option value="30000">30,000</option>
+              <option value="40000">40,000</option>
+              <option value="50000">50,000</option>
+              <option value="60000">60,000</option>
+              <option value="70000">70,000</option>
+              <option value="80000">80,000</option>
+              <option value="100000">100K</option>
+              <option value="150000">150K</option>
+              <option value="200000">200K</option>
+              <option value="300000">300K</option>
               <option value="500000">500K</option>
               <option value="1000000">1M</option>
               <option value="2000000">2M</option>
               <option value="3000000">3M</option>
+              <option value="4000000">4M</option>
               <option value="5000000">5M</option>
+              <option value="6000000">6M</option>
+              <option value="7000000">7M</option>
+              <option value="8000000">8M</option>
+              <option value="9000000">9M</option>
               <option value="10000000">10M</option>
+              <option value="15000000">15M</option>
               <option value="20000000">20M</option>
+              <option value="25000000">25M</option>
+              <option value="30000000">30M</option>
+              <option value="40000000">40M</option>
               <option value="50000000">50M</option>
+              <option value="60000000">60M</option>
+              <option value="70000000">70M</option>
+              <option value="80000000">80M</option>
+              <option value="90000000">90M</option>
+              <option value="100000000">100M</option>
             </select>
           </div>
           <div>
             <label id="ls-label-max" style="display:block;font-size:11px;font-weight:700;color:rgba(255,220,150,.9);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px"><i class="fas fa-tag"></i> ราคาสูงสุด</label>
             <select id="ls-max" style="width:100%;padding:9px 12px;border:1.5px solid rgba(255,255,255,.25);border-radius:9px;font-size:12px;color:#fff;background:rgba(20,40,80,.85);font-family:inherit" onchange="listingsInlineSearch()">
-              <option value="999000000">ไม่จำกัด</option>
+              <option value="5000">5,000</option>
+              <option value="10000">10,000</option>
+              <option value="15000">15,000</option>
+              <option value="20000">20,000</option>
+              <option value="25000">25,000</option>
+              <option value="30000">30,000</option>
+              <option value="40000">40,000</option>
+              <option value="50000">50,000</option>
+              <option value="60000">60,000</option>
+              <option value="70000">70,000</option>
+              <option value="80000">80,000</option>
+              <option value="100000">100K</option>
+              <option value="150000">150K</option>
+              <option value="200000">200K</option>
+              <option value="300000">300K</option>
+              <option value="500000">500K</option>
               <option value="1000000">1M</option>
               <option value="2000000">2M</option>
               <option value="3000000">3M</option>
+              <option value="4000000">4M</option>
               <option value="5000000">5M</option>
+              <option value="6000000">6M</option>
+              <option value="7000000">7M</option>
+              <option value="8000000">8M</option>
+              <option value="9000000">9M</option>
               <option value="10000000">10M</option>
+              <option value="15000000">15M</option>
               <option value="20000000">20M</option>
+              <option value="25000000">25M</option>
+              <option value="30000000">30M</option>
+              <option value="40000000">40M</option>
               <option value="50000000">50M</option>
+              <option value="60000000">60M</option>
+              <option value="70000000">70M</option>
+              <option value="80000000">80M</option>
+              <option value="90000000">90M</option>
               <option value="100000000">100M</option>
+              <option value="999000000" selected>ราคาสูงสุด</option>
             </select>
           </div>
           <div class="ls-btn-row" style="display:contents">
