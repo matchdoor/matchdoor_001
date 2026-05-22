@@ -194,6 +194,47 @@
 <meta name="google-site-verification" content="YOUR_GOOGLE_VERIFICATION_CODE_HERE">
 <!-- ═══ Bing Webmaster ════════════════════════════════════════════════════ -->
 <meta name="msvalidate.01" content="YOUR_BING_VERIFICATION_CODE_HERE">
+<!-- ═══ GA4 — Google Analytics 4 ═════════════════════════════════════════
+     🔧 วิธีตั้งค่า:
+       1. analytics.google.com → Admin → Create Property → Web Stream
+       2. คัดลอก Measurement ID (รูปแบบ G-XXXXXXXXXX)
+       3. ใส่ใน C.GA4_ID ในบล็อก const C = { ... } ด้านล่าง
+     📊 impact: track property_view, phone_click, line_click, form_submit,
+                search, favorite_add — เชื่อม consent จาก getAnalyticsConsent() ══ -->
+<script>
+(function(){
+  var _ga4Loaded = false;
+  function _loadGA4(){
+    var gid = (typeof C !== 'undefined' && C.GA4_ID && C.GA4_ID !== 'G-XXXXXXXXXX') ? C.GA4_ID : '';
+    if(!gid || _ga4Loaded) return;
+    _ga4Loaded = true;
+    // inject gtag.js
+    var s = document.createElement('script');
+    s.src = 'https://www.googletagmanager.com/gtag/js?id=' + gid;
+    s.async = true;
+    document.head.appendChild(s);
+    // bootstrap dataLayer
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function(){ window.dataLayer.push(arguments); };
+    gtag('js', new Date());
+    gtag('config', gid, {
+      send_page_view: false,        // เราจะ send manual เพื่อ SPA
+      anonymize_ip: true,           // PDPA compliance
+      cookie_flags: 'SameSite=None;Secure'
+    });
+  }
+  // โหลดเฉพาะเมื่อผู้ใช้ให้ consent analytics
+  function _maybeLoadGA4(){
+    if(typeof getAnalyticsConsent === 'function' && getAnalyticsConsent()) _loadGA4();
+  }
+  // รอ page load ก่อน
+  if(document.readyState === 'complete') _maybeLoadGA4();
+  else window.addEventListener('load', _maybeLoadGA4, {once:true});
+  // expose สำหรับ consent update ทีหลัง
+  window._initGA4 = _loadGA4;
+})();
+</script>
+
 <!-- ═══ Font Loading — Critical CSS First ════════════════════════════════ -->
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&family=Kanit:wght@500;700;800&display=swap" onload="this.onload=null;this.rel='stylesheet'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&family=Kanit:wght@500;700;800&display=swap" rel="stylesheet"></noscript>
@@ -219,6 +260,53 @@
      ดู: https://dash.cloudflare.com → Turnstile → Add site
      เลือก Widget type: "Invisible" เพื่อไม่รบกวน UX ผู้ใช้ -->
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
+
+<!-- ═══ Sentry Error Monitoring (Free Tier — 5k errors/month) ═══════════════
+     🔧 วิธีตั้งค่า:
+       1. สมัคร sentry.io (ฟรี) → New Project → JavaScript → Browser
+       2. คัดลอก DSN มาใส่ใน C.SENTRY_DSN ด้านบน
+       3. Sentry จะ capture JS errors อัตโนมัติทันที
+     📊 impact: รู้ error ก่อนลูกค้าโทรมาบ่น ═══════════════════════════════ -->
+<script>
+(function(){
+  // โหลด Sentry แบบ lazy — ไม่ block first paint
+  function _loadSentry(){
+    var dsn = (typeof C !== 'undefined' && C.SENTRY_DSN) ? C.SENTRY_DSN : '';
+    if(!dsn) return; // ยังไม่ได้ config — ข้ามไป
+    var s = document.createElement('script');
+    s.src = 'https://browser.sentry-cdn.com/7.119.1/bundle.tracing.min.js';
+    s.crossOrigin = 'anonymous';
+    s.onload = function(){
+      if(!window.Sentry) return;
+      Sentry.init({
+        dsn: dsn,
+        tracesSampleRate: 0.1,    // sample 10% of transactions (ประหยัด quota)
+        replaysSessionSampleRate: 0,
+        replaysOnErrorSampleRate: 0,
+        environment: window.location.hostname === 'matchdoor.co' ? 'production' : 'development',
+        beforeSend: function(event){
+          // กรอง noise — ข้าม error จาก browser extension และ localhost
+          if(event.exception){
+            var vals = (event.exception.values||[]);
+            for(var i=0;i<vals.length;i++){
+              var msg = (vals[i].value||'');
+              if(/ResizeObserver|Script error|Non-Error promise rejection|chrome-extension|moz-extension/i.test(msg)) return null;
+            }
+          }
+          return event;
+        }
+      });
+      // Tag เพิ่มเติมช่วย debug
+      Sentry.setTag('app', 'matchdoor');
+      Sentry.setTag('supabase_connected', typeof sb !== 'undefined' && !!sb ? 'yes' : 'no');
+    };
+    document.head.appendChild(s);
+  }
+  // โหลดหลัง page ทำงานได้แล้ว (ไม่รีบ)
+  if(document.readyState === 'complete') _loadSentry();
+  else window.addEventListener('load', _loadSentry, {once:true});
+})();
+</script>
 <!--
 ═══════════════════════════════════════════════════════════════════
   SERVER-SIDE RATE LIMIT SETUP (Layer 3) — Supabase
@@ -3991,7 +4079,14 @@ const C = {
   //                     3) insert ด้วย service role (ผ่าน RLS)
   //   ดูโค้ด Edge Function ได้ในไฟล์ supabase/functions/verify-and-insert/index.ts
   //   (ตัวอย่างโค้ดอยู่ใน comment บรรทัด 240–280 ในไฟล์นี้)
-  USE_EDGE_FUNCTION: false // 🔧 เปลี่ยนเป็น true เมื่อ deploy Edge Function แล้ว
+  USE_EDGE_FUNCTION: false, // 🔧 เปลี่ยนเป็น true เมื่อ deploy Edge Function แล้ว
+
+  // --- [6] Analytics & Monitoring ---
+  GA4_ID: 'G-XXXXXXXXXX',   // 🔧 [CONFIG-19] แทนด้วย Measurement ID จาก Google Analytics 4
+                              //   ได้จาก: analytics.google.com → Admin → Data Streams → Measurement ID
+  SENTRY_DSN: '',             // 🔧 [CONFIG-20] แทนด้วย DSN จาก Sentry Dashboard
+                              //   ได้จาก: sentry.io → Project → Settings → Client Keys (DSN)
+                              //   ใช้ Free Tier (5,000 errors/month ฟรี)
 };
 
 // 🖼️ SUPABASE STORAGE HELPER
@@ -4164,6 +4259,8 @@ function initCookieConsent(){
     localStorage.setItem('md_cookie_consent', JSON.stringify({necessary:true, analytics:true, ts: Date.now()}));
     hideCookieBanner();
     toast('ขอบคุณที่ยอมรับนโยบายคุกกี้ ✨');
+    // โหลด GA4 ทันทีเมื่อ consent
+    if(typeof window._onAnalyticsConsentGranted === 'function') window._onAnalyticsConsentGranted();
   });
   if(declineBtn) declineBtn.addEventListener('click', ()=>{
     localStorage.setItem('md_cookie_consent', JSON.stringify({necessary:true, analytics:false, ts: Date.now()}));
@@ -4177,6 +4274,7 @@ function initCookieConsent(){
     localStorage.setItem('md_cookie_consent', JSON.stringify({necessary:true, analytics:true, ts: Date.now()}));
     closeCookieModal();
     toast('ขอบคุณที่ยอมรับนโยบายคุกกี้');
+    if(typeof window._onAnalyticsConsentGranted === 'function') window._onAnalyticsConsentGranted();
   });
   if(oldDecline) oldDecline.addEventListener('click', ()=>{
     localStorage.setItem('md_cookie_consent', JSON.stringify({necessary:true, analytics:false, ts: Date.now()}));
@@ -4245,6 +4343,40 @@ function getAnalyticsConsent(){
   try{ const c=JSON.parse(localStorage.getItem('md_cookie_consent')||'{}'); return c.analytics===true; }
   catch(e){ return false; }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   GA4 Custom Event Tracking — เชื่อม consent + consent-aware
+   ใช้: trackEvent('property_view', { property_id:'p1', price:3500000 })
+   ═══════════════════════════════════════════════════════════════ */
+function trackEvent(eventName, params){
+  try{
+    if(!getAnalyticsConsent()) return;       // ไม่ track ถ้ายังไม่ได้ consent
+    if(typeof window.gtag !== 'function') return; // GA4 ยังไม่โหลด
+    const base = {
+      send_to: (typeof C !== 'undefined' && C.GA4_ID) ? C.GA4_ID : undefined,
+      app_name: 'matchdoor',
+      lang: typeof _lang !== 'undefined' ? _lang : 'th'
+    };
+    window.gtag('event', eventName, Object.assign(base, params||{}));
+  } catch(e){ /* silent fail — ไม่ให้ tracking error มา break app */ }
+}
+
+/* ── GA4: SPA Page View tracker — เรียกทุกครั้งที่ showPage() ── */
+function trackPageView(pageName, pageTitle){
+  try{
+    if(!getAnalyticsConsent() || typeof window.gtag !== 'function') return;
+    window.gtag('event', 'page_view', {
+      page_path: '/' + pageName,
+      page_title: pageTitle || pageName,
+      app_name: 'matchdoor'
+    });
+  } catch(e){}
+}
+
+/* ── ถ้าผู้ใช้ให้ consent ทีหลัง (จาก cookie banner) ── */
+window._onAnalyticsConsentGranted = function(){
+  if(typeof window._initGA4 === 'function') window._initGA4();
+};
 
 function initSB(){
   const url = (C.SUPABASE_URL||'').trim();
@@ -5270,7 +5402,10 @@ function translateKeyword(kw) {
   return kw; // return original if no translation
 }
 
-function doSearch(){ curType=($('s-type')?.value||'').trim(); $$('.cat-card').forEach((c,i)=>c.classList.toggle('active',i===0)); applyFilters().catch(console.error); scrollToEl('all-sec'); }
+function doSearch(){ curType=($('s-type')?.value||'').trim(); $$('.cat-card').forEach((c,i)=>c.classList.toggle('active',i===0)); applyFilters().catch(console.error); scrollToEl('all-sec');
+  // GA4: search event
+  try{ if(typeof trackEvent==='function'){ const _kw=($('s-kw')?.value||'').trim(); const _tx=($('s-tx')?.value||$('tx-tab.active')?.dataset?.tx||''); const _type=($('s-type')?.value||''); const _prov=($('s-prov')?.value||''); if(_kw||_type||_prov) trackEvent('search',{search_term:_kw,tx:_tx,property_type:_type,province:_prov,source:'home'}); } }catch(e){}
+}
 async function applyFilters(){
   const kw=($('s-kw')?.value||'').trim();
   const tp=curType||$('s-type')?.value||'';
@@ -5798,6 +5933,8 @@ function _silentShowPage(name, skipScrollTop) {
     };
     if(bcMap[name]) _injectBreadcrumbSchema(bcMap[name]);
   }
+  // GA4: SPA page_view
+  if(typeof trackPageView === 'function') trackPageView(name, route ? route.title : name);
 }
 
 // Read URL on page load and navigate to correct section
@@ -5862,6 +5999,22 @@ window.openModal = function(id) {
   }
   _origOpenModal(id);
   _openPropertyUrl(id);
+  // GA4: property_view
+  (function(){
+    try{
+      const _p = (typeof props !== 'undefined') ? props.find(function(x){ return String(x.id)===String(id); }) : null;
+      if(typeof trackEvent === 'function'){
+        trackEvent('property_view', {
+          property_id: String(id),
+          property_title: _p ? (_p.title||'') : '',
+          property_type:  _p ? (_p.type||'') : '',
+          property_price: _p ? (_p.price||0) : 0,
+          property_tx:    _p ? (_p.tx||'') : '',
+          province:       _p ? (_p.province||'') : ''
+        });
+      }
+    } catch(e){}
+  })();
 };
 
 // ── Patch closeModal to restore URL ──
@@ -5919,7 +6072,34 @@ document.addEventListener('DOMContentLoaded', function initRouter() {
     }).observe(propModalEl, { attributes: true, attributeFilter: ['class'] });
   }
 });
-function openLine(){ window.open(lineUrl(C.LINE),'_blank'); }
+function openLine(){ 
+  if(typeof trackEvent==='function') trackEvent('line_click',{source:'nav_button',line_id:C.LINE});
+  window.open(lineUrl(C.LINE),'_blank'); 
+}
+
+/* ── GA4 tracked wrappers — ใช้ใน modal/card CTAs ── */
+function trackPhoneClick(source, propId){
+  if(typeof trackEvent==='function'){
+    const _p = (typeof props!=='undefined'&&propId) ? props.find(function(x){return String(x.id)===String(propId);}) : null;
+    trackEvent('phone_click',{
+      source: source||'modal',
+      property_id: propId||'',
+      property_title: _p?(_p.title||''):'',
+      phone: C.PHONE||''
+    });
+  }
+}
+function trackLineClick(source, propId){
+  if(typeof trackEvent==='function'){
+    const _p = (typeof props!=='undefined'&&propId) ? props.find(function(x){return String(x.id)===String(propId);}) : null;
+    trackEvent('line_click',{
+      source: source||'modal',
+      property_id: propId||'',
+      property_title: _p?(_p.title||''):'',
+      line_id: C.LINE||''
+    });
+  }
+}
 
 const CAT_LABELS={
   'dd.all':'ทั้งหมด','dd.house':'บ้านเดี่ยว','dd.town':'ทาวน์โฮม','dd.condo':'คอนโด',
@@ -6655,6 +6835,8 @@ function listingsInlineSearch() {
   _listingsData = sortListings(base, document.getElementById('listings-sort')?.value||'default');
   _listingsCurPage = 1;
   renderListingsPage();
+  // GA4: search on listings page (debounced — only track if has keyword or filter)
+  try{ if(typeof trackEvent==='function'&&(kwRaw||type||prov||transit)) trackEvent('search',{search_term:kwRaw,tx:txVal,property_type:type,province:prov,transit:transit,result_count:_listingsData.length,source:'listings'}); }catch(e){}
   // SEO sidebar: render ครั้งแรกเท่านั้น (ไม่ต้อง re-render ทุก search)
   if(!window._lsSeoSidebarRendered && typeof renderListingsSeoSidebar==='function'){
     window._lsSeoSidebarRendered = true;
@@ -6890,7 +7072,10 @@ function renderGrid(id,list,loading_sk=false){
   setTimeout(initAllCardSwipes, 50);
 }
 
-function toggleFav(id,e){ if(e)e.stopPropagation(); const sid=String(id); const i=favs.indexOf(sid); if(i===-1)favs.push(sid); else favs.splice(i,1); localStorage.setItem('md_favs',JSON.stringify(favs)); updateFavUI(); renderFavDropdown(); if($('page-favorites').classList.contains('active'))renderFavPage(); $$(`[data-id="${sid}"]`).forEach(b=>{ const on=favs.includes(sid); b.innerHTML=on?'<i class="fas fa-heart"></i>':'<i class="far fa-heart"></i>'; b.classList.toggle('favorited',on); }); }
+function toggleFav(id,e){ if(e)e.stopPropagation(); const sid=String(id); const i=favs.indexOf(sid); const isAdding=(i===-1); if(isAdding)favs.push(sid); else favs.splice(i,1); localStorage.setItem('md_favs',JSON.stringify(favs)); updateFavUI(); renderFavDropdown(); if($('page-favorites').classList.contains('active'))renderFavPage(); $$(`[data-id="${sid}"]`).forEach(b=>{ const on=favs.includes(sid); b.innerHTML=on?'<i class="fas fa-heart"></i>':'<i class="far fa-heart"></i>'; b.classList.toggle('favorited',on); });
+  // GA4: favorite event
+  try{ if(typeof trackEvent==='function'&&isAdding){ const _p=(typeof props!=='undefined')?props.find(function(x){return String(x.id)===sid;}):null; trackEvent('favorite_add',{property_id:sid,property_title:_p?(_p.title||''):'',property_type:_p?(_p.type||''):'',price:_p?(_p.price||0):0}); } }catch(e){}
+}
 function clearFavs(){
   if(!favs.length)return;
   if(!confirm('ล้างรายการโปรดทั้งหมด?'))return;
@@ -7010,7 +7195,9 @@ function openModal(id){
   // 7) CTA + Fav — synchronous
   const lid=a?.lineId||C.LINE, ph=a?.phone||C.PHONE;
   $('m-ln').href=lineUrl(lid);
+  $('m-ln').onclick=function(){ trackLineClick('modal', p.id); };
   $('m-tel').href='tel:'+ph;
+  $('m-tel').onclick=function(){ trackPhoneClick('modal', p.id); };
   const _isFaved = favs.includes(String(p.id));
   const _favBtn = $('m-fav-btn');
   const _favLabel = $('m-fav-label');
@@ -7888,6 +8075,8 @@ async function submitDep(){
     resetTurnstile('dep');
     $('dep-form').style.display='none'; $('dep-ok').style.display='block';
     toast('ส่งข้อมูลสำเร็จ ทีมงานจะติดต่อกลับ ✅');
+    // GA4: form_submit
+    try{ if(typeof trackEvent==='function') trackEvent('form_submit',{form_type:'deposit',province:prov,tx:sanitize($('d-tx').value),prop_type:sanitize($('d-type').value)}); }catch(e){}
     // เริ่ม countdown UI หลังส่งสำเร็จ
     startCooldownUI('dep-btn', COOLDOWN_MS);
     setTimeout(()=>{
@@ -7977,6 +8166,8 @@ async function submitWish(){
     resetTurnstile('wish');
     $('wish-form').style.display='none'; $('wish-ok').style.display='block';
     toast('ส่งความต้องการสำเร็จ ✅');
+    // GA4: form_submit
+    try{ if(typeof trackEvent==='function') trackEvent('form_submit',{form_type:'wish',province:sanitize($('w-prov').value),tx:sanitize($('w-tx').value),prop_type:sanitize($('w-type').value),budget:parseFloat($('w-budget').value)||0}); }catch(e){}
     // เริ่ม countdown UI หลังส่งสำเร็จ
     startCooldownUI('wish-btn', COOLDOWN_MS);
     setTimeout(()=>{
