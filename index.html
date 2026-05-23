@@ -912,6 +912,8 @@ nav{
   border-bottom:1.5px solid #e8ecf2;
   padding:10px 20px;
   z-index:5;
+  transition:max-height .3s cubic-bezier(.4,0,.2,1), opacity .25s ease, padding .3s ease;
+  overflow:hidden;
 }
 #all-modal-filter-sticky:empty{
   display:none;
@@ -939,15 +941,37 @@ nav{
     align-self:flex-end;
   }
   #all-modal{align-items:flex-end}
-  #all-modal-filter-sticky{padding:8px 12px}
-  #all-modal-filter-sticky .modal-adv-filter-bar{padding:7px 8px;gap:5px}
-  #all-modal-filter-sticky .modal-adv-filter-row1{gap:5px}
-  #all-modal-filter-sticky .modal-adv-search-wrap{min-width:0;flex:1 1 100%}
-  #all-modal-filter-sticky .modal-adv-select{min-width:0;font-size:11.5px;padding:6px 6px;padding-right:20px}
+
+  /* ── Filterbar compact: mobile 3 rows ── */
+  #all-modal-filter-sticky{padding:6px 10px}
+  #all-modal-filter-sticky .modal-adv-filter-bar{padding:6px 8px;gap:4px;flex-wrap:wrap}
+  #all-modal-filter-sticky .modal-adv-filter-row1{display:flex;flex-wrap:wrap;gap:4px;width:100%}
+  #all-modal-filter-sticky .modal-adv-filter-row2{display:flex;flex-wrap:nowrap;gap:4px;width:100%}
+  #all-modal-filter-sticky .modal-adv-filter-row3{display:flex;flex-wrap:nowrap;gap:4px;width:100%}
+  /* row1: search full-width, then tx+proptype side by side */
+  #all-modal-filter-sticky .modal-adv-search-wrap{min-width:0;flex:1 1 100%;max-width:100%}
+  #all-modal-filter-sticky #modal-adv-tx{flex:0 0 auto;width:70px!important}
+  #all-modal-filter-sticky #modal-adv-proptype{flex:1 1 0}
+  /* row2: popular-loc + province equal width */
+  #all-modal-filter-sticky #modal-adv-popular-loc,
+  #all-modal-filter-sticky #modal-adv-province{flex:1 1 0;min-width:0}
+  /* row3: minprice + maxprice equal width + icon buttons */
+  #all-modal-filter-sticky #modal-adv-minprice,
+  #all-modal-filter-sticky #modal-adv-maxprice{flex:1 1 0;min-width:0}
+  #all-modal-filter-sticky .modal-adv-filter-btn,
+  #all-modal-filter-sticky .modal-adv-reset-btn{flex:0 0 auto;padding:5px 8px;min-width:32px}
+  /* general select sizing */
+  #all-modal-filter-sticky .modal-adv-select{
+    min-width:0;font-size:11px;padding:5px 4px;padding-right:16px
+  }
   #all-modal-filter-sticky .modal-adv-search-input{font-size:12px;padding:6px 8px 6px 26px}
-  #all-modal-filter-sticky .modal-adv-reset-btn{padding:6px 10px;font-size:12px}
-  #all-modal-hdr-actions .modal-adv-map-btn{padding:5px 10px;font-size:11.5px}
-  #all-modal-hdr-actions button{padding:5px 10px;font-size:11.5px}
+
+  /* ── Header buttons: icon-only on mobile ── */
+  #all-modal-hdr-actions .modal-adv-map-btn .btn-txt,
+  #all-modal-hdr-actions button .btn-txt{display:none!important}
+  #all-modal-hdr-actions .modal-adv-map-btn{padding:5px 8px!important;font-size:13px!important;gap:0!important;min-width:30px;justify-content:center}
+  #all-modal-hdr-actions button:not(select){padding:5px 8px!important;font-size:13px!important;gap:0!important;min-width:30px;justify-content:center}
+  .modal-hdr-sort-select{max-width:85px!important;font-size:11px!important;padding:4px 4px!important}
 }
 
 /* ══ ALL-MODAL: header polish when map is open ══ */
@@ -1143,16 +1167,16 @@ nav{
   border-radius:12px;
   padding:8px 10px;
   margin-bottom:12px;
-  display:flex;flex-direction:column;gap:6px;
+  display:flex;flex-direction:row;align-items:center;gap:5px;flex-wrap:nowrap;
 }
 .modal-adv-filter-row1{
-  display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+  display:contents;
 }
 .modal-adv-filter-row2{
-  display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+  display:contents;
 }
 .modal-adv-search-wrap{
-  flex:1;min-width:130px;
+  flex:1 1 140px;min-width:100px;max-width:220px;
   position:relative;
   display:flex;align-items:center;
 }
@@ -1168,20 +1192,52 @@ nav{
 .modal-adv-search-input:focus{border-color:var(--a)}
 .modal-adv-search-input::placeholder{color:#b0b8cc}
 .modal-adv-select{
-  padding:7px 10px;border:1.5px solid #dde3ee;border-radius:9px;
-  font-size:12.5px;color:var(--tx);background:#fff;outline:none;cursor:pointer;
-  min-width:0;width:auto;
+  padding:7px 6px;border:1.5px solid #dde3ee;border-radius:9px;
+  font-size:12px;color:var(--tx);background:#fff;outline:none;cursor:pointer;
+  min-width:0;width:auto;flex-shrink:1;
   transition:border-color .15s;
   appearance:none;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239ba8bb'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;background-position:right 8px center;padding-right:24px;
+  background-repeat:no-repeat;background-position:right 6px center;padding-right:20px;
+  text-align:center;text-align-last:center;
 }
 .modal-adv-select option,
 .modal-adv-select optgroup{
   background:#fff;
   color:#1B3A6B;
+  text-align:left;
 }
 .modal-adv-select:focus{border-color:var(--a)}
+
+/* ── qs-select: native select ใน quick-search-bar (dark hero) ── */
+.qs-select{
+  padding:8px 28px 8px 12px;
+  border:1.5px solid rgba(255,255,255,.25);
+  border-radius:9px;
+  font-size:12.5px;font-weight:600;
+  color:rgba(240,236,227,.95);
+  background:rgba(15,30,60,.65);
+  outline:none;cursor:pointer;
+  appearance:none;
+  -webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='rgba(240,220,150,0.85)'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 9px center;
+  backdrop-filter:blur(14px);
+  font-family:'Kanit','Noto Sans Thai',sans-serif;
+  white-space:nowrap;
+  transition:.2s;
+  text-align:center;
+  text-align-last:center;
+}
+.qs-select:hover{border-color:rgba(200,146,42,.85);background:rgba(200,146,42,.25);color:#fff}
+.qs-select:focus{border-color:rgba(232,184,75,1);outline:none}
+.qs-select option,.qs-select optgroup{background:#1B3A6B;color:#fff;text-align:left}
+/* BTS/MRT: กว้างเท่าข้อความเท่านั้น ไม่ยืด */
+#qs-bts-select, #qs-mrt-select{
+  width:auto !important;
+  flex:0 0 auto !important;
+  min-width:0 !important;
+}
 .modal-adv-filter-btn{
   padding:7px 14px;background:var(--p);color:#fff;border:none;border-radius:9px;
   font-size:12.5px;font-weight:700;cursor:pointer;
@@ -1599,9 +1655,9 @@ footer{background:linear-gradient(135deg,#2d2650 0%,#3d3373 100%);color:rgba(255
   border-top:4px solid var(--p);
 }
 .adv-check-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
-.adv-check-item{display:flex;align-items:center;gap:8px;font-size:15px;cursor:pointer;padding:8px 10px;border-radius:8px;transition:.15s}
+.adv-check-item{display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;padding:5px 8px;border-radius:8px;transition:.15s}
 .adv-check-item:hover{background:var(--lt)}
-.adv-check-item input{accent-color:var(--a);width:14px;height:14px}
+.adv-check-item input{accent-color:var(--a);width:12px;height:12px;flex-shrink:0}
 .adv-select-row{margin-bottom:8px}
 .adv-select-row label{font-size:12px;font-weight:600;color:var(--tx2);display:block;margin-bottom:4px}
 .adv-select-row select{width:100%;padding:8px 10px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;background:#fff}
@@ -3553,7 +3609,7 @@ footer::after{
    <div class="sf">
     <div class="ac-wrap"><label><i class="fas fa-search"></i> คำค้นหา</label><input id="s-kw" placeholder="ชื่อโครงการ ทำเล..." autocomplete="off" oninput="debouncedSearch()"><div class="ac-list" id="ac-list" style="display:none"></div></div>
     <div><label><i class="fas fa-building"></i> ประเภท</label><select id="s-type"><option value="">ทุกประเภท</option><option value="บ้านเดี่ยว">บ้านเดี่ยว</option><option value="ทาวน์โฮม">ทาวน์โฮม</option><option value="คอนโด">คอนโด</option><option value="อาคารพาณิชย์">อาคารพาณิชย์</option><option value="ที่ดิน">ที่ดิน</option><option value="วิลล่า">วิลล่า</option><option value="รีสอร์ท">รีสอร์ท</option><option value="โรงแรม">โรงแรม</option></select></div>
-    <div><label><i class="fas fa-map-marker-alt"></i> จังหวัด</label><select id="s-prov"><option value="">ทุกจังหวัด</option></select></div>
+    <div><label><i class="fas fa-map-marker-alt"></i> จังหวัด / ทำเล</label><select id="s-prov"><option value="">ทุกทำเล</option></select></div>
     <div><label><i class="fas fa-tag"></i> ราคาต่ำสุด</label><select id="s-min" onchange="updatePriceMax()" style="width:100%;padding:10px 12px;border:1.5px solid rgba(200,146,42,.4);border-radius:10px;font-size:13px;color:#1a2744;background:rgba(255,255,255,0.95);font-weight:600"></select></div>
     <div><label><i class="fas fa-tag"></i> ราคาสูงสุด</label><select id="s-max" style="width:100%;padding:10px 12px;border:1.5px solid rgba(200,146,42,.4);border-radius:10px;font-size:13px;color:#1a2744;background:rgba(255,255,255,0.95);font-weight:600"></select></div>
     <button class="btn-search" onclick="doSearch()"><i class="fas fa-search"></i> ค้นหา</button>
@@ -3570,69 +3626,75 @@ footer::after{
    </div>
    <!-- 🔥 ทำเลยอดนิยม -->
    <div class="qs-group">
-    <button class="qs-dd-btn" onclick="toggleQsDD('qs-popular-dd',this)" data-panel="qs-popular-dd">
-     <span class="qs-icon">🔥</span> ทำเลยอดนิยม <i class="fas fa-chevron-down chevdown"></i>
-    </button>
-    <div class="qs-dd-panel" id="qs-popular-dd">
-     <div class="qs-dd-sec">📍 โซนกลางเมือง — CBD</div>
-     <button class="qs-opt" onclick="quickSearch('สุขุมวิท');closeQsDDs()">📍 สุขุมวิท</button>
-     <button class="qs-opt" onclick="quickSearch('สาทร');closeQsDDs()">📍 สาทร</button>
-     <button class="qs-opt" onclick="quickSearch('สีลม');closeQsDDs()">📍 สีลม</button>
-     <button class="qs-opt" onclick="quickSearch('อโศก');closeQsDDs()">📍 อโศก</button>
-     <button class="qs-opt" onclick="quickSearch('ทองหล่อ');closeQsDDs()">📍 ทองหล่อ</button>
-     <button class="qs-opt" onclick="quickSearch('เพลินจิต');closeQsDDs()">📍 เพลินจิต</button>
-     <button class="qs-opt" onclick="quickSearch('ชิดลม');closeQsDDs()">📍 ชิดลม</button>
-     <button class="qs-opt" onclick="quickSearch('ราชประสงค์');closeQsDDs()">📍 ราชประสงค์</button>
-     <button class="qs-opt" onclick="quickSearch('ลุมพินี');closeQsDDs()">📍 ลุมพินี</button>
-     <button class="qs-opt" onclick="quickSearch('วิทยุ');closeQsDDs()">📍 ถ.วิทยุ</button>
-     <div class="qs-dd-sec">📍 โซนตะวันออก</div>
-     <button class="qs-opt" onclick="quickSearch('พระโขนง');closeQsDDs()">📍 พระโขนง</button>
-     <button class="qs-opt" onclick="quickSearch('เอกมัย');closeQsDDs()">📍 เอกมัย</button>
-     <button class="qs-opt" onclick="quickSearch('อ่อนนุช');closeQsDDs()">📍 อ่อนนุช</button>
-     <button class="qs-opt" onclick="quickSearch('บางนา');closeQsDDs()">📍 บางนา</button>
-     <button class="qs-opt" onclick="quickSearch('ลาดกระบัง');closeQsDDs()">📍 ลาดกระบัง</button>
-     <button class="qs-opt" onclick="quickSearch('มีนบุรี');closeQsDDs()">📍 มีนบุรี</button>
-     <button class="qs-opt" onclick="quickSearch('รามคำแหง');closeQsDDs()">📍 รามคำแหง</button>
-     <button class="qs-opt" onclick="quickSearch('หัวหมาก');closeQsDDs()">📍 หัวหมาก</button>
-     <button class="qs-opt" onclick="quickSearch('สุวรรณภูมิ');closeQsDDs()">📍 สุวรรณภูมิ</button>
-     <div class="qs-dd-sec">📍 โซนเหนือ</div>
-     <button class="qs-opt" onclick="quickSearch('รัชดา');closeQsDDs()">📍 รัชดาภิเษก</button>
-     <button class="qs-opt" onclick="quickSearch('ลาดพร้าว');closeQsDDs()">📍 ลาดพร้าว</button>
-     <button class="qs-opt" onclick="quickSearch('จตุจักร');closeQsDDs()">📍 จตุจักร</button>
-     <button class="qs-opt" onclick="quickSearch('หมอชิต');closeQsDDs()">📍 หมอชิต</button>
-     <button class="qs-opt" onclick="quickSearch('พหลโยธิน');closeQsDDs()">📍 พหลโยธิน</button>
-     <button class="qs-opt" onclick="quickSearch('อารีย์');closeQsDDs()">📍 อารีย์</button>
-     <button class="qs-opt" onclick="quickSearch('สะพานควาย');closeQsDDs()">📍 สะพานควาย</button>
-     <button class="qs-opt" onclick="quickSearch('ดอนเมือง');closeQsDDs()">📍 ดอนเมือง</button>
-     <button class="qs-opt" onclick="quickSearch('พระราม 9');closeQsDDs()">📍 พระราม 9</button>
-     <button class="qs-opt" onclick="quickSearch('ห้วยขวาง');closeQsDDs()">📍 ห้วยขวาง</button>
-     <div class="qs-dd-sec">📍 โซนตะวันตก & ใต้</div>
-     <button class="qs-opt" onclick="quickSearch('ปิ่นเกล้า');closeQsDDs()">📍 ปิ่นเกล้า</button>
-     <button class="qs-opt" onclick="quickSearch('บางแค');closeQsDDs()">📍 บางแค</button>
-     <button class="qs-opt" onclick="quickSearch('วงเวียนใหญ่');closeQsDDs()">📍 วงเวียนใหญ่</button>
-     <button class="qs-opt" onclick="quickSearch('พระราม 3');closeQsDDs()">📍 พระราม 3</button>
-     <button class="qs-opt" onclick="quickSearch('สาธุประดิษฐ์');closeQsDDs()">📍 สาธุประดิษฐ์</button>
-     <button class="qs-opt" onclick="quickSearch('ราษฎร์บูรณะ');closeQsDDs()">📍 ราษฎร์บูรณะ</button>
-     <button class="qs-opt" onclick="quickSearch('ตลิ่งชัน');closeQsDDs()">📍 ตลิ่งชัน</button>
-     <button class="qs-opt" onclick="quickSearch('บางกอกน้อย');closeQsDDs()">📍 บางกอกน้อย</button>
-     <button class="qs-opt" onclick="quickSearch('ธนบุรี');closeQsDDs()">📍 ธนบุรี</button>
-     <button class="qs-opt" onclick="quickSearch('บางบอน');closeQsDDs()">📍 บางบอน</button>
-    </div>
+    <select class="qs-select modal-adv-select" id="qs-popular-select" onchange="if(this.value){quickSearch(this.value);this.value=''}">
+     <option value="">🔥 ทำเลยอดนิยม</option>
+     <optgroup label="📍 โซนกลางเมือง — CBD">
+     <option value="สุขุมวิท">📍 สุขุมวิท</option>
+     <option value="สาทร">📍 สาทร</option>
+     <option value="สีลม">📍 สีลม</option>
+     <option value="อโศก">📍 อโศก</option>
+     <option value="ทองหล่อ">📍 ทองหล่อ</option>
+     <option value="เพลินจิต">📍 เพลินจิต</option>
+     <option value="ชิดลม">📍 ชิดลม</option>
+     <option value="ราชประสงค์">📍 ราชประสงค์</option>
+     <option value="ลุมพินี">📍 ลุมพินี</option>
+     <option value="วิทยุ">📍 ถ.วิทยุ</option>
+     </optgroup>
+     <optgroup label="📍 โซนตะวันออก">
+     <option value="พระโขนง">📍 พระโขนง</option>
+     <option value="เอกมัย">📍 เอกมัย</option>
+     <option value="อ่อนนุช">📍 อ่อนนุช</option>
+     <option value="บางนา">📍 บางนา</option>
+     <option value="ลาดกระบัง">📍 ลาดกระบัง</option>
+     <option value="มีนบุรี">📍 มีนบุรี</option>
+     <option value="รามคำแหง">📍 รามคำแหง</option>
+     <option value="หัวหมาก">📍 หัวหมาก</option>
+     <option value="สุวรรณภูมิ">📍 สุวรรณภูมิ</option>
+     </optgroup>
+     <optgroup label="📍 โซนเหนือ">
+     <option value="รัชดา">📍 รัชดาภิเษก</option>
+     <option value="ลาดพร้าว">📍 ลาดพร้าว</option>
+     <option value="จตุจักร">📍 จตุจักร</option>
+     <option value="หมอชิต">📍 หมอชิต</option>
+     <option value="พหลโยธิน">📍 พหลโยธิน</option>
+     <option value="อารีย์">📍 อารีย์</option>
+     <option value="สะพานควาย">📍 สะพานควาย</option>
+     <option value="ดอนเมือง">📍 ดอนเมือง</option>
+     <option value="พระราม 9">📍 พระราม 9</option>
+     <option value="ห้วยขวาง">📍 ห้วยขวาง</option>
+     </optgroup>
+     <optgroup label="📍 โซนตะวันตก &amp; ใต้">
+     <option value="ปิ่นเกล้า">📍 ปิ่นเกล้า</option>
+     <option value="บางแค">📍 บางแค</option>
+     <option value="วงเวียนใหญ่">📍 วงเวียนใหญ่</option>
+     <option value="พระราม 3">📍 พระราม 3</option>
+     <option value="สาธุประดิษฐ์">📍 สาธุประดิษฐ์</option>
+     <option value="ราษฎร์บูรณะ">📍 ราษฎร์บูรณะ</option>
+     <option value="ตลิ่งชัน">📍 ตลิ่งชัน</option>
+     <option value="บางกอกน้อย">📍 บางกอกน้อย</option>
+     <option value="ธนบุรี">📍 ธนบุรี</option>
+     <option value="บางบอน">📍 บางบอน</option>
+     </optgroup>
+    </select>
    </div>
    <!-- 🚈 BTS + 🚇 MRT wrapper -->
    <div class="qs-transit-wrap">
    <div class="qs-group qs-group-transit" id="qs-group-bts">
-    <button class="qs-dd-btn" onclick="toggleQsDD('qs-bts-dd',this)" data-panel="qs-bts-dd">
-     <span class="qs-icon">🚈</span> BTS <i class="fas fa-chevron-down chevdown"></i>
-    </button>
-    <div class="qs-dd-panel" id="qs-bts-dd"><!-- rendered by renderTransitButtons() --></div>
+    <select class="qs-select modal-adv-select" id="qs-bts-select" onchange="if(this.value){quickSearch(this.value);this.value=''}">
+     <option value="">🚈 BTS</option>
+     <!-- options จะ render โดย renderTransitSelects() -->
+    </select>
+    <!-- เก็บ panel เก่าไว้ (hidden) เพื่อ sync adv filter -->
+    <div class="qs-dd-panel" id="qs-bts-dd" style="display:none!important"></div>
    </div>
    <!-- 🚇 MRT -->
    <div class="qs-group qs-group-transit" id="qs-group-mrt">
-    <button class="qs-dd-btn" onclick="toggleQsDD('qs-mrt-dd',this)" data-panel="qs-mrt-dd">
-     <span class="qs-icon">🚇</span> MRT <i class="fas fa-chevron-down chevdown"></i>
-    </button>
-    <div class="qs-dd-panel" id="qs-mrt-dd"><!-- rendered by renderTransitButtons() --></div>
+    <select class="qs-select modal-adv-select" id="qs-mrt-select" onchange="if(this.value){quickSearch(this.value);this.value=''}">
+     <option value="">🚇 MRT</option>
+     <!-- options จะ render โดย renderTransitSelects() -->
+    </select>
+    <!-- เก็บ panel เก่าไว้ (hidden) เพื่อ sync adv filter -->
+    <div class="qs-dd-panel" id="qs-mrt-dd" style="display:none!important"></div>
    </div>
    </div><!-- end qs-transit-wrap -->
    <!-- 🎓 มหาวิทยาลัย removed -->
@@ -4261,7 +4323,6 @@ function popupMapFilterAll(){
     if(kw){ var hay=((p.title||'')+' '+(p.location||'')+' '+(p.province||'')).toLowerCase(); if(hay.indexOf(kw)===-1) return false; }
     if(tx && tx !== 'ALL' && p.tx !== tx) return false;
     if(typ && p.type && p.type.indexOf(typ) === -1) return false;
-    if(area && (p.location||'').indexOf(area) === -1 && (p.title||'').indexOf(area) === -1 && (p.desc||'').indexOf(area) === -1) return false;
     if(prov && p.province && p.province.indexOf(prov) === -1 && (p.location||'').indexOf(prov) === -1) return false;
     if(minPrice && p.price && p.price < minPrice) return false;
     if(maxPrice && p.price && p.price > maxPrice) return false;
@@ -4291,10 +4352,10 @@ function popupMapFilterAll(){
   if(txCard) txCard.value = (tx==='BUY'||tx==='RENT') ? tx : '';
   var typCard = document.getElementById('modal-adv-proptype');
   if(typCard) typCard.value = typ||'';
-  var areaCard = document.getElementById('modal-adv-area');
-  if(areaCard) areaCard.value = '';
   var provCard = document.getElementById('modal-adv-province');
   if(provCard) provCard.value = prov||'';
+  var popLocCard = document.getElementById('modal-adv-popular-loc');
+  if(popLocCard) popLocCard.value = '';
   var priceCard = document.getElementById('modal-adv-maxprice');
   if(priceCard) priceCard.value = maxPrice ? String(maxPrice) : '';
   var priceMinCard = document.getElementById('modal-adv-minprice');
@@ -4318,7 +4379,7 @@ function popupMapResetFilters(){
     _popupRefreshMarkers();
   }
   // Reset cards panel selects too
-  ['modal-adv-kw','modal-adv-tx','modal-adv-proptype','modal-adv-area','modal-adv-province','modal-adv-minprice','modal-adv-maxprice'].forEach(function(id){
+  ['modal-adv-kw','modal-adv-tx','modal-adv-proptype','modal-adv-popular-loc','modal-adv-province','modal-adv-minprice','modal-adv-maxprice'].forEach(function(id){
     var el = document.getElementById(id);
     if(!el) return;
     if(el.tagName === 'SELECT') el.value = el.options[0].value;
@@ -4397,8 +4458,8 @@ function modalAdvFilter(type){
   var kw = (document.getElementById('modal-adv-kw')||{}).value||'';
   var tx = (document.getElementById('modal-adv-tx')||{}).value||'';
   var typ = (document.getElementById('modal-adv-proptype')||{}).value||'';
-  var area = (document.getElementById('modal-adv-area')||{}).value||'';
-  var prov = (document.getElementById('modal-adv-province')||{}).value||'';
+  var prov = (document.getElementById('modal-adv-popular-loc')||{}).value||''
+            || (document.getElementById('modal-adv-province')||{}).value||'';
   var minPrice = Number((document.getElementById('modal-adv-minprice')||{}).value||0);
   var maxPrice = Number((document.getElementById('modal-adv-maxprice')||{}).value||0);
   var sort = (document.getElementById('modal-adv-sort')||{}).value||'default';
@@ -4421,12 +4482,15 @@ function modalAdvFilter(type){
     if(ef.minBed && Number(p.bedrooms||p.beds||p.bed||0) < Number(ef.minBed)) return false;
     if(ef.minBath && Number(p.bathrooms||p.baths||p.bath||0) < Number(ef.minBath)) return false;
     if(ef.minArea && Number(p.area||p.usable_area||0) < Number(ef.minArea)) return false;
+    if(ef.minPark && Number(p.parking||p.carpark||p.park||0) < Number(ef.minPark)) return false;
     if(ef.minPrice && p.price && p.price < Number(ef.minPrice)) return false;
     if(ef.maxPrice && p.price && p.price > Number(ef.maxPrice)) return false;
     if(ef.loc){var locH=((p.location||'')+(p.province||'')+(p.title||'')+(p.desc||'')).toLowerCase();if(locH.indexOf(ef.loc.toLowerCase())===-1) return false;}
     if(ef.bts){var btsH=((p.bts||'')+(p.location||'')+(p.transit||'')+(p.desc||'')).toLowerCase();if(btsH.indexOf(ef.bts.toLowerCase())===-1) return false;}
     if(ef.mrt){var mrtH=((p.mrt||'')+(p.location||'')+(p.transit||'')+(p.desc||'')).toLowerCase();if(mrtH.indexOf(ef.mrt.toLowerCase())===-1) return false;}
     if(ef.uni){var uniH=((p.location||'')+(p.desc||'')).toLowerCase();if(uniH.indexOf(ef.uni.toLowerCase())===-1) return false;}
+    if(ef.furniture){ if((p.furniture||'') !== ef.furniture) return false; }
+    if(ef.pets){ if(!p.pets_allowed) return false; }
     if(ef.features && ef.features.length){
       var feat = (p.features||p.amenities||[]);
       var featStr = (typeof feat === 'string') ? feat : feat.join(' ');
@@ -4448,7 +4512,7 @@ function modalAdvFilter(type){
   }
 }
 function modalAdvReset(type){
-  var ids = ['modal-adv-kw','modal-adv-tx','modal-adv-proptype','modal-adv-area','modal-adv-province','modal-adv-minprice','modal-adv-maxprice'];
+  var ids = ['modal-adv-kw','modal-adv-tx','modal-adv-proptype','modal-adv-popular-loc','modal-adv-province','modal-adv-minprice','modal-adv-maxprice'];
   ids.forEach(function(id){
     var el = document.getElementById(id);
     if(!el) return;
@@ -4459,8 +4523,9 @@ function modalAdvReset(type){
   if(sortEl) sortEl.value = 'default';
   var countEl = document.getElementById('modal-adv-count');
   if(countEl) countEl.textContent = '';
-  // clear extra filter
+  // clear extra filter and close any open extra-filter sheet
   window._modalExtraFilter = {};
+  document.getElementById('modal-extra-filter-sheet')?.remove();
   if(window._modalTypeData && window._modalTypeData._allData){
     window._modalTypeData.data = [...window._modalTypeData._allData];
     window._modalTypeData.currentPage = 1;
@@ -5102,7 +5167,35 @@ function _initApplyFilters(){
   // เรียก _renderHomeGrids แทน — แสดง ALL props โดยตรง
   _renderHomeGrids();
 }
-function resetSearch(){ const kw=$('s-kw'); if(kw){kw.value='';const al=$('ac-list');if(al)al.style.display='none';} const st=$('s-type');if(st)st.value=''; const sp=$('s-prov');if(sp)sp.value=''; const smn=$('s-min');if(smn)smn.selectedIndex=0; const smx=$('s-max');if(smx)smx.selectedIndex=0; const pr=$('s-price-range');if(pr)pr.value='0|0'; tx='ALL'; const bt=document.querySelectorAll('.tx-tab'); if(bt[0]){ bt[0].classList.add('active'); if(bt[1])bt[1].classList.remove('active'); if(bt[2])bt[2].classList.remove('active'); } const pb=$('price-buy-section'),prs=$('price-rent-section'); if(pb)pb.style.display='block'; if(prs)prs.style.display='none'; curType=''; const cc=$$('.cat-card'); cc.forEach((c,i)=>c.classList.toggle('active',i===0)); const ll=$('loc-search-layer');if(ll)ll.style.display='none'; locActiveCat=null; applyFilters().catch(console.error); requestAnimationFrame(()=>{ const hero=document.querySelector('#page-home .hero'); if(hero){ window.scrollTo({top:hero.getBoundingClientRect().top+(window.scrollY||window.pageYOffset)-64,behavior:'smooth'}); } else { window.scrollTo({top:0,behavior:'smooth'}); } }); }
+function resetSearch(){
+  // ── reset search bar fields ──
+  const kw=$('s-kw'); if(kw){kw.value='';const al=$('ac-list');if(al)al.style.display='none';}
+  const st=$('s-type');if(st)st.value='';
+  const sp=$('s-prov');if(sp)sp.value='';
+  const smn=$('s-min');if(smn)smn.selectedIndex=0;
+  const smx=$('s-max');if(smx)smx.selectedIndex=0;
+  const pr=$('s-price-range');if(pr)pr.value='0|0';
+  // ── reset tx tabs ──
+  tx='ALL';
+  const bt=document.querySelectorAll('.tx-tab');
+  if(bt[0]){ bt[0].classList.add('active'); if(bt[1])bt[1].classList.remove('active'); if(bt[2])bt[2].classList.remove('active'); }
+  const pb=$('price-buy-section'),prs=$('price-rent-section');
+  if(pb)pb.style.display='block'; if(prs)prs.style.display='none';
+  curType='';
+  const cc=$$('.cat-card'); cc.forEach((c,i)=>c.classList.toggle('active',i===0));
+  const ll=$('loc-search-layer');if(ll)ll.style.display='none';
+  locActiveCat=null;
+  // ── reset adv filter panel + sheet (Filter เพิ่มเติม) ──
+  if(typeof resetAdvFilter==='function') resetAdvFilter();
+  // ── reset modal extra filter state ──
+  window._modalExtraFilter={};
+  applyFilters().catch(console.error);
+  requestAnimationFrame(()=>{
+    const hero=document.querySelector('#page-home .hero');
+    if(hero){ window.scrollTo({top:hero.getBoundingClientRect().top+(window.scrollY||window.pageYOffset)-64,behavior:'smooth'}); }
+    else { window.scrollTo({top:0,behavior:'smooth'}); }
+  });
+}
 function handleLogoClick(){ resetSearch(); showPage('home'); }
 
 async function loadLegalPages(){
@@ -8711,7 +8804,60 @@ function openAllModal(type){
     const start = (curPage-1)*_PER;
     const slice = pageData.slice(start, start+_PER);
     const grid = document.getElementById('modal-prop-grid');
-    if(grid){ grid.innerHTML = slice.map(propCard).join(''); setTimeout(initAllCardSwipes,50); }
+    if(grid){
+      if(slice.length === 0 && total === 0){
+        const lang = (typeof _lang!=='undefined' && _lang) ? _lang : 'th';
+        const lineHref = (typeof C!=='undefined' && C && C.LINE) ? 'https://line.me/R/ti/p/'+C.LINE : 'https://line.me/ti/p/matchdoor';
+        const t2 = {
+          th:{ ico:'🔍', h:'ไม่พบทรัพย์ที่ตรงกับเงื่อนไข',
+               sub:'ลองปรับเงื่อนไขการค้นหา หรือ<br>ให้ทีมงานของเราช่วยหาทรัพย์ที่ใช่ให้คุณโดยตรง',
+               cta:'📩 ฝากความต้องการซื้อ-เช่า ให้ทีมงานหาให้',
+               reset:'🔄 รีเซ็ตการค้นหา' },
+          en:{ ico:'🔍', h:'No listings match your criteria',
+               sub:"Try adjusting your filters, or let our team find<br>the perfect property for you.",
+               cta:"📩 Leave your requirements — we'll find it for you",
+               reset:'🔄 Reset search' },
+          cn:{ ico:'🔍', h:'没有找到符合条件的房源',
+               sub:'请尝试调整筛选条件，<br>或让我们的团队为您寻找合适的房产。',
+               cta:'📩 留下需求，让我们为您寻找',
+               reset:'🔄 重置搜索' },
+          ja:{ ico:'🔍', h:'条件に合う物件が見つかりません',
+               sub:'検索条件を調整するか、<br>担当チームに理想の物件を探してもらいましょう。',
+               cta:'📩 ご要望を送る — スタッフが探します',
+               reset:'🔄 検索をリセット' },
+        };
+        const msg = t2[lang] || t2.th;
+        grid.innerHTML = `<div style="grid-column:1/-1;display:flex;justify-content:center;padding:20px 12px 40px">
+          <div style="text-align:center;max-width:420px;width:100%">
+            <div style="font-size:48px;margin-bottom:14px;line-height:1">${msg.ico}</div>
+            <p style="font-size:16px;font-weight:700;color:var(--tx);margin-bottom:10px">${msg.h}</p>
+            <p style="font-size:13px;color:var(--tx2);line-height:1.7;margin-bottom:24px">${msg.sub}</p>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <a href="${lineHref}" target="_blank" rel="noopener"
+                 style="display:flex;align-items:center;justify-content:center;gap:10px;
+                        background:#06C755;color:#fff;text-decoration:none;
+                        border-radius:12px;padding:13px 20px;font-size:14px;font-weight:700;
+                        box-shadow:0 4px 18px rgba(6,199,85,.38);transition:.2s"
+                 onmouseover="this.style.filter='brightness(1.08)'" onmouseout="this.style.filter=''">
+                <i class="fab fa-line" style="font-size:20px"></i> ${msg.cta}
+              </a>
+              <button onclick="modalAdvReset(window._modalCurrentType)"
+                 style="display:flex;align-items:center;justify-content:center;gap:8px;
+                        background:var(--lt);color:var(--tx);
+                        border:1.5px solid var(--bd);border-radius:12px;
+                        padding:12px 20px;font-size:13px;font-weight:600;cursor:pointer;
+                        transition:.2s"
+                 onmouseover="this.style.borderColor='var(--a)'" onmouseout="this.style.borderColor='var(--bd)'">
+                ${msg.reset}
+              </button>
+            </div>
+          </div>
+        </div>`;
+      } else {
+        grid.innerHTML = slice.map(propCard).join('');
+      }
+      setTimeout(initAllCardSwipes,50);
+    }
     // pagination bar
     const pgInfo = document.getElementById('modal-pg-info');
     const pgCtrl = document.getElementById('modal-pg-controls');
@@ -8769,17 +8915,21 @@ function openAllModal(type){
         <option value="alpha">${ui('modal.sort.alpha')}</option>
       </select>`;
     _hdrActions.innerHTML =
-      `<button class="modal-adv-map-btn" onclick="openGmapPopup()" style="padding:6px 12px;font-size:12px"><i class="fas fa-map-marked-alt"></i> ${ui('modal.map.btn')}</button>`
-      + (_viewAllBtn || '')
+      `<button class="modal-adv-map-btn" onclick="openGmapPopup()" style="padding:6px 12px;font-size:12px;display:inline-flex;align-items:center;gap:5px"><i class="fas fa-map-marked-alt"></i><span class="btn-txt"> ${ui('modal.map.btn')}</span></button>`
+      + (_viewAllBtn
+          ? _viewAllBtn
+              .replace(/(<i [^>]+><\/i>)\s*/,'$1<span class="btn-txt"> ')
+              .replace(/(<\/button>)/,'</span>$1')
+          : '')
       + _sortSelect;
   }
   const sortHtml=`<div class="modal-adv-filter-bar">
     <div class="modal-adv-filter-row1">
-      <div class="modal-adv-search-wrap" style="flex:0 1 160px;min-width:120px">
+      <div class="modal-adv-search-wrap" style="flex:1 1 140px;min-width:100px;max-width:220px">
         <i class="fas fa-search"></i>
         <input class="modal-adv-search-input" id="modal-adv-kw" placeholder="ชื่อโครงการ ทำเล..." oninput="modalAdvFilter('${type}')">
       </div>
-      <select class="modal-adv-select" id="modal-adv-tx" onchange="modalAdvFilter('${type}')">
+      <select class="modal-adv-select" id="modal-adv-tx" onchange="modalAdvFilter('${type}')" style="flex:0 0 auto;min-width:0;width:72px;text-align:center;text-align-last:center;padding-left:5px;padding-right:18px">
         <option value="">ทั้งหมด</option>
         <option value="BUY">ซื้อ</option>
         <option value="RENT">เช่า</option>
@@ -8794,8 +8944,10 @@ function openAllModal(type){
         <option value="โรงแรม">โรงแรม</option>
         <option value="รีสอร์ท">รีสอร์ท</option>
       </select>
-      <select class="modal-adv-select" id="modal-adv-area" onchange="modalAdvFilter('${type}')" title="ค้นหาด้วยทำเล">
-        <option value="">ทุกทำเล</option>
+    </div><!-- end row1 -->
+    <div class="modal-adv-filter-row2" style="display:flex;flex-wrap:nowrap;gap:6px;align-items:center">
+      <select class="modal-adv-select" id="modal-adv-popular-loc" onchange="if(this.value){document.getElementById('modal-adv-province').value='';} modalAdvFilter('${type}')">
+        <option value="">ทำเลยอดนิยม</option>
         <optgroup label="📍 โซนกลางเมือง — CBD">
         <option value="สุขุมวิท">สุขุมวิท</option>
         <option value="สาทร">สาทร</option>
@@ -8806,14 +8958,12 @@ function openAllModal(type){
         <option value="ชิดลม">ชิดลม</option>
         <option value="ราชประสงค์">ราชประสงค์</option>
         <option value="ลุมพินี">ลุมพินี</option>
-        <option value="วิทยุ">ถ.วิทยุ</option>
         </optgroup>
         <optgroup label="📍 โซนตะวันออก">
         <option value="พระโขนง">พระโขนง</option>
         <option value="เอกมัย">เอกมัย</option>
         <option value="อ่อนนุช">อ่อนนุช</option>
         <option value="บางนา">บางนา</option>
-        <option value="ลาดกระบัง">ลาดกระบัง</option>
         <option value="มีนบุรี">มีนบุรี</option>
         <option value="รามคำแหง">รามคำแหง</option>
         <option value="หัวหมาก">หัวหมาก</option>
@@ -8826,116 +8976,111 @@ function openAllModal(type){
         <option value="หมอชิต">หมอชิต</option>
         <option value="พหลโยธิน">พหลโยธิน</option>
         <option value="อารีย์">อารีย์</option>
-        <option value="สะพานควาย">สะพานควาย</option>
-        <option value="ดอนเมือง">ดอนเมือง</option>
         <option value="พระราม 9">พระราม 9</option>
         <option value="ห้วยขวาง">ห้วยขวาง</option>
+        <option value="ดอนเมือง">ดอนเมือง</option>
         </optgroup>
-        <optgroup label="📍 โซนตะวันตก & ใต้">
+        <optgroup label="📍 โซนตะวันตก &amp; ใต้">
         <option value="ปิ่นเกล้า">ปิ่นเกล้า</option>
         <option value="บางแค">บางแค</option>
-        <option value="วงเวียนใหญ่">วงเวียนใหญ่</option>
         <option value="พระราม 3">พระราม 3</option>
-        <option value="สาธุประดิษฐ์">สาธุประดิษฐ์</option>
-        <option value="ราษฎร์บูรณะ">ราษฎร์บูรณะ</option>
-        <option value="ตลิ่งชัน">ตลิ่งชัน</option>
-        <option value="บางกอกน้อย">บางกอกน้อย</option>
         <option value="ธนบุรี">ธนบุรี</option>
-        <option value="บางบอน">บางบอน</option>
+        <option value="ตลิ่งชัน">ตลิ่งชัน</option>
+        <option value="สาธุประดิษฐ์">สาธุประดิษฐ์</option>
+        </optgroup>
+        <optgroup label="🏖️ ต่างจังหวัดยอดนิยม">
+        <option value="เชียงใหม่">เชียงใหม่</option>
+        <option value="ภูเก็ต">ภูเก็ต</option>
+        <option value="พัทยา">พัทยา / ชลบุรี</option>
+        <option value="เขาใหญ่">เขาใหญ่</option>
+        <option value="หัวหิน">หัวหิน</option>
+        <option value="กาญจนบุรี">กาญจนบุรี</option>
+        <option value="เกาะสมุย">เกาะสมุย</option>
         </optgroup>
       </select>
-      <select class="modal-adv-select" id="modal-adv-province" onchange="modalAdvFilter('${type}')" title="ค้นหาด้วยจังหวัด">
-        <option value="">ทุกจังหวัด</option>
-        <optgroup label="🏙️ กรุงเทพฯ & ปริมณฑล">
+      <select class="modal-adv-select" id="modal-adv-province" onchange="if(this.value){document.getElementById('modal-adv-popular-loc').value='';} modalAdvFilter('${type}')">
+        <option value="">จังหวัด / ทำเล</option>
         <option value="กรุงเทพมหานคร">กรุงเทพมหานคร</option>
-        <option value="นนทบุรี">นนทบุรี</option>
-        <option value="ปทุมธานี">ปทุมธานี</option>
-        <option value="สมุทรปราการ">สมุทรปราการ</option>
-        <option value="สมุทรสาคร">สมุทรสาคร</option>
-        <option value="นครปฐม">นครปฐม</option>
-        </optgroup>
-        <optgroup label="🌆 ภาคกลาง">
-        <option value="พระนครศรีอยุธยา">พระนครศรีอยุธยา</option>
-        <option value="อ่างทอง">อ่างทอง</option>
-        <option value="สิงห์บุรี">สิงห์บุรี</option>
-        <option value="ชัยนาท">ชัยนาท</option>
-        <option value="ลพบุรี">ลพบุรี</option>
-        <option value="สระบุรี">สระบุรี</option>
-        <option value="นครนายก">นครนายก</option>
-        <option value="สระแก้ว">สระแก้ว</option>
-        <option value="ฉะเชิงเทรา">ฉะเชิงเทรา</option>
-        <option value="สมุทรสงคราม">สมุทรสงคราม</option>
-        <option value="สุพรรณบุรี">สุพรรณบุรี</option>
+        <option value="กระบี่">กระบี่</option>
         <option value="กาญจนบุรี">กาญจนบุรี</option>
-        <option value="ราชบุรี">ราชบุรี</option>
-        <option value="เพชรบุรี">เพชรบุรี</option>
-        <option value="ประจวบคีรีขันธ์">ประจวบคีรีขันธ์</option>
-        </optgroup>
-        <optgroup label="🌊 ภาคตะวันออก">
-        <option value="ชลบุรี">ชลบุรี</option>
-        <option value="ระยอง">ระยอง</option>
-        <option value="จันทบุรี">จันทบุรี</option>
-        <option value="ตราด">ตราด</option>
-        <option value="ปราจีนบุรี">ปราจีนบุรี</option>
-        </optgroup>
-        <optgroup label="🏔️ ภาคเหนือ">
-        <option value="เชียงใหม่">เชียงใหม่</option>
-        <option value="เชียงราย">เชียงราย</option>
-        <option value="แม่ฮ่องสอน">แม่ฮ่องสอน</option>
-        <option value="ลำพูน">ลำพูน</option>
-        <option value="ลำปาง">ลำปาง</option>
-        <option value="พะเยา">พะเยา</option>
-        <option value="แพร่">แพร่</option>
-        <option value="น่าน">น่าน</option>
-        <option value="อุตรดิตถ์">อุตรดิตถ์</option>
-        <option value="สุโขทัย">สุโขทัย</option>
-        <option value="พิษณุโลก">พิษณุโลก</option>
-        <option value="พิจิตร">พิจิตร</option>
+        <option value="กาฬสินธุ์">กาฬสินธุ์</option>
         <option value="กำแพงเพชร">กำแพงเพชร</option>
-        <option value="ตาก">ตาก</option>
-        <option value="นครสวรรค์">นครสวรรค์</option>
-        <option value="อุทัยธานี">อุทัยธานี</option>
-        </optgroup>
-        <optgroup label="🌾 ภาคอีสาน">
-        <option value="นครราชสีมา">นครราชสีมา</option>
         <option value="ขอนแก่น">ขอนแก่น</option>
-        <option value="อุดรธานี">อุดรธานี</option>
-        <option value="อุบลราชธานี">อุบลราชธานี</option>
+        <option value="จันทบุรี">จันทบุรี</option>
+        <option value="ฉะเชิงเทรา">ฉะเชิงเทรา</option>
+        <option value="ชลบุรี">ชลบุรี</option>
+        <option value="ชัยนาท">ชัยนาท</option>
+        <option value="ชัยภูมิ">ชัยภูมิ</option>
+        <option value="ชุมพร">ชุมพร</option>
+        <option value="เชียงราย">เชียงราย</option>
+        <option value="เชียงใหม่">เชียงใหม่</option>
+        <option value="ตรัง">ตรัง</option>
+        <option value="ตราด">ตราด</option>
+        <option value="ตาก">ตาก</option>
+        <option value="นครนายก">นครนายก</option>
+        <option value="นครปฐม">นครปฐม</option>
+        <option value="นครพนม">นครพนม</option>
+        <option value="นครราชสีมา">นครราชสีมา</option>
+        <option value="นครศรีธรรมราช">นครศรีธรรมราช</option>
+        <option value="นครสวรรค์">นครสวรรค์</option>
+        <option value="นนทบุรี">นนทบุรี</option>
+        <option value="นราธิวาส">นราธิวาส</option>
+        <option value="น่าน">น่าน</option>
         <option value="บึงกาฬ">บึงกาฬ</option>
+        <option value="บุรีรัมย์">บุรีรัมย์</option>
+        <option value="ปทุมธานี">ปทุมธานี</option>
+        <option value="ประจวบคีรีขันธ์">ประจวบคีรีขันธ์</option>
+        <option value="ปราจีนบุรี">ปราจีนบุรี</option>
+        <option value="ปัตตานี">ปัตตานี</option>
+        <option value="พระนครศรีอยุธยา">พระนครศรีอยุธยา</option>
+        <option value="พะเยา">พะเยา</option>
+        <option value="พังงา">พังงา</option>
+        <option value="พัทลุง">พัทลุง</option>
+        <option value="พิจิตร">พิจิตร</option>
+        <option value="พิษณุโลก">พิษณุโลก</option>
+        <option value="เพชรบุรี">เพชรบุรี</option>
+        <option value="เพชรบูรณ์">เพชรบูรณ์</option>
+        <option value="แพร่">แพร่</option>
+        <option value="ภูเก็ต">ภูเก็ต</option>
+        <option value="มหาสารคาม">มหาสารคาม</option>
+        <option value="มุกดาหาร">มุกดาหาร</option>
+        <option value="แม่ฮ่องสอน">แม่ฮ่องสอน</option>
+        <option value="ยโสธร">ยโสธร</option>
+        <option value="ยะลา">ยะลา</option>
+        <option value="ร้อยเอ็ด">ร้อยเอ็ด</option>
+        <option value="ระนอง">ระนอง</option>
+        <option value="ระยอง">ระยอง</option>
+        <option value="ราชบุรี">ราชบุรี</option>
+        <option value="ลพบุรี">ลพบุรี</option>
+        <option value="ลำปาง">ลำปาง</option>
+        <option value="ลำพูน">ลำพูน</option>
+        <option value="เลย">เลย</option>
+        <option value="ศรีสะเกษ">ศรีสะเกษ</option>
+        <option value="สกลนคร">สกลนคร</option>
+        <option value="สงขลา">สงขลา</option>
+        <option value="สตูล">สตูล</option>
+        <option value="สมุทรปราการ">สมุทรปราการ</option>
+        <option value="สมุทรสงคราม">สมุทรสงคราม</option>
+        <option value="สมุทรสาคร">สมุทรสาคร</option>
+        <option value="สระแก้ว">สระแก้ว</option>
+        <option value="สระบุรี">สระบุรี</option>
+        <option value="สิงห์บุรี">สิงห์บุรี</option>
+        <option value="สุโขทัย">สุโขทัย</option>
+        <option value="สุพรรณบุรี">สุพรรณบุรี</option>
+        <option value="สุราษฎร์ธานี">สุราษฎร์ธานี</option>
+        <option value="สุรินทร์">สุรินทร์</option>
         <option value="หนองคาย">หนองคาย</option>
         <option value="หนองบัวลำภู">หนองบัวลำภู</option>
-        <option value="เลย">เลย</option>
-        <option value="ชัยภูมิ">ชัยภูมิ</option>
-        <option value="บุรีรัมย์">บุรีรัมย์</option>
-        <option value="สุรินทร์">สุรินทร์</option>
-        <option value="ศรีสะเกษ">ศรีสะเกษ</option>
-        <option value="ยโสธร">ยโสธร</option>
-        <option value="มุกดาหาร">มุกดาหาร</option>
+        <option value="อ่างทอง">อ่างทอง</option>
         <option value="อำนาจเจริญ">อำนาจเจริญ</option>
-        <option value="ร้อยเอ็ด">ร้อยเอ็ด</option>
-        <option value="กาฬสินธุ์">กาฬสินธุ์</option>
-        <option value="มหาสารคาม">มหาสารคาม</option>
-        <option value="นครพนม">นครพนม</option>
-        <option value="สกลนคร">สกลนคร</option>
-        </optgroup>
-        <optgroup label="🌴 ภาคใต้">
-        <option value="สุราษฎร์ธานี">สุราษฎร์ธานี</option>
-        <option value="ภูเก็ต">ภูเก็ต</option>
-        <option value="กระบี่">กระบี่</option>
-        <option value="พังงา">พังงา</option>
-        <option value="ระนอง">ระนอง</option>
-        <option value="ชุมพร">ชุมพร</option>
-        <option value="นครศรีธรรมราช">นครศรีธรรมราช</option>
-        <option value="พัทลุง">พัทลุง</option>
-        <option value="ตรัง">ตรัง</option>
-        <option value="สตูล">สตูล</option>
-        <option value="สงขลา">สงขลา</option>
-        <option value="ปัตตานี">ปัตตานี</option>
-        <option value="ยะลา">ยะลา</option>
-        <option value="นราธิวาส">นราธิวาส</option>
-        </optgroup>
+        <option value="อุดรธานี">อุดรธานี</option>
+        <option value="อุตรดิตถ์">อุตรดิตถ์</option>
+        <option value="อุทัยธานี">อุทัยธานี</option>
+        <option value="อุบลราชธานี">อุบลราชธานี</option>
       </select>
-      <select class="modal-adv-select" id="modal-adv-minprice" onchange="modalAdvFilter('${type}')">
+    </div><!-- end row2 -->
+    <div class="modal-adv-filter-row3" style="display:flex;flex-wrap:nowrap;gap:6px;align-items:center">
+      <select class="modal-adv-select" id="modal-adv-minprice" onchange="modalAdvFilter('${type}')" style="flex:1 1 80px;min-width:0">
         <option value="">ราคาต่ำสุด</option>
         <option value="5000">5,000</option>
         <option value="10000">10,000</option>
@@ -8965,7 +9110,7 @@ function openAllModal(type){
         <option value="50000000">50M</option>
         <option value="100000000">100M</option>
       </select>
-      <select class="modal-adv-select" id="modal-adv-maxprice" onchange="modalAdvFilter('${type}')">
+      <select class="modal-adv-select" id="modal-adv-maxprice" onchange="modalAdvFilter('${type}')" style="flex:1 1 80px;min-width:0">
         <option value="">ราคาสูงสุด</option>
         <option value="5000">5,000</option>
         <option value="10000">10,000</option>
@@ -9042,6 +9187,42 @@ function openAllModal(type){
   var _filterSticky = document.getElementById('all-modal-filter-sticky');
   if(_filterSticky) _filterSticky.innerHTML = sortHtml;
 
+  // ── Scroll hide/show filterbar: ซ่อนเมื่อเลื่อนลง, แสดงเมื่อเลื่อนขึ้น (smooth) ──
+  (function(){
+    var _allBody = document.getElementById('all-body');
+    var _sticky = document.getElementById('all-modal-filter-sticky');
+    if(!_allBody || !_sticky) return;
+    // ถอด listener เก่าออก (ถ้ามี)
+    if(_allBody._scrollHandler) _allBody.removeEventListener('scroll', _allBody._scrollHandler);
+    var _lastTop = 0;
+    _allBody._scrollHandler = function(){
+      var top = _allBody.scrollTop;
+      if(top < 60){
+        // ยังอยู่บนสุด — แสดงเสมอ
+        _sticky.style.maxHeight = '';
+        _sticky.style.opacity = '1';
+        _sticky.style.pointerEvents = '';
+        _sticky.style.paddingTop = '';
+        _sticky.style.paddingBottom = '';
+        _sticky.style.overflow = '';
+      } else if(top > _lastTop){
+        // เลื่อนลง → ซ่อน
+        _sticky.style.maxHeight = '0';
+        _sticky.style.opacity = '0';
+        _sticky.style.pointerEvents = 'none';
+        _sticky.style.overflow = 'hidden';
+      } else {
+        // เลื่อนขึ้น → แสดง
+        _sticky.style.maxHeight = '';
+        _sticky.style.opacity = '1';
+        _sticky.style.pointerEvents = '';
+        _sticky.style.overflow = '';
+      }
+      _lastTop = top;
+    };
+    _allBody.addEventListener('scroll', _allBody._scrollHandler, {passive:true});
+  })();
+
   b.innerHTML=`<div id="all-body-map-col">`
     +_inlineMapHtml
     +`</div>`
@@ -9083,7 +9264,9 @@ function openModalAdvExtraFilter(type) {
   const _mrt      = _ef.mrt      || '';
   const _uni      = _ef.uni      || '';
   const _features = _ef.features || [];
-  const featureList = ['เฟอร์นิเจอร์ครบ','แอร์','ที่จอดรถ','สระว่ายน้ำ','ฟิตเนส','ลิฟต์','รักษาความปลอดภัย','ส่วนกลาง'];
+  const _furniture = _ef.furniture || '';
+  const _pets      = _ef.pets     || false;
+  const featureList = ['แอร์','ตู้เย็น','ที่จอดรถ','เครื่องซักผ้า','สระว่ายน้ำ','ฟิตเนส','ลิฟต์','รักษาความปลอดภัย','ส่วนกลาง'];
 
   const mo = document.createElement('div');
   mo.id = 'modal-extra-filter-sheet';
@@ -9166,10 +9349,11 @@ function openModalAdvExtraFilter(type) {
         </div>
       </div>
 
-      <!-- ทำเล/จังหวัด -->
-      <div style="margin-bottom:16px">
-        <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4"><i class="fas fa-map-marker-alt" style="color:var(--p)"></i> ทำเล / จังหวัด</div>
-        <select id="mef-loc" style="width:100%;padding:8px 10px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;background:#fff">
+      <!-- ทำเล/จังหวัด (2 col) -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
+        <div>
+          <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4"><i class="fas fa-fire" style="color:#ff4d6d"></i> ทำเลยอดนิยม</div>
+          <select id="mef-loc" style="width:100%;padding:8px 10px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;background:#fff">
           <option value="">-- เลือกทำเลยอดนิยม --</option>
           <optgroup label="📍 โซนกลางเมือง — CBD">
           <option value="สุขุมวิท" ${_loc=='สุขุมวิท'?'selected':''}>สุขุมวิท</option>
@@ -9178,119 +9362,457 @@ function openModalAdvExtraFilter(type) {
           <option value="อโศก" ${_loc=='อโศก'?'selected':''}>อโศก</option>
           <option value="ทองหล่อ" ${_loc=='ทองหล่อ'?'selected':''}>ทองหล่อ</option>
           <option value="เพลินจิต" ${_loc=='เพลินจิต'?'selected':''}>เพลินจิต</option>
+          <option value="ชิดลม" ${_loc=='ชิดลม'?'selected':''}>ชิดลม</option>
+          <option value="ราชประสงค์" ${_loc=='ราชประสงค์'?'selected':''}>ราชประสงค์</option>
+          <option value="ลุมพินี" ${_loc=='ลุมพินี'?'selected':''}>ลุมพินี</option>
+          </optgroup>
+          <optgroup label="📍 โซนตะวันออก">
+          <option value="พระโขนง" ${_loc=='พระโขนง'?'selected':''}>พระโขนง</option>
+          <option value="เอกมัย" ${_loc=='เอกมัย'?'selected':''}>เอกมัย</option>
+          <option value="อ่อนนุช" ${_loc=='อ่อนนุช'?'selected':''}>อ่อนนุช</option>
+          <option value="บางนา" ${_loc=='บางนา'?'selected':''}>บางนา</option>
+          <option value="มีนบุรี" ${_loc=='มีนบุรี'?'selected':''}>มีนบุรี</option>
+          <option value="รามคำแหง" ${_loc=='รามคำแหง'?'selected':''}>รามคำแหง</option>
+          <option value="หัวหมาก" ${_loc=='หัวหมาก'?'selected':''}>หัวหมาก</option>
+          <option value="สุวรรณภูมิ" ${_loc=='สุวรรณภูมิ'?'selected':''}>สุวรรณภูมิ</option>
+          </optgroup>
+          <optgroup label="📍 โซนเหนือ">
           <option value="รัชดา" ${_loc=='รัชดา'?'selected':''}>รัชดาภิเษก</option>
           <option value="ลาดพร้าว" ${_loc=='ลาดพร้าว'?'selected':''}>ลาดพร้าว</option>
+          <option value="จตุจักร" ${_loc=='จตุจักร'?'selected':''}>จตุจักร</option>
+          <option value="หมอชิต" ${_loc=='หมอชิต'?'selected':''}>หมอชิต</option>
+          <option value="พหลโยธิน" ${_loc=='พหลโยธิน'?'selected':''}>พหลโยธิน</option>
+          <option value="อารีย์" ${_loc=='อารีย์'?'selected':''}>อารีย์</option>
           <option value="พระราม 9" ${_loc=='พระราม 9'?'selected':''}>พระราม 9</option>
-          <option value="บางนา" ${_loc=='บางนา'?'selected':''}>บางนา</option>
+          <option value="ห้วยขวาง" ${_loc=='ห้วยขวาง'?'selected':''}>ห้วยขวาง</option>
+          <option value="ดอนเมือง" ${_loc=='ดอนเมือง'?'selected':''}>ดอนเมือง</option>
           </optgroup>
-          <optgroup label="🗺️ จังหวัด">
-          <option value="กรุงเทพมหานคร" ${_loc=='กรุงเทพมหานคร'?'selected':''}>กรุงเทพมหานคร</option>
-          <option value="นนทบุรี" ${_loc=='นนทบุรี'?'selected':''}>นนทบุรี</option>
-          <option value="ปทุมธานี" ${_loc=='ปทุมธานี'?'selected':''}>ปทุมธานี</option>
-          <option value="สมุทรปราการ" ${_loc=='สมุทรปราการ'?'selected':''}>สมุทรปราการ</option>
-          <option value="ภูเก็ต" ${_loc=='ภูเก็ต'?'selected':''}>ภูเก็ต</option>
+          <optgroup label="📍 โซนตะวันตก &amp; ใต้">
+          <option value="ปิ่นเกล้า" ${_loc=='ปิ่นเกล้า'?'selected':''}>ปิ่นเกล้า</option>
+          <option value="บางแค" ${_loc=='บางแค'?'selected':''}>บางแค</option>
+          <option value="พระราม 3" ${_loc=='พระราม 3'?'selected':''}>พระราม 3</option>
+          <option value="ธนบุรี" ${_loc=='ธนบุรี'?'selected':''}>ธนบุรี</option>
+          <option value="ตลิ่งชัน" ${_loc=='ตลิ่งชัน'?'selected':''}>ตลิ่งชัน</option>
+          <option value="สาธุประดิษฐ์" ${_loc=='สาธุประดิษฐ์'?'selected':''}>สาธุประดิษฐ์</option>
+          </optgroup>
+          <optgroup label="🏖️ ต่างจังหวัดยอดนิยม">
           <option value="เชียงใหม่" ${_loc=='เชียงใหม่'?'selected':''}>เชียงใหม่</option>
-          <option value="ชลบุรี" ${_loc=='ชลบุรี'?'selected':''}>ชลบุรี</option>
+          <option value="ภูเก็ต" ${_loc=='ภูเก็ต'?'selected':''}>ภูเก็ต</option>
+          <option value="พัทยา" ${_loc=='พัทยา'?'selected':''}>พัทยา / ชลบุรี</option>
+          <option value="เขาใหญ่" ${_loc=='เขาใหญ่'?'selected':''}>เขาใหญ่</option>
+          <option value="หัวหิน" ${_loc=='หัวหิน'?'selected':''}>หัวหิน</option>
+          <option value="กาญจนบุรี" ${_loc=='กาญจนบุรี'?'selected':''}>กาญจนบุรี</option>
+          <option value="เกาะสมุย" ${_loc=='เกาะสมุย'?'selected':''}>เกาะสมุย</option>
           </optgroup>
         </select>
-      </div>
-
-      <!-- BTS -->
-      <div style="margin-bottom:16px">
-        <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4"><i class="fas fa-train" style="color:#009900"></i> ใกล้สถานี BTS</div>
-        <select id="mef-bts" style="width:100%;padding:8px 10px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;background:#fff">
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4"><i class="fas fa-map-marker-alt" style="color:var(--p)"></i> จังหวัด (77 จังหวัด)</div>
+          <select id="mef-province" style="width:100%;padding:8px 10px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;background:#fff">
           <option value="">ทุกจังหวัด</option>
-          <optgroup label="🚈 สายสุขุมวิท (N/E)">
-          <option value="หมอชิต" ${_bts=='หมอชิต'?'selected':''}>หมอชิต (N8)</option>
-          <option value="อารีย์" ${_bts=='อารีย์'?'selected':''}>อารีย์ (N5)</option>
-          <option value="สยาม" ${_bts=='สยาม'?'selected':''}>สยาม (CEN)</option>
-          <option value="นานา" ${_bts=='นานา'?'selected':''}>นานา (E4)</option>
-          <option value="อโศก" ${_bts=='อโศก'?'selected':''}>อโศก (E5)</option>
-          <option value="พร้อมพงษ์" ${_bts=='พร้อมพงษ์'?'selected':''}>พร้อมพงษ์ (E6)</option>
-          <option value="ทองหล่อ" ${_bts=='ทองหล่อ'?'selected':''}>ทองหล่อ (E7)</option>
-          <option value="เอกมัย" ${_bts=='เอกมัย'?'selected':''}>เอกมัย (E8)</option>
-          <option value="อ่อนนุช" ${_bts=='อ่อนนุช'?'selected':''}>อ่อนนุช (E10)</option>
-          <option value="บางนา" ${_bts=='บางนา'?'selected':''}>บางนา (E14)</option>
-          </optgroup>
-          <optgroup label="🚈 สายสีลม (S)">
-          <option value="ราชดำริ" ${_bts=='ราชดำริ'?'selected':''}>ราชดำริ (S1)</option>
-          <option value="ช่องนนทรี" ${_bts=='ช่องนนทรี'?'selected':''}>ช่องนนทรี (S2)</option>
-          <option value="สุรศักดิ์" ${_bts=='สุรศักดิ์'?'selected':''}>สุรศักดิ์ (S3)</option>
-          <option value="สะพานตากสิน" ${_bts=='สะพานตากสิน'?'selected':''}>สะพานตากสิน (S4)</option>
-          </optgroup>
+          <option value="กรุงเทพมหานคร" ${_loc=='กรุงเทพมหานคร'?'selected':''}>กรุงเทพมหานคร</option>
+          <option value="กระบี่" ${_loc=='กระบี่'?'selected':''}>กระบี่</option>
+          <option value="กาญจนบุรี" ${_loc=='กาญจนบุรี'?'selected':''}>กาญจนบุรี</option>
+          <option value="กาฬสินธุ์" ${_loc=='กาฬสินธุ์'?'selected':''}>กาฬสินธุ์</option>
+          <option value="กำแพงเพชร" ${_loc=='กำแพงเพชร'?'selected':''}>กำแพงเพชร</option>
+          <option value="ขอนแก่น" ${_loc=='ขอนแก่น'?'selected':''}>ขอนแก่น</option>
+          <option value="จันทบุรี" ${_loc=='จันทบุรี'?'selected':''}>จันทบุรี</option>
+          <option value="ฉะเชิงเทรา" ${_loc=='ฉะเชิงเทรา'?'selected':''}>ฉะเชิงเทรา</option>
+          <option value="ชลบุรี" ${_loc=='ชลบุรี'?'selected':''}>ชลบุรี</option>
+          <option value="ชัยนาท" ${_loc=='ชัยนาท'?'selected':''}>ชัยนาท</option>
+          <option value="ชัยภูมิ" ${_loc=='ชัยภูมิ'?'selected':''}>ชัยภูมิ</option>
+          <option value="ชุมพร" ${_loc=='ชุมพร'?'selected':''}>ชุมพร</option>
+          <option value="เชียงราย" ${_loc=='เชียงราย'?'selected':''}>เชียงราย</option>
+          <option value="เชียงใหม่" ${_loc=='เชียงใหม่'?'selected':''}>เชียงใหม่</option>
+          <option value="ตรัง" ${_loc=='ตรัง'?'selected':''}>ตรัง</option>
+          <option value="ตราด" ${_loc=='ตราด'?'selected':''}>ตราด</option>
+          <option value="ตาก" ${_loc=='ตาก'?'selected':''}>ตาก</option>
+          <option value="นครนายก" ${_loc=='นครนายก'?'selected':''}>นครนายก</option>
+          <option value="นครปฐม" ${_loc=='นครปฐม'?'selected':''}>นครปฐม</option>
+          <option value="นครพนม" ${_loc=='นครพนม'?'selected':''}>นครพนม</option>
+          <option value="นครราชสีมา" ${_loc=='นครราชสีมา'?'selected':''}>นครราชสีมา</option>
+          <option value="นครศรีธรรมราช" ${_loc=='นครศรีธรรมราช'?'selected':''}>นครศรีธรรมราช</option>
+          <option value="นครสวรรค์" ${_loc=='นครสวรรค์'?'selected':''}>นครสวรรค์</option>
+          <option value="นนทบุรี" ${_loc=='นนทบุรี'?'selected':''}>นนทบุรี</option>
+          <option value="นราธิวาส" ${_loc=='นราธิวาส'?'selected':''}>นราธิวาส</option>
+          <option value="น่าน" ${_loc=='น่าน'?'selected':''}>น่าน</option>
+          <option value="บึงกาฬ" ${_loc=='บึงกาฬ'?'selected':''}>บึงกาฬ</option>
+          <option value="บุรีรัมย์" ${_loc=='บุรีรัมย์'?'selected':''}>บุรีรัมย์</option>
+          <option value="ปทุมธานี" ${_loc=='ปทุมธานี'?'selected':''}>ปทุมธานี</option>
+          <option value="ประจวบคีรีขันธ์" ${_loc=='ประจวบคีรีขันธ์'?'selected':''}>ประจวบคีรีขันธ์</option>
+          <option value="ปราจีนบุรี" ${_loc=='ปราจีนบุรี'?'selected':''}>ปราจีนบุรี</option>
+          <option value="ปัตตานี" ${_loc=='ปัตตานี'?'selected':''}>ปัตตานี</option>
+          <option value="พระนครศรีอยุธยา" ${_loc=='พระนครศรีอยุธยา'?'selected':''}>พระนครศรีอยุธยา</option>
+          <option value="พะเยา" ${_loc=='พะเยา'?'selected':''}>พะเยา</option>
+          <option value="พังงา" ${_loc=='พังงา'?'selected':''}>พังงา</option>
+          <option value="พัทลุง" ${_loc=='พัทลุง'?'selected':''}>พัทลุง</option>
+          <option value="พิจิตร" ${_loc=='พิจิตร'?'selected':''}>พิจิตร</option>
+          <option value="พิษณุโลก" ${_loc=='พิษณุโลก'?'selected':''}>พิษณุโลก</option>
+          <option value="เพชรบุรี" ${_loc=='เพชรบุรี'?'selected':''}>เพชรบุรี</option>
+          <option value="เพชรบูรณ์" ${_loc=='เพชรบูรณ์'?'selected':''}>เพชรบูรณ์</option>
+          <option value="แพร่" ${_loc=='แพร่'?'selected':''}>แพร่</option>
+          <option value="ภูเก็ต" ${_loc=='ภูเก็ต'?'selected':''}>ภูเก็ต</option>
+          <option value="มหาสารคาม" ${_loc=='มหาสารคาม'?'selected':''}>มหาสารคาม</option>
+          <option value="มุกดาหาร" ${_loc=='มุกดาหาร'?'selected':''}>มุกดาหาร</option>
+          <option value="แม่ฮ่องสอน" ${_loc=='แม่ฮ่องสอน'?'selected':''}>แม่ฮ่องสอน</option>
+          <option value="ยโสธร" ${_loc=='ยโสธร'?'selected':''}>ยโสธร</option>
+          <option value="ยะลา" ${_loc=='ยะลา'?'selected':''}>ยะลา</option>
+          <option value="ร้อยเอ็ด" ${_loc=='ร้อยเอ็ด'?'selected':''}>ร้อยเอ็ด</option>
+          <option value="ระนอง" ${_loc=='ระนอง'?'selected':''}>ระนอง</option>
+          <option value="ระยอง" ${_loc=='ระยอง'?'selected':''}>ระยอง</option>
+          <option value="ราชบุรี" ${_loc=='ราชบุรี'?'selected':''}>ราชบุรี</option>
+          <option value="ลพบุรี" ${_loc=='ลพบุรี'?'selected':''}>ลพบุรี</option>
+          <option value="ลำปาง" ${_loc=='ลำปาง'?'selected':''}>ลำปาง</option>
+          <option value="ลำพูน" ${_loc=='ลำพูน'?'selected':''}>ลำพูน</option>
+          <option value="เลย" ${_loc=='เลย'?'selected':''}>เลย</option>
+          <option value="ศรีสะเกษ" ${_loc=='ศรีสะเกษ'?'selected':''}>ศรีสะเกษ</option>
+          <option value="สกลนคร" ${_loc=='สกลนคร'?'selected':''}>สกลนคร</option>
+          <option value="สงขลา" ${_loc=='สงขลา'?'selected':''}>สงขลา</option>
+          <option value="สตูล" ${_loc=='สตูล'?'selected':''}>สตูล</option>
+          <option value="สมุทรปราการ" ${_loc=='สมุทรปราการ'?'selected':''}>สมุทรปราการ</option>
+          <option value="สมุทรสงคราม" ${_loc=='สมุทรสงคราม'?'selected':''}>สมุทรสงคราม</option>
+          <option value="สมุทรสาคร" ${_loc=='สมุทรสาคร'?'selected':''}>สมุทรสาคร</option>
+          <option value="สระแก้ว" ${_loc=='สระแก้ว'?'selected':''}>สระแก้ว</option>
+          <option value="สระบุรี" ${_loc=='สระบุรี'?'selected':''}>สระบุรี</option>
+          <option value="สิงห์บุรี" ${_loc=='สิงห์บุรี'?'selected':''}>สิงห์บุรี</option>
+          <option value="สุโขทัย" ${_loc=='สุโขทัย'?'selected':''}>สุโขทัย</option>
+          <option value="สุพรรณบุรี" ${_loc=='สุพรรณบุรี'?'selected':''}>สุพรรณบุรี</option>
+          <option value="สุราษฎร์ธานี" ${_loc=='สุราษฎร์ธานี'?'selected':''}>สุราษฎร์ธานี</option>
+          <option value="สุรินทร์" ${_loc=='สุรินทร์'?'selected':''}>สุรินทร์</option>
+          <option value="หนองคาย" ${_loc=='หนองคาย'?'selected':''}>หนองคาย</option>
+          <option value="หนองบัวลำภู" ${_loc=='หนองบัวลำภู'?'selected':''}>หนองบัวลำภู</option>
+          <option value="อ่างทอง" ${_loc=='อ่างทอง'?'selected':''}>อ่างทอง</option>
+          <option value="อำนาจเจริญ" ${_loc=='อำนาจเจริญ'?'selected':''}>อำนาจเจริญ</option>
+          <option value="อุดรธานี" ${_loc=='อุดรธานี'?'selected':''}>อุดรธานี</option>
+          <option value="อุตรดิตถ์" ${_loc=='อุตรดิตถ์'?'selected':''}>อุตรดิตถ์</option>
+          <option value="อุทัยธานี" ${_loc=='อุทัยธานี'?'selected':''}>อุทัยธานี</option>
+          <option value="อุบลราชธานี" ${_loc=='อุบลราชธานี'?'selected':''}>อุบลราชธานี</option>
         </select>
-      </div>
+        </div>
+      </div><!-- end 2-col: ทำเล + จังหวัด -->
 
-      <!-- MRT -->
-      <div style="margin-bottom:16px">
-        <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4"><i class="fas fa-subway" style="color:#003399"></i> ใกล้สถานี MRT</div>
-        <select id="mef-mrt" style="width:100%;padding:8px 10px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;background:#fff">
+      <!-- BTS + MRT (2 col) -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
+        <div>
+          <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4"><i class="fas fa-train" style="color:#009900"></i> ใกล้สถานี BTS</div>
+          <select id="mef-bts" style="width:100%;padding:8px 10px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;background:#fff">
           <option value="">ทุกสถานี BTS/SRT/ARL</option>
-          <optgroup label="🚇 สายสีน้ำเงิน (MRT)">
-          <option value="หัวลำโพง" ${_mrt=='หัวลำโพง'?'selected':''}>หัวลำโพง</option>
-          <option value="สามย่าน" ${_mrt=='สามย่าน'?'selected':''}>สามย่าน</option>
-          <option value="สีลม" ${_mrt=='สีลม'?'selected':''}>สีลม</option>
-          <option value="ลุมพินี" ${_mrt=='ลุมพินี'?'selected':''}>ลุมพินี</option>
-          <option value="คลองเตย" ${_mrt=='คลองเตย'?'selected':''}>คลองเตย</option>
-          <option value="ศูนย์วัฒนธรรม" ${_mrt=='ศูนย์วัฒนธรรม'?'selected':''}>ศูนย์วัฒนธรรม</option>
-          <option value="พระราม 9" ${_mrt=='พระราม 9'?'selected':''}>พระราม 9</option>
-          <option value="รัชดาภิเษก" ${_mrt=='รัชดาภิเษก'?'selected':''}>รัชดาภิเษก</option>
-          <option value="ลาดพร้าว" ${_mrt=='ลาดพร้าว'?'selected':''}>ลาดพร้าว</option>
-          <option value="จตุจักร" ${_mrt=='จตุจักร'?'selected':''}>จตุจักร</option>
+          <optgroup label="🟢 BTS สายสุขุมวิท — เหนือ (N1–N24)">
+          <option value="ราชเทวี" ${_bts=='ราชเทวี'?'selected':''}>ราชเทวี (N1)</option>
+          <option value="พญาไท" ${_bts=='พญาไท'?'selected':''}>พญาไท (N2)</option>
+          <option value="อนุสาวรีย์ชัยสมรภูมิ" ${_bts=='อนุสาวรีย์ชัยสมรภูมิ'?'selected':''}>อนุสาวรีย์ฯ (N3)</option>
+          <option value="สนามเป้า" ${_bts=='สนามเป้า'?'selected':''}>สนามเป้า (N4)</option>
+          <option value="อารีย์" ${_bts=='อารีย์'?'selected':''}>อารีย์ (N5)</option>
+          <option value="สะพานควาย" ${_bts=='สะพานควาย'?'selected':''}>สะพานควาย (N7)</option>
+          <option value="หมอชิต" ${_bts=='หมอชิต'?'selected':''}>หมอชิต (N8)</option>
+          <option value="ห้าแยกลาดพร้าว" ${_bts=='ห้าแยกลาดพร้าว'?'selected':''}>ห้าแยกลาดพร้าว (N9)</option>
+          <option value="พหลโยธิน 24" ${_bts=='พหลโยธิน 24'?'selected':''}>พหลโยธิน 24 (N10)</option>
+          <option value="รัชโยธิน" ${_bts=='รัชโยธิน'?'selected':''}>รัชโยธิน (N11)</option>
+          <option value="เสนานิคม" ${_bts=='เสนานิคม'?'selected':''}>เสนานิคม (N12)</option>
+          <option value="ม.เกษตรศาสตร์" ${_bts=='ม.เกษตรศาสตร์'?'selected':''}>ม.เกษตรศาสตร์ (N13)</option>
+          <option value="กรมป่าไม้" ${_bts=='กรมป่าไม้'?'selected':''}>กรมป่าไม้ (N14)</option>
+          <option value="บางบัว" ${_bts=='บางบัว'?'selected':''}>บางบัว (N15)</option>
+          <option value="กรมทหารราบที่ 11" ${_bts=='กรมทหารราบที่ 11'?'selected':''}>กรมทหารราบที่ 11 (N16)</option>
+          <option value="วัดพระศรีมหาธาตุ" ${_bts=='วัดพระศรีมหาธาตุ'?'selected':''}>วัดพระศรีมหาธาตุ (N17)</option>
+          <option value="พหลโยธิน 59" ${_bts=='พหลโยธิน 59'?'selected':''}>พหลโยธิน 59 (N18)</option>
+          <option value="สายหยุด" ${_bts=='สายหยุด'?'selected':''}>สายหยุด (N19)</option>
+          <option value="สะพานใหม่" ${_bts=='สะพานใหม่'?'selected':''}>สะพานใหม่ (N20)</option>
+          <option value="โรงพยาบาลภูมิพลอดุลยเดช" ${_bts=='โรงพยาบาลภูมิพลอดุลยเดช'?'selected':''}>รพ.ภูมิพลอดุลยเดช (N21)</option>
+          <option value="พิพิธภัณฑ์กองทัพอากาศ" ${_bts=='พิพิธภัณฑ์กองทัพอากาศ'?'selected':''}>พิพิธภัณฑ์กองทัพอากาศ (N22)</option>
+          <option value="แยก คปอ." ${_bts=='แยก คปอ.'?'selected':''}>แยก คปอ. (N23)</option>
+          <option value="คูคต" ${_bts=='คูคต'?'selected':''}>คูคต (N24)</option>
+          </optgroup>
+          <optgroup label="🟢 BTS สายสุขุมวิท — กลาง/ตะวันออก (E1–E23)">
+          <option value="สยาม" ${_bts=='สยาม'?'selected':''}>สยาม (CEN)</option>
+          <option value="ชิดลม" ${_bts=='ชิดลม'?'selected':''}>ชิดลม (E1)</option>
+          <option value="เพลินจิต" ${_bts=='เพลินจิต'?'selected':''}>เพลินจิต (E2)</option>
+          <option value="นานา" ${_bts=='นานา'?'selected':''}>นานา (E3)</option>
+          <option value="อโศก" ${_bts=='อโศก'?'selected':''}>อโศก (E4)</option>
+          <option value="พร้อมพงษ์" ${_bts=='พร้อมพงษ์'?'selected':''}>พร้อมพงษ์ (E5)</option>
+          <option value="ทองหล่อ" ${_bts=='ทองหล่อ'?'selected':''}>ทองหล่อ (E6)</option>
+          <option value="เอกมัย" ${_bts=='เอกมัย'?'selected':''}>เอกมัย (E7)</option>
+          <option value="พระโขนง" ${_bts=='พระโขนง'?'selected':''}>พระโขนง (E8)</option>
+          <option value="อ่อนนุช" ${_bts=='อ่อนนุช'?'selected':''}>อ่อนนุช (E9)</option>
+          <option value="บางจาก" ${_bts=='บางจาก'?'selected':''}>บางจาก (E10)</option>
+          <option value="ปุณณวิถี" ${_bts=='ปุณณวิถี'?'selected':''}>ปุณณวิถี (E11)</option>
+          <option value="อุดมสุข" ${_bts=='อุดมสุข'?'selected':''}>อุดมสุข (E12)</option>
+          <option value="บางนา" ${_bts=='บางนา'?'selected':''}>บางนา (E13)</option>
+          <option value="แบริ่ง" ${_bts=='แบริ่ง'?'selected':''}>แบริ่ง (E14)</option>
+          <option value="สำโรง BTS" ${_bts=='สำโรง BTS'?'selected':''}>สำโรง (E15)</option>
+          <option value="ปู่เจ้า" ${_bts=='ปู่เจ้า'?'selected':''}>ปู่เจ้า (E16)</option>
+          <option value="ช้างเอราวัณ" ${_bts=='ช้างเอราวัณ'?'selected':''}>ช้างเอราวัณ (E17)</option>
+          <option value="โรงเรียนนายเรือ" ${_bts=='โรงเรียนนายเรือ'?'selected':''}>โรงเรียนนายเรือ (E18)</option>
+          <option value="ปากน้ำ BTS" ${_bts=='ปากน้ำ BTS'?'selected':''}>ปากน้ำ (E19)</option>
+          <option value="ศรีนครินทร์ BTS" ${_bts=='ศรีนครินทร์ BTS'?'selected':''}>ศรีนครินทร์ (E20)</option>
+          <option value="แพรกษา" ${_bts=='แพรกษา'?'selected':''}>แพรกษา (E21)</option>
+          <option value="สายลวด" ${_bts=='สายลวด'?'selected':''}>สายลวด (E22)</option>
+          <option value="เคหะฯ" ${_bts=='เคหะฯ'?'selected':''}>เคหะฯ (E23)</option>
+          </optgroup>
+          <optgroup label="🟢 BTS สายสีลม (W1, S1–S12)">
+          <option value="สนามกีฬาแห่งชาติ" ${_bts=='สนามกีฬาแห่งชาติ'?'selected':''}>สนามกีฬาแห่งชาติ (W1)</option>
+          <option value="ราชดำริ" ${_bts=='ราชดำริ'?'selected':''}>ราชดำริ (S1)</option>
+          <option value="ศาลาแดง" ${_bts=='ศาลาแดง'?'selected':''}>ศาลาแดง (S2)</option>
+          <option value="ช่องนนทรี" ${_bts=='ช่องนนทรี'?'selected':''}>ช่องนนทรี (S3)</option>
+          <option value="เซนต์หลุยส์" ${_bts=='เซนต์หลุยส์'?'selected':''}>เซนต์หลุยส์ (S4)</option>
+          <option value="สุรศักดิ์" ${_bts=='สุรศักดิ์'?'selected':''}>สุรศักดิ์ (S5)</option>
+          <option value="สะพานตากสิน" ${_bts=='สะพานตากสิน'?'selected':''}>สะพานตากสิน (S6)</option>
+          <option value="กรุงธนบุรี BTS" ${_bts=='กรุงธนบุรี BTS'?'selected':''}>กรุงธนบุรี (S7)</option>
+          <option value="วงเวียนใหญ่" ${_bts=='วงเวียนใหญ่'?'selected':''}>วงเวียนใหญ่ (S8)</option>
+          <option value="โพธิ์นิมิตร" ${_bts=='โพธิ์นิมิตร'?'selected':''}>โพธิ์นิมิตร (S9)</option>
+          <option value="ตลาดพลู" ${_bts=='ตลาดพลู'?'selected':''}>ตลาดพลู (S10)</option>
+          <option value="วุฒากาศ" ${_bts=='วุฒากาศ'?'selected':''}>วุฒากาศ (S11)</option>
+          <option value="บางหว้า BTS" ${_bts=='บางหว้า BTS'?'selected':''}>บางหว้า (S12)</option>
+          </optgroup>
+          <optgroup label="🟤 BTS สายสีทอง (G1–G3)">
+          <option value="กรุงธนบุรี สีทอง" ${_bts=='กรุงธนบุรี สีทอง'?'selected':''}>กรุงธนบุรี (G1)</option>
+          <option value="เจริญนคร" ${_bts=='เจริญนคร'?'selected':''}>เจริญนคร (G2)</option>
+          <option value="คลองสาน" ${_bts=='คลองสาน'?'selected':''}>คลองสาน (G3)</option>
+          </optgroup>
+          <optgroup label="🔴 SRT สายสีแดงเข้ม — รังสิต (RN01–RN10)">
+          <option value="กลางกรุงเทพอภิวัฒน์ SRT" ${_bts=='กลางกรุงเทพอภิวัฒน์ SRT'?'selected':''}>กลางกรุงเทพอภิวัฒน์ (RN01)</option>
+          <option value="จตุจักร SRT" ${_bts=='จตุจักร SRT'?'selected':''}>จตุจักร (RN02)</option>
+          <option value="วัดเสมียนนารี SRT" ${_bts=='วัดเสมียนนารี SRT'?'selected':''}>วัดเสมียนนารี (RN03)</option>
+          <option value="บางเขน SRT" ${_bts=='บางเขน SRT'?'selected':''}>บางเขน (RN04)</option>
+          <option value="ทุ่งสองห้อง SRT" ${_bts=='ทุ่งสองห้อง SRT'?'selected':''}>ทุ่งสองห้อง (RN05)</option>
+          <option value="หลักสี่ SRT" ${_bts=='หลักสี่ SRT'?'selected':''}>หลักสี่ (RN06)</option>
+          <option value="การเคหะ SRT" ${_bts=='การเคหะ SRT'?'selected':''}>การเคหะ (RN07)</option>
+          <option value="ดอนเมือง SRT" ${_bts=='ดอนเมือง SRT'?'selected':''}>ดอนเมือง (RN08)</option>
+          <option value="หลักหก SRT" ${_bts=='หลักหก SRT'?'selected':''}>หลักหก (RN09)</option>
+          <option value="รังสิต SRT" ${_bts=='รังสิต SRT'?'selected':''}>รังสิต (RN10)</option>
+          </optgroup>
+          <optgroup label="🔴 SRT สายสีแดงอ่อน — ตลิ่งชัน (RW01–RW06)">
+          <option value="กลางกรุงเทพอภิวัฒน์ SRT ตลิ่งชัน" ${_bts=='กลางกรุงเทพอภิวัฒน์ SRT ตลิ่งชัน'?'selected':''}>กลางกรุงเทพอภิวัฒน์ (RW01)</option>
+          <option value="บางซ่อน SRT" ${_bts=='บางซ่อน SRT'?'selected':''}>บางซ่อน (RW02)</option>
+          <option value="บางบำหรุ SRT" ${_bts=='บางบำหรุ SRT'?'selected':''}>บางบำหรุ (RW05)</option>
+          <option value="ตลิ่งชัน SRT" ${_bts=='ตลิ่งชัน SRT'?'selected':''}>ตลิ่งชัน (RW06)</option>
+          </optgroup>
+          <optgroup label="✈️ Airport Rail Link (A1–A8)">
+          <option value="สุวรรณภูมิ ARL" ${_bts=='สุวรรณภูมิ ARL'?'selected':''}>สุวรรณภูมิ (A1)</option>
+          <option value="ลาดกระบัง ARL" ${_bts=='ลาดกระบัง ARL'?'selected':''}>ลาดกระบัง (A2)</option>
+          <option value="บ้านทับช้าง ARL" ${_bts=='บ้านทับช้าง ARL'?'selected':''}>บ้านทับช้าง (A3)</option>
+          <option value="หัวหมาก ARL" ${_bts=='หัวหมาก ARL'?'selected':''}>หัวหมาก (A4)</option>
+          <option value="รามคำแหง ARL" ${_bts=='รามคำแหง ARL'?'selected':''}>รามคำแหง (A5)</option>
+          <option value="มักกะสัน ARL" ${_bts=='มักกะสัน ARL'?'selected':''}>มักกะสัน (A6)</option>
+          <option value="ราชปรารภ ARL" ${_bts=='ราชปรารภ ARL'?'selected':''}>ราชปรารภ (A7)</option>
+          <option value="พญาไท ARL" ${_bts=='พญาไท ARL'?'selected':''}>พญาไท (A8)</option>
           </optgroup>
         </select>
-      </div>
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4"><i class="fas fa-subway" style="color:#003399"></i> ใกล้สถานี MRT</div>
+          <select id="mef-mrt" style="width:100%;padding:8px 10px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;background:#fff">
+          <option value="">ทุกสถานี MRT/BEM</option>
+          <optgroup label="🔵 สายน้ำเงิน (วงแหวน)">
+          <option value="ท่าพระ" ${_mrt=='ท่าพระ'?'selected':''}>ท่าพระ (BL01)</option>
+          <option value="บางไผ่" ${_mrt=='บางไผ่'?'selected':''}>บางไผ่ (BL02)</option>
+          <option value="บางหว้า MRT" ${_mrt=='บางหว้า MRT'?'selected':''}>บางหว้า (BL34)</option>
+          <option value="ภาษีเจริญ" ${_mrt=='ภาษีเจริญ'?'selected':''}>ภาษีเจริญ (BL36)</option>
+          <option value="บางแค" ${_mrt=='บางแค'?'selected':''}>บางแค (BL37)</option>
+          <option value="หลักสอง" ${_mrt=='หลักสอง'?'selected':''}>หลักสอง (BL38)</option>
+          <option value="อิสรภาพ" ${_mrt=='อิสรภาพ'?'selected':''}>อิสรภาพ (BL03)</option>
+          <option value="ท่าพระ-สนามไชย" ${_mrt=='ท่าพระ-สนามไชย'?'selected':''}>สนามไชย (BL04)</option>
+          <option value="อ้อมน้อย" ${_mrt=='อ้อมน้อย'?'selected':''}>อ้อมน้อย</option>
+          <option value="สามย่าน" ${_mrt=='สามย่าน'?'selected':''}>สามย่าน (BL26)</option>
+          <option value="สีลม MRT" ${_mrt=='สีลม MRT'?'selected':''}>สีลม (BL25)</option>
+          <option value="ลุมพินี" ${_mrt=='ลุมพินี'?'selected':''}>ลุมพินี (BL24)</option>
+          <option value="คลองเตย" ${_mrt=='คลองเตย'?'selected':''}>คลองเตย (BL23)</option>
+          <option value="สุขุมวิท MRT" ${_mrt=='สุขุมวิท MRT'?'selected':''}>สุขุมวิท (BL22)</option>
+          <option value="เพชรบุรี" ${_mrt=='เพชรบุรี'?'selected':''}>เพชรบุรี (BL21)</option>
+          <option value="พระราม 9" ${_mrt=='พระราม 9'?'selected':''}>พระราม 9 (BL20)</option>
+          <option value="ศูนย์วัฒนธรรมฯ" ${_mrt=='ศูนย์วัฒนธรรมฯ'?'selected':''}>ศูนย์วัฒนธรรมฯ (BL19)</option>
+          <option value="ห้วยขวาง" ${_mrt=='ห้วยขวาง'?'selected':''}>ห้วยขวาง (BL18)</option>
+          <option value="สุทธิสาร" ${_mrt=='สุทธิสาร'?'selected':''}>สุทธิสาร (BL17)</option>
+          <option value="รัชดา" ${_mrt=='รัชดา'?'selected':''}>รัชดา (BL16)</option>
+          <option value="ลาดพร้าว MRT" ${_mrt=='ลาดพร้าว MRT'?'selected':''}>ลาดพร้าว (BL15)</option>
+          <option value="พหลโยธิน MRT" ${_mrt=='พหลโยธิน MRT'?'selected':''}>พหลโยธิน (BL14)</option>
+          <option value="จตุจักร MRT" ${_mrt=='จตุจักร MRT'?'selected':''}>จตุจักร (BL13)</option>
+          <option value="กำแพงเพชร" ${_mrt=='กำแพงเพชร'?'selected':''}>กำแพงเพชร (BL12)</option>
+          <option value="บางซื่อ" ${_mrt=='บางซื่อ'?'selected':''}>บางซื่อ (BL11)</option>
+          <option value="เตาปูน" ${_mrt=='เตาปูน'?'selected':''}>เตาปูน (BL10)</option>
+          <option value="บางโพ" ${_mrt=='บางโพ'?'selected':''}>บางโพ (BL09)</option>
+          <option value="บางอ้อ" ${_mrt=='บางอ้อ'?'selected':''}>บางอ้อ (BL08)</option>
+          <option value="บางพลัด" ${_mrt=='บางพลัด'?'selected':''}>บางพลัด (BL07)</option>
+          <option value="สิรินธร" ${_mrt=='สิรินธร'?'selected':''}>สิรินธร (BL06)</option>
+          <option value="บางยี่ขัน" ${_mrt=='บางยี่ขัน'?'selected':''}>บางยี่ขัน (BL05)</option>
+          </optgroup>
+          <optgroup label="🟣 MRT สายสีม่วง (PP01–PP16)">
+          <option value="คลองบางไผ่ MRT" ${_mrt=='คลองบางไผ่ MRT'?'selected':''}>คลองบางไผ่ (PP01)</option>
+          <option value="ตลาดบางใหญ่ MRT" ${_mrt=='ตลาดบางใหญ่ MRT'?'selected':''}>ตลาดบางใหญ่ (PP02)</option>
+          <option value="สามแยกบางใหญ่ MRT" ${_mrt=='สามแยกบางใหญ่ MRT'?'selected':''}>สามแยกบางใหญ่ (PP03)</option>
+          <option value="บางพลู MRT" ${_mrt=='บางพลู MRT'?'selected':''}>บางพลู (PP04)</option>
+          <option value="บางรักใหญ่ MRT" ${_mrt=='บางรักใหญ่ MRT'?'selected':''}>บางรักใหญ่ (PP05)</option>
+          <option value="บางรักน้อยท่าอิฐ MRT" ${_mrt=='บางรักน้อยท่าอิฐ MRT'?'selected':''}>บางรักน้อยท่าอิฐ (PP06)</option>
+          <option value="ไทรม้า MRT" ${_mrt=='ไทรม้า MRT'?'selected':''}>ไทรม้า (PP07)</option>
+          <option value="สะพานพระนั่งเกล้า MRT" ${_mrt=='สะพานพระนั่งเกล้า MRT'?'selected':''}>สะพานพระนั่งเกล้า (PP08)</option>
+          <option value="แยกนนทบุรี 1 MRT" ${_mrt=='แยกนนทบุรี 1 MRT'?'selected':''}>แยกนนทบุรี 1 (PP09)</option>
+          <option value="บางกระสอ MRT" ${_mrt=='บางกระสอ MRT'?'selected':''}>บางกระสอ (PP10)</option>
+          <option value="ศูนย์ราชการนนทบุรี MRT" ${_mrt=='ศูนย์ราชการนนทบุรี MRT'?'selected':''}>ศูนย์ราชการนนทบุรี (PP11)</option>
+          <option value="กระทรวงสาธารณสุข MRT" ${_mrt=='กระทรวงสาธารณสุข MRT'?'selected':''}>กระทรวงสาธารณสุข (PP12)</option>
+          <option value="แยกติวานนท์ MRT" ${_mrt=='แยกติวานนท์ MRT'?'selected':''}>แยกติวานนท์ (PP13)</option>
+          <option value="วงศ์สว่าง MRT" ${_mrt=='วงศ์สว่าง MRT'?'selected':''}>วงศ์สว่าง (PP14)</option>
+          <option value="บางซ่อน MRT สีม่วง" ${_mrt=='บางซ่อน MRT สีม่วง'?'selected':''}>บางซ่อน (PP15)</option>
+          <option value="เตาปูน MRT สีม่วง" ${_mrt=='เตาปูน MRT สีม่วง'?'selected':''}>เตาปูน (PP16)</option>
+          </optgroup>
+          <optgroup label="🟡 MRT สายสีเหลือง (YL01–YL23)">
+          <option value="ลาดพร้าว MRT สีเหลือง" ${_mrt=='ลาดพร้าว MRT สีเหลือง'?'selected':''}>ลาดพร้าว (YL01)</option>
+          <option value="ภาวนา MRT" ${_mrt=='ภาวนา MRT'?'selected':''}>ภาวนา (YL02)</option>
+          <option value="โชคชัย 4 MRT" ${_mrt=='โชคชัย 4 MRT'?'selected':''}>โชคชัย 4 (YL03)</option>
+          <option value="ลาดพร้าว 71 MRT" ${_mrt=='ลาดพร้าว 71 MRT'?'selected':''}>ลาดพร้าว 71 (YL04)</option>
+          <option value="ลาดพร้าว 83 MRT" ${_mrt=='ลาดพร้าว 83 MRT'?'selected':''}>ลาดพร้าว 83 (YL05)</option>
+          <option value="มหาดไทย MRT" ${_mrt=='มหาดไทย MRT'?'selected':''}>มหาดไทย (YL06)</option>
+          <option value="ลาดพร้าว 101 MRT" ${_mrt=='ลาดพร้าว 101 MRT'?'selected':''}>ลาดพร้าว 101 (YL07)</option>
+          <option value="บางกะปิ MRT" ${_mrt=='บางกะปิ MRT'?'selected':''}>บางกะปิ (YL08)</option>
+          <option value="แยกลำสาลี MRT" ${_mrt=='แยกลำสาลี MRT'?'selected':''}>แยกลำสาลี (YL09)</option>
+          <option value="ศรีกรีฑา MRT" ${_mrt=='ศรีกรีฑา MRT'?'selected':''}>ศรีกรีฑา (YL10)</option>
+          <option value="หัวหมาก MRT สีเหลือง" ${_mrt=='หัวหมาก MRT สีเหลือง'?'selected':''}>หัวหมาก (YL11)</option>
+          <option value="กลันตัน MRT" ${_mrt=='กลันตัน MRT'?'selected':''}>กลันตัน (YL12)</option>
+          <option value="ศรีนุช MRT" ${_mrt=='ศรีนุช MRT'?'selected':''}>ศรีนุช (YL13)</option>
+          <option value="ศรีนครินทร์ 38 MRT" ${_mrt=='ศรีนครินทร์ 38 MRT'?'selected':''}>ศรีนครินทร์ 38 (YL14)</option>
+          <option value="สวนหลวง ร.9 MRT" ${_mrt=='สวนหลวง ร.9 MRT'?'selected':''}>สวนหลวง ร.9 (YL15)</option>
+          <option value="ศรีอุดม MRT" ${_mrt=='ศรีอุดม MRT'?'selected':''}>ศรีอุดม (YL16)</option>
+          <option value="ศรีเอี่ยม MRT" ${_mrt=='ศรีเอี่ยม MRT'?'selected':''}>ศรีเอี่ยม (YL17)</option>
+          <option value="ศรีลาซาล MRT" ${_mrt=='ศรีลาซาล MRT'?'selected':''}>ศรีลาซาล (YL18)</option>
+          <option value="ศรีแบริ่ง MRT" ${_mrt=='ศรีแบริ่ง MRT'?'selected':''}>ศรีแบริ่ง (YL19)</option>
+          <option value="ศรีด่าน MRT" ${_mrt=='ศรีด่าน MRT'?'selected':''}>ศรีด่าน (YL20)</option>
+          <option value="ศรีเทพา MRT" ${_mrt=='ศรีเทพา MRT'?'selected':''}>ศรีเทพา (YL21)</option>
+          <option value="ทิพวัล MRT" ${_mrt=='ทิพวัล MRT'?'selected':''}>ทิพวัล (YL22)</option>
+          <option value="สำโรง MRT สีเหลือง" ${_mrt=='สำโรง MRT สีเหลือง'?'selected':''}>สำโรง (YL23)</option>
+          </optgroup>
+          <optgroup label="🩷 MRT สายสีชมพู (PK01–PK30)">
+          <option value="ศูนย์ราชการนนทบุรี MRT สีชมพู" ${_mrt=='ศูนย์ราชการนนทบุรี MRT สีชมพู'?'selected':''}>ศูนย์ราชการนนทบุรี (PK01)</option>
+          <option value="แคราย MRT" ${_mrt=='แคราย MRT'?'selected':''}>แคราย (PK02)</option>
+          <option value="สนามบินน้ำ MRT" ${_mrt=='สนามบินน้ำ MRT'?'selected':''}>สนามบินน้ำ (PK03)</option>
+          <option value="สามัคคี MRT" ${_mrt=='สามัคคี MRT'?'selected':''}>สามัคคี (PK04)</option>
+          <option value="กรมชลประทาน MRT" ${_mrt=='กรมชลประทาน MRT'?'selected':''}>กรมชลประทาน (PK05)</option>
+          <option value="แยกปากเกร็ด MRT" ${_mrt=='แยกปากเกร็ด MRT'?'selected':''}>แยกปากเกร็ด (PK06)</option>
+          <option value="เลี่ยงเมืองปากเกร็ด MRT" ${_mrt=='เลี่ยงเมืองปากเกร็ด MRT'?'selected':''}>เลี่ยงเมืองปากเกร็ด (PK07)</option>
+          <option value="แจ้งวัฒนะ-ปากเกร็ด 28 MRT" ${_mrt=='แจ้งวัฒนะ-ปากเกร็ด 28 MRT'?'selected':''}>แจ้งวัฒนะ-ปากเกร็ด 28 (PK08)</option>
+          <option value="ศรีรัช MRT" ${_mrt=='ศรีรัช MRT'?'selected':''}>ศรีรัช (PK09)</option>
+          <option value="เมืองทองธานี MRT" ${_mrt=='เมืองทองธานี MRT'?'selected':''}>เมืองทองธานี (PK10)</option>
+          <option value="แจ้งวัฒนะ 14 MRT" ${_mrt=='แจ้งวัฒนะ 14 MRT'?'selected':''}>แจ้งวัฒนะ 14 (PK11)</option>
+          <option value="ศูนย์ราชการเฉลิมพระเกียรติ MRT" ${_mrt=='ศูนย์ราชการเฉลิมพระเกียรติ MRT'?'selected':''}>ศูนย์ราชการเฉลิมพระเกียรติ (PK12)</option>
+          <option value="โทรคมนาคมแห่งชาติ MRT" ${_mrt=='โทรคมนาคมแห่งชาติ MRT'?'selected':''}>โทรคมนาคมแห่งชาติ (PK13)</option>
+          <option value="หลักสี่ MRT สีชมพู" ${_mrt=='หลักสี่ MRT สีชมพู'?'selected':''}>หลักสี่ (PK14)</option>
+          <option value="ราชภัฏพระนคร MRT" ${_mrt=='ราชภัฏพระนคร MRT'?'selected':''}>ราชภัฏพระนคร (PK15)</option>
+          <option value="วัดพระศรีมหาธาตุ MRT สีชมพู" ${_mrt=='วัดพระศรีมหาธาตุ MRT สีชมพู'?'selected':''}>วัดพระศรีมหาธาตุ (PK16)</option>
+          <option value="รามอินทรา 3 MRT" ${_mrt=='รามอินทรา 3 MRT'?'selected':''}>รามอินทรา 3 (PK17)</option>
+          <option value="ลาดปลาเค้า MRT" ${_mrt=='ลาดปลาเค้า MRT'?'selected':''}>ลาดปลาเค้า (PK18)</option>
+          <option value="รามอินทรา กม.4 MRT" ${_mrt=='รามอินทรา กม.4 MRT'?'selected':''}>รามอินทรา กม.4 (PK19)</option>
+          <option value="มัยลาภ MRT" ${_mrt=='มัยลาภ MRT'?'selected':''}>มัยลาภ (PK20)</option>
+          <option value="วัชรพล MRT" ${_mrt=='วัชรพล MRT'?'selected':''}>วัชรพล (PK21)</option>
+          <option value="รามอินทรา กม.6 MRT" ${_mrt=='รามอินทรา กม.6 MRT'?'selected':''}>รามอินทรา กม.6 (PK22)</option>
+          <option value="คู้บอน MRT" ${_mrt=='คู้บอน MRT'?'selected':''}>คู้บอน (PK23)</option>
+          <option value="รามอินทรา กม.9 MRT" ${_mrt=='รามอินทรา กม.9 MRT'?'selected':''}>รามอินทรา กม.9 (PK24)</option>
+          <option value="วงแหวนรามอินทรา MRT" ${_mrt=='วงแหวนรามอินทรา MRT'?'selected':''}>วงแหวนรามอินทรา (PK25)</option>
+          <option value="นพรัตน์ MRT" ${_mrt=='นพรัตน์ MRT'?'selected':''}>นพรัตน์ (PK26)</option>
+          <option value="บางชัน MRT" ${_mrt=='บางชัน MRT'?'selected':''}>บางชัน (PK27)</option>
+          <option value="เศรษฐบุตรบำเพ็ญ MRT" ${_mrt=='เศรษฐบุตรบำเพ็ญ MRT'?'selected':''}>เศรษฐบุตรบำเพ็ญ (PK28)</option>
+          <option value="ตลาดมีนบุรี MRT" ${_mrt=='ตลาดมีนบุรี MRT'?'selected':''}>ตลาดมีนบุรี (PK29)</option>
+          <option value="มีนบุรี MRT สีชมพู" ${_mrt=='มีนบุรี MRT สีชมพู'?'selected':''}>มีนบุรี (PK30)</option>
+          </optgroup>
+        </select>
+        </div>
+      </div><!-- end 2-col: BTS + MRT -->
 
-      <!-- ใกล้มหาวิทยาลัย -->
+      <!-- ใกล้มหาวิทยาลัย (full width) -->
       <div style="margin-bottom:16px">
         <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4"><i class="fas fa-university" style="color:#7c3aed"></i> ใกล้มหาวิทยาลัย</div>
         <select id="mef-uni" style="width:100%;padding:8px 10px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;background:#fff">
-          <option value="">ทุกสถานี MRT/BEM</option>
-          ${['จุฬาลงกรณ์มหาวิทยาลัย','มหาวิทยาลัยธรรมศาสตร์','มหาวิทยาลัยมหิดล','มหาวิทยาลัยเกษตรศาสตร์','มหาวิทยาลัยรามคำแหง','สถาบันเทคโนโลยีพระจอมเกล้า','มหาวิทยาลัยกรุงเทพ','มหาวิทยาลัยอัสสัมชัญ'].map(u=>`<option value="${u}" ${_uni===u?'selected':''}>${u}</option>`).join('')}
+          <option value="">ทุกมหาวิทยาลัย</option>
+          <optgroup label="กรุงเทพฯ และปริมณฑล">
+          <option value="จุฬาลงกรณ์" ${_uni=='จุฬาลงกรณ์'?'selected':''}>จุฬาลงกรณ์มหาวิทยาลัย</option>
+          <option value="ธรรมศาสตร์" ${_uni=='ธรรมศาสตร์'?'selected':''}>มหาวิทยาลัยธรรมศาสตร์</option>
+          <option value="เกษตรศาสตร์" ${_uni=='เกษตรศาสตร์'?'selected':''}>มหาวิทยาลัยเกษตรศาสตร์</option>
+          <option value="มหิดล" ${_uni=='มหิดล'?'selected':''}>มหาวิทยาลัยมหิดล</option>
+          <option value="ศิลปากร" ${_uni=='ศิลปากร'?'selected':''}>มหาวิทยาลัยศิลปากร</option>
+          <option value="สวนดุสิต" ${_uni=='สวนดุสิต'?'selected':''}>มหาวิทยาลัยสวนดุสิต</option>
+          <option value="กรุงเทพ" ${_uni=='กรุงเทพ'?'selected':''}>มหาวิทยาลัยกรุงเทพ</option>
+          <option value="รังสิต" ${_uni=='รังสิต'?'selected':''}>มหาวิทยาลัยรังสิต</option>
+          <option value="ABAC" ${_uni=='ABAC'?'selected':''}>มหาวิทยาลัยอัสสัมชัญ (ABAC)</option>
+          <option value="ศรีนครินทรวิโรฒ" ${_uni=='ศรีนครินทรวิโรฒ'?'selected':''}>มหาวิทยาลัยศรีนครินทรวิโรฒ (มศว)</option>
+          <option value="รามคำแหง" ${_uni=='รามคำแหง'?'selected':''}>มหาวิทยาลัยรามคำแหง</option>
+          <option value="ราชภัฏจันทรเกษม" ${_uni=='ราชภัฏจันทรเกษม'?'selected':''}>มรภ.จันทรเกษม</option>
+          <option value="ราชภัฏพระนคร" ${_uni=='ราชภัฏพระนคร'?'selected':''}>มรภ.พระนคร</option>
+          <option value="ราชภัฏธนบุรี" ${_uni=='ราชภัฏธนบุรี'?'selected':''}>มรภ.ธนบุรี</option>
+          <option value="เทคโนโลยีพระจอมเกล้าพระนครเหนือ" ${_uni=='เทคโนโลยีพระจอมเกล้าพระนครเหนือ'?'selected':''}>มจพ. (พระจอมเกล้าพระนครเหนือ)</option>
+          <option value="เทคโนโลยีพระจอมเกล้าธนบุรี" ${_uni=='เทคโนโลยีพระจอมเกล้าธนบุรี'?'selected':''}>มจธ. (พระจอมเกล้าธนบุรี)</option>
+          <option value="เทคโนโลยีพระจอมเกล้าลาดกระบัง" ${_uni=='เทคโนโลยีพระจอมเกล้าลาดกระบัง'?'selected':''}>สจล. (ลาดกระบัง)</option>
+          <option value="นิด้า" ${_uni=='นิด้า'?'selected':''}>สถาบันบัณฑิตพัฒนบริหารศาสตร์ (NIDA)</option>
+          <option value="หอการค้าไทย" ${_uni=='หอการค้าไทย'?'selected':''}>มหาวิทยาลัยหอการค้าไทย</option>
+          <option value="เอแบค" ${_uni=='เอแบค'?'selected':''}>มหาวิทยาลัยเอแบค</option>
+          </optgroup>
+          <optgroup label="ต่างจังหวัด">
+          <option value="เชียงใหม่" ${_uni=='เชียงใหม่'?'selected':''}>มหาวิทยาลัยเชียงใหม่</option>
+          <option value="เชียงราย" ${_uni=='เชียงราย'?'selected':''}>มหาวิทยาลัยเชียงราย</option>
+          <option value="นเรศวร" ${_uni=='นเรศวร'?'selected':''}>มหาวิทยาลัยนเรศวร</option>
+          <option value="พะเยา" ${_uni=='พะเยา'?'selected':''}>มหาวิทยาลัยพะเยา</option>
+          <option value="ขอนแก่น" ${_uni=='ขอนแก่น'?'selected':''}>มหาวิทยาลัยขอนแก่น</option>
+          <option value="อุบลราชธานี" ${_uni=='อุบลราชธานี'?'selected':''}>มหาวิทยาลัยอุบลราชธานี</option>
+          <option value="มหาสารคาม" ${_uni=='มหาสารคาม'?'selected':''}>มหาวิทยาลัยมหาสารคาม</option>
+          <option value="สงขลานครินทร์" ${_uni=='สงขลานครินทร์'?'selected':''}>มหาวิทยาลัยสงขลานครินทร์</option>
+          <option value="วลัยลักษณ์" ${_uni=='วลัยลักษณ์'?'selected':''}>มหาวิทยาลัยวลัยลักษณ์</option>
+          <option value="ภูเก็ต" ${_uni=='ภูเก็ต'?'selected':''}>มหาวิทยาลัยสงขลานครินทร์ วิทยาเขตภูเก็ต</option>
+          <option value="บูรพา" ${_uni=='บูรพา'?'selected':''}>มหาวิทยาลัยบูรพา (ชลบุรี)</option>
+          </optgroup>
         </select>
       </div>
 
-      <!-- ห้องนอน/ห้องน้ำ -->
+      <!-- ห้องนอน / ห้องน้ำ (2 col) — checkbox เหมือน adv-filter-panel -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
         <div>
           <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4">ห้องนอน</div>
-          <select id="mef-min-bed" style="width:100%;padding:8px 10px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;background:#fff">
-            <option value="">ไม่จำกัด</option>
-            <option value="1" ${_minBed=='1'?'selected':''}>1 ห้อง+</option>
-            <option value="2" ${_minBed=='2'?'selected':''}>2 ห้อง+</option>
-            <option value="3" ${_minBed=='3'?'selected':''}>3 ห้อง+</option>
-            <option value="4" ${_minBed=='4'?'selected':''}>4 ห้อง+</option>
-            <option value="5" ${_minBed=='5'?'selected':''}>5 ห้อง+</option>
-          </select>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" value="1" class="mef-bed" ${(_minBed=='1')?'checked':''} style="accent-color:var(--p)"> 1 ห้อง</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" value="2" class="mef-bed" ${(_minBed=='2')?'checked':''} style="accent-color:var(--p)"> 2 ห้อง</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" value="3" class="mef-bed" ${(_minBed=='3')?'checked':''} style="accent-color:var(--p)"> 3 ห้อง</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" value="4" class="mef-bed" ${(_minBed=='4')?'checked':''} style="accent-color:var(--p)"> 4+ ห้อง</label>
+          </div>
         </div>
         <div>
           <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4">ห้องน้ำ</div>
-          <select id="mef-min-bath" style="width:100%;padding:8px 10px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;background:#fff">
-            <option value="">ไม่จำกัด</option>
-            <option value="1" ${_minBath=='1'?'selected':''}>1 ห้อง+</option>
-            <option value="2" ${_minBath=='2'?'selected':''}>2 ห้อง+</option>
-            <option value="3" ${_minBath=='3'?'selected':''}>3 ห้อง+</option>
-          </select>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" value="1" class="mef-bath" ${(_minBath=='1')?'checked':''} style="accent-color:var(--p)"> 1 ห้อง</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" value="2" class="mef-bath" ${(_minBath=='2')?'checked':''} style="accent-color:var(--p)"> 2 ห้อง</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" value="3" class="mef-bath" ${(_minBath=='3')?'checked':''} style="accent-color:var(--p)"> 3 ห้อง</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" value="4" class="mef-bath" ${(_minBath=='4')?'checked':''} style="accent-color:var(--p)"> 4+ ห้อง</label>
+          </div>
         </div>
       </div>
 
-      <!-- พื้นที่ -->
-      <div style="margin-bottom:16px">
-        <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4"><i class="fas fa-expand-arrows-alt" style="color:var(--a)"></i> พื้นที่ใช้สอย (ตร.ม.)</div>
-        <select id="mef-min-area" style="width:100%;padding:8px 10px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;background:#fff">
-          <option value="">ไม่จำกัด</option>
-          <option value="25" ${_minArea=='25'?'selected':''}>25 ตร.ม.+</option>
-          <option value="50" ${_minArea=='50'?'selected':''}>50 ตร.ม.+</option>
-          <option value="100" ${_minArea=='100'?'selected':''}>100 ตร.ม.+</option>
-          <option value="200" ${_minArea=='200'?'selected':''}>200 ตร.ม.+</option>
-          <option value="500" ${_minArea=='500'?'selected':''}>500 ตร.ม.+</option>
-        </select>
+      <!-- ที่จอดรถ / เฟอร์นิเจอร์ (2 col) — checkbox เหมือน adv-filter-panel -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+        <div>
+          <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4">ที่จอดรถ</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" value="1" class="mef-park" ${((_ef.minPark||'')=='1')?'checked':''} style="accent-color:var(--p)"> 1 คัน</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" value="2" class="mef-park" ${((_ef.minPark||'')=='2')?'checked':''} style="accent-color:var(--p)"> 2 คัน</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" value="3" class="mef-park" ${((_ef.minPark||'')=='3')?'checked':''} style="accent-color:var(--p)"> 3+ คัน</label>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4">เฟอร์นิเจอร์</div>
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" value="full" id="mef-furn-full" ${_furniture==='full'?'checked':''} style="accent-color:var(--p)"> เฟอร์นิเจอร์ครบ</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" value="partial" id="mef-furn-part" ${_furniture==='partial'?'checked':''} style="accent-color:var(--p)"> เฟอร์นิเจอร์บางส่วน</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" value="none" id="mef-furn-none" ${_furniture==='none'?'checked':''} style="accent-color:var(--p)"> ไม่มีเฟอร์นิเจอร์</label>
+          </div>
+        </div>
       </div>
 
-      <!-- สิ่งอำนวยความสะดวก -->
+      <!-- การเลี้ยงสัตว์ (full width) -->
+      <div style="margin-bottom:16px">
+        <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4"><i class="fas fa-paw" style="color:#be185d"></i> การเลี้ยงสัตว์</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">
+          <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" id="mef-pets" ${_pets?'checked':''} style="accent-color:var(--p)"> อนุญาตเลี้ยงสัตว์</label>
+        </div>
+      </div>
+
+      <!-- เครื่องใช้ไฟฟ้า & สิ่งอำนวยความสะดวก (full width) — เหมือน adv-filter-panel -->
       <div style="margin-bottom:8px">
-        <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4"><i class="fas fa-concierge-bell" style="color:var(--a)"></i> สิ่งอำนวยความสะดวก</div>
-        <div style="display:flex;flex-wrap:wrap;gap:6px">${featureList.map(f=>`<label style="display:flex;align-items:center;gap:5px;background:${_features.includes(f)?'var(--lt)':'#f5f7fc'};border:1.5px solid ${_features.includes(f)?'var(--p)':'var(--bd)'};border-radius:20px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;color:${_features.includes(f)?'var(--p)':'var(--tx)'}"><input type="checkbox" value="${f}" ${_features.includes(f)?'checked':''} style="accent-color:var(--p);width:13px;height:13px"> ${f}</label>`).join('')}</div>
+        <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4">เครื่องใช้ไฟฟ้า &amp; สิ่งอำนวยความสะดวก</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">
+          ${['แอร์','ตู้เย็น','เครื่องซักผ้า','เครื่องทำน้ำอุ่น','โทรทัศน์','ไมโครเวฟ','เตาไฟฟ้า','ระบบรักษาความปลอดภัย'].map(f=>`<label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" value="${f}" class="mef-app" ${_features.includes(f)?'checked':''} style="accent-color:var(--p)"> ${f}</label>`).join('')}
+        </div>
       </div>
     </div>
     <!-- Footer -->
@@ -9339,20 +9861,36 @@ function modalExtraFilterClear(type) {
 function modalExtraFilterApply(type) {
   const sheet = document.getElementById('modal-extra-filter-sheet');
   if(!sheet) return;
-  const features = [...sheet.querySelectorAll('input[type=checkbox]:checked')].map(c=>c.value);
+  // อ่านค่า checkbox bed (ค่าสูงสุดที่ติ๊ก)
+  const _bedChecked = [...sheet.querySelectorAll('.mef-bed:checked')].map(c=>Number(c.value));
+  const _minBedVal = _bedChecked.length ? String(Math.min(..._bedChecked)) : '';
+  // อ่านค่า checkbox bath
+  const _bathChecked = [...sheet.querySelectorAll('.mef-bath:checked')].map(c=>Number(c.value));
+  const _minBathVal = _bathChecked.length ? String(Math.min(..._bathChecked)) : '';
+  // อ่านค่า checkbox park
+  const _parkChecked = [...sheet.querySelectorAll('.mef-park:checked')].map(c=>Number(c.value));
+  const _minParkVal = _parkChecked.length ? String(Math.min(..._parkChecked)) : '';
+  // อ่านค่า checkbox furniture (เฟอร์นิเจอร์ — single check wins first)
+  const _furnChecked = [...sheet.querySelectorAll('#mef-furn-full:checked,#mef-furn-part:checked,#mef-furn-none:checked')];
+  const _furnVal = _furnChecked.length ? _furnChecked[0].value : '';
+  // อ่าน features จาก mef-app checkboxes
+  const features = [...sheet.querySelectorAll('.mef-app:checked')].map(c=>c.value);
   const isBuy = sheet.querySelector('#mef-mode-buy')?.style.background.includes('var(--p)') ||
                 sheet.querySelector('#mef-mode-buy')?.style.background === 'var(--p)';
   window._modalExtraFilter = {
-    minBed:    sheet.querySelector('#mef-min-bed')?.value   || '',
-    minBath:   sheet.querySelector('#mef-min-bath')?.value  || '',
-    minArea:   sheet.querySelector('#mef-min-area')?.value  || '',
+    minBed:    _minBedVal,
+    minBath:   _minBathVal,
+    minArea:   '',
+    minPark:   _minParkVal,
     minPrice:  sheet.querySelector('#mef-price-min')?.value || '',
     maxPrice:  sheet.querySelector('#mef-price-max')?.value || '',
     priceMode: isBuy ? 'buy' : 'rent',
-    loc:       sheet.querySelector('#mef-loc')?.value       || '',
+    loc:       sheet.querySelector('#mef-loc')?.value       || sheet.querySelector('#mef-province')?.value || '',
     bts:       sheet.querySelector('#mef-bts')?.value       || '',
     mrt:       sheet.querySelector('#mef-mrt')?.value       || '',
     uni:       sheet.querySelector('#mef-uni')?.value       || '',
+    furniture: _furnVal,
+    pets:      sheet.querySelector('#mef-pets')?.checked    || false,
     features
   };
   sheet.remove();
@@ -10149,23 +10687,20 @@ function applyLocOpt(val) { /* disabled */ }
 function populateProvinceSelect() {
   const sp = $('s-prov');
   if(!sp) return;
-  const provinces77 = [
-    ['🏙️ กรุงเทพฯ & ปริมณฑล', ['กรุงเทพมหานคร','นนทบุรี','ปทุมธานี','สมุทรปราการ','สมุทรสาคร','นครปฐม']],
-    ['🌆 ภาคกลาง', ['พระนครศรีอยุธยา','อ่างทอง','สิงห์บุรี','ชัยนาท','ลพบุรี','สระบุรี','นครนายก','สระแก้ว','ฉะเชิงเทรา','สมุทรสงคราม','สุพรรณบุรี','กาญจนบุรี','ราชบุรี','เพชรบุรี','ประจวบคีรีขันธ์']],
-    ['🌊 ภาคตะวันออก', ['ชลบุรี','ระยอง','จันทบุรี','ตราด','ปราจีนบุรี','ฉะเชิงเทรา','สระแก้ว']],
-    ['🏔️ ภาคเหนือ', ['เชียงใหม่','เชียงราย','แม่ฮ่องสอน','ลำพูน','ลำปาง','พะเยา','แพร่','น่าน','อุตรดิตถ์','สุโขทัย','พิษณุโลก','พิจิตร','กำแพงเพชร','ตาก','นครสวรรค์','อุทัยธานี']],
-    ['🌾 ภาคอีสาน', ['นครราชสีมา','ขอนแก่น','อุดรธานี','อุบลราชธานี','บึงกาฬ','หนองคาย','หนองบัวลำภู','เลย','ชัยภูมิ','บุรีรัมย์','สุรินทร์','ศรีสะเกษ','ยโสธร','มุกดาหาร','อำนาจเจริญ','ร้อยเอ็ด','กาฬสินธุ์','มหาสารคาม','นครพนม','สกลนคร']],
-    ['🌴 ภาคใต้', ['สุราษฎร์ธานี','ภูเก็ต','กระบี่','พังงา','ระนอง','ชุมพร','นครศรีธรรมราช','พัทลุง','ตรัง','สตูล','สงขลา','ปัตตานี','ยะลา','นราธิวาส']],
+  const dbProvs = [...new Set(props.map(p=>p.province).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'th'));
+  // จังหวัดหลักที่มีอสังหาริมทรัพย์มากที่สุด (เรียงตามความนิยม)
+  const priorityProvs = [
+    'กรุงเทพฯ','กรุงเทพมหานคร',
+    'นนทบุรี','ปทุมธานี','สมุทรปราการ','สมุทรสาคร',
+    'เชียงใหม่','ชลบุรี','ภูเก็ต','ขอนแก่น',
+    'กาญจนบุรี','ระยอง','สุราษฎร์ธานี','ประจวบคีรีขันธ์',
+    'พระนครศรีอยุธยา','นครราชสีมา','ราชบุรี','เพชรบุรี',
   ];
-  let html = '<option value="">ทุกจังหวัด</option>';
-  for(const [region, provList] of provinces77){
-    html += `<optgroup label="${region}">`;
-    for(const p of provList){
-      html += `<option value="${p}">${p}</option>`;
-    }
-    html += '</optgroup>';
-  }
-  sp.innerHTML = html;
+  // รวม db + priority แล้ว dedup
+  const allProvs = [...new Set([...dbProvs, ...priorityProvs])]
+    .filter(Boolean)
+    .sort((a,b)=>a.localeCompare(b,'th'));
+  sp.innerHTML = '<option value="">ทุกทำเล</option>' + allProvs.map(p=>`<option value="${p}">${p}</option>`).join('');
 }
 
 function debounce(fn, ms) { let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a), ms); }; }
@@ -11951,7 +12486,7 @@ const UI_TEXT = {
     /* search form */
     'sf.kw.label':'คำค้นหา','sf.kw.ph':'ชื่อโครงการ ทำเล...',
     'sf.type.label':'ประเภท','sf.type.all':'ทุกประเภท',
-    'sf.prov.label':'จังหวัด','sf.prov.all':'ทุกจังหวัด',
+    'sf.prov.label':'จังหวัด / ทำเล','sf.prov.all':'ทุกทำเล',
     'sf.min.label':'ราคาต่ำสุด','sf.max.label':'ราคาสูงสุด',
     'sf.btn':'ค้นหา','sf.btn.reset':'รีเซ็ต',
     /* quick search bar */
@@ -12078,7 +12613,8 @@ const UI_TEXT = {
     /* advanced filter panel */
     'af.title':'Filter เพิ่มเติม','af.btn.label':'Filter เพิ่มเติม',
     'af.sec.price':'ช่วงราคา (บาท)','af.price.min':'ราคาต่ำสุด','af.price.max':'ราคาสูงสุด (ไม่จำกัด)',
-    'af.sec.prov':'ทำเล / จังหวัด','af.prov.all':'ทุกจังหวัด',
+    'af.sec.popular':'ทำเลยอดนิยม',
+    'af.sec.prov':'จังหวัด (ทั้ง 77 จังหวัด)','af.prov.all':'ทุกจังหวัด',
     'af.sec.bts':'ใกล้สถานี BTS','af.bts.all':'ทุกสถานี BTS/SRT/ARL',
     'af.sec.mrt':'ใกล้สถานี MRT','af.mrt.all':'ทุกสถานี MRT/BEM',
     'af.sec.uni':'ใกล้มหาวิทยาลัย','af.uni.all':'ทุกมหาวิทยาลัย',
@@ -12284,7 +12820,8 @@ const UI_TEXT = {
     /* advanced filter panel */
     'af.title':'Advanced Filter','af.btn.label':'Advanced Filter',
     'af.sec.price':'Price Range (THB)','af.price.min':'Min Price','af.price.max':'Max Price (No Limit)',
-    'af.sec.prov':'Area / Province','af.prov.all':'All Provinces',
+    'af.sec.popular':'Popular Areas',
+    'af.sec.prov':'Province (All 77)','af.prov.all':'All Provinces',
     'af.sec.bts':'Near BTS Station','af.bts.all':'All BTS/SRT/ARL Stations',
     'af.sec.mrt':'Near MRT Station','af.mrt.all':'All MRT/BEM Stations',
     'af.sec.uni':'Near University','af.uni.all':'All Universities',
@@ -12472,7 +13009,8 @@ const UI_TEXT = {
     /* advanced filter panel */
     'af.title':'高级筛选','af.btn.label':'高级筛选',
     'af.sec.price':'价格区间（铢）','af.price.min':'最低价格','af.price.max':'最高价格（不限）',
-    'af.sec.prov':'地区 / 省份','af.prov.all':'所有省份',
+    'af.sec.popular':'热门地区',
+    'af.sec.prov':'省份（全77省）','af.prov.all':'所有省份',
     'af.sec.bts':'邻近BTS站','af.bts.all':'所有BTS/SRT/ARL站',
     'af.sec.mrt':'邻近MRT站','af.mrt.all':'所有MRT/BEM站',
     'af.sec.uni':'邻近大学','af.uni.all':'所有大学',
@@ -12660,7 +13198,8 @@ const UI_TEXT = {
     /* advanced filter panel */
     'af.title':'詳細フィルター','af.btn.label':'詳細フィルター',
     'af.sec.price':'価格帯（バーツ）','af.price.min':'最低価格','af.price.max':'最高価格（上限なし）',
-    'af.sec.prov':'エリア / 県','af.prov.all':'全県',
+    'af.sec.popular':'人気エリア',
+    'af.sec.prov':'県（全77県）','af.prov.all':'全県',
     'af.sec.bts':'BTS駅近く','af.bts.all':'全BTS/SRT/ARL駅',
     'af.sec.mrt':'MRT駅近く','af.mrt.all':'全MRT/BEM駅',
     'af.sec.uni':'大学近く','af.uni.all':'全大学',
@@ -13132,19 +13671,20 @@ function applyLang(){
 
     // 4. Section titles inside panel body (order matches HTML)
     const sectionCfg = [
-      { key:'af.sec.price', icon:'fas fa-tag',           color:'var(--a)' },
-      { key:'af.sec.prov',  icon:'fas fa-map-marker-alt',color:'var(--p)' },
-      { key:'af.sec.bts',   icon:'fas fa-train',         color:'#009900' },
-      { key:'af.sec.mrt',   icon:'fas fa-subway',        color:'#003399' },
-      { key:'af.sec.uni',   icon:'fas fa-university',    color:'#6b21a8' },
-      { key:'af.sec.land',  icon:null },
-      { key:'af.sec.area',  icon:null },
-      { key:'af.sec.bed',   icon:null },
-      { key:'af.sec.bath',  icon:null },
-      { key:'af.sec.park',  icon:null },
-      { key:'af.sec.furn',  icon:null },
-      { key:'af.sec.pets',  icon:null },
-      { key:'af.sec.app',   icon:null },
+      { key:'af.sec.price',    icon:'fas fa-tag',           color:'var(--a)' },
+      { key:'af.sec.popular',  icon:'fas fa-fire',          color:'#ff4d6d' },
+      { key:'af.sec.prov',     icon:'fas fa-map-marker-alt',color:'var(--p)' },
+      { key:'af.sec.bts',      icon:'fas fa-train',         color:'#009900' },
+      { key:'af.sec.mrt',      icon:'fas fa-subway',        color:'#003399' },
+      { key:'af.sec.uni',      icon:'fas fa-university',    color:'#6b21a8' },
+      { key:'af.sec.land',     icon:null },
+      { key:'af.sec.area',     icon:null },
+      { key:'af.sec.bed',      icon:null },
+      { key:'af.sec.bath',     icon:null },
+      { key:'af.sec.park',     icon:null },
+      { key:'af.sec.furn',     icon:null },
+      { key:'af.sec.pets',     icon:null },
+      { key:'af.sec.app',      icon:null },
     ];
     ['.adv-fp-body','.adv-sheet-body'].forEach(sel=>{
       const body = document.querySelector(sel);
@@ -14251,19 +14791,50 @@ function closeSeoDrawer(){
 }
 
 function resetAdvFilter(){
+  // ── reset adv-filter-panel (desktop) ──
   document.querySelectorAll('.adv-fp-body input[type=range]').forEach(el=>{ el.value=el.getAttribute('value')||el.min; });
   document.querySelectorAll('.adv-fp-body input[type=checkbox]').forEach(el=>{ el.checked=false; });
   document.querySelectorAll('.adv-fp-body select').forEach(el=>{ el.value=''; });
+  // ── reset adv-sheet (mobile) ──
   document.querySelectorAll('.adv-sheet-body input[type=range]').forEach(el=>{ el.value=el.getAttribute('value')||el.min; });
   document.querySelectorAll('.adv-sheet-body input[type=checkbox]').forEach(el=>{ el.checked=false; });
   document.querySelectorAll('.adv-sheet-body select').forEach(el=>{ el.value=''; });
-  // Reset popular location
+  // ── reset popular-loc select ──
   var pl = document.getElementById('af-popular-loc'); if(pl) pl.value='';
-  // Reset price mode to buy
+  // ── reset price mode to buy ──
   switchAdvPriceMode('buy');
   advRangeUpdate();
+  // ── reset badges ──
   const badge=document.getElementById('adv-badge');
   if(badge){ badge.textContent='0'; badge.classList.remove('show'); }
+  const lsBadge=document.getElementById('ls-adv-badge');
+  if(lsBadge){ lsBadge.textContent='0'; lsBadge.classList.remove('show'); }
+  // ── reset _modalExtraFilter state ──
+  window._modalExtraFilter={};
+  // ── reset main search bar fields to keep all filters in sync ──
+  const kw=document.getElementById('s-kw'); if(kw){kw.value='';const al=document.getElementById('ac-list');if(al)al.style.display='none';}
+  const st=document.getElementById('s-type'); if(st) st.value='';
+  const sp=document.getElementById('s-prov'); if(sp) sp.value='';
+  const smn=document.getElementById('s-min'); if(smn) smn.selectedIndex=0;
+  const smx=document.getElementById('s-max'); if(smx) smx.selectedIndex=0;
+  // ── apply reset to current page context ──
+  const isListingsPage = document.getElementById('page-listings')?.classList.contains('active');
+  if(isListingsPage){
+    // reset listings search bar too
+    const lkw=document.getElementById('ls-kw'); if(lkw) lkw.value='';
+    const ltx=document.getElementById('ls-tx'); if(ltx) ltx.value='';
+    const ltyp=document.getElementById('ls-type'); if(ltyp) ltyp.value='';
+    const lpv=document.getElementById('ls-prov'); if(lpv) lpv.value='';
+    const lmn=document.getElementById('ls-min'); if(lmn) lmn.value='0';
+    const lmx=document.getElementById('ls-max'); if(lmx) lmx.value='999000000';
+    if(typeof _listingsBaseData!=='undefined'){
+      _listingsData = [..._listingsBaseData];
+      _listingsCurPage = 1;
+      if(typeof renderListingsPage==='function') renderListingsPage();
+    }
+  } else {
+    applyFilters().catch(console.error);
+  }
 }
 </script>
 
@@ -14881,134 +15452,48 @@ function resetAdvFilter(){
     <button onclick="closeAdvFilter()" style="color:rgba(255,255,255,.7);font-size:18px;background:none;border:none;cursor:pointer">×</button>
   </div>
   <div class="adv-fp-body">
-  <div class="adv-fp-section">
+
+    <!-- ROW 1: ช่วงราคา (2 col) -->
+    <div class="adv-fp-section adv-fp-section-full">
       <div class="adv-fp-sec-title"><i class="fas fa-tag" style="color:var(--a)"></i> ช่วงราคา (บาท)</div>
-      <div class="adv-select-row">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
         <select id="af-price-min" style="width:100%;padding:7px 10px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;font-family:inherit" onchange="advRangeUpdate()">
           <option value="">ราคาต่ำสุด</option>
-          <option value="5000">5,000</option>
-          <option value="10000">10,000</option>
-          <option value="15000">15,000</option>
-          <option value="20000">20,000</option>
-          <option value="25000">25,000</option>
-          <option value="30000">30,000</option>
-          <option value="40000">40,000</option>
-          <option value="50000">50,000</option>
-          <option value="60000">60,000</option>
-          <option value="70000">70,000</option>
-          <option value="80000">80,000</option>
-          <option value="100000">100K</option>
-          <option value="150000">150K</option>
-          <option value="200000">200K</option>
-          <option value="300000">300K</option>
-          <option value="500000">500K</option>
-          <option value="1000000">1M</option>
-          <option value="2000000">2M</option>
-          <option value="3000000">3M</option>
-          <option value="5000000">5M</option>
-          <option value="7000000">7M</option>
-          <option value="10000000">10M</option>
-          <option value="15000000">15M</option>
-          <option value="20000000">20M</option>
-          <option value="30000000">30M</option>
-          <option value="50000000">50M</option>
-          <option value="100000000">100M</option>
+          <option value="5000">5,000</option><option value="10000">10,000</option><option value="15000">15,000</option><option value="20000">20,000</option><option value="25000">25,000</option><option value="30000">30,000</option><option value="40000">40,000</option><option value="50000">50,000</option><option value="60000">60,000</option><option value="70000">70,000</option><option value="80000">80,000</option><option value="100000">100K</option><option value="150000">150K</option><option value="200000">200K</option><option value="300000">300K</option><option value="500000">500K</option><option value="1000000">1M</option><option value="2000000">2M</option><option value="3000000">3M</option><option value="5000000">5M</option><option value="7000000">7M</option><option value="10000000">10M</option><option value="15000000">15M</option><option value="20000000">20M</option><option value="30000000">30M</option><option value="50000000">50M</option><option value="100000000">100M</option>
         </select>
-      </div>
-      <div class="adv-select-row">
         <select id="af-price-max" style="width:100%;padding:7px 10px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;font-family:inherit" onchange="advRangeUpdate()">
           <option value="">ราคาสูงสุด</option>
-          <option value="5000">5,000</option>
-          <option value="10000">10,000</option>
-          <option value="15000">15,000</option>
-          <option value="20000">20,000</option>
-          <option value="25000">25,000</option>
-          <option value="30000">30,000</option>
-          <option value="40000">40,000</option>
-          <option value="50000">50,000</option>
-          <option value="60000">60,000</option>
-          <option value="70000">70,000</option>
-          <option value="80000">80,000</option>
-          <option value="100000">100K</option>
-          <option value="150000">150K</option>
-          <option value="200000">200K</option>
-          <option value="300000">300K</option>
-          <option value="500000">500K</option>
-          <option value="1000000">1M</option>
-          <option value="2000000">2M</option>
-          <option value="3000000">3M</option>
-          <option value="5000000">5M</option>
-          <option value="7000000">7M</option>
-          <option value="10000000">10M</option>
-          <option value="15000000">15M</option>
-          <option value="20000000">20M</option>
-          <option value="30000000">30M</option>
-          <option value="50000000">50M</option>
-          <option value="100000000">100M</option>
-          <option value="999000000">ราคาสูงสุด</option>
+          <option value="5000">5,000</option><option value="10000">10,000</option><option value="15000">15,000</option><option value="20000">20,000</option><option value="25000">25,000</option><option value="30000">30,000</option><option value="40000">40,000</option><option value="50000">50,000</option><option value="60000">60,000</option><option value="70000">70,000</option><option value="80000">80,000</option><option value="100000">100K</option><option value="150000">150K</option><option value="200000">200K</option><option value="300000">300K</option><option value="500000">500K</option><option value="1000000">1M</option><option value="2000000">2M</option><option value="3000000">3M</option><option value="5000000">5M</option><option value="7000000">7M</option><option value="10000000">10M</option><option value="15000000">15M</option><option value="20000000">20M</option><option value="30000000">30M</option><option value="50000000">50M</option><option value="100000000">100M</option><option value="999000000">ราคาสูงสุด</option>
         </select>
       </div>
     </div>
-    <div class="adv-fp-section">
-      <div class="adv-fp-sec-title"><i class="fas fa-fire" style="color:#ff4d6d"></i> ทำเลยอดนิยม</div>
-      <div class="adv-select-row">
+
+    <!-- ROW 2: ทำเลยอดนิยม + จังหวัด (2 col) -->
+    <div class="adv-fp-body-grid">
+      <div class="adv-fp-section">
+        <div class="adv-fp-sec-title"><i class="fas fa-fire" style="color:#ff4d6d"></i> ทำเลยอดนิยม</div>
         <select id="af-popular-loc" style="width:100%;padding:7px 10px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;font-family:inherit" onchange="if(this.value){document.getElementById('af-province').value='';} advRangeUpdate()">
           <option value="">-- เลือกทำเลยอดนิยม --</option>
           <optgroup label="📍 โซนกลางเมือง — CBD">
-          <option value="สุขุมวิท">สุขุมวิท</option>
-          <option value="สาทร">สาทร</option>
-          <option value="สีลม">สีลม</option>
-          <option value="อโศก">อโศก</option>
-          <option value="ทองหล่อ">ทองหล่อ</option>
-          <option value="เพลินจิต">เพลินจิต</option>
-          <option value="ชิดลม">ชิดลม</option>
-          <option value="ราชประสงค์">ราชประสงค์</option>
-          <option value="ลุมพินี">ลุมพินี</option>
+          <option value="สุขุมวิท">สุขุมวิท</option><option value="สาทร">สาทร</option><option value="สีลม">สีลม</option><option value="อโศก">อโศก</option><option value="ทองหล่อ">ทองหล่อ</option><option value="เพลินจิต">เพลินจิต</option><option value="ชิดลม">ชิดลม</option><option value="ราชประสงค์">ราชประสงค์</option><option value="ลุมพินี">ลุมพินี</option>
           </optgroup>
           <optgroup label="📍 โซนตะวันออก">
-          <option value="พระโขนง">พระโขนง</option>
-          <option value="เอกมัย">เอกมัย</option>
-          <option value="อ่อนนุช">อ่อนนุช</option>
-          <option value="บางนา">บางนา</option>
-          <option value="มีนบุรี">มีนบุรี</option>
-          <option value="รามคำแหง">รามคำแหง</option>
-          <option value="หัวหมาก">หัวหมาก</option>
-          <option value="สุวรรณภูมิ">สุวรรณภูมิ</option>
+          <option value="พระโขนง">พระโขนง</option><option value="เอกมัย">เอกมัย</option><option value="อ่อนนุช">อ่อนนุช</option><option value="บางนา">บางนา</option><option value="มีนบุรี">มีนบุรี</option><option value="รามคำแหง">รามคำแหง</option><option value="หัวหมาก">หัวหมาก</option><option value="สุวรรณภูมิ">สุวรรณภูมิ</option>
           </optgroup>
           <optgroup label="📍 โซนเหนือ">
-          <option value="รัชดา">รัชดาภิเษก</option>
-          <option value="ลาดพร้าว">ลาดพร้าว</option>
-          <option value="จตุจักร">จตุจักร</option>
-          <option value="หมอชิต">หมอชิต</option>
-          <option value="พหลโยธิน">พหลโยธิน</option>
-          <option value="อารีย์">อารีย์</option>
-          <option value="พระราม 9">พระราม 9</option>
-          <option value="ห้วยขวาง">ห้วยขวาง</option>
-          <option value="ดอนเมือง">ดอนเมือง</option>
+          <option value="รัชดา">รัชดาภิเษก</option><option value="ลาดพร้าว">ลาดพร้าว</option><option value="จตุจักร">จตุจักร</option><option value="หมอชิต">หมอชิต</option><option value="พหลโยธิน">พหลโยธิน</option><option value="อารีย์">อารีย์</option><option value="พระราม 9">พระราม 9</option><option value="ห้วยขวาง">ห้วยขวาง</option><option value="ดอนเมือง">ดอนเมือง</option>
           </optgroup>
           <optgroup label="📍 โซนตะวันตก &amp; ใต้">
-          <option value="ปิ่นเกล้า">ปิ่นเกล้า</option>
-          <option value="บางแค">บางแค</option>
-          <option value="พระราม 3">พระราม 3</option>
-          <option value="ธนบุรี">ธนบุรี</option>
-          <option value="ตลิ่งชัน">ตลิ่งชัน</option>
-          <option value="สาธุประดิษฐ์">สาธุประดิษฐ์</option>
+          <option value="ปิ่นเกล้า">ปิ่นเกล้า</option><option value="บางแค">บางแค</option><option value="พระราม 3">พระราม 3</option><option value="ธนบุรี">ธนบุรี</option><option value="ตลิ่งชัน">ตลิ่งชัน</option><option value="สาธุประดิษฐ์">สาธุประดิษฐ์</option>
           </optgroup>
           <optgroup label="🏖️ ต่างจังหวัดยอดนิยม">
-          <option value="เชียงใหม่">เชียงใหม่</option>
-          <option value="ภูเก็ต">ภูเก็ต</option>
-          <option value="พัทยา">พัทยา / ชลบุรี</option>
-          <option value="เขาใหญ่">เขาใหญ่</option>
-          <option value="หัวหิน">หัวหิน</option>
-          <option value="กาญจนบุรี">กาญจนบุรี</option>
-          <option value="เกาะสมุย">เกาะสมุย</option>
+          <option value="เชียงใหม่">เชียงใหม่</option><option value="ภูเก็ต">ภูเก็ต</option><option value="พัทยา">พัทยา / ชลบุรี</option><option value="เขาใหญ่">เขาใหญ่</option><option value="หัวหิน">หัวหิน</option><option value="กาญจนบุรี">กาญจนบุรี</option><option value="เกาะสมุย">เกาะสมุย</option>
           </optgroup>
         </select>
       </div>
-    </div>
-    <div class="adv-fp-section">
-      <div class="adv-fp-sec-title"><i class="fas fa-map-marker-alt" style="color:var(--p)"></i> จังหวัด (ทั้ง 77 จังหวัด)</div>
-      <div class="adv-select-row">
+      <div class="adv-fp-section">
+        <div class="adv-fp-sec-title"><i class="fas fa-map-marker-alt" style="color:var(--p)"></i> จังหวัด (ทั้ง 77 จังหวัด)</div>
+        <div class="adv-select-row">
         <select id="af-province" style="width:100%;padding:7px 10px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;font-family:inherit" onchange="if(this.value){document.getElementById('af-popular-loc').value='';} advRangeUpdate()">
           <option value="">ทุกจังหวัด</option>
           <option value="กรุงเทพมหานคร">กรุงเทพมหานคร</option>
@@ -15090,11 +15575,14 @@ function resetAdvFilter(){
           <option value="อุทัยธานี">อุทัยธานี</option>
           <option value="อุบลราชธานี">อุบลราชธานี</option>
         </select>
+        </div>
       </div>
-    </div>
-    <div class="adv-fp-section">
-      <div class="adv-fp-sec-title"><i class="fas fa-train" style="color:#009900"></i> ใกล้สถานี BTS</div>
-      <div class="adv-select-row">
+    </div><!-- end 2-col: ทำเลยอดนิยม + จังหวัด -->
+
+    <!-- ROW 3: BTS + MRT (2 col) -->
+    <div class="adv-fp-body-grid">
+      <div class="adv-fp-section">
+        <div class="adv-fp-sec-title"><i class="fas fa-train" style="color:#009900"></i> ใกล้สถานี BTS</div>
         <select id="af-bts-select" style="width:100%;padding:7px 10px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;font-family:inherit">
           <option value="">ทุกสถานี BTS/SRT/ARL</option>
           <optgroup label="🟢 BTS สายสุขุมวิท — เหนือ (N1–N24)">
@@ -15198,10 +15686,8 @@ function resetAdvFilter(){
           </optgroup>
         </select>
       </div>
-    </div>
-    <div class="adv-fp-section">
-      <div class="adv-fp-sec-title"><i class="fas fa-subway" style="color:#003399"></i> ใกล้สถานี MRT</div>
-      <div class="adv-select-row">
+      <div class="adv-fp-section">
+        <div class="adv-fp-sec-title"><i class="fas fa-subway" style="color:#003399"></i> ใกล้สถานี MRT</div>
         <select id="af-mrt-select" style="width:100%;padding:7px 10px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;font-family:inherit">
           <option value="">ทุกสถานี</option>
           <optgroup label="🔵 สายน้ำเงิน (วงแหวน)">
@@ -15314,138 +15800,125 @@ function resetAdvFilter(){
           </optgroup>
         </select>
       </div>
-    </div>
-    <div class="adv-fp-section">
+    </div><!-- end 2-col: BTS + MRT -->
+
+    <!-- ROW 4: ใกล้มหาวิทยาลัย (full width) -->
+    <div class="adv-fp-section adv-fp-section-full">
       <div class="adv-fp-sec-title"><i class="fas fa-university" style="color:#7c3aed"></i> ใกล้มหาวิทยาลัย</div>
-      <div class="adv-select-row">
-        <select id="af-uni-select" style="width:100%;padding:7px 10px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;font-family:inherit">
-          <option value="">ทุกมหาวิทยาลัย</option>
-          <optgroup label="กรุงเทพฯ และปริมณฑล">
-          <option value="จุฬาลงกรณ์">จุฬาลงกรณ์มหาวิทยาลัย</option>
-          <option value="ธรรมศาสตร์">มหาวิทยาลัยธรรมศาสตร์</option>
-          <option value="เกษตรศาสตร์">มหาวิทยาลัยเกษตรศาสตร์</option>
-          <option value="มหิดล">มหาวิทยาลัยมหิดล</option>
-          <option value="ศิลปากร">มหาวิทยาลัยศิลปากร</option>
-          <option value="สวนดุสิต">มหาวิทยาลัยสวนดุสิต</option>
-          <option value="กรุงเทพ">มหาวิทยาลัยกรุงเทพ</option>
-          <option value="รังสิต">มหาวิทยาลัยรังสิต</option>
-          <option value="ABAC">มหาวิทยาลัยอัสสัมชัญ (ABAC)</option>
-          <option value="ศรีนครินทรวิโรฒ">มหาวิทยาลัยศรีนครินทรวิโรฒ (มศว)</option>
-          <option value="รามคำแหง">มหาวิทยาลัยรามคำแหง</option>
-          <option value="ราชภัฏจันทรเกษม">มรภ.จันทรเกษม</option>
-          <option value="ราชภัฏพระนคร">มรภ.พระนคร</option>
-          <option value="ราชภัฏธนบุรี">มรภ.ธนบุรี</option>
-          <option value="เทคโนโลยีพระจอมเกล้าพระนครเหนือ">มจพ. (พระจอมเกล้าพระนครเหนือ)</option>
-          <option value="เทคโนโลยีพระจอมเกล้าธนบุรี">มจธ. (พระจอมเกล้าธนบุรี)</option>
-          <option value="เทคโนโลยีพระจอมเกล้าลาดกระบัง">สจล. (ลาดกระบัง)</option>
-          <option value="นิด้า">สถาบันบัณฑิตพัฒนบริหารศาสตร์ (NIDA)</option>
-          <option value="หอการค้าไทย">มหาวิทยาลัยหอการค้าไทย</option>
-          <option value="เอแบค">มหาวิทยาลัยเอแบค</option>
-          </optgroup>
-          <optgroup label="ต่างจังหวัด">
-          <option value="เชียงใหม่">มหาวิทยาลัยเชียงใหม่</option>
-          <option value="เชียงราย">มหาวิทยาลัยเชียงราย</option>
-          <option value="นเรศวร">มหาวิทยาลัยนเรศวร</option>
-          <option value="พะเยา">มหาวิทยาลัยพะเยา</option>
-          <option value="ขอนแก่น">มหาวิทยาลัยขอนแก่น</option>
-          <option value="อุบลราชธานี">มหาวิทยาลัยอุบลราชธานี</option>
-          <option value="มหาสารคาม">มหาวิทยาลัยมหาสารคาม</option>
-          <option value="สงขลานครินทร์">มหาวิทยาลัยสงขลานครินทร์</option>
-          <option value="วลัยลักษณ์">มหาวิทยาลัยวลัยลักษณ์</option>
-          <option value="ภูเก็ต">มหาวิทยาลัยสงขลานครินทร์ วิทยาเขตภูเก็ต</option>
-          <option value="บูรพา">มหาวิทยาลัยบูรพา (ชลบุรี)</option>
-          </optgroup>
-        </select>
-      </div>
+      <select id="af-uni-select" style="width:100%;padding:7px 10px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;font-family:inherit">
+        <option value="">ทุกมหาวิทยาลัย</option>
+        <optgroup label="กรุงเทพฯ และปริมณฑล">
+        <option value="จุฬาลงกรณ์">จุฬาลงกรณ์มหาวิทยาลัย</option><option value="ธรรมศาสตร์">มหาวิทยาลัยธรรมศาสตร์</option><option value="เกษตรศาสตร์">มหาวิทยาลัยเกษตรศาสตร์</option><option value="มหิดล">มหาวิทยาลัยมหิดล</option><option value="ศิลปากร">มหาวิทยาลัยศิลปากร</option><option value="สวนดุสิต">มหาวิทยาลัยสวนดุสิต</option><option value="กรุงเทพ">มหาวิทยาลัยกรุงเทพ</option><option value="รังสิต">มหาวิทยาลัยรังสิต</option><option value="ABAC">มหาวิทยาลัยอัสสัมชัญ (ABAC)</option><option value="ศรีนครินทรวิโรฒ">มหาวิทยาลัยศรีนครินทรวิโรฒ (มศว)</option><option value="รามคำแหง">มหาวิทยาลัยรามคำแหง</option><option value="ราชภัฏจันทรเกษม">มรภ.จันทรเกษม</option><option value="ราชภัฏพระนคร">มรภ.พระนคร</option><option value="ราชภัฏธนบุรี">มรภ.ธนบุรี</option><option value="เทคโนโลยีพระจอมเกล้าพระนครเหนือ">มจพ.</option><option value="เทคโนโลยีพระจอมเกล้าธนบุรี">มจธ.</option><option value="เทคโนโลยีพระจอมเกล้าลาดกระบัง">สจล.</option><option value="นิด้า">NIDA</option><option value="หอการค้าไทย">ม.หอการค้าไทย</option><option value="เอแบค">ม.เอแบค</option>
+        </optgroup>
+        <optgroup label="ต่างจังหวัด">
+        <option value="เชียงใหม่">ม.เชียงใหม่</option><option value="เชียงราย">ม.เชียงราย</option><option value="นเรศวร">ม.นเรศวร</option><option value="พะเยา">ม.พะเยา</option><option value="ขอนแก่น">ม.ขอนแก่น</option><option value="อุบลราชธานี">ม.อุบลราชธานี</option><option value="มหาสารคาม">ม.มหาสารคาม</option><option value="สงขลานครินทร์">ม.สงขลานครินทร์</option><option value="วลัยลักษณ์">ม.วลัยลักษณ์</option><option value="ภูเก็ต">มอ.วิทยาเขตภูเก็ต</option><option value="บูรพา">ม.บูรพา</option>
+        </optgroup>
+      </select>
     </div>
-    <div class="adv-fp-section">
-      <div class="adv-fp-sec-title">ขนาดที่ดิน (ตร.ว.)</div>
-      <div class="adv-range-summary" id="af-land-summary">ทุกขนาด</div>
-      <div class="adv-range-track-wrap">
-        <div class="adv-range-labels"><span>0</span><span>250</span><span>500</span><span>750</span><span>1,000+</span></div>
-        <div class="adv-dual-row">
-          <div class="adv-range-item">
-            <label>ต่ำสุด</label>
-            <div class="adv-range-bubble-wrap">
-              <input type="range" id="af-land-min" min="0" max="1000" step="10" value="0" oninput="advRangeUpdate(this,'af-land-min-v','af-land-summary','land')">
-              <span class="adv-range-bubble" id="af-land-min-v">0</span>
+
+    <!-- ROW 5: ขนาดที่ดิน + ขนาดพื้นที่ใช้สอย (2 col) -->
+    <div class="adv-fp-body-grid">
+      <div class="adv-fp-section">
+        <div class="adv-fp-sec-title">ขนาดที่ดิน (ตร.ว.)</div>
+        <div class="adv-range-summary" id="af-land-summary">ทุกขนาด</div>
+        <div class="adv-range-track-wrap">
+          <div class="adv-range-labels"><span>0</span><span>250</span><span>500</span><span>750</span><span>1,000+</span></div>
+          <div class="adv-dual-row">
+            <div class="adv-range-item">
+              <label>ต่ำสุด</label>
+              <div class="adv-range-bubble-wrap">
+                <input type="range" id="af-land-min" min="0" max="1000" step="10" value="0" oninput="advRangeUpdate(this,'af-land-min-v','af-land-summary','land')">
+                <span class="adv-range-bubble" id="af-land-min-v">0</span>
+              </div>
             </div>
-          </div>
-          <div class="adv-range-item">
-            <label>สูงสุด</label>
-            <div class="adv-range-bubble-wrap">
-              <input type="range" id="af-land-max" min="0" max="1000" step="10" value="1000" oninput="advRangeUpdate(this,'af-land-max-v','af-land-summary','land')">
-              <span class="adv-range-bubble" id="af-land-max-v">ไม่จำกัด</span>
+            <div class="adv-range-item">
+              <label>สูงสุด</label>
+              <div class="adv-range-bubble-wrap">
+                <input type="range" id="af-land-max" min="0" max="1000" step="10" value="1000" oninput="advRangeUpdate(this,'af-land-max-v','af-land-summary','land')">
+                <span class="adv-range-bubble" id="af-land-max-v">ไม่จำกัด</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-    <div class="adv-fp-section">
-      <div class="adv-fp-sec-title">ขนาดพื้นที่ใช้สอย (ตร.ม.)</div>
-      <div class="adv-range-summary" id="af-area-summary">ทุกขนาด</div>
-      <div class="adv-range-track-wrap">
-        <div class="adv-range-labels"><span>0</span><span>125</span><span>250</span><span>375</span><span>500+</span></div>
-        <div class="adv-dual-row">
-          <div class="adv-range-item">
-            <label>ต่ำสุด</label>
-            <div class="adv-range-bubble-wrap">
-              <input type="range" id="af-area-min" min="0" max="500" step="5" value="0" oninput="advRangeUpdate(this,'af-area-min-v','af-area-summary','area')">
-              <span class="adv-range-bubble" id="af-area-min-v">0</span>
+      <div class="adv-fp-section">
+        <div class="adv-fp-sec-title">ขนาดพื้นที่ใช้สอย (ตร.ม.)</div>
+        <div class="adv-range-summary" id="af-area-summary">ทุกขนาด</div>
+        <div class="adv-range-track-wrap">
+          <div class="adv-range-labels"><span>0</span><span>125</span><span>250</span><span>375</span><span>500+</span></div>
+          <div class="adv-dual-row">
+            <div class="adv-range-item">
+              <label>ต่ำสุด</label>
+              <div class="adv-range-bubble-wrap">
+                <input type="range" id="af-area-min" min="0" max="500" step="5" value="0" oninput="advRangeUpdate(this,'af-area-min-v','af-area-summary','area')">
+                <span class="adv-range-bubble" id="af-area-min-v">0</span>
+              </div>
             </div>
-          </div>
-          <div class="adv-range-item">
-            <label>สูงสุด</label>
-            <div class="adv-range-bubble-wrap">
-              <input type="range" id="af-area-max" min="0" max="500" step="5" value="500" oninput="advRangeUpdate(this,'af-area-max-v','af-area-summary','area')">
-              <span class="adv-range-bubble" id="af-area-max-v">ไม่จำกัด</span>
+            <div class="adv-range-item">
+              <label>สูงสุด</label>
+              <div class="adv-range-bubble-wrap">
+                <input type="range" id="af-area-max" min="0" max="500" step="5" value="500" oninput="advRangeUpdate(this,'af-area-max-v','af-area-summary','area')">
+                <span class="adv-range-bubble" id="af-area-max-v">ไม่จำกัด</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-    <div class="adv-fp-section">
-      <div class="adv-fp-sec-title">ห้องนอน</div>
-      <div class="adv-check-grid">
-        <label class="adv-check-item"><input type="checkbox" value="1" class="af-bed"> 1 ห้อง</label>
-        <label class="adv-check-item"><input type="checkbox" value="2" class="af-bed"> 2 ห้อง</label>
-        <label class="adv-check-item"><input type="checkbox" value="3" class="af-bed"> 3 ห้อง</label>
-        <label class="adv-check-item"><input type="checkbox" value="4" class="af-bed"> 4+ ห้อง</label>
+    </div><!-- end 2-col: ขนาดที่ดิน + พื้นที่ -->
+
+    <!-- ROW 6: ห้องนอน + ห้องน้ำ (2 col) -->
+    <div class="adv-fp-body-grid">
+      <div class="adv-fp-section">
+        <div class="adv-fp-sec-title">ห้องนอน</div>
+        <div class="adv-check-grid">
+          <label class="adv-check-item"><input type="checkbox" value="1" class="af-bed"> 1 ห้อง</label>
+          <label class="adv-check-item"><input type="checkbox" value="2" class="af-bed"> 2 ห้อง</label>
+          <label class="adv-check-item"><input type="checkbox" value="3" class="af-bed"> 3 ห้อง</label>
+          <label class="adv-check-item"><input type="checkbox" value="4" class="af-bed"> 4+ ห้อง</label>
+        </div>
       </div>
-    </div>
-    <div class="adv-fp-section">
-      <div class="adv-fp-sec-title">ห้องน้ำ</div>
-      <div class="adv-check-grid">
-        <label class="adv-check-item"><input type="checkbox" value="1" class="af-bath"> 1 ห้อง</label>
-        <label class="adv-check-item"><input type="checkbox" value="2" class="af-bath"> 2 ห้อง</label>
-        <label class="adv-check-item"><input type="checkbox" value="3" class="af-bath"> 3 ห้อง</label>
-        <label class="adv-check-item"><input type="checkbox" value="4" class="af-bath"> 4+ ห้อง</label>
+      <div class="adv-fp-section">
+        <div class="adv-fp-sec-title">ห้องน้ำ</div>
+        <div class="adv-check-grid">
+          <label class="adv-check-item"><input type="checkbox" value="1" class="af-bath"> 1 ห้อง</label>
+          <label class="adv-check-item"><input type="checkbox" value="2" class="af-bath"> 2 ห้อง</label>
+          <label class="adv-check-item"><input type="checkbox" value="3" class="af-bath"> 3 ห้อง</label>
+          <label class="adv-check-item"><input type="checkbox" value="4" class="af-bath"> 4+ ห้อง</label>
+        </div>
       </div>
-    </div>
-    <div class="adv-fp-section">
-      <div class="adv-fp-sec-title">ที่จอดรถ</div>
-      <div class="adv-check-grid">
-        <label class="adv-check-item"><input type="checkbox" value="1" class="af-park"> 1 คัน</label>
-        <label class="adv-check-item"><input type="checkbox" value="2" class="af-park"> 2 คัน</label>
-        <label class="adv-check-item"><input type="checkbox" value="3" class="af-park"> 3+ คัน</label>
+    </div><!-- end 2-col: ห้องนอน + ห้องน้ำ -->
+
+    <!-- ROW 7: ที่จอดรถ + เฟอร์นิเจอร์ (2 col) -->
+    <div class="adv-fp-body-grid">
+      <div class="adv-fp-section">
+        <div class="adv-fp-sec-title">ที่จอดรถ</div>
+        <div class="adv-check-grid">
+          <label class="adv-check-item"><input type="checkbox" value="1" class="af-park"> 1 คัน</label>
+          <label class="adv-check-item"><input type="checkbox" value="2" class="af-park"> 2 คัน</label>
+          <label class="adv-check-item"><input type="checkbox" value="3" class="af-park"> 3+ คัน</label>
+        </div>
       </div>
-    </div>
-    <div class="adv-fp-section">
-      <div class="adv-fp-sec-title">เฟอร์นิเจอร์</div>
-      <div class="adv-check-grid">
-        <label class="adv-check-item"><input type="checkbox" value="full" id="af-furn-full"> เฟอร์นิเจอร์ครบ</label>
-        <label class="adv-check-item"><input type="checkbox" value="partial" id="af-furn-part"> เฟอร์นิเจอร์บางส่วน</label>
-        <label class="adv-check-item"><input type="checkbox" value="none" id="af-furn-none"> ไม่มีเฟอร์นิเจอร์</label>
+      <div class="adv-fp-section">
+        <div class="adv-fp-sec-title">เฟอร์นิเจอร์</div>
+        <div class="adv-check-grid">
+          <label class="adv-check-item"><input type="checkbox" value="full" id="af-furn-full"> เฟอร์นิเจอร์ครบ</label>
+          <label class="adv-check-item"><input type="checkbox" value="partial" id="af-furn-part"> เฟอร์นิเจอร์บางส่วน</label>
+          <label class="adv-check-item"><input type="checkbox" value="none" id="af-furn-none"> ไม่มีเฟอร์นิเจอร์</label>
+        </div>
       </div>
-    </div>
-    <div class="adv-fp-section">
-      <div class="adv-fp-sec-title">การเลี้ยงสัตว์</div>
+    </div><!-- end 2-col: ที่จอดรถ + เฟอร์นิเจอร์ -->
+
+    <!-- ROW 7b: การเลี้ยงสัตว์ (full width) -->
+    <div class="adv-fp-section adv-fp-section-full">
+      <div class="adv-fp-sec-title"><i class="fas fa-paw" style="color:#be185d"></i> การเลี้ยงสัตว์</div>
       <div class="adv-check-grid">
         <label class="adv-check-item"><input type="checkbox" id="af-pets"> อนุญาตเลี้ยงสัตว์</label>
       </div>
     </div>
-    <div class="adv-fp-section">
-      <div class="adv-fp-sec-title">เครื่องใช้ไฟฟ้า</div>
+
+    <!-- ROW 8: เครื่องใช้ไฟฟ้า (full width) -->
+    <div class="adv-fp-section adv-fp-section-full">
+      <div class="adv-fp-sec-title">เครื่องใช้ไฟฟ้า &amp; สิ่งอำนวยความสะดวก</div>
       <div class="adv-check-grid">
         <label class="adv-check-item"><input type="checkbox" value="แอร์" class="af-app"> แอร์</label>
         <label class="adv-check-item"><input type="checkbox" value="ตู้เย็น" class="af-app"> ตู้เย็น</label>
@@ -15509,7 +15982,7 @@ function resetAdvFilter(){
           <div>
             <label id="ls-label-prov" style="display:block;font-size:11px;font-weight:700;color:rgba(255,220,150,.9);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px"><i class="fas fa-map-marker-alt"></i> จังหวัด</label>
             <select id="ls-prov" style="width:100%;padding:9px 12px;border:1.5px solid rgba(255,255,255,.25);border-radius:9px;font-size:13px;color:#fff;background:rgba(20,40,80,.85);font-family:inherit" onchange="listingsInlineSearch()">
-              <option value="" id="ls-prov-all-opt">ทุกจังหวัด</option>
+              <option value="" id="ls-prov-all-opt">ทุกทำเล</option>
             </select>
           </div>
           <div>
@@ -16209,11 +16682,35 @@ function _renderTransitItems(items, defaultIcon) {
   }).join('\n');
 }
 
+function _renderTransitOptions(items, defaultIcon) {
+  var html = '';
+  var currentGroup = null;
+  items.forEach(function(item) {
+    if (item.sec) {
+      if (currentGroup) html += '</optgroup>';
+      html += '<optgroup label="' + item.sec.replace(/"/g,'&quot;') + '">';
+      currentGroup = item.sec;
+    } else {
+      var icon = item.icon || defaultIcon;
+      html += '<option value="' + item.q.replace(/"/g,'&quot;') + '">' + icon + ' ' + item.label + '</option>';
+    }
+  });
+  if (currentGroup) html += '</optgroup>';
+  return html;
+}
+
 function renderTransitButtons() {
+  // Hidden panels (for adv-filter sync backward compatibility)
   var btsPan = document.getElementById('qs-bts-dd');
   if (btsPan) btsPan.innerHTML = _renderTransitItems(TRANSIT_BTS, '🚉');
   var mrtPan = document.getElementById('qs-mrt-dd');
   if (mrtPan) mrtPan.innerHTML = _renderTransitItems(TRANSIT_MRT, '🚇');
+
+  // Native select elements
+  var btsSel = document.getElementById('qs-bts-select');
+  if (btsSel) btsSel.innerHTML = '<option value="">🚈 BTS</option>' + _renderTransitOptions(TRANSIT_BTS, '🚉');
+  var mrtSel = document.getElementById('qs-mrt-select');
+  if (mrtSel) mrtSel.innerHTML = '<option value="">🚇 MRT</option>' + _renderTransitOptions(TRANSIT_MRT, '🚇');
 }
 
 document.addEventListener('DOMContentLoaded', renderTransitButtons);
