@@ -491,7 +491,8 @@ body:not(:has(.ov.open)):not(:has(.apply-overlay.open)):not(:has(.seo-drawer.ope
   .ov,.modal,.mbody{-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 }
 /* ── z-index ให้เป็นระบบ (ทุก device) ────────────────────────
-   nav=1000 | dd-mobile-overlay=1001 | dd-panel=1050 | modal=3200 | sheet=1500 | toast=9999 */
+   nav=1000 | dd-panel=1050 | .ov(base)=3200 | prop-modal=3600 | ag-modal=3700 | toast=9999
+   Layer order (ล่าง→บน): nav → dropdown → modal(all/login) → prop-modal → ag-modal → toast */
 nav{z-index:1000!important}
 /* dd-panel อยู่เหนือ nav */
 .dd-panel,.qs-dd-panel{z-index:1050!important}
@@ -504,7 +505,7 @@ nav{z-index:1000!important}
 .adv-filter-panel{z-index:3500!important;pointer-events:auto!important}
 .toast{z-index:9999!important}
 /* search autocomplete อยู่เหนือ dropdown */
-.ac-list{z-index:1100!important}
+.ac-list{z-index:9000!important}
 /* listings page autocomplete */
 .ls-ac-wrap{position:relative;z-index:500}
 .ls-ac-list{
@@ -876,15 +877,14 @@ nav{
 }
 /* prop-modal: เปิดทันที — ไม่มี animation ใดๆ ทั้งสิ้น */
 #prop-modal.open{
-  z-index:3300;isolation:isolate;
+  z-index:3600!important;isolation:isolate;
 }
 /* ลบ animation ออกทั้งหมด — scale+opacity พร้อมกันบน iOS ทำให้เกิด composite jank */
 #prop-modal.open .modal{
   /* animation:none — modal ปรากฏทันที ไม่มี delay */
 }
 /* iOS Safari: ต้องใช้ isolation:isolate เพื่อป้องกัน z-index stacking context ค้าง */
-#prop-modal.open{z-index:3300;isolation:isolate}
-#ag-modal.open{z-index:3400;isolation:isolate}
+#ag-modal.open{z-index:3700!important;isolation:isolate}
 .modal{
   background:#fff;border-radius:var(--rl);
   max-width:550px;width:100%;
@@ -911,9 +911,9 @@ nav{
   background:#fff;
   border-bottom:1.5px solid #e8ecf2;
   padding:10px 20px;
-  z-index:5;
+  z-index:20;
   transition:max-height .3s cubic-bezier(.4,0,.2,1), opacity .25s ease, padding .3s ease;
-  overflow:hidden;
+  overflow:visible;
 }
 #all-modal-filter-sticky:empty{
   display:none;
@@ -1237,6 +1237,13 @@ nav{
   width:auto !important;
   flex:0 0 auto !important;
   min-width:0 !important;
+  max-width:90px !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+}
+.qs-group-transit{
+  max-width:95px;
+  flex-shrink:0;
 }
 .modal-adv-filter-btn{
   padding:7px 14px;background:var(--p);color:#fff;border:none;border-radius:9px;
@@ -1483,11 +1490,11 @@ footer{background:linear-gradient(135deg,#2d2650 0%,#3d3373 100%);color:rgba(255
 .page{display:none}
 .page.active{display:block}
 
-.hero{background:#080E1D;padding:60px 20px 40px;text-align:center;color:#fff;position:relative;overflow:hidden}.hero-banner-img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;object-position:center center;z-index:0;opacity:0;pointer-events:none;filter:blur(0px);}
+.hero{background:#080E1D;padding:60px 20px 40px;text-align:center;color:#fff;position:relative;overflow:visible}.hero-banner-img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;object-position:center center;z-index:0;opacity:0;pointer-events:none;filter:blur(0px);}
 @media(max-width:768px){.hero-banner-img{width:100%;height:100%;object-fit:cover;object-position:center 60%;}}
 .hero-bg-clip{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}
 #hero-canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0}
-.hero-content{position:relative;z-index:2;padding-bottom:20px}
+.hero-content{position:relative;z-index:2;padding-bottom:20px;isolation:auto}
 .hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(10,22,48,0.65);border:1.5px solid rgba(232,184,75,.7);border-radius:30px;padding:8px 22px;font-size:13px;font-weight:700;color:#FFE082;margin-bottom:24px;backdrop-filter:blur(16px);letter-spacing:.5px;font-family:'Kanit','Noto Sans Thai',sans-serif;text-shadow:0 1px 4px rgba(0,0,0,.6);box-shadow:0 2px 12px rgba(0,0,0,.3)}
 .hero h1{font-size:clamp(30px,5vw,54px);font-weight:700;margin-bottom:14px;text-align:center;line-height:1.15;letter-spacing:-.5px;font-family:'Playfair Display','Sarabun','Noto Sans Thai',serif;color:#FFFFFF;text-shadow:0 1px 3px rgba(0,0,0,.30),0 4px 16px rgba(0,0,0,.18),0 8px 32px rgba(0,0,0,.10)}
 .hero h1 span{background:linear-gradient(135deg,#F5D060,#E8B84B,#C8922A);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;display:inline-block;font-weight:700;text-shadow:none;filter:drop-shadow(0 1px 2px rgba(0,0,0,.30)) drop-shadow(0 3px 8px rgba(0,0,0,.15))}
@@ -1557,7 +1564,7 @@ footer{background:linear-gradient(135deg,#2d2650 0%,#3d3373 100%);color:rgba(255
 .hcounter{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.18);border-radius:16px;padding:14px 24px;text-align:center;backdrop-filter:blur(12px);min-width:130px;transition:.3s}
 .hcounter:hover{background:rgba(255,255,255,.22);transform:translateY(-2px)}
 .hc-num{font-size:32px;font-weight:800;color:#F0ECE3;line-height:1;font-family:'Kanit',sans-serif}
-.search-box{background:rgba(255,255,255,0.27);backdrop-filter:blur(20px);border-radius:var(--rl);padding:22px 24px;max-width:1100px;margin:0 auto;box-shadow:0 20px 60px rgba(0,0,0,.35);position:relative;z-index:150;overflow:visible;border:1px solid rgba(200,146,42,.15)}
+.search-box{background:rgba(255,255,255,0.27);backdrop-filter:blur(20px);border-radius:var(--rl);padding:22px 24px;max-width:1100px;margin:0 auto;box-shadow:0 20px 60px rgba(0,0,0,.35);position:relative;z-index:200;overflow:visible;border:1px solid rgba(200,146,42,.15)}
 .quick-search-bar{max-width:1100px;margin:0 auto;padding:12px 20px 22px;display:flex;flex-direction:row;flex-wrap:wrap;gap:8px;position:relative;z-index:150;justify-content:center;align-items:center}
 
 /* ── Advanced Filter button & panel ── */
@@ -2337,15 +2344,20 @@ footer::after{
 .privacy-modal-body ul{padding-left:20px;margin-bottom:12px}
 .privacy-modal-body li{margin-bottom:4px}
 .privacy-modal-body .highlight-box{background:#faf8ff;border-left:3px solid var(--p);padding:10px 14px;border-radius:0 8px 8px 0;margin:12px 0;font-size:12px}
-.ac-wrap{position:relative;z-index:300}
-.ac-list{position:absolute;top:100%;left:0;right:0;background:#fff;border:1.5px solid var(--bd);border-top:none;border-radius:0 0 10px 10px;z-index:230;max-height:220px;overflow-y:auto;box-shadow:0 8px 24px rgba(27,58,107,.18)}
-.ac-item{padding:9px 13px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--lt);color:#1A1A2E !important;background:#fff}
+/* ac-wrap: ไม่สร้าง stacking context (ไม่ใส่ z-index) เพื่อให้ ac-list ลอยขึ้นได้ */
+.ac-wrap{position:relative}
+.ac-list{position:fixed;background:#fff;border:1.5px solid var(--bd);border-radius:10px;z-index:9000;max-height:280px;overflow-y:auto;box-shadow:0 12px 32px rgba(27,58,107,.22)}
+/* ac-item: 2-row layout — icon + title แถว 1, location แถว 2 */
+.ac-item{padding:9px 13px;cursor:pointer;font-size:13px;display:grid;grid-template-columns:22px 1fr;grid-template-rows:auto auto;column-gap:8px;row-gap:2px;align-items:center;border-bottom:1px solid var(--lt);color:#1A1A2E !important;background:#fff}
 .ac-item *{color:#1A1A2E}
 .ac-item:last-child{border-bottom:none}
 .ac-item:hover{background:var(--lt);color:var(--p) !important}
 .ac-item:hover *{color:var(--p)}
 .ac-item mark{background:rgba(200,146,42,.22);color:#0F2548 !important;border-radius:2px;padding:0 2px;font-style:normal;font-weight:700}
-.ac-item .ac-sub{font-size:11px;color:#8A8070 !important;margin-left:auto;white-space:nowrap}
+/* icon: span 2 แถว, title: แถว 1, location: แถว 2 */
+.ac-item .ac-icon{grid-column:1;grid-row:1/3;font-size:18px;display:flex;align-items:center;justify-content:center}
+.ac-item .ac-title{grid-column:2;grid-row:1;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ac-item .ac-sub{grid-column:2;grid-row:2;font-size:11px;color:#8A8070 !important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-left:0}
 .loc-cats{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px}
 .loc-cat{padding:5px 12px;border-radius:20px;border:1.5px solid var(--bd);background:#fff;cursor:pointer;font-size:12px;font-weight:600;color:var(--tx2);transition:.2s}
 .loc-cat.active{background:var(--p);color:#F0ECE3;border-color:var(--p)}
@@ -3304,6 +3316,93 @@ footer::after{
 @media(max-width:600px){.apply-modal{touch-action:pan-x}}
 
 </style>
+<style>
+/* ── Drill-down location picker ── */
+#loc-drill-wrap { position:relative; }
+#loc-drill-label { display:block; font-size:13px; font-weight:800; color:#1a2744; margin-bottom:5px; letter-spacing:.2px; }
+#loc-drill-btn {
+  width:100%; padding:10px 12px; border:1.5px solid rgba(200,146,42,.4); border-radius:10px;
+  font-size:14px; color:#1a2744; background:rgba(255,255,255,0.95); font-weight:600;
+  cursor:pointer; display:flex; align-items:center; justify-content:space-between;
+  user-select:none; transition:border-color .15s; position:relative;
+}
+#loc-drill-btn:hover { border-color:var(--p,#1B3A6B); }
+#loc-drill-btn.open { border-color:var(--p,#1B3A6B); border-radius:10px 10px 0 0; }
+#loc-drill-btn.open.drop-up { border-radius:0 0 10px 10px; }
+#loc-drill-chevron { font-size:11px; color:#888; transition:transform .2s; flex-shrink:0; }
+#loc-drill-btn.open #loc-drill-chevron { transform:rotate(180deg); }
+#loc-drill-display { text-align:left; flex:1; }
+#loc-drill-panel {
+  position:absolute; top:100%; left:0; right:0; z-index:3000;
+  background:#fff; border:1.5px solid var(--p,#1B3A6B); border-top:none;
+  border-radius:0 0 10px 10px; box-shadow:0 8px 24px rgba(27,58,107,.18);
+  max-height:260px; overflow-y:auto; margin-top:-1px;
+  text-align:left; font-weight:400; display:block;
+}
+#loc-drill-panel.drop-up {
+  top:auto; bottom:100%; border-top:1.5px solid var(--p,#1B3A6B); border-bottom:none;
+  border-radius:10px 10px 0 0; box-shadow:0 -8px 24px rgba(27,58,107,.18); margin-top:0; margin-bottom:-1px;
+}
+#loc-drill-list { padding:4px 0; text-align:left; }
+.loc-item {
+  padding:9px 14px 9px 12px; font-size:13px; color:#1a2744; cursor:pointer;
+  display:flex; align-items:center; justify-content:flex-start; gap:6px; transition:background .1s;
+  text-align:left; width:100%; box-sizing:border-box;
+}
+.loc-item:hover { background:#f0f4ff; }
+.loc-item.active { background:#eef3ff; font-weight:700; color:var(--p,#1B3A6B); }
+.loc-item.loc-back {
+  color:var(--p,#1B3A6B); font-weight:700; border-bottom:1px solid #eee;
+  background:#f8f9ff; font-size:12px;
+}
+.loc-item.loc-back:hover { background:#e8ecff; }
+.loc-item.loc-clear { color:#999; font-size:12px; border-top:1px solid #eee; white-space:nowrap; }
+.loc-item.loc-clear:hover { background:#fff5f5; color:#c0392b; }
+.loc-drill-section-head {
+  padding:6px 12px 3px; font-size:10px; font-weight:800; color:#aaa;
+  text-transform:uppercase; letter-spacing:.8px; text-align:left;
+}
+
+/* ── Modal Province Drill-down (same style as home loc-drill) ── */
+#madv-loc-wrap { position:relative; flex:1 1 0; min-width:0; }
+#madv-loc-btn {
+  width:100%; padding:0 10px; height:36px; border:1.5px solid rgba(200,146,42,.35); border-radius:8px;
+  font-size:13px; color:#1a2744; background:#fff; font-weight:500;
+  cursor:pointer; display:flex; align-items:center; justify-content:space-between;
+  user-select:none; transition:border-color .15s; position:relative; box-sizing:border-box;
+}
+#madv-loc-btn:hover { border-color:var(--p,#1B3A6B); }
+#madv-loc-btn.open { border-color:var(--p,#1B3A6B); border-radius:8px 8px 0 0; }
+#madv-loc-btn.open.drop-up { border-radius:0 0 8px 8px; }
+#madv-loc-display { text-align:left; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+#madv-loc-chevron { font-size:10px; color:#888; transition:transform .2s; flex-shrink:0; margin-left:4px; }
+#madv-loc-btn.open #madv-loc-chevron { transform:rotate(180deg); }
+#madv-loc-panel {
+  position:absolute; top:100%; left:0; right:0; z-index:4500;
+  background:#fff; border:1.5px solid var(--p,#1B3A6B); border-top:none;
+  border-radius:0 0 8px 8px; box-shadow:0 8px 24px rgba(27,58,107,.18);
+  max-height:240px; overflow-y:auto; margin-top:-1px;
+  text-align:left; font-weight:400; display:block;
+}
+#madv-loc-panel.drop-up {
+  top:auto; bottom:100%; border-top:1.5px solid var(--p,#1B3A6B); border-bottom:none;
+  border-radius:8px 8px 0 0; box-shadow:0 -8px 24px rgba(27,58,107,.18); margin-top:0; margin-bottom:-1px;
+}
+#madv-loc-list { padding:4px 0; text-align:left; }
+.madv-loc-head { padding:5px 12px 2px; font-size:10px; font-weight:800; color:#aaa; text-transform:uppercase; letter-spacing:.8px; }
+.madv-loc-item {
+  padding:8px 12px; font-size:13px; color:#1a2744; cursor:pointer;
+  display:flex; align-items:center; justify-content:flex-start; gap:6px;
+  transition:background .1s; text-align:left; width:100%; box-sizing:border-box; white-space:nowrap;
+}
+.madv-loc-item:hover { background:#f0f4ff; }
+.madv-loc-item.active { background:#eef3ff; font-weight:700; color:var(--p,#1B3A6B); }
+.madv-loc-item.loc-back { color:var(--p,#1B3A6B); font-weight:700; border-bottom:1px solid #eee; background:#f8f9ff; font-size:12px; }
+.madv-loc-item.loc-back:hover { background:#e8ecff; }
+.madv-loc-item.loc-clear { color:#999; font-size:12px; border-top:1px solid #eee; }
+.madv-loc-item.loc-clear:hover { background:#fff5f5; color:#c0392b; }
+.madv-loc-sep { height:1px; background:#eee; margin:2px 0; }
+</style>
 </head>
 <body>
 
@@ -3609,7 +3708,20 @@ footer::after{
    <div class="sf">
     <div class="ac-wrap"><label><i class="fas fa-search"></i> คำค้นหา</label><input id="s-kw" placeholder="ชื่อโครงการ ทำเล..." autocomplete="off" oninput="debouncedSearch()"><div class="ac-list" id="ac-list" style="display:none"></div></div>
     <div><label><i class="fas fa-building"></i> ประเภท</label><select id="s-type"><option value="">ทุกประเภท</option><option value="บ้านเดี่ยว">บ้านเดี่ยว</option><option value="ทาวน์โฮม">ทาวน์โฮม</option><option value="คอนโด">คอนโด</option><option value="อาคารพาณิชย์">อาคารพาณิชย์</option><option value="ที่ดิน">ที่ดิน</option><option value="วิลล่า">วิลล่า</option><option value="รีสอร์ท">รีสอร์ท</option><option value="โรงแรม">โรงแรม</option></select></div>
-    <div><label><i class="fas fa-map-marker-alt"></i> จังหวัด / ทำเล</label><select id="s-prov"><option value="">ทุกทำเล</option></select></div>
+    <div id="loc-drill-wrap">
+      <label id="loc-drill-label"><i class="fas fa-map-marker-alt"></i> <span id="loc-drill-label-text">จังหวัด / ทำเล</span></label>
+      <div id="loc-drill-btn" onclick="locDrillToggle()" title="เลือกจังหวัด / อำเภอ">
+        <span id="loc-drill-display">ทุกทำเล</span>
+        <i class="fas fa-chevron-down" id="loc-drill-chevron"></i>
+        <!-- hidden selects retained for applyFilters compatibility -->
+        <select id="s-prov" style="display:none"></select>
+        <select id="s-dist" style="display:none"></select>
+      <!-- dropdown panel -->
+        <div id="loc-drill-panel" style="display:none" onclick="event.stopPropagation()">
+          <div id="loc-drill-list"></div>
+        </div>
+      </div>
+    </div>
     <div><label><i class="fas fa-tag"></i> ราคาต่ำสุด</label><select id="s-min" onchange="updatePriceMax()" style="width:100%;padding:10px 12px;border:1.5px solid rgba(200,146,42,.4);border-radius:10px;font-size:13px;color:#1a2744;background:rgba(255,255,255,0.95);font-weight:600"></select></div>
     <div><label><i class="fas fa-tag"></i> ราคาสูงสุด</label><select id="s-max" style="width:100%;padding:10px 12px;border:1.5px solid rgba(200,146,42,.4);border-radius:10px;font-size:13px;color:#1a2744;background:rgba(255,255,255,0.95);font-weight:600"></select></div>
     <button class="btn-search" onclick="doSearch()"><i class="fas fa-search"></i> ค้นหา</button>
@@ -4129,7 +4241,7 @@ footer::after{
   <div class="sub-page-footer"></div>
 </div>
 
-<div class="ov" id="prop-modal" onclick="closeModal(event)"><div class="modal"><div class="mhd"><h2 id="m-title"></h2><div style="display:flex;align-items:center;gap:8px"><button onclick="event.stopPropagation();(function(){const url=location.href;if(navigator.share)navigator.share({title:document.title,url});else navigator.clipboard?.writeText(url).then(()=>toast('คัดลอก URL แล้ว ✅'));})()" style="width:34px;height:34px;border-radius:50%;background:var(--lt);border:1.5px solid var(--bd);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--p);font-size:14px" title="แชร์"><i class="fas fa-share-nodes"></i></button><button id="m-fav-btn" onclick="event.stopPropagation();toggleModalFav()" class="modal-fav-btn" title="เพิ่มรายการโปรด"><i class="far fa-heart"></i></button><span class="mclose" onclick="event.stopPropagation();closeModal()">×</span></div></div><div class="mbody"><div class="mslider-wrap"><div class="mslider"><div class="slides" id="slides"></div></div><button class="sarr prev" onclick="slide(-1)"><i class="fas fa-chevron-left"></i></button><button class="sarr next" onclick="slide(1)"><i class="fas fa-chevron-right"></i></button><div class="sdots" id="sdots"></div></div><div id="m-tags" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px"></div><div class="modal-price" id="m-price"></div><div class="modal-loc" id="m-loc"></div><div class="specs" id="m-specs"></div><div id="m-extras"></div><div class="agent-box" id="m-agent"><div class="ag-av" id="m-ag-av"></div><div><div id="m-ag-name" style="font-weight:700"></div><div id="m-ag-role" style="font-size:12px;color:var(--gr)"></div></div></div><div class="modal-desc" id="m-desc"></div><div id="m-chips" style="margin-bottom:10px"></div><div id="m-map" style="margin-bottom:16px"></div><div id="m-360-wrap" style="margin-bottom:16px"><button id="m-360-toggle-btn" onclick="toggle360()" style="display:flex;align-items:center;gap:8px;width:100%;background:linear-gradient(135deg,#0f1e3a,#1b3a6b);color:#fff;border:none;border-radius:12px;padding:13px 18px;cursor:pointer;font-size:14px;font-weight:700;font-family:inherit;transition:.2s" onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'"><i class="fas fa-street-view" style="font-size:18px;opacity:.9"></i><span id="m-360-label">มุมมอง 360°</span><span class="tour360-badge">Virtual Tour</span><i id="m-360-chevron" class="fas fa-chevron-down" style="margin-left:auto;font-size:12px;opacity:.7;transition:transform .3s"></i></button><div id="m-360-viewer-wrap" style="display:none;margin-top:8px"><div id="m-360-viewer" class="tour360-viewer"><canvas id="tour360-canvas"></canvas><div class="tour360-hint"><i class="fas fa-hand-pointer"></i> <span id="m-drag-hint">ลากเพื่อหมุน</span></div><button class="tour360-close" onclick="toggle360()"><i class="fas fa-times"></i></button></div></div></div><div id="m-nearby" style="margin-bottom:14px"></div><div class="cta-row"><a class="btn-cta cta-ln" id="m-ln" href="#" target="_blank"><i class="fab fa-line"></i> <span id="m-ln-label">แชท Line</span></a><a class="btn-cta cta-tel" id="m-tel" href="#"><i class="fas fa-mobile-alt"></i> <span id="m-tel-label">โทรสอบถาม</span></a></div></div></div></div>
+<div class="ov" id="prop-modal" onclick="closeModal(event)"><div class="modal"><div class="mhd" style="justify-content:space-between"><h2 id="m-title" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-right:8px"></h2><div style="display:flex;align-items:center;gap:8px;flex-shrink:0"><button onclick="event.stopPropagation();(function(){const url=location.href;if(navigator.share)navigator.share({title:document.title,url});else navigator.clipboard?.writeText(url).then(()=>toast('คัดลอก URL แล้ว ✅'));})()" style="width:34px;height:34px;border-radius:50%;background:var(--lt);border:1.5px solid var(--bd);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--p);font-size:14px" title="แชร์"><i class="fas fa-share-nodes"></i></button><button id="m-fav-btn" onclick="event.stopPropagation();toggleModalFav()" class="modal-fav-btn" title="เพิ่มรายการโปรด"><i class="far fa-heart"></i></button><span class="mclose" onclick="event.stopPropagation();closeModal()">×</span></div></div><div class="mbody"><div class="mslider-wrap"><div class="mslider"><div class="slides" id="slides"></div></div><button class="sarr prev" onclick="slide(-1)"><i class="fas fa-chevron-left"></i></button><button class="sarr next" onclick="slide(1)"><i class="fas fa-chevron-right"></i></button><div class="sdots" id="sdots"></div></div><div id="m-tags" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px"></div><div class="modal-price" id="m-price"></div><div class="modal-loc" id="m-loc"></div><div class="specs" id="m-specs"></div><div id="m-extras"></div><div class="agent-box" id="m-agent"><div class="ag-av" id="m-ag-av"></div><div><div id="m-ag-name" style="font-weight:700"></div><div id="m-ag-role" style="font-size:12px;color:var(--gr)"></div></div></div><div class="modal-desc" id="m-desc"></div><div id="m-chips" style="margin-bottom:10px"></div><div id="m-map" style="margin-bottom:16px"></div><div id="m-360-wrap" style="margin-bottom:16px"><button id="m-360-toggle-btn" onclick="toggle360()" style="display:flex;align-items:center;gap:8px;width:100%;background:linear-gradient(135deg,#0f1e3a,#1b3a6b);color:#fff;border:none;border-radius:12px;padding:13px 18px;cursor:pointer;font-size:14px;font-weight:700;font-family:inherit;transition:.2s" onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'"><i class="fas fa-street-view" style="font-size:18px;opacity:.9"></i><span id="m-360-label">มุมมอง 360°</span><span class="tour360-badge">Virtual Tour</span><i id="m-360-chevron" class="fas fa-chevron-down" style="margin-left:auto;font-size:12px;opacity:.7;transition:transform .3s"></i></button><div id="m-360-viewer-wrap" style="display:none;margin-top:8px"><div id="m-360-viewer" class="tour360-viewer"><canvas id="tour360-canvas"></canvas><div class="tour360-hint"><i class="fas fa-hand-pointer"></i> <span id="m-drag-hint">ลากเพื่อหมุน</span></div><button class="tour360-close" onclick="toggle360()"><i class="fas fa-times"></i></button></div></div></div><div id="m-nearby" style="margin-bottom:14px"></div><div class="cta-row"><a class="btn-cta cta-ln" id="m-ln" href="#" target="_blank"><i class="fab fa-line"></i> <span id="m-ln-label">แชท Line</span></a><a class="btn-cta cta-tel" id="m-tel" href="#"><i class="fas fa-mobile-alt"></i> <span id="m-tel-label">โทรสอบถาม</span></a></div></div></div></div>
 <div class="ov" id="all-modal" onclick="if(event.target===this){if(window._allModalParentType){var _pt=window._allModalParentType;window._allModalParentType=null;openAllModal(_pt);}else{_closeModal('all-modal');window._modalCurrentType=null;}}"><div class="modal wide"><div class="mhd"><h2 id="all-title2"></h2><div id="all-modal-hdr-actions" style="display:flex;align-items:center;gap:7px;flex-shrink:0"></div><span class="mclose" onclick="if(window._allModalParentType){var _pt=window._allModalParentType;window._allModalParentType=null;openAllModal(_pt);}else{_closeModal('all-modal');window._modalCurrentType=null;}">×</span></div><div id="all-modal-filter-sticky"></div><div class="mbody" id="all-body" style="overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain"></div></div></div>
 <!-- ===== GOOGLE MY MAPS POPUP (เปิดทับ all-modal) ===== -->
 <!-- ===== GOOGLE MY MAPS INLINE PANEL — injected dynamically into all-modal ===== -->
@@ -4491,6 +4603,10 @@ function modalAdvFilter(type){
     if(ef.uni){var uniH=((p.location||'')+(p.desc||'')).toLowerCase();if(uniH.indexOf(ef.uni.toLowerCase())===-1) return false;}
     if(ef.furniture){ if((p.furniture||'') !== ef.furniture) return false; }
     if(ef.pets){ if(!p.pets_allowed) return false; }
+    if(ef.minLand && ef.minLand > 0 && Number(p.land_area||p.land||0) < ef.minLand) return false;
+    if(ef.maxLand && ef.maxLand < 1000 && Number(p.land_area||p.land||0) > ef.maxLand) return false;
+    if(ef.minUsable && ef.minUsable > 0 && Number(p.area||p.usable_area||p.usable||0) < ef.minUsable) return false;
+    if(ef.maxUsable && ef.maxUsable < 500 && Number(p.area||p.usable_area||p.usable||0) > ef.maxUsable) return false;
     if(ef.features && ef.features.length){
       var feat = (p.features||p.amenities||[]);
       var featStr = (typeof feat === 'string') ? feat : feat.join(' ');
@@ -4519,6 +4635,11 @@ function modalAdvReset(type){
     if(el.tagName === 'SELECT') el.value = el.options[0].value;
     else el.value = '';
   });
+  // reset custom drill-down widget
+  _madvProv = ''; _madvDist = ''; _madvLevel = 'top';
+  var disp = document.getElementById('madv-loc-display');
+  if(disp) disp.textContent = 'จังหวัด / ทำเล';
+  madvLocClose();
   var sortEl = document.getElementById('modal-adv-sort');
   if(sortEl) sortEl.value = 'default';
   var countEl = document.getElementById('modal-adv-count');
@@ -4639,7 +4760,7 @@ function _popupRefreshMarkersFromData(data){
 <div class="ov" id="srv-modal" onclick="if(event.target===this)_closeModal('srv-modal')"><div class="modal"><div class="mhd"><h2 id="srv-title2"></h2><span class="mclose" onclick="_closeModal('srv-modal')">×</span></div><div class="mbody" id="srv-body"></div></div></div>
 <div class="ov" id="blog-modal" onclick="if(event.target===this)_closeModal('blog-modal')"><div class="modal"><div class="mhd"><h2 id="blog-title"></h2><span class="mclose" onclick="_closeModal('blog-modal')">×</span></div><div class="mbody" id="blog-body"></div></div></div>
 <div class="ov" id="port-modal" onclick="if(event.target===this)_closeModal('port-modal')"><div class="modal"><div class="mhd"><h2 id="port-title"></h2><span class="mclose" onclick="_closeModal('port-modal')">×</span></div><div class="mbody" id="port-body"></div></div></div>
-<div class="ov" id="ag-modal" onclick="if(event.target===this)_closeModal('ag-modal')"><div class="modal"><div class="mhd"><h2 id="ag-title"></h2><span class="mclose" onclick="_closeModal('ag-modal')">×</span></div><div class="mbody" id="ag-body"></div></div></div>
+<div class="ov" id="ag-modal" onclick="if(event.target===this)_closeModal('ag-modal')"><div class="modal"><div class="mhd" style="justify-content:space-between"><h2 id="ag-title" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-right:8px"></h2><span class="mclose" style="flex-shrink:0" onclick="_closeModal('ag-modal')">×</span></div><div class="mbody" id="ag-body"></div></div></div>
 <div class="ov" id="login-modal" onclick="if(event.target===this)_closeModal('login-modal')"><div class="modal" style="max-width:400px"><div class="mhd"><h2><i class="fas fa-sign-in-alt" style="color:var(--p)"></i> เข้าสู่ระบบ</h2><span class="mclose" onclick="_closeModal('login-modal')">×</span></div><div class="mbody"><p style="margin-bottom:16px;color:var(--tx2);font-size:13px">กรุณาเข้าสู่ระบบก่อนส่งข้อมูลฝากทรัพย์หรือฝากความต้องการ</p><div class="login-btns"><button class="login-provider" onclick="loginWith('google')"><i class="fab fa-google" style="color:#DB4437"></i> เข้าสู่ระบบด้วย Google</button><button class="login-provider" onclick="loginWith('facebook')"><i class="fab fa-facebook" style="color:var(--fb)"></i> เข้าสู่ระบบด้วย Facebook</button></div><div class="login-sep">หรือ</div><div class="login-toggle"><button id="lt-pw-btn" class="active" onclick="setLoginTab('pw')">รหัสผ่าน</button><button id="lt-magic-btn" onclick="setLoginTab('magic')">Magic Link</button></div><input class="login-field" type="email" id="login-email" placeholder="อีเมล"><div id="lt-pw-section"><input class="login-field" type="password" id="login-pw" placeholder="รหัสผ่าน"><div style="text-align:right;margin-top:-4px;margin-bottom:10px"><button class="auth-link" onclick="resetPassword()">ลืมรหัสผ่าน?</button></div><button class="btn-sub" onclick="loginEmail()"><i class="fas fa-sign-in-alt"></i> เข้าสู่ระบบ</button></div><div id="lt-magic-section" style="display:none"><p class="magic-notice">เราจะส่งลิงก์เข้าสู่ระบบไปที่อีเมลโดยไม่ต้องใช้รหัสผ่าน</p><button class="btn-sub" onclick="loginMagicLink()"><i class="fas fa-magic"></i> ส่ง Magic Link</button></div><div style="margin-top:12px;text-align:center;font-size:12px">ยังไม่มีบัญชี? <a href="#" onclick="showSignup()" style="color:var(--a)">สมัครสมาชิก</a></div><div style="margin-top:10px;text-align:center"><button class="auth-link" style="font-size:12px;color:var(--gr)" onclick="_closeModal('login-modal');showPage('listings')"><i class="fas fa-search"></i> <span id="login-modal-browse-lbl">ดูประกาศก่อน ไม่ต้อง Login</span></button></div></div></div></div>
 <div class="ov" id="signup-modal" onclick="if(event.target===this)_closeModal('signup-modal')"><div class="modal" style="max-width:400px"><div class="mhd"><h2><i class="fas fa-user-plus" style="color:var(--p)"></i> สมัครสมาชิก</h2><span class="mclose" onclick="_closeModal('signup-modal')">×</span></div><div class="mbody"><div class="login-btns"><button class="login-provider" onclick="loginWith('google')"><i class="fab fa-google" style="color:#DB4437"></i> สมัครด้วย Google</button><button class="login-provider" onclick="loginWith('facebook')"><i class="fab fa-facebook" style="color:var(--fb)"></i> สมัครด้วย Facebook</button></div><div class="login-sep">หรือสมัครด้วยอีเมล</div><input class="login-field" type="email" id="su-email" placeholder="อีเมล"><input class="login-field" type="password" id="su-pw" placeholder="รหัสผ่าน (อย่างน้อย 6 ตัว)"><button class="btn-sub" onclick="signupEmail()"><i class="fas fa-user-plus"></i> สมัครสมาชิก</button><div style="margin-top:12px;text-align:center;font-size:12px">มีบัญชีแล้ว? <a href="#" onclick="showLogin()" style="color:var(--a)">เข้าสู่ระบบ</a></div></div></div></div>
 <!-- Reset Password Modal -->
@@ -5171,7 +5292,7 @@ function resetSearch(){
   // ── reset search bar fields ──
   const kw=$('s-kw'); if(kw){kw.value='';const al=$('ac-list');if(al)al.style.display='none';}
   const st=$('s-type');if(st)st.value='';
-  const sp=$('s-prov');if(sp)sp.value='';
+  locDrillClear(); locDrillClose();
   const smn=$('s-min');if(smn)smn.selectedIndex=0;
   const smx=$('s-max');if(smx)smx.selectedIndex=0;
   const pr=$('s-price-range');if(pr)pr.value='0|0';
@@ -6356,11 +6477,11 @@ function _buildPriceOpts(list, addUnlim) {
   // min dropdown: เริ่มด้วย "ราคาต่ำสุด" (v=0), max dropdown: ลงท้ายด้วย "ราคาสูงสุด" (v=999000000)
   if(addUnlim) {
     // max dropdown
-    return `<option value="999000000">ราคาสูงสุด</option>`
+    return `<option value="999000000">${(typeof ui==='function'?ui('sf.max.label'):'ราคาสูงสุด')}</option>`
       + list.map(o=>`<option value="${o.v}">${o.label}</option>`).join('');
   } else {
     // min dropdown
-    return `<option value="0">ราคาต่ำสุด</option>`
+    return `<option value="0">${(typeof ui==='function'?ui('sf.min.label'):'ราคาต่ำสุด')}</option>`
       + list.map(o=>`<option value="${o.v}">${o.label}</option>`).join('');
   }
 }
@@ -6486,6 +6607,7 @@ async function applyFilters(){
   const kw=($('s-kw')?.value||'').trim();
   const tp=curType||$('s-type')?.value||'';
   const pv=$('s-prov')?.value||'';
+  const dv=($('s-dist')?.value||'').trim();
   const min=+$('s-min')?.value||0;
   const max=+$('s-max')?.value||999e6;
 
@@ -6496,7 +6618,7 @@ async function applyFilters(){
 
   // ── ถ้าไม่มีเงื่อนไขใดเลย → แสดงทั้งหมด (ไม่ต้องกรอง) ───────────
   // ถ้าไม่มี filter ใดเลย (รวมถึง tx='ALL') → แสดงทั้งหมดทันที
-  const hasAnyFilter = kw || tp || pv || min>0 || max<999e5 || (tx && tx!=='ALL');
+  const hasAnyFilter = kw || tp || pv || dv || min>0 || max<999e5 || (tx && tx!=='ALL');
   if(!hasAnyFilter){
     _renderHomeGrids();
     return;
@@ -6525,6 +6647,7 @@ async function applyFilters(){
     if(tx!=='ALL' && p.tx!==tx) return false;
     if(_acceptedTypes && !_acceptedTypes.includes(p.type)) return false;
     if(pv&&p.province!==pv) return false;
+    if(dv && !((p.district||p.amphoe||p.location||'').includes(dv))) return false;
     if(kwlOrig){
       const titleL = p.title.toLowerCase();
       const locL = (p.location||'').toLowerCase();
@@ -6710,7 +6833,7 @@ function gotoRec(){ _closeHamburger(); closeAllDD(); _silentShowPage('home', tru
 function gotoBlog(){ _closeHamburger(); closeAllDD(); _silentShowPage('home', true); setTimeout(()=>scrollToEl('blog-sec'),50); }
 function gotoOtherSrv(){ _closeHamburger(); closeAllDD(); _silentShowPage('home', true); setTimeout(()=>scrollToEl('osrv-sec'),50); }
 function quickSearch(kw){ _silentShowPage('home',true); const inp=document.getElementById('s-kw'); if(inp){inp.value=kw;} closeQsDDs(); closeQsSheet(); setTimeout(()=>{ doSearch(); setTimeout(()=>scrollToEl('all-sec'),80); },80); }
-function quickProvSearch(prov){ showPage('home'); setTimeout(()=>{ const sp=document.getElementById('s-prov'); if(sp){ let found=false; for(const opt of sp.options){if(opt.value===prov||opt.text===prov){opt.selected=true;found=true;break;}} if(!found){const o=document.createElement('option');o.value=prov;o.text=prov;o.selected=true;sp.appendChild(o);} } applyFilters().catch(console.error); scrollToEl('all-sec'); },100); }
+function quickProvSearch(prov){ showPage('home'); setTimeout(()=>{ _locProv=prov; _locDist=''; _locLevel='province'; locDrillCommit(); scrollToEl('all-sec'); },100); }
 // Map section names to URL paths and SEO metadata
 const PAGE_ROUTES = {
   'listings':   { path: '/listings',   title: 'ประกาศอสังหาฯทั้งหมด — บ้าน คอนโด ที่ดิน ใกล้ BTS MRT กรุงเทพ | Matchdoor', desc: 'ค้นหาบ้าน คอนโด ทาวน์โฮม ที่ดิน ใกล้ BTS MRT ทุกสาย กรุงเทพ ทุกระดับราคา ปรึกษาฟรี' },
@@ -8441,9 +8564,8 @@ function openModal(id){
   const allModalOpen = $('all-modal').classList.contains('open');
   window._openedFromAllModal = allModalOpen;
   if(allModalOpen) {
-    // ซ่อน all-modal ชั่วคราว (ไม่ _closeModal ซึ่งจะทำลาย state pagination/sort)
-    $('all-modal').style.visibility = 'hidden';
-    $('all-modal').style.pointerEvents = 'none';
+    // ไม่ซ่อน all-modal — ให้ prop-modal ลอยอยู่เหนือด้วย z-index ที่สูงกว่า
+    // all-modal จะยังมองเห็นอยู่เบื้องหลัง prop-modal
   }
   const p=props.find(x=>String(x.id)==String(id));
   if(!p)return;
@@ -8695,27 +8817,13 @@ function closeModal(e){
   const savedY = document.body._savedScrollY || 0;
   document.body._savedScrollY = 0;
 
-  // unlock scroll และปิด modal ใน 1 ชุดคำสั่ง
-  document.body.style.removeProperty('overflow');
-  document.body.style.removeProperty('position');
-  document.body.style.removeProperty('top');
-  document.body.style.removeProperty('width');
-  document.body.style.removeProperty('left');
-  document.body.classList.remove('modal-open');
-  modal.classList.remove('open');
-  window._currentModalId = null;
-
-  // ── ถ้าเปิดการ์ดมาจาก all-modal → คืน all-modal กลับมา ──
+  // ── ถ้าเปิดการ์ดมาจาก all-modal → ปิดแค่ prop-modal, all-modal ยังคงเปิดอยู่ ──
   if(window._openedFromAllModal) {
     window._openedFromAllModal = false;
-    const allModal = $('all-modal');
-    if(allModal && allModal.classList.contains('open')) {
-      allModal.style.visibility = '';
-      allModal.style.pointerEvents = '';
-      // re-lock scroll เพราะ all-modal ยังเปิดอยู่
-      document.body.classList.add('modal-open');
-    }
-    // reset scroll lock flags และจบ (ไม่ต้องทำ restore page)
+    modal.classList.remove('open');
+    window._currentModalId = null;
+    // ไม่ unlock scroll เพราะ all-modal ยังเปิดอยู่ต้องการ modal-open
+    // (document.body.classList ยังคง modal-open ไว้)
     requestAnimationFrame(function() {
       if(typeof window._listingsRenderGen !== 'undefined') {
         window._listingsRenderGen = (window._listingsRenderGen + 1) & 0xFFFF;
@@ -8727,6 +8835,16 @@ function closeModal(e){
     });
     return;
   }
+
+  // unlock scroll และปิด modal ใน 1 ชุดคำสั่ง (กรณีไม่ได้มาจาก all-modal)
+  document.body.style.removeProperty('overflow');
+  document.body.style.removeProperty('position');
+  document.body.style.removeProperty('top');
+  document.body.style.removeProperty('width');
+  document.body.style.removeProperty('left');
+  document.body.classList.remove('modal-open');
+  modal.classList.remove('open');
+  window._currentModalId = null;
 
   // ── FIX ข้อ 6: restore listings page หลัง modal ปิด — ใช้ logic เดียวกับ ข้อ 1-4 ──
   // ใช้ requestAnimationFrame เดียว ไม่มี nested setTimeout ป้องกัน race condition
@@ -8902,11 +9020,11 @@ function openAllModal(type){
   // ── header action buttons: map + viewall (injected into modal header beside ×) ──
   const _viewAllBtn = type!=='all'
     ? `<button onclick="window._allModalParentType='${type}';openAllModal('all')" style="padding:6px 13px;background:var(--p);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:5px;flex-shrink:0"><i class="fas fa-list"></i> ${ui('modal.viewall')}</button>`
-    : (window._allModalParentType ? `<button onclick="var _pt=window._allModalParentType;window._allModalParentType=null;openAllModal(_pt)" style="padding:6px 13px;background:var(--lt);color:var(--p);border:1.5px solid var(--bd);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:5px;flex-shrink:0"><i class="fas fa-arrow-left"></i> กลับ</button>` : '');
+    : (window._allModalParentType ? `<button onclick="var _pt=window._allModalParentType;window._allModalParentType=null;openAllModal(_pt)" style="padding:6px 13px;background:var(--lt);color:var(--p);border:1.5px solid var(--bd);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:5px;flex-shrink:0"><i class="fas fa-arrow-left"></i><span class="btn-txt"> ${ui('ls.back')}</span></button>` : '');
   // inject map + viewall buttons into header actions slot
   const _hdrActions = document.getElementById('all-modal-hdr-actions');
   if(_hdrActions){
-    const _sortSelect = `<select id="modal-adv-sort" class="modal-hdr-sort-select" onchange="modalAdvFilter('${type}')" title="เรียงลำดับ">
+    const _sortSelect = `<select id="modal-adv-sort" class="modal-hdr-sort-select" onchange="modalAdvFilter('${type}')" title="${ui('modal.sort.rec')}">
         <option value="default">${ui('modal.sort.rec')}</option>
         <option value="price_asc">${ui('modal.sort.asc')}</option>
         <option value="price_desc">${ui('modal.sort.desc')}</option>
@@ -8927,161 +9045,42 @@ function openAllModal(type){
     <div class="modal-adv-filter-row1">
       <div class="modal-adv-search-wrap" style="flex:1 1 140px;min-width:100px;max-width:220px">
         <i class="fas fa-search"></i>
-        <input class="modal-adv-search-input" id="modal-adv-kw" placeholder="ชื่อโครงการ ทำเล..." oninput="modalAdvFilter('${type}')">
+        <input class="modal-adv-search-input" id="modal-adv-kw" placeholder="${ui('sf.kw.ph')}" oninput="modalAdvFilter('${type}')">
       </div>
       <select class="modal-adv-select" id="modal-adv-tx" onchange="modalAdvFilter('${type}')" style="flex:0 0 auto;min-width:0;width:72px;text-align:center;text-align-last:center;padding-left:5px;padding-right:18px">
-        <option value="">ทั้งหมด</option>
-        <option value="BUY">ซื้อ</option>
-        <option value="RENT">เช่า</option>
+        <option value="">${ui('hero.all.label')}</option>
+        <option value="BUY">${ui('hero.buy.label')}</option>
+        <option value="RENT">${ui('hero.rent.label')}</option>
       </select>
       <select class="modal-adv-select" id="modal-adv-proptype" onchange="modalAdvFilter('${type}')">
-        <option value="">ทุกประเภท</option>
-        <option value="คอนโด">คอนโด</option>
-        <option value="บ้านเดี่ยว">บ้านเดี่ยว</option>
-        <option value="ทาวน์โฮม">ทาวน์โฮม</option>
-        <option value="ที่ดิน">ที่ดิน</option>
-        <option value="อาคารพาณิชย์">อาคารพาณิชย์</option>
-        <option value="โรงแรม">โรงแรม</option>
-        <option value="รีสอร์ท">รีสอร์ท</option>
+        <option value="">${ui('sf.type.all')}</option>
+        <option value="คอนโด">${ui('dd.condo')}</option>
+        <option value="บ้านเดี่ยว">${ui('dd.house')}</option>
+        <option value="ทาวน์โฮม">${ui('dd.town')}</option>
+        <option value="ที่ดิน">${ui('dd.land')}</option>
+        <option value="อาคารพาณิชย์">${ui('dd.comm')}</option>
+        <option value="โรงแรม">${ui('dd.hotel')}</option>
+        <option value="รีสอร์ท">${ui('dd.resort')}</option>
       </select>
     </div><!-- end row1 -->
     <div class="modal-adv-filter-row2" style="display:flex;flex-wrap:nowrap;gap:6px;align-items:center">
-      <select class="modal-adv-select" id="modal-adv-popular-loc" onchange="if(this.value){document.getElementById('modal-adv-province').value='';} modalAdvFilter('${type}')">
-        <option value="">ทำเลยอดนิยม</option>
-        <optgroup label="📍 โซนกลางเมือง — CBD">
-        <option value="สุขุมวิท">สุขุมวิท</option>
-        <option value="สาทร">สาทร</option>
-        <option value="สีลม">สีลม</option>
-        <option value="อโศก">อโศก</option>
-        <option value="ทองหล่อ">ทองหล่อ</option>
-        <option value="เพลินจิต">เพลินจิต</option>
-        <option value="ชิดลม">ชิดลม</option>
-        <option value="ราชประสงค์">ราชประสงค์</option>
-        <option value="ลุมพินี">ลุมพินี</option>
-        </optgroup>
-        <optgroup label="📍 โซนตะวันออก">
-        <option value="พระโขนง">พระโขนง</option>
-        <option value="เอกมัย">เอกมัย</option>
-        <option value="อ่อนนุช">อ่อนนุช</option>
-        <option value="บางนา">บางนา</option>
-        <option value="มีนบุรี">มีนบุรี</option>
-        <option value="รามคำแหง">รามคำแหง</option>
-        <option value="หัวหมาก">หัวหมาก</option>
-        <option value="สุวรรณภูมิ">สุวรรณภูมิ</option>
-        </optgroup>
-        <optgroup label="📍 โซนเหนือ">
-        <option value="รัชดา">รัชดาภิเษก</option>
-        <option value="ลาดพร้าว">ลาดพร้าว</option>
-        <option value="จตุจักร">จตุจักร</option>
-        <option value="หมอชิต">หมอชิต</option>
-        <option value="พหลโยธิน">พหลโยธิน</option>
-        <option value="อารีย์">อารีย์</option>
-        <option value="พระราม 9">พระราม 9</option>
-        <option value="ห้วยขวาง">ห้วยขวาง</option>
-        <option value="ดอนเมือง">ดอนเมือง</option>
-        </optgroup>
-        <optgroup label="📍 โซนตะวันตก &amp; ใต้">
-        <option value="ปิ่นเกล้า">ปิ่นเกล้า</option>
-        <option value="บางแค">บางแค</option>
-        <option value="พระราม 3">พระราม 3</option>
-        <option value="ธนบุรี">ธนบุรี</option>
-        <option value="ตลิ่งชัน">ตลิ่งชัน</option>
-        <option value="สาธุประดิษฐ์">สาธุประดิษฐ์</option>
-        </optgroup>
-        <optgroup label="🏖️ ต่างจังหวัดยอดนิยม">
-        <option value="เชียงใหม่">เชียงใหม่</option>
-        <option value="ภูเก็ต">ภูเก็ต</option>
-        <option value="พัทยา">พัทยา / ชลบุรี</option>
-        <option value="เขาใหญ่">เขาใหญ่</option>
-        <option value="หัวหิน">หัวหิน</option>
-        <option value="กาญจนบุรี">กาญจนบุรี</option>
-        <option value="เกาะสมุย">เกาะสมุย</option>
-        </optgroup>
-      </select>
-      <select class="modal-adv-select" id="modal-adv-province" onchange="if(this.value){document.getElementById('modal-adv-popular-loc').value='';} modalAdvFilter('${type}')">
-        <option value="">จังหวัด / ทำเล</option>
-        <option value="กรุงเทพมหานคร">กรุงเทพมหานคร</option>
-        <option value="กระบี่">กระบี่</option>
-        <option value="กาญจนบุรี">กาญจนบุรี</option>
-        <option value="กาฬสินธุ์">กาฬสินธุ์</option>
-        <option value="กำแพงเพชร">กำแพงเพชร</option>
-        <option value="ขอนแก่น">ขอนแก่น</option>
-        <option value="จันทบุรี">จันทบุรี</option>
-        <option value="ฉะเชิงเทรา">ฉะเชิงเทรา</option>
-        <option value="ชลบุรี">ชลบุรี</option>
-        <option value="ชัยนาท">ชัยนาท</option>
-        <option value="ชัยภูมิ">ชัยภูมิ</option>
-        <option value="ชุมพร">ชุมพร</option>
-        <option value="เชียงราย">เชียงราย</option>
-        <option value="เชียงใหม่">เชียงใหม่</option>
-        <option value="ตรัง">ตรัง</option>
-        <option value="ตราด">ตราด</option>
-        <option value="ตาก">ตาก</option>
-        <option value="นครนายก">นครนายก</option>
-        <option value="นครปฐม">นครปฐม</option>
-        <option value="นครพนม">นครพนม</option>
-        <option value="นครราชสีมา">นครราชสีมา</option>
-        <option value="นครศรีธรรมราช">นครศรีธรรมราช</option>
-        <option value="นครสวรรค์">นครสวรรค์</option>
-        <option value="นนทบุรี">นนทบุรี</option>
-        <option value="นราธิวาส">นราธิวาส</option>
-        <option value="น่าน">น่าน</option>
-        <option value="บึงกาฬ">บึงกาฬ</option>
-        <option value="บุรีรัมย์">บุรีรัมย์</option>
-        <option value="ปทุมธานี">ปทุมธานี</option>
-        <option value="ประจวบคีรีขันธ์">ประจวบคีรีขันธ์</option>
-        <option value="ปราจีนบุรี">ปราจีนบุรี</option>
-        <option value="ปัตตานี">ปัตตานี</option>
-        <option value="พระนครศรีอยุธยา">พระนครศรีอยุธยา</option>
-        <option value="พะเยา">พะเยา</option>
-        <option value="พังงา">พังงา</option>
-        <option value="พัทลุง">พัทลุง</option>
-        <option value="พิจิตร">พิจิตร</option>
-        <option value="พิษณุโลก">พิษณุโลก</option>
-        <option value="เพชรบุรี">เพชรบุรี</option>
-        <option value="เพชรบูรณ์">เพชรบูรณ์</option>
-        <option value="แพร่">แพร่</option>
-        <option value="ภูเก็ต">ภูเก็ต</option>
-        <option value="มหาสารคาม">มหาสารคาม</option>
-        <option value="มุกดาหาร">มุกดาหาร</option>
-        <option value="แม่ฮ่องสอน">แม่ฮ่องสอน</option>
-        <option value="ยโสธร">ยโสธร</option>
-        <option value="ยะลา">ยะลา</option>
-        <option value="ร้อยเอ็ด">ร้อยเอ็ด</option>
-        <option value="ระนอง">ระนอง</option>
-        <option value="ระยอง">ระยอง</option>
-        <option value="ราชบุรี">ราชบุรี</option>
-        <option value="ลพบุรี">ลพบุรี</option>
-        <option value="ลำปาง">ลำปาง</option>
-        <option value="ลำพูน">ลำพูน</option>
-        <option value="เลย">เลย</option>
-        <option value="ศรีสะเกษ">ศรีสะเกษ</option>
-        <option value="สกลนคร">สกลนคร</option>
-        <option value="สงขลา">สงขลา</option>
-        <option value="สตูล">สตูล</option>
-        <option value="สมุทรปราการ">สมุทรปราการ</option>
-        <option value="สมุทรสงคราม">สมุทรสงคราม</option>
-        <option value="สมุทรสาคร">สมุทรสาคร</option>
-        <option value="สระแก้ว">สระแก้ว</option>
-        <option value="สระบุรี">สระบุรี</option>
-        <option value="สิงห์บุรี">สิงห์บุรี</option>
-        <option value="สุโขทัย">สุโขทัย</option>
-        <option value="สุพรรณบุรี">สุพรรณบุรี</option>
-        <option value="สุราษฎร์ธานี">สุราษฎร์ธานี</option>
-        <option value="สุรินทร์">สุรินทร์</option>
-        <option value="หนองคาย">หนองคาย</option>
-        <option value="หนองบัวลำภู">หนองบัวลำภู</option>
-        <option value="อ่างทอง">อ่างทอง</option>
-        <option value="อำนาจเจริญ">อำนาจเจริญ</option>
-        <option value="อุดรธานี">อุดรธานี</option>
-        <option value="อุตรดิตถ์">อุตรดิตถ์</option>
-        <option value="อุทัยธานี">อุทัยธานี</option>
-        <option value="อุบลราชธานี">อุบลราชธานี</option>
-      </select>
+      <!-- hidden selects for modalAdvFilter compatibility -->
+      <select id="modal-adv-popular-loc" style="display:none"></select>
+      <select id="modal-adv-province" style="display:none"></select>
+      <!-- custom drill-down -->
+      <div id="madv-loc-wrap">
+        <div id="madv-loc-btn" onclick="madvLocToggle()" title="เลือกทำเล / จังหวัด">
+          <span id="madv-loc-display">จังหวัด / ทำเล</span>
+          <i class="fas fa-chevron-down" id="madv-loc-chevron"></i>
+          <div id="madv-loc-panel" style="display:none" onclick="event.stopPropagation()">
+            <div id="madv-loc-list"></div>
+          </div>
+        </div>
+      </div>
     </div><!-- end row2 -->
     <div class="modal-adv-filter-row3" style="display:flex;flex-wrap:nowrap;gap:6px;align-items:center">
       <select class="modal-adv-select" id="modal-adv-minprice" onchange="modalAdvFilter('${type}')" style="flex:1 1 80px;min-width:0">
-        <option value="">ราคาต่ำสุด</option>
+        <option value="">${ui('sf.min.label')}</option>
         <option value="5000">5,000</option>
         <option value="10000">10,000</option>
         <option value="15000">15,000</option>
@@ -9111,7 +9110,7 @@ function openAllModal(type){
         <option value="100000000">100M</option>
       </select>
       <select class="modal-adv-select" id="modal-adv-maxprice" onchange="modalAdvFilter('${type}')" style="flex:1 1 80px;min-width:0">
-        <option value="">ราคาสูงสุด</option>
+        <option value="">${ui('sf.max.label')}</option>
         <option value="5000">5,000</option>
         <option value="10000">10,000</option>
         <option value="15000">15,000</option>
@@ -9140,8 +9139,8 @@ function openAllModal(type){
         <option value="50000000">50M</option>
         <option value="100000000">100M</option>
       </select>
-      <button class="modal-adv-filter-btn" onclick="openModalAdvExtraFilter('${type}')" title="Filter เพิ่มเติม" style="background:#fff;color:var(--p);border:1.5px solid var(--bd);padding:7px 10px;min-width:36px"><i class="fas fa-sliders-h"></i></button>
-      <button class="modal-adv-reset-btn" onclick="modalAdvReset('${type}')" title="รีเซ็ต" style="padding:7px 10px;min-width:36px"><i class="fas fa-undo"></i></button>
+      <button class="modal-adv-filter-btn" onclick="openModalAdvExtraFilter('${type}')" title="${ui('af.btn.label')}" style="background:#fff;color:var(--p);border:1.5px solid var(--bd);padding:7px 10px;min-width:36px"><i class="fas fa-sliders-h"></i></button>
+      <button class="modal-adv-reset-btn" onclick="modalAdvReset('${type}')" title="${ui('af.btn.reset')}" style="padding:7px 10px;min-width:36px"><i class="fas fa-undo"></i></button>
     </div>
   </div>`;
   t.textContent=title;
@@ -9263,9 +9262,13 @@ function openModalAdvExtraFilter(type) {
   const _bts      = _ef.bts      || '';
   const _mrt      = _ef.mrt      || '';
   const _uni      = _ef.uni      || '';
-  const _features = _ef.features || [];
+  const _features  = _ef.features  || [];
   const _furniture = _ef.furniture || '';
-  const _pets      = _ef.pets     || false;
+  const _pets      = _ef.pets      || false;
+  const _minLand   = _ef.minLand   || 0;
+  const _maxLand   = _ef.maxLand   || 1000;
+  const _minUsable = _ef.minUsable || 0;
+  const _maxUsable = _ef.maxUsable || 500;
   const featureList = ['แอร์','ตู้เย็น','ที่จอดรถ','เครื่องซักผ้า','สระว่ายน้ำ','ฟิตเนส','ลิฟต์','รักษาความปลอดภัย','ส่วนกลาง'];
 
   const mo = document.createElement('div');
@@ -9276,7 +9279,7 @@ function openModalAdvExtraFilter(type) {
   <div style="background:#fff;border-radius:20px;width:100%;max-width:560px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 28px 70px rgba(0,0,0,.38),0 2px 12px rgba(0,0,0,.15);border:1.5px solid rgba(200,146,42,.25);animation:advPopupIn .22s cubic-bezier(.34,1.4,.64,1)">
     <!-- Header -->
     <div style="padding:16px 20px 12px;background:linear-gradient(135deg,#0A1628,#1B3A6B);color:#fff;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
-      <h3 style="font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px;margin:0"><i class="fas fa-sliders-h" style="color:var(--a)"></i> Filter เพิ่มเติม</h3>
+      <h3 style="font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px;margin:0"><i class="fas fa-sliders-h" style="color:var(--a)"></i> ${ui('af.title')}</h3>
       <button onclick="document.getElementById('modal-extra-filter-sheet').remove()" style="background:none;border:none;font-size:22px;cursor:pointer;color:rgba(255,255,255,.7);line-height:1">×</button>
     </div>
     <!-- Body -->
@@ -9284,10 +9287,10 @@ function openModalAdvExtraFilter(type) {
 
       <!-- ช่วงราคา -->
       <div style="margin-bottom:16px">
-        <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4"><i class="fas fa-tag" style="color:var(--a)"></i> ช่วงราคา (บาท)</div>
+        <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4"><i class="fas fa-tag" style="color:var(--a)"></i> ${ui('af.sec.price')}</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
           <select id="mef-price-min" style="width:100%;padding:8px 10px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;background:#fff">
-            <option value="">ราคาต่ำสุด</option>
+            <option value="">${ui('af.price.min')}</option>
             <option value="5000" ${_minPrice=='5000'?'selected':''}>5,000</option>
             <option value="10000" ${_minPrice=='10000'?'selected':''}>10,000</option>
             <option value="15000" ${_minPrice=='15000'?'selected':''}>15,000</option>
@@ -9317,7 +9320,7 @@ function openModalAdvExtraFilter(type) {
             <option value="100000000" ${_minPrice=='100000000'?'selected':''}>100M</option>
           </select>
           <select id="mef-price-max" style="width:100%;padding:8px 10px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;background:#fff">
-            <option value="">ราคาสูงสุด</option>
+            <option value="">${ui('sf.max.label')}</option>
             <option value="5000" ${_maxPrice=='5000'?'selected':''}>5,000</option>
             <option value="10000" ${_maxPrice=='10000'?'selected':''}>10,000</option>
             <option value="15000" ${_maxPrice=='15000'?'selected':''}>15,000</option>
@@ -9352,9 +9355,9 @@ function openModalAdvExtraFilter(type) {
       <!-- ทำเล/จังหวัด (2 col) -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
         <div>
-          <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4"><i class="fas fa-fire" style="color:#ff4d6d"></i> ทำเลยอดนิยม</div>
+          <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4"><i class="fas fa-fire" style="color:#ff4d6d"></i> ${ui('af.sec.popular')}</div>
           <select id="mef-loc" style="width:100%;padding:8px 10px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;background:#fff">
-          <option value="">-- เลือกทำเลยอดนิยม --</option>
+          <option value="">-- ${ui('af.sec.popular')} --</option>
           <optgroup label="📍 โซนกลางเมือง — CBD">
           <option value="สุขุมวิท" ${_loc=='สุขุมวิท'?'selected':''}>สุขุมวิท</option>
           <option value="สาทร" ${_loc=='สาทร'?'selected':''}>สาทร</option>
@@ -9407,9 +9410,9 @@ function openModalAdvExtraFilter(type) {
         </select>
         </div>
         <div>
-          <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4"><i class="fas fa-map-marker-alt" style="color:var(--p)"></i> จังหวัด (77 จังหวัด)</div>
+          <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4"><i class="fas fa-map-marker-alt" style="color:var(--p)"></i> ${ui('af.sec.prov')}</div>
           <select id="mef-province" style="width:100%;padding:8px 10px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;background:#fff">
-          <option value="">ทุกจังหวัด</option>
+          <option value="">${ui('af.prov.all')}</option>
           <option value="กรุงเทพมหานคร" ${_loc=='กรุงเทพมหานคร'?'selected':''}>กรุงเทพมหานคร</option>
           <option value="กระบี่" ${_loc=='กระบี่'?'selected':''}>กระบี่</option>
           <option value="กาญจนบุรี" ${_loc=='กาญจนบุรี'?'selected':''}>กาญจนบุรี</option>
@@ -9494,9 +9497,9 @@ function openModalAdvExtraFilter(type) {
       <!-- BTS + MRT (2 col) -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
         <div>
-          <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4"><i class="fas fa-train" style="color:#009900"></i> ใกล้สถานี BTS</div>
+          <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4"><i class="fas fa-train" style="color:#009900"></i> ${ui('af.sec.bts')}</div>
           <select id="mef-bts" style="width:100%;padding:8px 10px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;background:#fff">
-          <option value="">ทุกสถานี BTS/SRT/ARL</option>
+          <option value="">${ui('af.bts.all')}</option>
           <optgroup label="🟢 BTS สายสุขุมวิท — เหนือ (N1–N24)">
           <option value="ราชเทวี" ${_bts=='ราชเทวี'?'selected':''}>ราชเทวี (N1)</option>
           <option value="พญาไท" ${_bts=='พญาไท'?'selected':''}>พญาไท (N2)</option>
@@ -9599,9 +9602,9 @@ function openModalAdvExtraFilter(type) {
         </select>
         </div>
         <div>
-          <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4"><i class="fas fa-subway" style="color:#003399"></i> ใกล้สถานี MRT</div>
+          <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4"><i class="fas fa-subway" style="color:#003399"></i> ${ui('af.sec.mrt')}</div>
           <select id="mef-mrt" style="width:100%;padding:8px 10px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;background:#fff">
-          <option value="">ทุกสถานี MRT/BEM</option>
+          <option value="">${ui('af.mrt.all')}</option>
           <optgroup label="🔵 สายน้ำเงิน (วงแหวน)">
           <option value="ท่าพระ" ${_mrt=='ท่าพระ'?'selected':''}>ท่าพระ (BL01)</option>
           <option value="บางไผ่" ${_mrt=='บางไผ่'?'selected':''}>บางไผ่ (BL02)</option>
@@ -9716,9 +9719,9 @@ function openModalAdvExtraFilter(type) {
 
       <!-- ใกล้มหาวิทยาลัย (full width) -->
       <div style="margin-bottom:16px">
-        <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4"><i class="fas fa-university" style="color:#7c3aed"></i> ใกล้มหาวิทยาลัย</div>
+        <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4"><i class="fas fa-university" style="color:#7c3aed"></i> ${ui('af.sec.uni')}</div>
         <select id="mef-uni" style="width:100%;padding:8px 10px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;background:#fff">
-          <option value="">ทุกมหาวิทยาลัย</option>
+          <option value="">${ui('af.uni.all')}</option>
           <optgroup label="กรุงเทพฯ และปริมณฑล">
           <option value="จุฬาลงกรณ์" ${_uni=='จุฬาลงกรณ์'?'selected':''}>จุฬาลงกรณ์มหาวิทยาลัย</option>
           <option value="ธรรมศาสตร์" ${_uni=='ธรรมศาสตร์'?'selected':''}>มหาวิทยาลัยธรรมศาสตร์</option>
@@ -9757,24 +9760,80 @@ function openModalAdvExtraFilter(type) {
         </select>
       </div>
 
+      <!-- ขนาดที่ดิน + ขนาดพื้นที่ใช้สอย (2 col) — range slider เหมือน adv-filter-panel -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+        <!-- ขนาดที่ดิน -->
+        <div>
+          <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4">${ui('af.sec.land')}</div>
+          <div id="mef-land-summary" style="font-size:11px;font-weight:700;color:var(--p);background:rgba(27,58,107,.07);border-radius:6px;padding:3px 8px;margin-bottom:6px;text-align:center">${_minLand===0&&_maxLand>=1000?ui('af.all.size'):(_minLand+' – '+(_maxLand>=1000?ui('af.unlimited'):_maxLand)+' ตร.ว.')}</div>
+          <div style="font-size:10px;color:#aaa;display:flex;justify-content:space-between;margin-bottom:2px"><span>0</span><span>250</span><span>500</span><span>750</span><span>1,000+</span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+            <div>
+              <label style="font-size:10px;color:#888;display:block;margin-bottom:2px">${ui('af.min')}</label>
+              <div style="position:relative">
+                <input type="range" id="mef-land-min" min="0" max="1000" step="10" value="${_minLand}"
+                  style="width:100%;accent-color:var(--p);cursor:pointer"
+                  oninput="mefRangeUpdate('land')">
+                <span id="mef-land-min-v" style="position:absolute;top:-22px;left:50%;transform:translateX(-50%);background:var(--p);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;white-space:nowrap">${_minLand} ตร.ว.</span>
+              </div>
+            </div>
+            <div>
+              <label style="font-size:10px;color:#888;display:block;margin-bottom:2px">${ui('af.max')}</label>
+              <div style="position:relative">
+                <input type="range" id="mef-land-max" min="0" max="1000" step="10" value="${_maxLand}"
+                  style="width:100%;accent-color:var(--a);cursor:pointer"
+                  oninput="mefRangeUpdate('land')">
+                <span id="mef-land-max-v" style="position:absolute;top:-22px;left:50%;transform:translateX(-50%);background:#1A1A2E;color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;white-space:nowrap">${_maxLand>=1000?ui('af.unlimited'):_maxLand+' ตร.ว.'}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- ขนาดพื้นที่ใช้สอย -->
+        <div>
+          <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4">${ui('af.sec.area')}</div>
+          <div id="mef-area-summary" style="font-size:11px;font-weight:700;color:var(--p);background:rgba(27,58,107,.07);border-radius:6px;padding:3px 8px;margin-bottom:6px;text-align:center">${_minUsable===0&&_maxUsable>=500?ui('af.all.size'):(_minUsable+' – '+(_maxUsable>=500?ui('af.unlimited'):_maxUsable)+' ตร.ม.')}</div>
+          <div style="font-size:10px;color:#aaa;display:flex;justify-content:space-between;margin-bottom:2px"><span>0</span><span>125</span><span>250</span><span>375</span><span>500+</span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+            <div>
+              <label style="font-size:10px;color:#888;display:block;margin-bottom:2px">${ui('af.min')}</label>
+              <div style="position:relative">
+                <input type="range" id="mef-area-min" min="0" max="500" step="5" value="${_minUsable}"
+                  style="width:100%;accent-color:var(--p);cursor:pointer"
+                  oninput="mefRangeUpdate('area')">
+                <span id="mef-area-min-v" style="position:absolute;top:-22px;left:50%;transform:translateX(-50%);background:var(--p);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;white-space:nowrap">${_minUsable} ตร.ม.</span>
+              </div>
+            </div>
+            <div>
+              <label style="font-size:10px;color:#888;display:block;margin-bottom:2px">${ui('af.max')}</label>
+              <div style="position:relative">
+                <input type="range" id="mef-area-max" min="0" max="500" step="5" value="${_maxUsable}"
+                  style="width:100%;accent-color:var(--a);cursor:pointer"
+                  oninput="mefRangeUpdate('area')">
+                <span id="mef-area-max-v" style="position:absolute;top:-22px;left:50%;transform:translateX(-50%);background:#1A1A2E;color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;white-space:nowrap">${_maxUsable>=500?ui('af.unlimited'):_maxUsable+' ตร.ม.'}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- end 2-col: ขนาดที่ดิน + พื้นที่ใช้สอย -->
+
       <!-- ห้องนอน / ห้องน้ำ (2 col) — checkbox เหมือน adv-filter-panel -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
         <div>
-          <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4">ห้องนอน</div>
+          <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4">${ui('af.sec.bed')}</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" value="1" class="mef-bed" ${(_minBed=='1')?'checked':''} style="accent-color:var(--p)"> 1 ห้อง</label>
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" value="2" class="mef-bed" ${(_minBed=='2')?'checked':''} style="accent-color:var(--p)"> 2 ห้อง</label>
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" value="3" class="mef-bed" ${(_minBed=='3')?'checked':''} style="accent-color:var(--p)"> 3 ห้อง</label>
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" value="4" class="mef-bed" ${(_minBed=='4')?'checked':''} style="accent-color:var(--p)"> 4+ ห้อง</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" value="1" class="mef-bed" ${(_minBed=='1')?'checked':''} style="accent-color:var(--p)"> ${ui('af.room1')}</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" value="2" class="mef-bed" ${(_minBed=='2')?'checked':''} style="accent-color:var(--p)"> ${ui('af.room2')}</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" value="3" class="mef-bed" ${(_minBed=='3')?'checked':''} style="accent-color:var(--p)"> ${ui('af.room3')}</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" value="4" class="mef-bed" ${(_minBed=='4')?'checked':''} style="accent-color:var(--p)"> ${ui('af.room4')}</label>
           </div>
         </div>
         <div>
-          <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4">ห้องน้ำ</div>
+          <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4">${ui('af.sec.bath')}</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" value="1" class="mef-bath" ${(_minBath=='1')?'checked':''} style="accent-color:var(--p)"> 1 ห้อง</label>
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" value="2" class="mef-bath" ${(_minBath=='2')?'checked':''} style="accent-color:var(--p)"> 2 ห้อง</label>
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" value="3" class="mef-bath" ${(_minBath=='3')?'checked':''} style="accent-color:var(--p)"> 3 ห้อง</label>
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" value="4" class="mef-bath" ${(_minBath=='4')?'checked':''} style="accent-color:var(--p)"> 4+ ห้อง</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" value="1" class="mef-bath" ${(_minBath=='1')?'checked':''} style="accent-color:var(--p)"> ${ui('af.room1')}</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" value="2" class="mef-bath" ${(_minBath=='2')?'checked':''} style="accent-color:var(--p)"> ${ui('af.room2')}</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" value="3" class="mef-bath" ${(_minBath=='3')?'checked':''} style="accent-color:var(--p)"> ${ui('af.room3')}</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" value="4" class="mef-bath" ${(_minBath=='4')?'checked':''} style="accent-color:var(--p)"> ${ui('af.room4')}</label>
           </div>
         </div>
       </div>
@@ -9782,43 +9841,43 @@ function openModalAdvExtraFilter(type) {
       <!-- ที่จอดรถ / เฟอร์นิเจอร์ (2 col) — checkbox เหมือน adv-filter-panel -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
         <div>
-          <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4">ที่จอดรถ</div>
+          <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4">${ui('af.sec.park')}</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" value="1" class="mef-park" ${((_ef.minPark||'')=='1')?'checked':''} style="accent-color:var(--p)"> 1 คัน</label>
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" value="2" class="mef-park" ${((_ef.minPark||'')=='2')?'checked':''} style="accent-color:var(--p)"> 2 คัน</label>
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" value="3" class="mef-park" ${((_ef.minPark||'')=='3')?'checked':''} style="accent-color:var(--p)"> 3+ คัน</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" value="1" class="mef-park" ${((_ef.minPark||'')=='1')?'checked':''} style="accent-color:var(--p)"> ${ui('af.car1')}</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" value="2" class="mef-park" ${((_ef.minPark||'')=='2')?'checked':''} style="accent-color:var(--p)"> ${ui('af.car2')}</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" value="3" class="mef-park" ${((_ef.minPark||'')=='3')?'checked':''} style="accent-color:var(--p)"> ${ui('af.car3')}</label>
           </div>
         </div>
         <div>
-          <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4">เฟอร์นิเจอร์</div>
+          <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4">${ui('af.sec.furn')}</div>
           <div style="display:flex;flex-direction:column;gap:4px">
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" value="full" id="mef-furn-full" ${_furniture==='full'?'checked':''} style="accent-color:var(--p)"> เฟอร์นิเจอร์ครบ</label>
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" value="partial" id="mef-furn-part" ${_furniture==='partial'?'checked':''} style="accent-color:var(--p)"> เฟอร์นิเจอร์บางส่วน</label>
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" value="none" id="mef-furn-none" ${_furniture==='none'?'checked':''} style="accent-color:var(--p)"> ไม่มีเฟอร์นิเจอร์</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" value="full" id="mef-furn-full" ${_furniture==='full'?'checked':''} style="accent-color:var(--p)"> ${ui('af.furn.full')}</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" value="partial" id="mef-furn-part" ${_furniture==='partial'?'checked':''} style="accent-color:var(--p)"> ${ui('af.furn.part')}</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" value="none" id="mef-furn-none" ${_furniture==='none'?'checked':''} style="accent-color:var(--p)"> ${ui('af.furn.none')}</label>
           </div>
         </div>
       </div>
 
       <!-- การเลี้ยงสัตว์ (full width) -->
       <div style="margin-bottom:16px">
-        <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4"><i class="fas fa-paw" style="color:#be185d"></i> การเลี้ยงสัตว์</div>
+        <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4"><i class="fas fa-paw" style="color:#be185d"></i> ${ui('af.sec.pets')}</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">
-          <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" id="mef-pets" ${_pets?'checked':''} style="accent-color:var(--p)"> อนุญาตเลี้ยงสัตว์</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" id="mef-pets" ${_pets?'checked':''} style="accent-color:var(--p)"> ${ui('af.pets.ok')}</label>
         </div>
       </div>
 
       <!-- เครื่องใช้ไฟฟ้า & สิ่งอำนวยความสะดวก (full width) — เหมือน adv-filter-panel -->
       <div style="margin-bottom:8px">
-        <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4">เครื่องใช้ไฟฟ้า &amp; สิ่งอำนวยความสะดวก</div>
+        <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4">${ui('af.sec.app')}</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">
-          ${['แอร์','ตู้เย็น','เครื่องซักผ้า','เครื่องทำน้ำอุ่น','โทรทัศน์','ไมโครเวฟ','เตาไฟฟ้า','ระบบรักษาความปลอดภัย'].map(f=>`<label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" value="${f}" class="mef-app" ${_features.includes(f)?'checked':''} style="accent-color:var(--p)"> ${f}</label>`).join('')}
+          ${[['แอร์','af.app.ac'],['ตู้เย็น','af.app.fridge'],['เครื่องซักผ้า','af.app.washer'],['เครื่องทำน้ำอุ่น','af.app.heater'],['โทรทัศน์','af.app.tv'],['ไมโครเวฟ','af.app.micro'],['เตาไฟฟ้า','af.app.stove'],['ระบบรักษาความปลอดภัย','af.app.security']].map(([val,k])=>`<label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" value="${val}" class="mef-app" ${_features.includes(val)?'checked':''} style="accent-color:var(--p)"> ${ui(k)}</label>`).join('')}
         </div>
       </div>
     </div>
     <!-- Footer -->
     <div style="padding:12px 18px;background:#f9f5ef;border-top:1px solid var(--bd);display:flex;gap:10px;flex-shrink:0">
-      <button onclick="modalExtraFilterClear('${type}')" style="padding:12px 18px;background:#fff;color:var(--tx2);border:1.5px solid var(--bd);border-radius:10px;font-size:14px;font-weight:700;cursor:pointer"><i class="fas fa-undo"></i> รีเซ็ต</button>
-      <button onclick="modalExtraFilterApply('${type}')" style="flex:1;padding:12px;background:linear-gradient(135deg,var(--a),var(--a2));color:#1A1A2E;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer"><i class="fas fa-search"></i> ค้นหาผลลัพธ์</button>
+      <button onclick="modalExtraFilterClear('${type}')" style="padding:12px 18px;background:#fff;color:var(--tx2);border:1.5px solid var(--bd);border-radius:10px;font-size:14px;font-weight:700;cursor:pointer"><i class="fas fa-undo"></i> ${ui('af.btn.reset')}</button>
+      <button onclick="modalExtraFilterApply('${type}')" style="flex:1;padding:12px;background:linear-gradient(135deg,var(--a),var(--a2));color:#1A1A2E;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer"><i class="fas fa-search"></i> ${ui('af.btn.apply')}</button>
     </div>
   </div>`;
   mo.onclick = function(e){ if(e.target===mo) mo.remove(); };
@@ -9858,6 +9917,33 @@ function modalExtraFilterClear(type) {
   }
 }
 
+/* ── mefRangeUpdate: real-time slider label update for modal extra filter ── */
+function mefRangeUpdate(kind) {
+  if (kind === 'land') {
+    const minEl = document.getElementById('mef-land-min');
+    const maxEl = document.getElementById('mef-land-max');
+    const minV  = document.getElementById('mef-land-min-v');
+    const maxV  = document.getElementById('mef-land-max-v');
+    const sumEl = document.getElementById('mef-land-summary');
+    if (!minEl || !maxEl) return;
+    const mn = +minEl.value, mx = +maxEl.value;
+    if (minV) minV.textContent = mn + ' ตร.ว.';
+    if (maxV) maxV.textContent = mx >= 1000 ? ui('af.unlimited') : mx + ' ตร.ว.';
+    if (sumEl) sumEl.textContent = (mn === 0 && mx >= 1000) ? ui('af.all.size') : (mn + ' – ' + (mx >= 1000 ? ui('af.unlimited') : mx) + ' ตร.ว.');
+  } else {
+    const minEl = document.getElementById('mef-area-min');
+    const maxEl = document.getElementById('mef-area-max');
+    const minV  = document.getElementById('mef-area-min-v');
+    const maxV  = document.getElementById('mef-area-max-v');
+    const sumEl = document.getElementById('mef-area-summary');
+    if (!minEl || !maxEl) return;
+    const mn = +minEl.value, mx = +maxEl.value;
+    if (minV) minV.textContent = mn + ' ตร.ม.';
+    if (maxV) maxV.textContent = mx >= 500 ? ui('af.unlimited') : mx + ' ตร.ม.';
+    if (sumEl) sumEl.textContent = (mn === 0 && mx >= 500) ? ui('af.all.size') : (mn + ' – ' + (mx >= 500 ? ui('af.unlimited') : mx) + ' ตร.ม.');
+  }
+}
+
 function modalExtraFilterApply(type) {
   const sheet = document.getElementById('modal-extra-filter-sheet');
   if(!sheet) return;
@@ -9891,7 +9977,11 @@ function modalExtraFilterApply(type) {
     uni:       sheet.querySelector('#mef-uni')?.value       || '',
     furniture: _furnVal,
     pets:      sheet.querySelector('#mef-pets')?.checked    || false,
-    features
+    features,
+    minLand:   +(sheet.querySelector('#mef-land-min')?.value   || 0),
+    maxLand:   +(sheet.querySelector('#mef-land-max')?.value   || 1000),
+    minUsable: +(sheet.querySelector('#mef-area-min')?.value   || 0),
+    maxUsable: +(sheet.querySelector('#mef-area-max')?.value   || 500),
   };
   sheet.remove();
   modalAdvFilter(type);
@@ -10098,25 +10188,55 @@ function renderAgents(){
   }).join(''):'<div class="empty">ไม่พบข้อมูลตัวแทน</div>';
   setTimeout(initAllCardSwipes, 100);
 }
+function agScrollProps(dir) {
+  const el = document.getElementById('ag-props-scroll');
+  if (!el) return;
+  const cardW = el.querySelector('.nearby-mini-card')?.offsetWidth || 160;
+  el.scrollBy({ left: dir * (cardW + 10) * 2, behavior: 'smooth' });
+  setTimeout(_agUpdateScrollBtns, 320);
+}
+function _agUpdateScrollBtns() {
+  const el = document.getElementById('ag-props-scroll');
+  const prev = document.getElementById('ag-scroll-prev');
+  const next = document.getElementById('ag-scroll-next');
+  if (!el) return;
+  const atStart = el.scrollLeft <= 4;
+  const atEnd   = el.scrollLeft + el.clientWidth >= el.scrollWidth - 4;
+  if (prev) prev.style.opacity = atStart ? '0.3' : '1';
+  if (next) next.style.opacity = atEnd   ? '0.3' : '1';
+}
+
 function showAgentDetail(a){ 
   const myProps=props.filter(p=>a.propIds?.includes(p.id)||p.agentId===a.id); 
   $('ag-title').textContent=a.name; 
   const propsHtml = myProps.length ? `
     <div style="margin-bottom:16px">
-      <div style="font-size:11px;font-weight:800;color:var(--p);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;display:flex;align-items:center;gap:6px"><i class="fas fa-home" style="color:var(--a)"></i> ทรัพย์ที่ดูแล (${myProps.length} รายการ)</div>
-      <div style="display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;-ms-overflow-style:none;scrollbar-width:none" class="agent-props-scroll">
-        ${myProps.map(p=>`<div class="nearby-mini-card" onclick="_closeModal('ag-modal');setTimeout(()=>openModal('${p.id}'),200)" style="flex-shrink:0;cursor:pointer">
-          <div class="nearby-mini-img">${p.photos?.[0]?`<img src="${p.photos[0]}" loading="lazy">`:`<span style="font-size:22px">${p.icon||typeIcon(p.type)}</span>`}</div>
-          <div class="nearby-mini-body">
-            <div class="nearby-mini-price">${fmtPrice(p.price,p.tx)}</div>
-            <div class="nearby-mini-title">${sanitize(p.title||'')}</div>
-            <div class="nearby-mini-loc"><i class="fas fa-map-marker-alt"></i> ${sanitize(p.location||'')}</div>
-          </div>
-        </div>`).join('')}
+      <div style="font-size:11px;font-weight:800;color:var(--p);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;display:flex;align-items:center;gap:6px">
+        <i class="fas fa-home" style="color:var(--a)"></i> ทรัพย์ที่ดูแล (${myProps.length} รายการ)
+      </div>
+      <div style="position:relative">
+        <button onclick="agScrollProps(-1)" id="ag-scroll-prev" style="position:absolute;left:-4px;top:50%;transform:translateY(-50%);z-index:2;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.95);border:1.5px solid var(--bd);box-shadow:0 2px 8px rgba(0,0,0,.15);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--p);font-size:11px;transition:.15s" onmouseover="this.style.background='var(--p)';this.style.color='#fff'" onmouseout="this.style.background='rgba(255,255,255,.95)';this.style.color='var(--p)'"><i class="fas fa-chevron-left"></i></button>
+        <div style="display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;padding-left:2px;padding-right:2px;-ms-overflow-style:none;scrollbar-width:none;scroll-behavior:smooth" class="agent-props-scroll" id="ag-props-scroll">
+          ${myProps.map(p=>`<div class="nearby-mini-card" onclick="_closeModal('ag-modal');setTimeout(()=>openModal('${p.id}'),200)" style="flex-shrink:0;cursor:pointer">
+            <div class="nearby-mini-img">${p.photos?.[0]?`<img src="${p.photos[0]}" loading="lazy">`:`<span style="font-size:22px">${p.icon||typeIcon(p.type)}</span>`}</div>
+            <div class="nearby-mini-body">
+              <div class="nearby-mini-price">${fmtPrice(p.price,p.tx)}</div>
+              <div class="nearby-mini-title">${sanitize(p.title||'')}</div>
+              <div class="nearby-mini-loc"><i class="fas fa-map-marker-alt"></i> ${sanitize(p.location||'')}</div>
+            </div>
+          </div>`).join('')}
+        </div>
+        <button onclick="agScrollProps(1)" id="ag-scroll-next" style="position:absolute;right:-4px;top:50%;transform:translateY(-50%);z-index:2;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.95);border:1.5px solid var(--bd);box-shadow:0 2px 8px rgba(0,0,0,.15);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--p);font-size:11px;transition:.15s" onmouseover="this.style.background='var(--p)';this.style.color='#fff'" onmouseout="this.style.background='rgba(255,255,255,.95)';this.style.color='var(--p)'"><i class="fas fa-chevron-right"></i></button>
       </div>
     </div>` : '';
   $('ag-body').innerHTML=`<div style="text-align:center;margin-bottom:16px">${a.avatar_url?`<img src="${a.avatar_url}" loading="lazy" style="width:100px;height:100px;border-radius:50%;object-fit:cover;border:3px solid var(--pastel5);box-shadow:0 4px 16px rgba(124,111,205,.2)">`:`<div style="width:100px;height:100px;border-radius:50%;background:${a.color||'#7c6fcd'};display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:700;color:#fff;margin:0 auto">${a.initials||a.name[0]}</div>`}</div><div style="text-align:center;margin-bottom:14px"><div style="font-size:18px;font-weight:700">${a.name}</div><div style="color:var(--gr)">${a.title}</div></div><div style="background:var(--bg);padding:12px 16px;border-radius:10px;margin-bottom:16px"><div style="margin-bottom:6px"><strong>${ui('ag.detail.phone')}:</strong> ${a.phone}</div><div style="margin-bottom:6px"><strong>${ui('ag.detail.line')}:</strong> ${a.lineId}</div><div style="margin-bottom:6px"><strong>${ui('ag.detail.props')}:</strong> ${myProps.length}</div><div><strong>${ui('ag.detail.deals')}:</strong> ${port.length}</div></div>${a.bio?`<p style="font-size:13px;color:var(--tx2);margin-bottom:16px">${a.bio}</p>`:''}${propsHtml}<div class="cta-row"><a class="btn-cta cta-ln" href="${lineUrl(a.lineId)}" target="_blank"><i class="fab fa-line"></i> ${ui('cta.line')}</a><a class="btn-cta cta-tel" href="tel:${a.phone}"><i class="fas fa-mobile-alt"></i> ${ui('cta.call')}</a></div>`; 
   _openModal('ag-modal');
+  // init scroll buttons state หลัง render
+  setTimeout(() => {
+    _agUpdateScrollBtns();
+    const sc = document.getElementById('ag-props-scroll');
+    if (sc) sc.addEventListener('scroll', _agUpdateScrollBtns, { passive: true });
+  }, 80);
 }
 
 // Sanitize: strip HTML tags to prevent XSS injection
@@ -10320,7 +10440,7 @@ function openDepositModal(){
   if(existingMod) existingMod.remove();
   const mo = document.createElement('div');
   mo.className='ov'; mo.id='deposit-modal';
-  mo.style.cssText='display:flex;z-index:3300';
+  mo.style.cssText='display:flex;z-index:3700';
   mo.innerHTML=`<div class="modal" style="max-width:520px">
     <div class="mhd">
       <h2><i class="fas fa-home" style="color:var(--a)"></i> ฝากทรัพย์กับเรา</h2>
@@ -10684,24 +10804,396 @@ function showLocLayer() { /* disabled */ }
 function selectLocCat(key) { /* disabled */ }
 function applyLocOpt(val) { /* disabled */ }
 
+// ── ข้อมูลอำเภอครบ 77 จังหวัด ─────────────────────────────────────
+const PROVINCE_DISTRICTS = {
+  'กรุงเทพมหานคร':['พระนคร','ดุสิต','หนองจอก','บางรัก','บางเขน','บางกะปิ','ปทุมวัน','ป้อมปราบศัตรูพ่าย','พระโขนง','มีนบุรี','ลาดกระบัง','ยานนาวา','สัมพันธวงศ์','พญาไท','ธนบุรี','บางกอกใหญ่','ห้วยขวาง','คลองสาน','ตลิ่งชัน','บางกอกน้อย','บางขุนเทียน','ภาษีเจริญ','หนองแขม','ราษฎร์บูรณะ','บางพลัด','ดินแดง','บึงกุ่ม','สาทร','บางซื่อ','จตุจักร','บางคอแหลม','ประเวศ','คลองเตย','สวนหลวง','จอมทอง','ดอนเมือง','ราชเทวี','ลาดพร้าว','วัฒนา','บางแค','หลักสี่','สายไหม','คันนายาว','สะพานสูง','วังทองหลาง','คลองสามวา','บางนา','ทวีวัฒนา','ทุ่งครุ','บางบอน'],
+  'กระบี่':['เมืองกระบี่','เขาพนม','เกาะลันตา','คลองท่อม','อ่าวลึก','ปลายพระยา','ลำทับ','เหนือคลอง'],
+  'กาญจนบุรี':['เมืองกาญจนบุรี','ไทรโยค','บ่อพลอย','ศรีสวัสดิ์','ท่ามะกา','ท่าม่วง','ทองผาภูมิ','สังขละบุรี','พนมทวน','เลาขวัญ','ด่านมะขามเตี้ย','หนองปรือ','ห้วยกระเจา'],
+  'กาฬสินธุ์':['เมืองกาฬสินธุ์','นามน','กมลาไสย','ร่องคำ','กุฉินารายณ์','เขาวง','ยางตลาด','ห้วยเม็ก','สหัสขันธ์','คำม่วง','ท่าคันโท','หนองกุงศรี','สมเด็จ','ห้วยผึ้ง','สามชัย','นาคู','ดอนจาน','ฆ้องชัย'],
+  'กำแพงเพชร':['เมืองกำแพงเพชร','ไทรงาม','คลองลาน','ขาณุวรลักษบุรี','คลองขลุง','พรานกระต่าย','ลานกระบือ','ทรายทองวัฒนา','ปางศิลาทอง','บึงสามัคคี','โกสัมพีนคร'],
+  'ขอนแก่น':['เมืองขอนแก่น','บ้านฝาง','พระยืน','หนองเรือ','ชุมแพ','สีชมพู','น้ำพอง','อุบลรัตน์','กระนวน','บ้านไผ่','เปือยน้อย','พล','แวงใหญ่','แวงน้อย','หนองสองห้อง','ภูเวียง','มัญจาคีรี','ชนบท','เขาสวนกวาง','ภูผาม่าน','ซำสูง','โคกโพธิ์ไชย','หนองนาคำ','บ้านแฮด','โนนศิลา','เวียงเก่า'],
+  'จันทบุรี':['เมืองจันทบุรี','ขลุง','ท่าใหม่','โป่งน้ำร้อน','มะขาม','แหลมสิงห์','สอยดาว','แก่งหางแมว','นายายอาม','เขาคิชฌกูฏ'],
+  'ฉะเชิงเทรา':['เมืองฉะเชิงเทรา','บางคล้า','บางน้ำเปรี้ยว','บางปะกง','บ้านโพธิ์','พนมสารคาม','ราชสาส์น','สนามชัยเขต','แปลงยาว','ท่าตะเกียบ','คลองเขื่อน'],
+  'ชลบุรี':['เมืองชลบุรี','บ้านบึง','หนองใหญ่','บางละมุง','พานทอง','พนัสนิคม','ศรีราชา','เกาะสีชัง','สัตหีบ','บ่อทอง','เกาะจันทร์'],
+  'ชัยนาท':['เมืองชัยนาท','มโนรมย์','วัดสิงห์','สรรพยา','สรรคบุรี','หันคา','หนองมะโมง','เนินขาม'],
+  'ชัยภูมิ':['เมืองชัยภูมิ','บ้านเขว้า','คอนสวรรค์','เกษตรสมบูรณ์','หนองบัวแดง','จัตุรัส','บำเหน็จณรงค์','หนองบัวระเหว','เทพสถิต','ภูเขียว','บ้านแท่น','แก้งคร้อ','คอนสาร','ภักดีชุมพล','เนินสง่า','ซับใหญ่'],
+  'ชุมพร':['เมืองชุมพร','ท่าแซะ','ปะทิว','หลังสวน','ละแม','พะโต๊ะ','สวี','ทุ่งตะโก'],
+  'เชียงราย':['เมืองเชียงราย','เวียงชัย','เชียงของ','เทิง','พาน','ป่าแดด','แม่จัน','เชียงแสน','แม่สาย','แม่สรวย','เวียงป่าเป้า','พญาเม็งราย','เวียงแก่น','ขุนตาล','แม่ฟ้าหลวง','แม่ลาว','เวียงเชียงรุ้ง','ดอยหลวง'],
+  'เชียงใหม่':['เมืองเชียงใหม่','จอมทอง','แม่แจ่ม','เชียงดาว','ดอยสะเก็ด','แม่แตง','แม่ริม','สะเมิง','ฝาง','แม่อาย','พร้าว','สันป่าตอง','สันกำแพง','สันทราย','หางดง','ฮอด','ดอยเต่า','อมก๋อย','สารภี','เวียงแหง','ไชยปราการ','แม่วาง','แม่ออน','ดอยหล่อ'],
+  'ตรัง':['เมืองตรัง','กันตัง','ย่านตาขาว','ปะเหลียน','สิเกา','ห้วยยอด','วังวิเศษ','นาโยง','รัษฎา','หาดสำราญ'],
+  'ตราด':['เมืองตราด','คลองใหญ่','เขาสมิง','บ่อไร่','แหลมงอบ','เกาะกูด','เกาะช้าง'],
+  'ตาก':['เมืองตาก','บ้านตาก','สามเงา','แม่ระมาด','ท่าสองยาง','แม่สอด','พบพระ','อุ้มผาง','วังเจ้า'],
+  'นครนายก':['เมืองนครนายก','ปากพลี','บ้านนา','องครักษ์'],
+  'นครปฐม':['เมืองนครปฐม','กำแพงแสน','นครชัยศรี','ดอนตูม','บางเลน','สามพราน','พุทธมณฑล'],
+  'นครพนม':['เมืองนครพนม','ปลาปาก','ท่าอุเทน','บ้านแพง','ธาตุพนม','เรณูนคร','นาแก','ศรีสงคราม','นาหว้า','โพนสวรรค์','นาทม','วังยาง'],
+  'นครราชสีมา':['เมืองนครราชสีมา','ครบุรี','เสิงสาง','คง','บ้านเหลื่อม','จักราช','โชคชัย','ด่านขุนทด','โนนไทย','โนนสูง','ขามสะแกแสง','บัวใหญ่','ประทาย','ปักธงชัย','พิมาย','ห้วยแถลง','ชุมพวง','สูงเนิน','ขามทะเลสอ','สีคิ้ว','ปากช่อง','หนองบุนนาก','แก้งสนามนาง','โนนแดง','วังน้ำเขียว','เทพารักษ์','เมืองยาง','พระทองคำ','ลำทะเมนชัย','บัวลาย','สีดา','เฉลิมพระเกียรติ'],
+  'นครศรีธรรมราช':['เมืองนครศรีธรรมราช','พรหมคีรี','ลานสกา','ฉวาง','พิปูน','เชียรใหญ่','ชะอวด','ท่าศาลา','ทุ่งสง','นาบอน','ทุ่งใหญ่','ปากพนัง','ร่อนพิบูลย์','สิชล','ขนอม','หัวไทร','บางขัน','ถ้ำพรรณรา','ฉวาง','จุฬาภรณ์','พระพรหม','นบพิตำ','ช้างกลาง','เฉลิมพระเกียรติ'],
+  'นครสวรรค์':['เมืองนครสวรรค์','โกรกพระ','ชุมแสง','หนองบัว','บึงเสนาท','บรรพตพิสัย','เก้าเลี้ยว','ตาคลี','ท่าตะโก','ไพศาลี','พยุหะคีรี','ลาดยาว','ตากฟ้า','แม่วงก์','แม่เปิน','ชุมตาบง'],
+  'นนทบุรี':['เมืองนนทบุรี','บางกรวย','บางใหญ่','บางบัวทอง','ไทรน้อย','ปากเกร็ด'],
+  'นราธิวาส':['เมืองนราธิวาส','ตากใบ','บาเจาะ','ยี่งอ','ระแงะ','รือเสาะ','ศรีสาคร','แว้ง','สุคิริน','สุไหงโก-ลก','สุไหงปาดี','จะแนะ','เจาะไอร้อง'],
+  'น่าน':['เมืองน่าน','แม่จริม','บ้านหลวง','นาน้อย','ปัว','ท่าวังผา','เวียงสา','ทุ่งช้าง','เชียงกลาง','นาหมื่น','สันติสุข','บ่อเกลือ','สองแคว','ภูเพียง','เฉลิมพระเกียรติ'],
+  'บึงกาฬ':['เมืองบึงกาฬ','พรเจริญ','โซ่พิสัย','เซกา','ปากคาด','บึงโขงหลง','ศรีวิไล','บุ่งคล้า'],
+  'บุรีรัมย์':['เมืองบุรีรัมย์','คูเมือง','กระสัง','นางรอง','หนองกี่','ละหานทราย','ประโคนชัย','บ้านกรวด','พุทไธสง','ลำปลายมาศ','สตึก','ปะคำ','นาโพธิ์','หนองหงส์','พลับพลาชัย','ห้วยราช','โนนสุวรรณ','ชำนิ','บ้านใหม่ไชยพจน์','โนนดินแดง','บ้านด่าน','แคนดง','เฉลิมพระเกียรติ'],
+  'ปทุมธานี':['เมืองปทุมธานี','คลองหลวง','ธัญบุรี','หนองเสือ','ลาดหลุมแก้ว','ลำลูกกา','สามโคก'],
+  'ประจวบคีรีขันธ์':['เมืองประจวบคีรีขันธ์','กุยบุรี','ทับสะแก','บางสะพาน','บางสะพานน้อย','ปราณบุรี','หัวหิน','สามร้อยยอด'],
+  'ปราจีนบุรี':['เมืองปราจีนบุรี','กบินทร์บุรี','นาดี','บ้านสร้าง','ประจันตคาม','ศรีมหาโพธิ','ศรีมโหสถ'],
+  'ปัตตานี':['เมืองปัตตานี','โคกโพธิ์','หนองจิก','ปะนาเระ','มายอ','ทุ่งยางแดง','สายบุรี','ไม้แก่น','ยะรัง','ยะหริ่ง','จะนะ','บาเจาะ','กะพ้อ','แม่ลาน'],
+  'พระนครศรีอยุธยา':['พระนครศรีอยุธยา','ท่าเรือ','นครหลวง','บางไทร','บางบาล','บางปะอิน','บางปะหัน','ผักไห่','ภาชี','ลาดบัวหลวง','วังน้อย','เสนา','บางซ้าย','อุทัย','มหาราช','บ้านแพรก'],
+  'พะเยา':['เมืองพะเยา','จุน','เชียงคำ','เชียงม่วน','ดอกคำใต้','ปง','แม่ใจ','ภูซาง','ภูกามยาว'],
+  'พังงา':['เมืองพังงา','เกาะยาว','กะปง','ตะกั่วทุ่ง','ตะกั่วป่า','คุระบุรี','ทับปุด','ท้ายเหมือง'],
+  'พัทลุง':['เมืองพัทลุง','กงหรา','เขาชัยสน','ตะโหมด','ควนขนุน','ปากพะยูน','ศรีบรรพต','ป่าพะยอม','บางแก้ว','ป่าบอน','ควนโดน'],
+  'พิจิตร':['เมืองพิจิตร','วังทรายพูน','โพธิ์ประทับช้าง','ตะพานหิน','บางมูลนาก','โพทะเล','สามง่าม','ทับคล้อ','สากเหล็ก','บึงนาราง','ดงเจริญ','วชิรบารมี'],
+  'พิษณุโลก':['เมืองพิษณุโลก','นครไทย','ชาติตระการ','บางระกำ','บางกระทุ่ม','พรหมพิราม','วัดโบสถ์','วังทอง','เนินมะปราง'],
+  'เพชรบุรี':['เมืองเพชรบุรี','เขาย้อย','หนองหญ้าปล้อง','ชะอำ','ท่ายาง','บ้านลาด','บ้านแหลม','แก่งกระจาน'],
+  'เพชรบูรณ์':['เมืองเพชรบูรณ์','ชนแดน','หล่มสัก','หล่มเก่า','วิเชียรบุรี','ศรีเทพ','หนองไผ่','บึงสามพัน','น้ำหนาว','วังโป่ง','เขาค้อ'],
+  'แพร่':['เมืองแพร่','ร้องกวาง','ลอง','สูงเม่น','เด่นชัย','สอง','วังชิ้น','หนองม่วงไข่'],
+  'ภูเก็ต':['เมืองภูเก็ต','กะทู้','ถลาง'],
+  'มหาสารคาม':['เมืองมหาสารคาม','แกดำ','โกสุมพิสัย','กันทรวิชัย','เชียงยืน','บรบือ','นาเชือก','พยัคฆภูมิพิสัย','วาปีปทุม','นาดูน','ยางสีสุราช','กุดรัง','ชื่นชม'],
+  'มุกดาหาร':['เมืองมุกดาหาร','นิคมคำสร้อย','ดอนตาล','ดงหลวง','คำชะอี','หว้านใหญ่','หนองสูง'],
+  'แม่ฮ่องสอน':['เมืองแม่ฮ่องสอน','ขุนยวม','ปาย','แม่สะเรียง','แม่ลาน้อย','สบเมย','ปางมะผ้า'],
+  'ยโสธร':['เมืองยโสธร','ทรายมูล','กุดชุม','คำเขื่อนแก้ว','ป่าติ้ว','มหาชนะชัย','ค้อวัง','เลิงนกทา','ไทยเจริญ'],
+  'ยะลา':['เมืองยะลา','เบตง','บันนังสตา','ธารโต','ยะหา','รามัน','กาบัง','กรงปินัง'],
+  'ร้อยเอ็ด':['เมืองร้อยเอ็ด','เกษตรวิสัย','ปทุมรัตต์','จตุรพักตรพิมาน','ธวัชบุรี','พนมไพร','โพนทอง','โพธิ์ชัย','หนองพอก','เสลภูมิ','สุวรรณภูมิ','เมืองสรวง','โพนทราย','อาจสามารถ','เมยวดี','ศรีสมเด็จ','จังหาร','เชียงขวัญ','หนองฮี','ทุ่งเขาหลวง'],
+  'ระนอง':['เมืองระนอง','ละอุ่น','กะเปอร์','กระบุรี','สุขสำราญ'],
+  'ระยอง':['เมืองระยอง','บ้านฉาง','แกลง','วังจันทร์','บ้านค่าย','ปลวกแดง','เขาชะเมา','นิคมพัฒนา'],
+  'ราชบุรี':['เมืองราชบุรี','จอมบึง','สวนผึ้ง','ดำเนินสะดวก','บ้านโป่ง','บางแพ','โพธาราม','ปากท่อ','วัดเพลง','บ้านคา'],
+  'ลพบุรี':['เมืองลพบุรี','พัฒนานิคม','โคกสำโรง','ชัยบาดาล','ท่าวุ้ง','บ้านหมี่','ท่าหลวง','สระโบสถ์','โคกเจริญ','ลำสนธิ','หนองม้า'],
+  'ลำปาง':['เมืองลำปาง','แม่เมาะ','เกาะคา','เสริมงาม','งาว','แจ้ห่ม','วังเหนือ','เถิน','แม่พริก','แม่ทะ','สบปราบ','ห้างฉัตร','เมืองปาน'],
+  'ลำพูน':['เมืองลำพูน','แม่ทา','บ้านโฮ่ง','ลี้','ทุ่งหัวช้าง','ป่าซาง','บ้านธิ','เวียงหนองล่อง'],
+  'เลย':['เมืองเลย','นาด้วง','เชียงคาน','ปากชม','ด่านซ้าย','นาแห้ว','ภูเรือ','ท่าลี่','วังสะพุง','ภูกระดึง','ภูหลวง','ผาขาว','เอราวัณ','หนองหิน'],
+  'ศรีสะเกษ':['เมืองศรีสะเกษ','ยางชุมน้อย','กันทรารมย์','กันทรลักษ์','ขุขันธ์','ไพรบึง','ปรางค์กู่','ขุนหาญ','ราษีไศล','อุทุมพรพิสัย','บึงบูรพ์','ห้วยทับทัน','โนนคูณ','ศรีรัตนะ','น้ำเกลี้ยง','วังหิน','ภูสิงห์','เมืองจันทร์','เบญจลักษ์','พยุห์','โพธิ์ศรีสุวรรณ','ศิลาลาด'],
+  'สกลนคร':['เมืองสกลนคร','กุสุมาลย์','กุดบาก','พรรณานิคม','พังโคน','วาริชภูมิ','นิคมน้ำอูน','เต่างอย','โคกศรีสุพรรณ','เจิรญศิลป์','โพนนาแก้ว','ภูพาน','โนนนาคำ','บ้านม่วง','อากาศอำนวย','สว่างแดนดิน','ส่องดาว','คำตากล้า','บึงโขงหลง','วานรนิวาส','คูเมือง'],
+  'สงขลา':['เมืองสงขลา','สทิงพระ','จะนะ','นาทวี','เทพา','สะบ้าย้อย','ระโนด','กระแสสินธุ์','รัตภูมิ','สะเดา','หาดใหญ่','นาหม่อม','ควนเนียง','บางกล่ำ','สิงหนคร','คลองหอยโข่ง'],
+  'สตูล':['เมืองสตูล','ควนโดน','ควนกาหลง','ท่าแพ','กระแสสินธุ์','ละงู','ทุ่งหว้า','มะนัง'],
+  'สมุทรปราการ':['เมืองสมุทรปราการ','บางบ่อ','บางพลี','พระประแดง','พระสมุทรเจดีย์','บางเสาธง'],
+  'สมุทรสงคราม':['เมืองสมุทรสงคราม','บางคนที','อัมพวา'],
+  'สมุทรสาคร':['เมืองสมุทรสาคร','กระทุ่มแบน','บ้านแพ้ว'],
+  'สระแก้ว':['เมืองสระแก้ว','คลองหาด','ตาพระยา','วังน้ำเย็น','วังสมบูรณ์','วัฒนานคร','อรัญประเทศ','เขาฉกรรจ์','โคกสูง','บ้านใหม่ไทยเจริญ'],
+  'สระบุรี':['เมืองสระบุรี','แก่งคอย','หนองแค','วิหารแดง','หนองแซง','บ้านหมอ','ดอนพุด','หนองโดน','พระพุทธบาท','เสาไห้','มวกเหล็ก','วังม่วง','เฉลิมพระเกียรติ'],
+  'สิงห์บุรี':['เมืองสิงห์บุรี','บางระจัน','ค่ายบางระจัน','พรหมบุรี','ท่าช้าง','อินทร์บุรี'],
+  'สุโขทัย':['เมืองสุโขทัย','บ้านด้าน','คีรีมาศ','กงไกรลาศ','ศรีสัชนาลัย','ศรีสำโรง','สวรรคโลก','ศรีนคร','ทุ่งเสลี่ยม'],
+  'สุพรรณบุรี':['เมืองสุพรรณบุรี','เดิมบางนางบวช','ด่านช้าง','บางปลาม้า','ศรีประจันต์','ดอนเจดีย์','สองพี่น้อง','สามชุก','อู่ทอง','หนองหญ้าไซ'],
+  'สุราษฎร์ธานี':['เมืองสุราษฎร์ธานี','กาญจนดิษฐ์','ดอนสัก','เกาะสมุย','เกาะพะงัน','ไชยา','ท่าชนะ','คีรีรัฐนิคม','บ้านตาขุน','พนม','ท่าฉาง','บ้านนาสาร','บ้านนาเดิม','เคียนซา','เวียงสระ','พระแสง','พุนพิน','ชัยบุรี','วิภาวดี'],
+  'สุรินทร์':['เมืองสุรินทร์','ชุมพลบุรี','ท่าตูม','จอมพระ','ปราสาท','กาบเชิง','รัตนบุรี','สนม','ศีขรภูมิ','สังขะ','ลำดวน','สำโรงทาบ','บัวเชด','พนมดงรัก','ศรีณรงค์','เขวาสินรินทร์','โนนนารายณ์'],
+  'หนองคาย':['เมืองหนองคาย','ท่าบ่อ','โพนพิสัย','ศรีเชียงใหม่','สังคม','สระใคร','เฝ้าไร่','รัตนวาปี','โพธิ์ตาก'],
+  'หนองบัวลำภู':['เมืองหนองบัวลำภู','นากลาง','โนนสัง','ศรีบุญเรือง','สุวรรณคูหา','นาวัง'],
+  'อ่างทอง':['เมืองอ่างทอง','ไชโย','ป่าโมก','โพธิ์ทอง','แสวงหา','วิเศษชัยชาญ','สามโก้'],
+  'อำนาจเจริญ':['เมืองอำนาจเจริญ','ชานุมาน','ปทุมราชวงศา','พนา','เสนางคนิคม','หัวตะพาน','ลืออำนาจ'],
+  'อุดรธานี':['เมืองอุดรธานี','กุดจับ','หนองวัวซอ','กุมภวาปี','โนนสะอาด','หนองหาน','ทุ่งฝน','ไชยวาน','ศรีธาตุ','วังสามหมอ','บ้านดุง','บ้านผือ','น้ำโสม','เพ็ญ','สร้างคอม','หนองแสง','นายูง','พิบูลย์รักษ์','กู่แก้ว','ประจักษ์ศิลปาคม'],
+  'อุตรดิตถ์':['เมืองอุตรดิตถ์','ตรอน','ท่าปลา','น้ำปาด','ฟากท่า','บ้านโคก','พิชัย','ลับแล','ทองแสนขัน'],
+  'อุทัยธานี':['เมืองอุทัยธานี','ทัพทัน','สว่างอารมณ์','หนองฉาง','หนองขาหย่าง','บ้านไร่','ลานสัก','ห้วยคต'],
+  'อุบลราชธานี':['เมืองอุบลราชธานี','ศรีเมืองใหม่','โขงเจียม','เขื่องใน','เขมราฐ','เดชอุดม','นาจะหลวย','น้ำยืน','บุณฑริก','ตระการพืชผล','กุดข้าวปุ้น','ม่วงสามสิบ','วารินชำราบ','พิบูลมังสาหาร','ตาลสุม','โพธิ์ไทร','สำโรง','ดอนมดแดง','สิรินธร','ทุ่งศรีอุดม','นาเยีย','นาตาล','เหล่าเสือโก้ก','สว่างวีระวงศ์','น้ำขุ่น'],
+};
+
+// ── Drill-down location picker state ─────────────────────────────
+let _locLevel = 'province'; // 'province' | 'district'
+let _locProv  = '';         // selected province
+let _locDist  = '';         // selected district
+
 function populateProvinceSelect() {
+  // seed hidden select with all 77 provinces (for compatibility)
   const sp = $('s-prov');
   if(!sp) return;
-  const dbProvs = [...new Set(props.map(p=>p.province).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'th'));
-  // จังหวัดหลักที่มีอสังหาริมทรัพย์มากที่สุด (เรียงตามความนิยม)
-  const priorityProvs = [
-    'กรุงเทพฯ','กรุงเทพมหานคร',
-    'นนทบุรี','ปทุมธานี','สมุทรปราการ','สมุทรสาคร',
-    'เชียงใหม่','ชลบุรี','ภูเก็ต','ขอนแก่น',
-    'กาญจนบุรี','ระยอง','สุราษฎร์ธานี','ประจวบคีรีขันธ์',
-    'พระนครศรีอยุธยา','นครราชสีมา','ราชบุรี','เพชรบุรี',
-  ];
-  // รวม db + priority แล้ว dedup
-  const allProvs = [...new Set([...dbProvs, ...priorityProvs])]
-    .filter(Boolean)
-    .sort((a,b)=>a.localeCompare(b,'th'));
-  sp.innerHTML = '<option value="">ทุกทำเล</option>' + allProvs.map(p=>`<option value="${p}">${p}</option>`).join('');
+  const allProvinces77 = Object.keys(PROVINCE_DISTRICTS);
+  const dbProvs = [...new Set(props.map(p=>p.province).filter(Boolean))];
+  const allProvs = [...new Set([...allProvinces77, ...dbProvs])]
+    .filter(p => Boolean(p) && p !== 'กรุงเทพฯ').sort((a,b)=>a.localeCompare(b,'th'));
+  sp.innerHTML = '<option value=""></option>' + allProvs.map(p=>`<option value="${p}"></option>`).join('');
+  locDrillRender();
 }
+
+function locDrillToggle() {
+  const panel = $('loc-drill-panel');
+  const btn   = $('loc-drill-btn');
+  if(!panel) return;
+  const isOpen = panel.style.display !== 'none';
+  if(isOpen){ locDrillClose(); }
+  else {
+    panel.style.display='block';
+    locDrillRender();
+    // ตรวจสอบว่าพื้นที่ด้านล่างพอหรือไม่
+    const btnRect = btn.getBoundingClientRect();
+    const panelH  = panel.offsetHeight || 260;
+    const spaceBelow = window.innerHeight - btnRect.bottom;
+    const spaceAbove = btnRect.top;
+    const shouldDropUp = spaceBelow < panelH && spaceAbove > spaceBelow;
+    if(shouldDropUp) {
+      panel.classList.add('drop-up');
+      btn.classList.add('open','drop-up');
+    } else {
+      panel.classList.remove('drop-up');
+      btn.classList.add('open');
+      btn.classList.remove('drop-up');
+    }
+  }
+}
+
+function locDrillClose() {
+  const panel = $('loc-drill-panel');
+  const btn   = $('loc-drill-btn');
+  if(panel) { panel.style.display='none'; panel.classList.remove('drop-up'); }
+  if(btn)   { btn.classList.remove('open','drop-up'); }
+}
+
+function locDrillRender() {
+  const list = $('loc-drill-list');
+  if(!list) return;
+  let html = '';
+
+  if(_locLevel === 'province') {
+    // Level 1: จังหวัด
+    html += '<div class="loc-drill-section-head">🗺️ จังหวัด</div>';
+    if(_locProv) {
+      html += `<div class="loc-item loc-clear" onclick="locDrillClear()"><i class="fas fa-times-circle"></i> ล้างการเลือกทั้งหมด</div>`;
+    }
+    const allProvinces77 = Object.keys(PROVINCE_DISTRICTS);
+    const dbProvs = [...new Set(props.map(p=>p.province).filter(Boolean))];
+    const allProvs = [...new Set([...allProvinces77, ...dbProvs])]
+      .filter(Boolean).sort((a,b)=>a.localeCompare(b,'th'));
+    allProvs.forEach(p => {
+      const active = p === _locProv ? ' active' : '';
+      const hasDistricts = (PROVINCE_DISTRICTS[p]||[]).length > 0;
+      html += `<div class="loc-item${active}" onclick="locDrillSelectProv('${p.replace(/'/g,"\'")}')">
+        <span style="flex:1">${p}</span>
+        ${hasDistricts ? '<i class="fas fa-chevron-right" style="font-size:10px;color:#bbb"></i>' : ''}
+      </div>`;
+    });
+  } else {
+    // Level 2: อำเภอ
+    html += `<div class="loc-item loc-back" onclick="locDrillGoBack()">
+      <i class="fas fa-chevron-left"></i> กลับ &nbsp;·&nbsp; <span style="color:#555">${_locProv}</span>
+    </div>`;
+    html += '<div class="loc-drill-section-head">📍 อำเภอ / เขต</div>';
+    // "ทุกอำเภอ" option
+    const allActive = !_locDist ? ' active' : '';
+    html += `<div class="loc-item${allActive}" onclick="locDrillSelectDist('')">
+      <span>ทุกอำเภอใน ${_locProv}</span>
+    </div>`;
+    const districts = PROVINCE_DISTRICTS[_locProv] || [];
+    districts.forEach(d => {
+      const active = d === _locDist ? ' active' : '';
+      html += `<div class="loc-item${active}" onclick="locDrillSelectDist('${d.replace(/'/g,"\'")}')">
+        <span>${d}</span>
+      </div>`;
+    });
+  }
+  list.innerHTML = html;
+}
+
+function locDrillSelectProv(prov) {
+  _locProv  = prov;
+  _locDist  = '';
+  const hasDist = (PROVINCE_DISTRICTS[prov]||[]).length > 0;
+  if(hasDist) {
+    // มีอำเภอ → แสดงหน้าอำเภอ แต่ยังไม่ปิด dropdown จนกว่าจะเลือกอำเภอ
+    _locLevel = 'district';
+    locDrillCommit();
+    locDrillRender();
+  } else {
+    // ไม่มีอำเภอ → select & close ได้เลย
+    _locLevel = 'province';
+    locDrillCommit();
+    locDrillClose();
+  }
+}
+
+function locDrillGoBack() {
+  _locLevel = 'province';
+  _locDist  = '';
+  locDrillRender();
+}
+
+function locDrillSelectDist(dist) {
+  _locDist = dist;
+  locDrillCommit();
+  locDrillClose();
+}
+
+function locDrillClear() {
+  _locProv  = '';
+  _locDist  = '';
+  _locLevel = 'province';
+  locDrillCommit();
+  locDrillRender();
+}
+
+function locDrillCommit() {
+  // sync hidden selects
+  const sp = $('s-prov');
+  const sd = $('s-dist');
+  if(sp) sp.value = _locProv;
+  if(sd) sd.value = _locDist;
+  // update button display — อัปเดต disp ก่อนเสมอ ไม่ขึ้นกับ lbl
+  const disp = $('loc-drill-display');
+  if(disp) {
+    if(_locDist) {
+      disp.textContent = _locDist;
+    } else if(_locProv) {
+      disp.textContent = _locProv;
+    } else {
+      disp.textContent = (typeof ui==='function') ? ui('sf.prov.all') : 'ทุกทำเล';
+    }
+  }
+  // update label text (อาจถูกลบโดย applyLang — ถ้าไม่เจอให้ rebuild)
+  let lbl = $('loc-drill-label-text');
+  if(!lbl) {
+    const labelEl = document.getElementById('loc-drill-label');
+    if(labelEl) {
+      labelEl.innerHTML = '<i class="fas fa-map-marker-alt"></i> <span id="loc-drill-label-text"></span>';
+      lbl = $('loc-drill-label-text');
+    }
+  }
+  if(lbl) {
+    if(_locDist) {
+      lbl.innerHTML = '<i class="fas fa-map-pin"></i> ' + _locProv + ' ›';
+    } else {
+      lbl.textContent = (typeof ui==='function') ? ui('sf.prov.label') : 'จังหวัด / ทำเล';
+    }
+  }
+  _filterOnly();
+}
+
+// close panel on outside click — use composedPath so re-rendered innerHTML nodes are handled correctly
+document.addEventListener('click', function(e){
+  const wrap = $('loc-drill-wrap');
+  if(!wrap) return;
+  const path = e.composedPath ? e.composedPath() : [];
+  const insideWrap = path.includes(wrap) || wrap.contains(e.target);
+  if(!insideWrap) locDrillClose();
+});
+
+function populateDistrictSelect() { /* no-op: handled by drill-down */ }
+
+/* ═══ Modal Province/Location Drill-down ═══════════════════════════════════ */
+let _madvLevel = 'top';   // 'top' | 'province'
+let _madvProv  = '';
+let _madvDist  = '';
+
+// Popular locations removed — province+district only
+
+function madvLocToggle() {
+  const panel = document.getElementById('madv-loc-panel');
+  const btn   = document.getElementById('madv-loc-btn');
+  if(!panel) return;
+  const isOpen = panel.style.display !== 'none';
+  if(isOpen){ madvLocClose(); return; }
+  panel.style.display = 'block';
+  madvLocRender();
+  const btnRect    = btn.getBoundingClientRect();
+  const panelH     = panel.offsetHeight || 240;
+  const spaceBelow = window.innerHeight - btnRect.bottom;
+  const spaceAbove = btnRect.top;
+  const dropUp     = spaceBelow < panelH && spaceAbove > spaceBelow;
+  if(dropUp){ panel.classList.add('drop-up'); btn.classList.add('open','drop-up'); }
+  else      { panel.classList.remove('drop-up'); btn.classList.add('open'); btn.classList.remove('drop-up'); }
+}
+
+function madvLocClose() {
+  const panel = document.getElementById('madv-loc-panel');
+  const btn   = document.getElementById('madv-loc-btn');
+  if(panel){ panel.style.display='none'; panel.classList.remove('drop-up'); }
+  if(btn)  { btn.classList.remove('open','drop-up'); }
+}
+
+function madvLocRender() {
+  const list = document.getElementById('madv-loc-list');
+  if(!list) return;
+  let html = '';
+
+  if(_madvLevel === 'top') {
+    // ── Clear button
+    if(_madvProv || _madvDist) {
+      html += `<div class="madv-loc-item loc-clear" onclick="madvLocClear()"><i class="fas fa-times-circle"></i> ล้างการเลือก</div>`;
+    }
+    html += '<div class="madv-loc-head">🗺️ จังหวัด</div>';
+    const allProvs = Object.keys(PROVINCE_DISTRICTS)
+      .filter(p => p !== 'กรุงเทพฯ')
+      .sort((a,b)=>a.localeCompare(b,'th'));
+    allProvs.forEach(function(p){
+      const active = (p === _madvProv && _madvLevel !== 'top') ? ' active' : '';
+      const hasDist = (PROVINCE_DISTRICTS[p]||[]).length > 0;
+      html += `<div class="madv-loc-item${active}" onclick="madvSelectProv('${p.replace(/'/g,"\'")}')">
+        <span style="flex:1">${p}</span>
+        ${hasDist ? '<i class="fas fa-chevron-right" style="font-size:10px;color:#bbb"></i>' : ''}
+      </div>`;
+    });
+  } else {
+    // ── District level
+    html += `<div class="madv-loc-item loc-back" onclick="madvGoBack()"><i class="fas fa-chevron-left"></i> กลับ · <span style="color:#555">${_madvProv}</span></div>`;
+    html += '<div class="madv-loc-head">📍 อำเภอ / เขต</div>';
+    const allActive = !_madvDist ? ' active' : '';
+    html += `<div class="madv-loc-item${allActive}" onclick="madvSelectDist('')"><span>ทุกอำเภอใน ${_madvProv}</span></div>`;
+    (PROVINCE_DISTRICTS[_madvProv]||[]).forEach(function(d){
+      const active = d === _madvDist ? ' active' : '';
+      html += `<div class="madv-loc-item${active}" onclick="madvSelectDist('${d.replace(/'/g,"\'")}')"><span>${d}</span></div>`;
+    });
+  }
+  list.innerHTML = html;
+}
+
+function madvSelectProv(prov) {
+  _madvProv = prov; _madvDist = ''; 
+  const hasDist = (PROVINCE_DISTRICTS[prov]||[]).length > 0;
+  if(hasDist) {
+    _madvLevel = 'province';
+    madvCommit(); madvLocRender();
+  } else {
+    _madvLevel = 'top';
+    madvCommit(); madvLocClose();
+  }
+}
+
+function madvSelectDist(dist) {
+  _madvDist = dist; madvCommit(); madvLocClose();
+}
+
+function madvGoBack() {
+  _madvLevel = 'top'; _madvDist = ''; madvLocRender();
+}
+
+function madvLocClear() {
+  _madvProv = ''; _madvDist = ''; _madvLevel = 'top';
+  madvCommit(); madvLocRender();
+}
+
+function madvCommit() {
+  // Sync to hidden selects so modalAdvFilter reads the right value
+  // popular-loc: sub-area names (not province keys), province: province names
+  const spop  = document.getElementById('modal-adv-popular-loc');
+  const sprov = document.getElementById('modal-adv-province');
+  const isProvKey = _madvProv && PROVINCE_DISTRICTS.hasOwnProperty(_madvProv);
+  if(_madvDist && !isProvKey) {
+    // Popular area selection (e.g. สุขุมวิท, ลาดพร้าว)
+    if(spop)  spop.value  = _madvDist;
+    if(sprov) sprov.value = '';
+  } else {
+    // Province (+ optional district within province)
+    if(spop)  spop.value  = _madvDist || ''; // district name used as loc filter
+    if(sprov) sprov.value = _madvProv  || '';
+  }
+
+  // Update display text
+  const disp = document.getElementById('madv-loc-display');
+  if(disp) {
+    if(_madvDist && _madvProv) disp.textContent = _madvProv + ' › ' + _madvDist;
+    else if(_madvDist)         disp.textContent = _madvDist;
+    else if(_madvProv)         disp.textContent = _madvProv;
+    else                       disp.textContent = 'จังหวัด / ทำเล';
+  }
+
+  // Trigger filter
+  const typeCtx = window._modalTypeData ? (window._modalTypeData.type||'') : '';
+  if(typeof modalAdvFilter === 'function') modalAdvFilter(typeCtx);
+}
+
+// Close on outside click
+document.addEventListener('click', function(e){
+  const wrap = document.getElementById('madv-loc-wrap');
+  if(!wrap) return;
+  const path = e.composedPath ? e.composedPath() : [];
+  if(!path.includes(wrap) && !wrap.contains(e.target)) madvLocClose();
+});
+
 
 function debounce(fn, ms) { let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a), ms); }; }
 function _filterOnly(){ applyFilters().catch(console.error); }
@@ -10717,6 +11209,23 @@ function initAutocomplete() {
   const inp = $('s-kw');
   const list = $('ac-list');
   if(!inp||!list) return;
+
+  /* ── Portal: ย้าย ac-list ไปที่ body เพื่อหลีก stacking context ของ .hero ── */
+  document.body.appendChild(list);
+  Object.assign(list.style, {
+    position:'fixed', background:'#fff',
+    border:'1.5px solid var(--bd)', borderRadius:'10px',
+    zIndex:'9000', maxHeight:'280px', overflowY:'auto',
+    boxShadow:'0 12px 32px rgba(27,58,107,.22)', display:'none'
+  });
+
+  function positionList() {
+    const r = inp.getBoundingClientRect();
+    list.style.top   = (r.bottom + 2) + 'px';
+    list.style.left  = r.left + 'px';
+    list.style.width = r.width + 'px';
+  }
+
   const doAC = debounce(kw => {
     if(!kw || kw.length < 1) { list.style.display='none'; return; }
     const kwl = kw.toLowerCase();
@@ -10726,16 +11235,19 @@ function initAutocomplete() {
     if(!matches.length) { list.style.display='none'; return; }
     list.innerHTML = matches.map(p=>`
       <div class="ac-item" onclick="selectAC('${p.id}','${p.title.replace(/'/g,"\\'")}','${(p.location||'').replace(/'/g,"\\'")}')">
-        <span style="font-size:16px">${typeIcon(p.type)}</span>
-        <span>${highlight(sanitize(p.title||''),kw)}</span>
+        <span class="ac-icon">${typeIcon(p.type)}</span>
+        <span class="ac-title">${highlight(sanitize(p.title||''),kw)}</span>
         <span class="ac-sub">${sanitize(p.location||'')}</span>
       </div>`).join('');
+    positionList();
     list.style.display='block';
   }, 300);
 
   inp.addEventListener('input', e => doAC(e.target.value.trim()));
   inp.addEventListener('keydown', e => { if(e.key==='Escape'||e.key==='Enter') { list.style.display='none'; if(e.key==='Enter') { doSearch(); } } });
-  document.addEventListener('click', e => { if(!e.target.closest('.ac-wrap')) list.style.display='none'; });
+  window.addEventListener('scroll', () => { if(list.style.display!=='none') positionList(); }, {passive:true});
+  window.addEventListener('resize', () => { if(list.style.display!=='none') positionList(); }, {passive:true});
+  document.addEventListener('click', e => { if(!inp.contains(e.target) && !list.contains(e.target)) list.style.display='none'; });
 }
 
 function selectAC(id, title, loc) {
@@ -10766,8 +11278,8 @@ function initListingsAutocomplete() {
         if(!matches.length) { list.style.display='none'; return; }
         list.innerHTML = matches.map(p=>`
           <div class="ac-item" onclick="selectLsAC('${p.id}','${p.title.replace(/'/g,"\\'")}','${(p.location||'').replace(/'/g,"\\'")}')">
-            <span style="font-size:15px">${typeIcon(p.type)}</span>
-            <span>${highlight(sanitize(p.title||''),kw)}</span>
+            <span class="ac-icon">${typeIcon(p.type)}</span>
+            <span class="ac-title">${highlight(sanitize(p.title||''),kw)}</span>
             <span class="ac-sub">${sanitize(p.location||'')}</span>
           </div>`).join('');
         list.style.display='block';
@@ -13394,7 +13906,10 @@ function applyLang(){
   if(sfLabels.length>=5){
     sfLabels[0].innerHTML='<i class="fas fa-search"></i> '+ui('sf.kw.label');
     sfLabels[1].innerHTML='<i class="fas fa-building"></i> '+ui('sf.type.label');
-    sfLabels[2].innerHTML='<i class="fas fa-map-marker-alt"></i> '+ui('sf.prov.label');
+    // ── loc-drill-label: อย่า overwrite innerHTML ทั้งหมด เพราะจะลบ span#loc-drill-label-text ทิ้ง ──
+    const _locLblSpan = document.getElementById('loc-drill-label-text');
+    if(_locLblSpan) { _locLblSpan.textContent = ui('sf.prov.label'); }
+    else { sfLabels[2].innerHTML='<i class="fas fa-map-marker-alt"></i> <span id="loc-drill-label-text">'+ui('sf.prov.label')+'</span>'; }
     sfLabels[3].innerHTML='<i class="fas fa-tag"></i> '+ui('sf.min.label');
     sfLabels[4].innerHTML='<i class="fas fa-tag"></i> '+ui('sf.max.label');
   }
@@ -13436,6 +13951,9 @@ function applyLang(){
     const secs=panel.querySelectorAll('.qs-dd-sec');
     secs.forEach((sec,si)=>{if(qsSecMap[pi]&&qsSecMap[pi][si])sec.textContent=ui(qsSecMap[pi][si]);});
   });
+  // ── qs-popular-select: update first option label ──
+  const qsPopSel=document.getElementById('qs-popular-select');
+  if(qsPopSel&&qsPopSel.options[0]) qsPopSel.options[0].textContent='🔥 '+ui('qs.popular');
 
   // ── Price cards – Buy ──
   const buyCards=document.querySelectorAll('#price-buy-section .price-card');
