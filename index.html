@@ -953,8 +953,9 @@ nav{
   #all-modal-filter-sticky #modal-adv-tx{flex:0 0 auto;width:70px!important}
   #all-modal-filter-sticky #modal-adv-proptype{flex:1 1 0}
   /* row2: popular-loc + province equal width */
-  #all-modal-filter-sticky #modal-adv-popular-loc,
+  #all-modal-filter-sticky #modal-adv-popular-loc{flex:1 1 0;min-width:100px}
   #all-modal-filter-sticky #modal-adv-province{flex:1 1 0;min-width:0}
+  #all-modal-filter-sticky #madv-loc-wrap{min-width:110px;flex:1 1 110px}
   /* row3: minprice + maxprice equal width + icon buttons */
   #all-modal-filter-sticky #modal-adv-minprice,
   #all-modal-filter-sticky #modal-adv-maxprice{flex:1 1 0;min-width:0}
@@ -1007,6 +1008,25 @@ nav{
   color:#1B3A6B;
 }
 #all-modal.map-layout #all-modal-filter-sticky .modal-adv-search-input::placeholder{color:rgba(255,255,255,.45)}
+/* madv-loc-btn in map dark mode */
+#all-modal.map-layout #all-modal-filter-sticky #madv-loc-btn{
+  background:rgba(255,255,255,.1);
+  border-color:rgba(255,255,255,.18);
+  color:#fff;
+}
+#all-modal.map-layout #all-modal-filter-sticky #madv-loc-btn:hover{
+  border-color:rgba(200,146,42,.8);
+}
+#all-modal.map-layout #all-modal-filter-sticky #madv-loc-btn.open{
+  border-color:rgba(200,146,42,.9);
+  background:rgba(255,255,255,.15);
+}
+#all-modal.map-layout #all-modal-filter-sticky #madv-loc-display{
+  color:#fff;
+}
+#all-modal.map-layout #all-modal-filter-sticky #madv-loc-chevron{
+  color:rgba(255,255,255,.6);
+}
 
 /* ══ ALL-MODAL MAP-OPEN: side-by-side layout on desktop/tablet landscape ══ */
 @media(min-width:769px){
@@ -1767,7 +1787,7 @@ footer{background:linear-gradient(135deg,#2d2650 0%,#3d3373 100%);color:rgba(255
 .tx-tab.active{background:var(--p);color:#F0ECE3}
 .sf{display:grid;grid-template-columns:1.6fr 0.9fr 0.9fr 0.9fr 0.9fr auto auto;gap:10px;align-items:end}
 .sf label{display:block;font-size:13px;font-weight:800;color:#1a2744;margin-bottom:5px;text-shadow:none;letter-spacing:.2px}
-.sf select,.sf input{width:100%;padding:10px 12px;border:1.5px solid rgba(200,146,42,.4);border-radius:10px;font-size:14px;color:#1a2744;background:rgba(255,255,255,0.95);font-weight:600}
+.sf select,.sf input{width:100%;padding:10px 12px;border:1.5px solid rgba(200,146,42,.4);border-radius:10px;font-size:14px;color:#1a2744;background:rgba(255,255,255,0.95);font-weight:600;height:44px;box-sizing:border-box}
 .sf select:focus,.sf input:focus{outline:none;border-color:var(--p)}
 .btn-search{background:var(--a);color:#fff;padding:10px 22px;border-radius:10px;font-weight:700;height:44px;white-space:nowrap;display:flex;align-items:center;gap:6px}
 .btn-search:hover{opacity:.9}
@@ -2440,7 +2460,7 @@ footer::after{
   #qs-group-bts, #qs-group-mrt { flex-shrink:0 }
   #qs-group-bts + #qs-group-mrt { margin-left:0 }
   .search-box{padding:16px}
-  .sf select,.sf input{padding:8px 10px;font-size:13px}
+  .sf select,.sf input{padding:8px 10px;font-size:13px;height:40px;box-sizing:border-box}
   .btn-search{padding:8px 16px;height:40px}
   .price-card{padding:14px 16px}
   .price-card h3{font-size:14px}
@@ -3364,7 +3384,7 @@ footer::after{
 }
 
 /* ── Modal Province Drill-down (same style as home loc-drill) ── */
-#madv-loc-wrap { position:relative; flex:1 1 0; min-width:0; }
+#madv-loc-wrap { position:relative; flex:1 1 0; min-width:160px; }
 #madv-loc-btn {
   width:100%; padding:0 10px; height:36px; border:1.5px solid rgba(200,146,42,.35); border-radius:8px;
   font-size:13px; color:#1a2744; background:#fff; font-weight:500;
@@ -3378,15 +3398,15 @@ footer::after{
 #madv-loc-chevron { font-size:10px; color:#888; transition:transform .2s; flex-shrink:0; margin-left:4px; }
 #madv-loc-btn.open #madv-loc-chevron { transform:rotate(180deg); }
 #madv-loc-panel {
-  position:absolute; top:100%; left:0; right:0; z-index:4500;
-  background:#fff; border:1.5px solid var(--p,#1B3A6B); border-top:none;
+  position:fixed; z-index:99999;
+  background:#fff; border:1.5px solid var(--p,#1B3A6B);
   border-radius:0 0 8px 8px; box-shadow:0 8px 24px rgba(27,58,107,.18);
-  max-height:240px; overflow-y:auto; margin-top:-1px;
-  text-align:left; font-weight:400; display:block;
+  max-height:260px; overflow-y:auto;
+  text-align:left; font-weight:400;
+  min-width:200px;
 }
 #madv-loc-panel.drop-up {
-  top:auto; bottom:100%; border-top:1.5px solid var(--p,#1B3A6B); border-bottom:none;
-  border-radius:8px 8px 0 0; box-shadow:0 -8px 24px rgba(27,58,107,.18); margin-top:0; margin-bottom:-1px;
+  border-radius:8px 8px 0 0; box-shadow:0 -8px 24px rgba(27,58,107,.18);
 }
 #madv-loc-list { padding:4px 0; text-align:left; }
 .madv-loc-head { padding:5px 12px 2px; font-size:10px; font-weight:800; color:#aaa; text-transform:uppercase; letter-spacing:.8px; }
@@ -3709,9 +3729,9 @@ footer::after{
     <div class="ac-wrap"><label><i class="fas fa-search"></i> คำค้นหา</label><input id="s-kw" placeholder="ชื่อโครงการ ทำเล..." autocomplete="off" oninput="debouncedSearch()"><div class="ac-list" id="ac-list" style="display:none"></div></div>
     <div><label><i class="fas fa-building"></i> ประเภท</label><select id="s-type"><option value="">ทุกประเภท</option><option value="บ้านเดี่ยว">บ้านเดี่ยว</option><option value="ทาวน์โฮม">ทาวน์โฮม</option><option value="คอนโด">คอนโด</option><option value="อาคารพาณิชย์">อาคารพาณิชย์</option><option value="ที่ดิน">ที่ดิน</option><option value="วิลล่า">วิลล่า</option><option value="รีสอร์ท">รีสอร์ท</option><option value="โรงแรม">โรงแรม</option></select></div>
     <div id="loc-drill-wrap">
-      <label id="loc-drill-label"><i class="fas fa-map-marker-alt"></i> <span id="loc-drill-label-text">จังหวัด / ทำเล</span></label>
+      <label id="loc-drill-label"><i class="fas fa-map-marker-alt"></i> <span id="loc-drill-label-text">จังหวัด</span></label>
       <div id="loc-drill-btn" onclick="locDrillToggle()" title="เลือกจังหวัด / อำเภอ">
-        <span id="loc-drill-display">ทุกทำเล</span>
+        <span id="loc-drill-display">ทุกจังหวัด</span>
         <i class="fas fa-chevron-down" id="loc-drill-chevron"></i>
         <!-- hidden selects retained for applyFilters compatibility -->
         <select id="s-prov" style="display:none"></select>
@@ -4435,7 +4455,7 @@ function popupMapFilterAll(){
     if(kw){ var hay=((p.title||'')+' '+(p.location||'')+' '+(p.province||'')).toLowerCase(); if(hay.indexOf(kw)===-1) return false; }
     if(tx && tx !== 'ALL' && p.tx !== tx) return false;
     if(typ && p.type && p.type.indexOf(typ) === -1) return false;
-    if(prov && p.province && p.province.indexOf(prov) === -1 && (p.location||'').indexOf(prov) === -1) return false;
+    if(prov){ var _pvL=prov.toLowerCase(); var _pPL=(p.province||'').toLowerCase(); var _pLL=(p.location||'').toLowerCase(); var _norm=function(s){return s.replace('มหานคร','').replace('ฯ','').trim();}; var _matchP=_pPL.includes(_pvL)||_pvL.includes(_pPL)||_norm(_pPL).includes(_norm(_pvL))||_norm(_pvL).includes(_norm(_pPL))||_pLL.includes(_pvL)||_pLL.includes(_norm(_pvL)); if(!_matchP) return false; }
     if(minPrice && p.price && p.price < minPrice) return false;
     if(maxPrice && p.price && p.price > maxPrice) return false;
     return true;
@@ -4491,7 +4511,7 @@ function popupMapResetFilters(){
     _popupRefreshMarkers();
   }
   // Reset cards panel selects too
-  ['modal-adv-kw','modal-adv-tx','modal-adv-proptype','modal-adv-popular-loc','modal-adv-province','modal-adv-minprice','modal-adv-maxprice'].forEach(function(id){
+  ['modal-adv-kw','modal-adv-tx','modal-adv-proptype','modal-adv-popular-loc','modal-adv-province','modal-adv-district','modal-adv-minprice','modal-adv-maxprice'].forEach(function(id){
     var el = document.getElementById(id);
     if(!el) return;
     if(el.tagName === 'SELECT') el.value = el.options[0].value;
@@ -4510,7 +4530,7 @@ function _popupRefreshMarkersFiltered(tx, typ, prov, maxPrice, kw){
     if(kw){ var hay=((p.title||'')+' '+(p.location||'')+' '+(p.province||'')).toLowerCase(); if(hay.indexOf(kw)===-1) return false; }
     if(tx && tx !== 'ALL' && p.tx !== tx) return false;
     if(typ && p.type && p.type.indexOf(typ) === -1) return false;
-    if(prov && p.province && p.province.indexOf(prov) === -1 && (p.location||'').indexOf(prov) === -1) return false;
+    if(prov){ var _pvL=prov.toLowerCase(); var _pPL=(p.province||'').toLowerCase(); var _pLL=(p.location||'').toLowerCase(); var _norm=function(s){return s.replace('มหานคร','').replace('ฯ','').trim();}; var _matchP=_pPL.includes(_pvL)||_pvL.includes(_pPL)||_norm(_pPL).includes(_norm(_pvL))||_norm(_pvL).includes(_norm(_pPL))||_pLL.includes(_pvL)||_pLL.includes(_norm(_pvL)); if(!_matchP) return false; }
     if(maxPrice && p.price && p.price > maxPrice) return false;
     return true;
   });
@@ -4570,8 +4590,20 @@ function modalAdvFilter(type){
   var kw = (document.getElementById('modal-adv-kw')||{}).value||'';
   var tx = (document.getElementById('modal-adv-tx')||{}).value||'';
   var typ = (document.getElementById('modal-adv-proptype')||{}).value||'';
-  var prov = (document.getElementById('modal-adv-popular-loc')||{}).value||''
-            || (document.getElementById('modal-adv-province')||{}).value||'';
+  var popLoc = (document.getElementById('modal-adv-popular-loc')||{}).value||'';
+  var provVal = (document.getElementById('modal-adv-province')||{}).value||'';
+  var distVal = (document.getElementById('modal-adv-district')||{}).value||'';
+  // ถ้าเลือก popular-loc ให้ clear drill-down display + state
+  if(popLoc) {
+    _madvProv = ''; _madvDist = ''; _madvLevel = 'top';
+    var disp = document.getElementById('madv-loc-display');
+    if(disp) disp.textContent = 'จังหวัด';
+    var sprov = document.getElementById('modal-adv-province');
+    if(sprov) sprov.value = '';
+    var sdist = document.getElementById('modal-adv-district');
+    if(sdist) sdist.value = '';
+    distVal = '';
+  }
   var minPrice = Number((document.getElementById('modal-adv-minprice')||{}).value||0);
   var maxPrice = Number((document.getElementById('modal-adv-maxprice')||{}).value||0);
   var sort = (document.getElementById('modal-adv-sort')||{}).value||'default';
@@ -4582,12 +4614,34 @@ function modalAdvFilter(type){
   var filtered = base.filter(function(p){
     if(kw){
       var k = kw.toLowerCase();
-      var hay = ((p.title||'') + ' ' + (p.location||'') + ' ' + (p.province||'')).toLowerCase();
+      var hay = ((p.title||'') + ' ' + (p.location||'') + ' ' + (p.province||'') + ' ' + (p.district||p.amphoe||'')).toLowerCase();
       if(hay.indexOf(k) === -1) return false;
     }
     if(tx && p.tx !== tx) return false;
     if(typ && p.type && p.type.indexOf(typ) === -1) return false;
-    if(prov && p.province && p.province.indexOf(prov) === -1 && (p.location||'').indexOf(prov) === -1) return false;
+    // ── Province filter (flexible match: รองรับ กรุงเทพฯ variants) ──
+    if(provVal) {
+      var pProv = (p.province||'').toLowerCase();
+      var pLoc  = (p.location||'').toLowerCase();
+      var fProv = provVal.toLowerCase();
+      var _normP = function(s){ return s.replace('มหานคร','').replace('ฯ','').trim(); };
+      var _matchAdv = pProv === fProv || pProv.includes(fProv) || fProv.includes(pProv)
+        || _normP(pProv) === _normP(fProv) || _normP(pProv).includes(_normP(fProv)) || _normP(fProv).includes(_normP(pProv))
+        || pLoc.includes(fProv) || pLoc.includes(_normP(fProv));
+      if(!_matchAdv) return false;
+    }
+    // ── District/amphoe filter (only when province also selected) ──
+    if(distVal) {
+      var fDist = distVal.toLowerCase();
+      var distHay = ((p.district||'') + ' ' + (p.amphoe||'') + ' ' + (p.location||'')).toLowerCase();
+      if(distHay.indexOf(fDist) === -1) return false;
+    }
+    // ── Popular location filter (keyword match across all location fields) ──
+    if(popLoc) {
+      var fPop = popLoc.toLowerCase();
+      var popHay = ((p.location||'') + ' ' + (p.province||'') + ' ' + (p.district||p.amphoe||'') + ' ' + (p.title||'')).toLowerCase();
+      if(popHay.indexOf(fPop) === -1) return false;
+    }
     if(minPrice && p.price && p.price < minPrice) return false;
     if(maxPrice && p.price && p.price > maxPrice) return false;
     // extra filters
@@ -4628,35 +4682,33 @@ function modalAdvFilter(type){
   }
 }
 function modalAdvReset(type){
-  var ids = ['modal-adv-kw','modal-adv-tx','modal-adv-proptype','modal-adv-popular-loc','modal-adv-province','modal-adv-minprice','modal-adv-maxprice'];
+  // ── 1. Reset all filter bar fields ──
+  var ids = ['modal-adv-kw','modal-adv-tx','modal-adv-proptype','modal-adv-popular-loc','modal-adv-province','modal-adv-district','modal-adv-minprice','modal-adv-maxprice'];
   ids.forEach(function(id){
     var el = document.getElementById(id);
     if(!el) return;
-    if(el.tagName === 'SELECT') el.value = el.options[0].value;
+    if(el.tagName === 'SELECT') el.selectedIndex = 0;
     else el.value = '';
   });
-  // reset custom drill-down widget
+  // ── 2. Reset custom drill-down location widget ──
   _madvProv = ''; _madvDist = ''; _madvLevel = 'top';
   var disp = document.getElementById('madv-loc-display');
-  if(disp) disp.textContent = 'จังหวัด / ทำเล';
-  madvLocClose();
+  if(disp) disp.textContent = 'จังหวัด';
+  if(typeof madvLocClose === 'function') madvLocClose();
+  // ── 3. Reset sort ──
   var sortEl = document.getElementById('modal-adv-sort');
   if(sortEl) sortEl.value = 'default';
   var countEl = document.getElementById('modal-adv-count');
   if(countEl) countEl.textContent = '';
-  // clear extra filter and close any open extra-filter sheet
+  // ── 4. Clear extra filter state ──
   window._modalExtraFilter = {};
   document.getElementById('modal-extra-filter-sheet')?.remove();
-  if(window._modalTypeData && window._modalTypeData._allData){
-    window._modalTypeData.data = [...window._modalTypeData._allData];
-    window._modalTypeData.currentPage = 1;
-    if(window._modalRenderPage) window._modalRenderPage(window._modalTypeData.data, 1);
-    // ── Reset map panel selects & refresh map markers ──
-    if(_gmapPanelOpen && _popupLeafletMap){
-      _syncMapSelectsFromCards('','','','',0);
-      _popupRefreshMarkersFromData(window._modalTypeData._allData);
-    }
+  // ── 5. Reset map panel selects ──
+  if(typeof _syncMapSelectsFromCards === 'function' && typeof _popupLeafletMap !== 'undefined' && _popupLeafletMap){
+    _syncMapSelectsFromCards('','','','',0,0);
   }
+  // ── 6. Re-apply filter with cleared values (restores full dataset + refreshes cards + map markers) ──
+  if(typeof modalAdvFilter === 'function') modalAdvFilter(type);
   var bd = document.getElementById('all-body'); if(bd) bd.scrollTop = 0;
 }
 
@@ -4954,7 +5006,7 @@ function _popupRefreshMarkersFromData(data){
       <ul>
         <li>ข้อตกลงนี้อยู่ภายใต้กฎหมายไทย</li>
         <li>ข้อพิพาทให้เจรจาก่อน หากตกลงกันไม่ได้ให้ใช้การไกล่เกลี่ย</li>
-        <li>หากไกล่เกลี่ยไม่สำเร็จ ให้นำไปสู่ศาลที่มีเขตอำนาจในกรุงเทพมหานคร</li>
+        <li>หากไกล่เกลี่ยไม่สำเร็จ ให้นำไปสู่ศาลที่มีเขตอำนาจในกรุงเทพฯ</li>
       </ul>
 
       <h3>9. การแก้ไขข้อตกลง</h3>
@@ -6089,7 +6141,10 @@ function mapProp(r){
   const apps=Array.isArray(r.appliances)?r.appliances:(r.appliances?[r.appliances]:[]);
   return {
     id:String(r.id),title:r.title,type:r.type,province:r.province,
-    location:r.location,price:Number(r.price),
+    location:r.location,
+    district:r.district||r.amphoe||'',
+    amphoe:r.amphoe||r.district||'',
+    price:Number(r.price),
     tx:(()=>{
       const v=(r.tx||'').toString().toUpperCase().trim();
       if(v==='RENT'||v==='เช่า'||v==='ให้เช่า') return 'RENT';
@@ -6606,8 +6661,10 @@ function doSearch(){ curType=($('s-type')?.value||'').trim(); $$('.cat-card').fo
 async function applyFilters(){
   const kw=($('s-kw')?.value||'').trim();
   const tp=curType||$('s-type')?.value||'';
-  const pv=$('s-prov')?.value||'';
-  const dv=($('s-dist')?.value||'').trim();
+  // อ่านจาก _locProv/_locDist (global state) โดยตรง เพื่อหลีกเลี่ยง
+  // hidden select dropping value เมื่อไม่มี matching option (เช่น กรุงเทพฯ)
+  const pv=(typeof _locProv!=='undefined'&&_locProv!==null)?_locProv:($('s-prov')?.value||'');
+  const dv=(typeof _locDist!=='undefined'&&_locDist!==null)?_locDist.trim():($('s-dist')?.value||'').trim();
   const min=+$('s-min')?.value||0;
   const max=+$('s-max')?.value||999e6;
 
@@ -6646,8 +6703,48 @@ async function applyFilters(){
   filtered=props.filter(p=>{
     if(tx!=='ALL' && p.tx!==tx) return false;
     if(_acceptedTypes && !_acceptedTypes.includes(p.type)) return false;
-    if(pv&&p.province!==pv) return false;
-    if(dv && !((p.district||p.amphoe||p.location||'').includes(dv))) return false;
+    // ── Province + District filter (ฟิลเตอร์จังหวัดก่อน อำเภอหลัง) ──────
+    const _normStr = (s) => s.replace('มหานคร','').replace('ฯ','').trim();
+    const _matchProv = () => {
+      const pvL    = pv.toLowerCase();
+      const pProv  = (p.province||'').toLowerCase();
+      const pLoc   = (p.location||'').toLowerCase();
+      const normPv   = _normStr(pvL);
+      const normProv = _normStr(pProv);
+      return pProv === pvL
+        || pProv.includes(pvL) || pvL.includes(pProv)
+        || normProv === normPv || normProv.includes(normPv) || normPv.includes(normProv)
+        || pLoc.includes(pvL) || pLoc.includes(normPv);
+    };
+    // 1. ฟิลเตอร์จังหวัดก่อนเสมอ
+    if(pv && !_matchProv()) return false;
+    // 2. ฟิลเตอร์อำเภอ/เขต — แสดงเฉพาะ listing ที่ตรงกับอำเภอที่เลือก
+    if(dv){
+      const dvL = dv.toLowerCase();
+      // ── Priority 1: มี field district/amphoe ใน data โดยตรง (Supabase column) ──
+      const distDirect = (p.district||p.amphoe||'').toLowerCase().trim();
+      if(distDirect){
+        // match แบบ contains เผื่อค่า db มีรายละเอียดเพิ่ม เช่น "เขตลาดพร้าว"
+        if(!distDirect.includes(dvL)) return false;
+      } else {
+        // ── Priority 2: ไม่มี district field → parse จาก location ──
+        // location รูปแบบ: "[เขต/ย่าน] [จังหวัด]" เช่น "ลาดกระบัง กรุงเทพฯ"
+        // หรือ "[ย่าน] [ซอย]" เช่น "สุขุมวิท 63" หรือแค่ "[ย่าน]" เช่น "สาทร"
+        // strategy: ตัดชื่อจังหวัดทุก variant ออก → เหลือส่วน district/ย่าน → includes match
+        const bkkAll = ['กรุงเทพมหานคร','กรุงเทพฯ','กรุงเทพ','มหานคร','bangkok'];
+        const provRaw = (p.province||'').toLowerCase();
+        let locClean = (p.location||'').toLowerCase();
+        // ตัดชื่อจังหวัด (longest-first กัน partial strip)
+        [...bkkAll, provRaw, _normStr(provRaw)]
+          .filter(Boolean)
+          .sort((a,b) => b.length - a.length)
+          .forEach(w => { locClean = locClean.split(w).join(' '); });
+        locClean = locClean.replace(/\s+/g,' ').trim();
+        // locClean = ส่วน district/ย่าน ล้วนๆ เช่น "ลาดกระบัง", "จตุจักร", "สุขุมวิท 63"
+        // ใช้ includes: dvL ต้องอยู่ใน locClean (district เป็น prefix ของ location เสมอ)
+        if(!locClean.includes(dvL)) return false;
+      }
+    }
     if(kwlOrig){
       const titleL = p.title.toLowerCase();
       const locL = (p.location||'').toLowerCase();
@@ -6942,7 +7039,7 @@ function _openPropertyUrl(propId) {
       "@type": "PostalAddress",
       "streetAddress": p.location || '',
       "addressLocality": p.location || '',
-      "addressRegion": p.province || 'กรุงเทพมหานคร',
+      "addressRegion": p.province || 'กรุงเทพฯ',
       "addressCountry": "TH"
     },
     "floorSize": p.area > 0 ? {"@type": "QuantitativeValue", "value": p.area, "unitCode": "MTK"} : undefined,
@@ -6951,7 +7048,7 @@ function _openPropertyUrl(propId) {
     "amenityFeature": p.amenities ? p.amenities.map(a => ({"@type": "LocationFeatureSpecification", "name": a, "value": true})) : undefined,
     "containedInPlace": {
       "@type": "City",
-      "name": p.province || 'กรุงเทพมหานคร',
+      "name": p.province || 'กรุงเทพฯ',
       "containedInPlace": {"@type": "Country", "name": "ประเทศไทย"}
     }
   };
@@ -7879,7 +7976,7 @@ function showListingsPage(title, data) {
 function _populateListingsProvince() {
   const sel = document.getElementById('ls-prov');
   if(!sel) return;
-  const allLabel = (typeof ui==='function') ? ui('sf.prov.all') : 'ทุกทำเล';
+  const allLabel = (typeof ui==='function') ? ui('sf.prov.all') : 'ทุกจังหวัด';
   const provs = [...new Set(_listingsBaseData.map(p=>p.province).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'th'));
   sel.innerHTML = `<option value="">${allLabel}</option>` + provs.map(p=>`<option value="${p}">${p}</option>`).join('');
 }
@@ -8026,7 +8123,17 @@ function listingsInlineSearch() {
     const acceptedTypes = _typeAliases[type] || [type];
     base = base.filter(p => acceptedTypes.includes(p.type));
   }
-  if(prov) base = base.filter(p=>p.province===prov||p.location===prov);
+  if(prov) {
+    const provL = prov.toLowerCase();
+    const _normL = (s) => s.replace('มหานคร','').replace('ฯ','').trim();
+    base = base.filter(p=>{
+      const pProv = (p.province||'').toLowerCase();
+      const pLoc  = (p.location||'').toLowerCase();
+      return pProv === provL || pProv.includes(provL) || provL.includes(pProv)
+        || _normL(pProv) === _normL(provL) || _normL(pProv).includes(_normL(provL)) || _normL(provL).includes(_normL(pProv))
+        || pLoc.includes(provL) || pLoc.includes(_normL(provL));
+    });
+  }
   if(transit) { const tk=transit.toLowerCase(); base = base.filter(p=>((p.bts||'')+(p.mrt||'')+(p.transit||'')+(p.location||'')+(p.desc||'')).toLowerCase().includes(tk)); }
   if(pMin>0) base = base.filter(p=>p.price>=pMin);
   if(pMax>0 && pMax<999000000) base = base.filter(p=>p.price<=pMax);
@@ -8225,7 +8332,7 @@ var _mdLocationCoords = {
   'ร่มเกล้า':       [13.7680, 100.7090],
   'ร่มเกล้า กรุงเทพฯ':[13.7680,100.7090],
   'กรุงเทพฯ':       [13.7563, 100.5018],
-  'กรุงเทพมหานคร':  [13.7563, 100.5018],
+  'กรุงเทพฯ':  [13.7563, 100.5018],
   'สยาม':           [13.7455, 100.5336],
   'ชิดลม':          [13.7445, 100.5490],
   'ราชเทวี':        [13.7540, 100.5355],
@@ -8879,6 +8986,13 @@ function propUrl(p) {
   return '/property/' + p.id + (slug ? '-' + slug : '');
 }
 function openAllModal(type){
+  // ── Clean up any portal-orphaned madv panel from previous modal session ──
+  const _stalePanel = document.getElementById('madv-loc-panel');
+  if(_stalePanel && _stalePanel.parentNode === document.body) {
+    _stalePanel.remove();
+  }
+  // Reset madv state so province dropdown starts fresh each time modal opens
+  _madvLevel = 'top'; _madvProv = ''; _madvDist = '';
   const m=$('all-modal'),t=$('all-title2'),b=$('all-body');
   let title='',data=[];
   window._modalCurrentType = type;
@@ -9064,13 +9178,64 @@ function openAllModal(type){
       </select>
     </div><!-- end row1 -->
     <div class="modal-adv-filter-row2" style="display:flex;flex-wrap:nowrap;gap:6px;align-items:center">
-      <!-- hidden selects for modalAdvFilter compatibility -->
-      <select id="modal-adv-popular-loc" style="display:none"></select>
-      <select id="modal-adv-province" style="display:none"></select>
-      <!-- custom drill-down -->
+      <!-- hidden inputs for drill-down filter — input[hidden] so .value works for any province string -->
+      <input id="modal-adv-province" type="hidden" value="">
+      <input  id="modal-adv-district" type="hidden" value="">
+      <!-- 🔥 ทำเลยอดนิยม select -->
+      <select class="modal-adv-select" id="modal-adv-popular-loc" onchange="modalAdvFilter('${type}')" style="flex:1 1 0;min-width:130px" title="ทำเลยอดนิยม">
+        <option value="">🔥 ทำเลยอดนิยม</option>
+        <optgroup label="📍 โซนกลางเมือง — CBD">
+        <option value="สุขุมวิท">📍 สุขุมวิท</option>
+        <option value="สาทร">📍 สาทร</option>
+        <option value="สีลม">📍 สีลม</option>
+        <option value="อโศก">📍 อโศก</option>
+        <option value="ทองหล่อ">📍 ทองหล่อ</option>
+        <option value="เพลินจิต">📍 เพลินจิต</option>
+        <option value="ชิดลม">📍 ชิดลม</option>
+        <option value="ราชประสงค์">📍 ราชประสงค์</option>
+        <option value="ลุมพินี">📍 ลุมพินี</option>
+        <option value="วิทยุ">📍 ถ.วิทยุ</option>
+        </optgroup>
+        <optgroup label="📍 โซนตะวันออก">
+        <option value="พระโขนง">📍 พระโขนง</option>
+        <option value="เอกมัย">📍 เอกมัย</option>
+        <option value="อ่อนนุช">📍 อ่อนนุช</option>
+        <option value="บางนา">📍 บางนา</option>
+        <option value="ลาดกระบัง">📍 ลาดกระบัง</option>
+        <option value="มีนบุรี">📍 มีนบุรี</option>
+        <option value="รามคำแหง">📍 รามคำแหง</option>
+        <option value="หัวหมาก">📍 หัวหมาก</option>
+        <option value="สุวรรณภูมิ">📍 สุวรรณภูมิ</option>
+        </optgroup>
+        <optgroup label="📍 โซนเหนือ">
+        <option value="รัชดา">📍 รัชดาภิเษก</option>
+        <option value="ลาดพร้าว">📍 ลาดพร้าว</option>
+        <option value="จตุจักร">📍 จตุจักร</option>
+        <option value="หมอชิต">📍 หมอชิต</option>
+        <option value="พหลโยธิน">📍 พหลโยธิน</option>
+        <option value="อารีย์">📍 อารีย์</option>
+        <option value="สะพานควาย">📍 สะพานควาย</option>
+        <option value="ดอนเมือง">📍 ดอนเมือง</option>
+        <option value="พระราม 9">📍 พระราม 9</option>
+        <option value="ห้วยขวาง">📍 ห้วยขวาง</option>
+        </optgroup>
+        <optgroup label="📍 โซนตะวันตก &amp; ใต้">
+        <option value="ปิ่นเกล้า">📍 ปิ่นเกล้า</option>
+        <option value="บางแค">📍 บางแค</option>
+        <option value="วงเวียนใหญ่">📍 วงเวียนใหญ่</option>
+        <option value="พระราม 3">📍 พระราม 3</option>
+        <option value="สาธุประดิษฐ์">📍 สาธุประดิษฐ์</option>
+        <option value="ราษฎร์บูรณะ">📍 ราษฎร์บูรณะ</option>
+        <option value="ตลิ่งชัน">📍 ตลิ่งชัน</option>
+        <option value="บางกอกน้อย">📍 บางกอกน้อย</option>
+        <option value="ธนบุรี">📍 ธนบุรี</option>
+        <option value="บางบอน">📍 บางบอน</option>
+        </optgroup>
+      </select>
+      <!-- custom drill-down จังหวัด -->
       <div id="madv-loc-wrap">
         <div id="madv-loc-btn" onclick="madvLocToggle()" title="เลือกทำเล / จังหวัด">
-          <span id="madv-loc-display">จังหวัด / ทำเล</span>
+          <span id="madv-loc-display">จังหวัด</span>
           <i class="fas fa-chevron-down" id="madv-loc-chevron"></i>
           <div id="madv-loc-panel" style="display:none" onclick="event.stopPropagation()">
             <div id="madv-loc-list"></div>
@@ -9413,7 +9578,7 @@ function openModalAdvExtraFilter(type) {
           <div style="font-size:11px;font-weight:800;color:#8A8070;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0ece4"><i class="fas fa-map-marker-alt" style="color:var(--p)"></i> ${ui('af.sec.prov')}</div>
           <select id="mef-province" style="width:100%;padding:8px 10px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;background:#fff">
           <option value="">${ui('af.prov.all')}</option>
-          <option value="กรุงเทพมหานคร" ${_loc=='กรุงเทพมหานคร'?'selected':''}>กรุงเทพมหานคร</option>
+          <option value="กรุงเทพฯ" ${_loc=='กรุงเทพฯ'?'selected':''}>กรุงเทพฯ</option>
           <option value="กระบี่" ${_loc=='กระบี่'?'selected':''}>กระบี่</option>
           <option value="กาญจนบุรี" ${_loc=='กาญจนบุรี'?'selected':''}>กาญจนบุรี</option>
           <option value="กาฬสินธุ์" ${_loc=='กาฬสินธุ์'?'selected':''}>กาฬสินธุ์</option>
@@ -9907,11 +10072,33 @@ function mefSwitchPriceMode(mode){
 }
 
 function modalExtraFilterClear(type) {
+  const sheet = document.getElementById('modal-extra-filter-sheet');
+  if(sheet){
+    // Reset all checkboxes inside the sheet
+    sheet.querySelectorAll('input[type="checkbox"]').forEach(function(cb){ cb.checked = false; });
+    // Reset all selects inside the sheet
+    sheet.querySelectorAll('select').forEach(function(sel){ sel.selectedIndex = 0; });
+    // Reset all text/number inputs
+    sheet.querySelectorAll('input[type="text"],input[type="number"]').forEach(function(inp){ inp.value = ''; });
+    // Reset range sliders to default positions
+    var areaMin = sheet.querySelector('#mef-area-min');
+    var areaMax = sheet.querySelector('#mef-area-max');
+    var landMin = sheet.querySelector('#mef-land-min');
+    var landMax = sheet.querySelector('#mef-land-max');
+    if(areaMin){ areaMin.value = areaMin.min || 0; }
+    if(areaMax){ areaMax.value = areaMax.max || 500; }
+    if(landMin){ landMin.value = landMin.min || 0; }
+    if(landMax){ landMax.value = landMax.max || 1000; }
+    // Update slider display labels
+    if(typeof mefRangeUpdate === 'function'){ mefRangeUpdate('area'); mefRangeUpdate('land'); }
+    // Reset price mode to buy
+    if(typeof mefSwitchPriceMode === 'function') mefSwitchPriceMode('buy');
+  }
+  // Clear internal filter state
   window._modalExtraFilter = {};
-  document.getElementById('modal-extra-filter-sheet')?.remove();
-  // re-run filter without extra conditions
+  // Re-run filter without extra conditions (keeps popup open)
   modalAdvFilter(type);
-  // also refresh map if open
+  // Also refresh map if open
   if(typeof _popupRefreshMarkersFromData==='function' && _popupLeafletMap && window._modalTypeData){
     _popupRefreshMarkersFromData(window._modalTypeData.data || []);
   }
@@ -10806,7 +10993,7 @@ function applyLocOpt(val) { /* disabled */ }
 
 // ── ข้อมูลอำเภอครบ 77 จังหวัด ─────────────────────────────────────
 const PROVINCE_DISTRICTS = {
-  'กรุงเทพมหานคร':['พระนคร','ดุสิต','หนองจอก','บางรัก','บางเขน','บางกะปิ','ปทุมวัน','ป้อมปราบศัตรูพ่าย','พระโขนง','มีนบุรี','ลาดกระบัง','ยานนาวา','สัมพันธวงศ์','พญาไท','ธนบุรี','บางกอกใหญ่','ห้วยขวาง','คลองสาน','ตลิ่งชัน','บางกอกน้อย','บางขุนเทียน','ภาษีเจริญ','หนองแขม','ราษฎร์บูรณะ','บางพลัด','ดินแดง','บึงกุ่ม','สาทร','บางซื่อ','จตุจักร','บางคอแหลม','ประเวศ','คลองเตย','สวนหลวง','จอมทอง','ดอนเมือง','ราชเทวี','ลาดพร้าว','วัฒนา','บางแค','หลักสี่','สายไหม','คันนายาว','สะพานสูง','วังทองหลาง','คลองสามวา','บางนา','ทวีวัฒนา','ทุ่งครุ','บางบอน'],
+  'กรุงเทพฯ':['พระนคร','ดุสิต','หนองจอก','บางรัก','บางเขน','บางกะปิ','ปทุมวัน','ป้อมปราบศัตรูพ่าย','พระโขนง','มีนบุรี','ลาดกระบัง','ยานนาวา','สัมพันธวงศ์','พญาไท','ธนบุรี','บางกอกใหญ่','ห้วยขวาง','คลองสาน','ตลิ่งชัน','บางกอกน้อย','บางขุนเทียน','ภาษีเจริญ','หนองแขม','ราษฎร์บูรณะ','บางพลัด','ดินแดง','บึงกุ่ม','สาทร','บางซื่อ','จตุจักร','บางคอแหลม','ประเวศ','คลองเตย','สวนหลวง','จอมทอง','ดอนเมือง','ราชเทวี','ลาดพร้าว','วัฒนา','บางแค','หลักสี่','สายไหม','คันนายาว','สะพานสูง','วังทองหลาง','คลองสามวา','บางนา','ทวีวัฒนา','ทุ่งครุ','บางบอน'],
   'กระบี่':['เมืองกระบี่','เขาพนม','เกาะลันตา','คลองท่อม','อ่าวลึก','ปลายพระยา','ลำทับ','เหนือคลอง'],
   'กาญจนบุรี':['เมืองกาญจนบุรี','ไทรโยค','บ่อพลอย','ศรีสวัสดิ์','ท่ามะกา','ท่าม่วง','ทองผาภูมิ','สังขละบุรี','พนมทวน','เลาขวัญ','ด่านมะขามเตี้ย','หนองปรือ','ห้วยกระเจา'],
   'กาฬสินธุ์':['เมืองกาฬสินธุ์','นามน','กมลาไสย','ร่องคำ','กุฉินารายณ์','เขาวง','ยางตลาด','ห้วยเม็ก','สหัสขันธ์','คำม่วง','ท่าคันโท','หนองกุงศรี','สมเด็จ','ห้วยผึ้ง','สามชัย','นาคู','ดอนจาน','ฆ้องชัย'],
@@ -10897,7 +11084,7 @@ function populateProvinceSelect() {
   const allProvinces77 = Object.keys(PROVINCE_DISTRICTS);
   const dbProvs = [...new Set(props.map(p=>p.province).filter(Boolean))];
   const allProvs = [...new Set([...allProvinces77, ...dbProvs])]
-    .filter(p => Boolean(p) && p !== 'กรุงเทพฯ').sort((a,b)=>a.localeCompare(b,'th'));
+    .filter(p => Boolean(p)).sort((a,b)=>a.localeCompare(b,'th'));
   sp.innerHTML = '<option value=""></option>' + allProvs.map(p=>`<option value="${p}"></option>`).join('');
   locDrillRender();
 }
@@ -10942,13 +11129,17 @@ function locDrillRender() {
 
   if(_locLevel === 'province') {
     // Level 1: จังหวัด
-    html += '<div class="loc-drill-section-head">🗺️ จังหวัด</div>';
+    html += `<div class="loc-drill-section-head">🗺️ ${(typeof ui==='function')?ui('sf.prov.head'):'จังหวัด'}</div>`;
     if(_locProv) {
-      html += `<div class="loc-item loc-clear" onclick="locDrillClear()"><i class="fas fa-times-circle"></i> ล้างการเลือกทั้งหมด</div>`;
+      html += `<div class="loc-item loc-clear" onclick="locDrillClear()"><i class="fas fa-times-circle"></i> ${(typeof ui==='function')?ui('sf.prov.clear'):'ล้างการเลือกทั้งหมด'}</div>`;
     }
     const allProvinces77 = Object.keys(PROVINCE_DISTRICTS);
     const dbProvs = [...new Set(props.map(p=>p.province).filter(Boolean))];
-    const allProvs = [...new Set([...allProvinces77, ...dbProvs])]
+    // ── normalize Bangkok: map "กรุงเทพ" variants → "กรุงเทพฯ" ──
+    const bkkVariants = ['กรุงเทพฯ','กรุงเทพ','Bangkok','bangkok','BKK'];
+    const normalizeProvince = (pv) => bkkVariants.includes(pv) ? 'กรุงเทพฯ' : pv;
+    const normalizedDb = dbProvs.map(normalizeProvince);
+    const allProvs = [...new Set([...allProvinces77, ...normalizedDb])]
       .filter(Boolean).sort((a,b)=>a.localeCompare(b,'th'));
     allProvs.forEach(p => {
       const active = p === _locProv ? ' active' : '';
@@ -10960,14 +11151,17 @@ function locDrillRender() {
     });
   } else {
     // Level 2: อำเภอ
+    const backLabel = (typeof ui==='function')?ui('sf.dist.back'):'กลับ';
     html += `<div class="loc-item loc-back" onclick="locDrillGoBack()">
-      <i class="fas fa-chevron-left"></i> กลับ &nbsp;·&nbsp; <span style="color:#555">${_locProv}</span>
+      <i class="fas fa-chevron-left"></i> ${backLabel} &nbsp;·&nbsp; <span style="color:#555">${_locProv}</span>
     </div>`;
-    html += '<div class="loc-drill-section-head">📍 อำเภอ / เขต</div>';
+    const distHead = (typeof ui==='function')?ui('sf.dist.head'):'อำเภอ / เขต';
+    html += `<div class="loc-drill-section-head">📍 ${distHead}</div>`;
     // "ทุกอำเภอ" option
     const allActive = !_locDist ? ' active' : '';
+    const allDistLabel = (typeof ui==='function')?ui('sf.dist.all'):'ทุกอำเภอใน';
     html += `<div class="loc-item${allActive}" onclick="locDrillSelectDist('')">
-      <span>ทุกอำเภอใน ${_locProv}</span>
+      <span>${allDistLabel} ${_locProv}</span>
     </div>`;
     const districts = PROVINCE_DISTRICTS[_locProv] || [];
     districts.forEach(d => {
@@ -11031,7 +11225,7 @@ function locDrillCommit() {
     } else if(_locProv) {
       disp.textContent = _locProv;
     } else {
-      disp.textContent = (typeof ui==='function') ? ui('sf.prov.all') : 'ทุกทำเล';
+      disp.textContent = (typeof ui==='function') ? ui('sf.prov.all') : 'ทุกจังหวัด';
     }
   }
   // update label text (อาจถูกลบโดย applyLang — ถ้าไม่เจอให้ rebuild)
@@ -11047,7 +11241,7 @@ function locDrillCommit() {
     if(_locDist) {
       lbl.innerHTML = '<i class="fas fa-map-pin"></i> ' + _locProv + ' ›';
     } else {
-      lbl.textContent = (typeof ui==='function') ? ui('sf.prov.label') : 'จังหวัด / ทำเล';
+      lbl.textContent = (typeof ui==='function') ? ui('sf.prov.label') : 'จังหวัด';
     }
   }
   _filterOnly();
@@ -11074,24 +11268,76 @@ let _madvDist  = '';
 function madvLocToggle() {
   const panel = document.getElementById('madv-loc-panel');
   const btn   = document.getElementById('madv-loc-btn');
-  if(!panel) return;
+  if(!panel || !btn) return;
   const isOpen = panel.style.display !== 'none';
   if(isOpen){ madvLocClose(); return; }
-  panel.style.display = 'block';
+  // ── Portal: always move panel to body to escape overflow:hidden containers ──
+  // Re-append every time to ensure it's at top of stacking context
+  document.body.appendChild(panel);
+  // Reset any stale position styles before measuring
+  panel.style.position = 'fixed';
+  panel.style.top      = '-9999px';
+  panel.style.left     = '0px';
+  panel.style.width    = '';
+  panel.style.display  = 'block';
   madvLocRender();
-  const btnRect    = btn.getBoundingClientRect();
-  const panelH     = panel.offsetHeight || 240;
+  // Triple-rAF: รอให้ modal transition + layout เสร็จก่อนวัดตำแหน่ง
+  requestAnimationFrame(function(){
+    requestAnimationFrame(function(){
+      requestAnimationFrame(function(){
+        _madvPositionPanel(panel, btn);
+      });
+    });
+  });
+}
+
+function _madvPositionPanel(panel, btn) {
+  if(!panel || !btn) return;
+  const btnRect = btn.getBoundingClientRect();
+  // Guard: ถ้า btn ยังไม่ถูก render หรือถูกซ่อนอยู่ (size = 0) ให้รอแล้วลองใหม่
+  if(btnRect.width === 0 && btnRect.height === 0) {
+    requestAnimationFrame(function(){
+      requestAnimationFrame(function(){
+        _madvPositionPanel(panel, btn);
+      });
+    });
+    return;
+  }
+  const panelH     = panel.offsetHeight || 260;
+  const panelW     = Math.max(panel.offsetWidth || 200, btnRect.width);
   const spaceBelow = window.innerHeight - btnRect.bottom;
   const spaceAbove = btnRect.top;
-  const dropUp     = spaceBelow < panelH && spaceAbove > spaceBelow;
-  if(dropUp){ panel.classList.add('drop-up'); btn.classList.add('open','drop-up'); }
-  else      { panel.classList.remove('drop-up'); btn.classList.add('open'); btn.classList.remove('drop-up'); }
+  const dropUp     = spaceBelow < panelH + 20 && spaceAbove > spaceBelow;
+  // panel ถูก portal ไป body → ใช้ position:fixed (ไม่ต้องบวก scrollY)
+  panel.style.position = 'fixed';
+  panel.style.zIndex   = '99999';
+  panel.style.width    = panelW + 'px';
+  if(dropUp){
+    panel.style.top    = (btnRect.top - panelH) + 'px';
+    panel.style.bottom = 'auto';
+    panel.style.left   = btnRect.left + 'px';
+    panel.classList.add('drop-up');
+    btn.classList.add('open','drop-up');
+  } else {
+    panel.style.top    = btnRect.bottom + 'px';
+    panel.style.bottom = 'auto';
+    panel.style.left   = btnRect.left + 'px';
+    panel.classList.remove('drop-up');
+    btn.classList.add('open');
+    btn.classList.remove('drop-up');
+  }
 }
 
 function madvLocClose() {
   const panel = document.getElementById('madv-loc-panel');
   const btn   = document.getElementById('madv-loc-btn');
-  if(panel){ panel.style.display='none'; panel.classList.remove('drop-up'); }
+  if(panel){
+    panel.style.display = 'none';
+    panel.style.top = '-9999px';
+    panel.style.left = '0px';
+    panel.style.width = '';
+    panel.classList.remove('drop-up');
+  }
   if(btn)  { btn.classList.remove('open','drop-up'); }
 }
 
@@ -11106,9 +11352,11 @@ function madvLocRender() {
       html += `<div class="madv-loc-item loc-clear" onclick="madvLocClear()"><i class="fas fa-times-circle"></i> ล้างการเลือก</div>`;
     }
     html += '<div class="madv-loc-head">🗺️ จังหวัด</div>';
-    const allProvs = Object.keys(PROVINCE_DISTRICTS)
+    // กรุงเทพฯ อยู่บนสุดเสมอ ตามด้วยจังหวัดอื่นเรียงตัวอักษร
+    const _otherProvs = Object.keys(PROVINCE_DISTRICTS)
       .filter(p => p !== 'กรุงเทพฯ')
       .sort((a,b)=>a.localeCompare(b,'th'));
+    const allProvs = ['กรุงเทพฯ', ..._otherProvs];
     allProvs.forEach(function(p){
       const active = (p === _madvProv && _madvLevel !== 'top') ? ' active' : '';
       const hasDist = (PROVINCE_DISTRICTS[p]||[]).length > 0;
@@ -11153,23 +11401,33 @@ function madvGoBack() {
 
 function madvLocClear() {
   _madvProv = ''; _madvDist = ''; _madvLevel = 'top';
+  var sdist = document.getElementById('modal-adv-district');
+  if(sdist) sdist.value = '';
+  var sprov = document.getElementById('modal-adv-province');
+  if(sprov) sprov.value = '';
+  var spop  = document.getElementById('modal-adv-popular-loc');
+  if(spop)  spop.value = '';
   madvCommit(); madvLocRender();
 }
 
 function madvCommit() {
-  // Sync to hidden selects so modalAdvFilter reads the right value
-  // popular-loc: sub-area names (not province keys), province: province names
+  // ── Sync province & district to hidden selects ──
+  // Use separate selects: modal-adv-province for province, modal-adv-district (hidden) for district
   const spop  = document.getElementById('modal-adv-popular-loc');
   const sprov = document.getElementById('modal-adv-province');
+  const sdist = document.getElementById('modal-adv-district');
   const isProvKey = _madvProv && PROVINCE_DISTRICTS.hasOwnProperty(_madvProv);
-  if(_madvDist && !isProvKey) {
-    // Popular area selection (e.g. สุขุมวิท, ลาดพร้าว)
+
+  if(!isProvKey && _madvDist) {
+    // Popular area selection (e.g. สุขุมวิท, ลาดพร้าว) — treat as keyword location
     if(spop)  spop.value  = _madvDist;
     if(sprov) sprov.value = '';
+    if(sdist) sdist.value = '';
   } else {
-    // Province (+ optional district within province)
-    if(spop)  spop.value  = _madvDist || ''; // district name used as loc filter
-    if(sprov) sprov.value = _madvProv  || '';
+    // Province + optional district drill-down
+    if(spop)  spop.value  = '';               // clear popular-loc (avoid double filter)
+    if(sprov) sprov.value = _madvProv || '';  // province
+    if(sdist) sdist.value = _madvDist || '';  // district/amphoe (may be empty = all districts)
   }
 
   // Update display text
@@ -11178,7 +11436,7 @@ function madvCommit() {
     if(_madvDist && _madvProv) disp.textContent = _madvProv + ' › ' + _madvDist;
     else if(_madvDist)         disp.textContent = _madvDist;
     else if(_madvProv)         disp.textContent = _madvProv;
-    else                       disp.textContent = 'จังหวัด / ทำเล';
+    else                       disp.textContent = 'จังหวัด';
   }
 
   // Trigger filter
@@ -11186,12 +11444,30 @@ function madvCommit() {
   if(typeof modalAdvFilter === 'function') modalAdvFilter(typeCtx);
 }
 
-// Close on outside click
+// Close on outside click — panel is portalled to body so check both wrap and panel
 document.addEventListener('click', function(e){
-  const wrap = document.getElementById('madv-loc-wrap');
+  const wrap  = document.getElementById('madv-loc-wrap');
+  const panel = document.getElementById('madv-loc-panel');
+  const btn   = document.getElementById('madv-loc-btn');
   if(!wrap) return;
+  // If the panel is currently hidden, nothing to close
+  if(!panel || panel.style.display === 'none') return;
   const path = e.composedPath ? e.composedPath() : [];
-  if(!path.includes(wrap) && !wrap.contains(e.target)) madvLocClose();
+  const inWrap  = path.includes(wrap)  || wrap.contains(e.target);
+  const inPanel = panel && (path.includes(panel) || panel.contains(e.target));
+  const inBtn   = btn   && (path.includes(btn)   || btn.contains(e.target));
+  if(!inWrap && !inPanel && !inBtn) madvLocClose();
+});
+// Reposition panel on scroll/resize while open
+window.addEventListener('scroll', function(){
+  var panel = document.getElementById('madv-loc-panel');
+  var btn   = document.getElementById('madv-loc-btn');
+  if(panel && btn && panel.style.display !== 'none') _madvPositionPanel(panel, btn);
+}, true);
+window.addEventListener('resize', function(){
+  var panel = document.getElementById('madv-loc-panel');
+  var btn   = document.getElementById('madv-loc-btn');
+  if(panel && btn && panel.style.display !== 'none') _madvPositionPanel(panel, btn);
 });
 
 
@@ -12998,7 +13274,9 @@ const UI_TEXT = {
     /* search form */
     'sf.kw.label':'คำค้นหา','sf.kw.ph':'ชื่อโครงการ ทำเล...',
     'sf.type.label':'ประเภท','sf.type.all':'ทุกประเภท',
-    'sf.prov.label':'จังหวัด / ทำเล','sf.prov.all':'ทุกทำเล',
+    'sf.prov.label':'จังหวัด','sf.prov.all':'ทุกจังหวัด',
+    'sf.dist.head':'อำเภอ / เขต','sf.dist.all':'ทุกอำเภอใน','sf.dist.back':'กลับ',
+    'sf.prov.head':'จังหวัด','sf.prov.clear':'ล้างการเลือกทั้งหมด',
     'sf.min.label':'ราคาต่ำสุด','sf.max.label':'ราคาสูงสุด',
     'sf.btn':'ค้นหา','sf.btn.reset':'รีเซ็ต',
     /* quick search bar */
@@ -13225,6 +13503,8 @@ const UI_TEXT = {
     'sf.kw.label':'Keyword','sf.kw.ph':'Project name, location...',
     'sf.type.label':'Type','sf.type.all':'All Types',
     'sf.prov.label':'Province / Area','sf.prov.all':'All Areas',
+    'sf.dist.head':'District / Sub-area','sf.dist.all':'All Districts in','sf.dist.back':'Back',
+    'sf.prov.head':'Province','sf.prov.clear':'Clear selection',
     'sf.min.label':'Min Price','sf.max.label':'Max Price',
     'sf.btn':'Search','sf.btn.reset':'Reset',
     'qs.popular':'Popular Areas','qs.bkk':'📍 Bangkok — Popular Areas','qs.other':'🏙️ Other Zones',
@@ -13414,6 +13694,8 @@ const UI_TEXT = {
     'sf.kw.label':'关键词','sf.kw.ph':'项目名称、地点...',
     'sf.type.label':'类型','sf.type.all':'所有类型',
     'sf.prov.label':'省份 / 地区','sf.prov.all':'所有地区',
+    'sf.dist.head':'区 / 县','sf.dist.all':'全部区县于','sf.dist.back':'返回',
+    'sf.prov.head':'省份','sf.prov.clear':'清除选择',
     'sf.min.label':'最低价格','sf.max.label':'最高价格',
     'sf.btn':'搜索','sf.btn.reset':'重置',
     'qs.popular':'热门地区','qs.bkk':'📍 曼谷 — 热门地区','qs.other':'🏙️ 其他区域',
@@ -13603,6 +13885,8 @@ const UI_TEXT = {
     'sf.kw.label':'キーワード','sf.kw.ph':'物件名・エリアを入力...',
     'sf.type.label':'タイプ','sf.type.all':'すべてのタイプ',
     'sf.prov.label':'県 / エリア','sf.prov.all':'すべてのエリア',
+    'sf.dist.head':'郡 / 区','sf.dist.all':'全区域・','sf.dist.back':'戻る',
+    'sf.prov.head':'県','sf.prov.clear':'選択を解除',
     'sf.min.label':'最低価格','sf.max.label':'最高価格',
     'sf.btn':'検索','sf.btn.reset':'リセット',
     'qs.popular':'人気エリア','qs.bkk':'📍 バンコク — 人気エリア','qs.other':'🏙️ その他のゾーン',
@@ -13920,6 +14204,11 @@ function applyLang(){
   }
   const sProv=document.getElementById('s-prov');
   if(sProv&&sProv.options[0])sProv.options[0].textContent=ui('sf.prov.all');
+  // ── Update loc-drill-display button text when language changes ──
+  (function(){
+    const disp=document.getElementById('loc-drill-display');
+    if(disp&&!_locProv&&!_locDist){ disp.textContent=ui('sf.prov.all'); }
+  })();
   const btnSearch=document.querySelector('.btn-search');
   if(btnSearch){const ico=btnSearch.querySelector('i');btnSearch.textContent=ui('sf.btn');if(ico)btnSearch.insertBefore(ico,btnSearch.firstChild);}
   const btnReset=document.querySelector('.btn-reset-search');
@@ -15444,7 +15733,7 @@ function resetAdvFilter(){
         <div class="apply-frow">
           <div class="apply-fg">
             <label>จังหวัดที่อยู่ปัจจุบัน <span class="req">*</span></label>
-            <input id="aa-province" placeholder="กรุงเทพมหานคร">
+            <input id="aa-province" placeholder="กรุงเทพฯ">
             <span class="err-msg">กรุณาระบุจังหวัด</span>
           </div>
           <div class="apply-fg">
@@ -15731,7 +16020,7 @@ function resetAdvFilter(){
         <div class="apply-frow">
           <div class="apply-fg">
             <label>จังหวัดที่อยู่ปัจจุบัน <span class="req">*</span></label>
-            <input id="ao-province" placeholder="กรุงเทพมหานคร">
+            <input id="ao-province" placeholder="กรุงเทพฯ">
             <span class="err-msg">กรุณาระบุจังหวัด</span>
           </div>
           <div class="apply-fg">
@@ -16014,7 +16303,7 @@ function resetAdvFilter(){
         <div class="adv-select-row">
         <select id="af-province" style="width:100%;padding:7px 10px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;font-family:inherit" onchange="if(this.value){document.getElementById('af-popular-loc').value='';} advRangeUpdate()">
           <option value="">ทุกจังหวัด</option>
-          <option value="กรุงเทพมหานคร">กรุงเทพมหานคร</option>
+          <option value="กรุงเทพฯ">กรุงเทพฯ</option>
           <option value="กระบี่">กระบี่</option>
           <option value="กาญจนบุรี">กาญจนบุรี</option>
           <option value="กาฬสินธุ์">กาฬสินธุ์</option>
@@ -16500,7 +16789,7 @@ function resetAdvFilter(){
           <div>
             <label id="ls-label-prov" style="display:block;font-size:11px;font-weight:700;color:rgba(255,220,150,.9);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px"><i class="fas fa-map-marker-alt"></i> จังหวัด</label>
             <select id="ls-prov" style="width:100%;padding:9px 12px;border:1.5px solid rgba(255,255,255,.25);border-radius:9px;font-size:13px;color:#fff;background:rgba(20,40,80,.85);font-family:inherit" onchange="listingsInlineSearch()">
-              <option value="" id="ls-prov-all-opt">ทุกทำเล</option>
+              <option value="" id="ls-prov-all-opt">ทุกจังหวัด</option>
             </select>
           </div>
           <div>
