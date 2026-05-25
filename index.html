@@ -5233,8 +5233,8 @@ function _popupRefreshMarkersFromData(data){
 // 🔧 จุด CONFIG ทั้งหมด — แก้ไขตรงนี้ที่เดียว
 const C = {
   // --- [1] Supabase Project ---
-  SUPABASE_URL:'https://cmyuivnrjwyqqwsdxbpw.supabase.co', // 🔧 [CONFIG-1] Supabase Project URL
-  SUPABASE_KEY:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNteXVpdm5yand5cXF3c2R4YnB3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0MjUxMzEsImV4cCI6MjA5NTAwMTEzMX0.na_PSr7LsXjnqxBQbWaBm071dOVfcEdz9N2btVSXeOk', // 🔧 [CONFIG-2] Supabase Anon/Public Key เท่านั้น!
+  SUPABASE_URL:'https://lbajqrnnxmphmawvnpyw.supabase.co', // 🔧 [CONFIG-1] Supabase Project URL
+  SUPABASE_KEY:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxiYWpxcm5ueG1waG1hd3ZucHl3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2ODA2NTIsImV4cCI6MjA5NTI1NjY1Mn0.AU7XVunq0P9d7qHgJwVfvsch_Vt4wE7ePzDTi9nyBBo', // 🔧 [CONFIG-2] Supabase Anon/Public Key เท่านั้น!
 
   // --- [2] Supabase Storage ---
   STORAGE_BUCKET: 'matchdoor-assets', // 🔧 [CONFIG-3] ชื่อ Storage Bucket หลัก
@@ -5603,17 +5603,25 @@ function initSB(){
   catch(e){ console.error('Supabase init failed:',e); return false; }
 }
 async function sbFetch(table,opts={}){ const q=sb.from(table).select(opts.select||'*'); if(opts.eq) Object.entries(opts.eq).forEach(([k,v])=>q.eq(k,v)); if(opts.order) q.order(opts.order,{ascending:false}); const {data,error}=await q; if(error){ console.error('[sbFetch]',table,error); return null; } return data; }
-async function sbInsert(table,data){ if(user) data.user_id=user.id; const {error}=await sb.from(table).insert([data]); if(error) throw new Error(error.message); }
+async function sbInsert(table,data){
+  // user_id: ใส่เมื่อ login เท่านั้น — anonymous ให้เป็น null (RLS รองรับแล้ว)
+  if(typeof user !== 'undefined' && user && user.id) data.user_id = user.id;
+  const {error}=await sb.from(table).insert([data]);
+  if(error) throw new Error(error.message);
+}
 
 async function fetchProperties(){
   if(!sb) return null;
-  const {data,error}=await sb.from('properties').select('*').order('created_at',{ascending:false});
+  const {data,error}=await sb.from('properties').select('*')
+    .eq('status','approved')
+    .order('created_at',{ascending:false});
   if(error){ console.error('[fetchProperties]',error); return null; }
   return data;
 }
 async function searchProperties(keyword){
   if(!sb||!keyword) return null;
   const {data,error}=await sb.from('properties').select('*')
+    .eq('status','approved')
     .or(`title.ilike.%${keyword}%,location.ilike.%${keyword}%,province.ilike.%${keyword}%,description.ilike.%${keyword}%`)
     .order('created_at',{ascending:false});
   if(error){ console.error('[searchProperties]',error); return null; }
@@ -5621,7 +5629,7 @@ async function searchProperties(keyword){
 }
 async function filterProperties(filters={}){
   if(!sb) return null;
-  let q=sb.from('properties').select('*');
+  let q=sb.from('properties').select('*').eq('status','approved');
   if(filters.tx && filters.tx!=='ALL') q=q.eq('tx',filters.tx);
   if(filters.type) q=q.eq('type',filters.type);
   if(filters.province) q=q.eq('province',filters.province);
@@ -6286,6 +6294,7 @@ async function loadData(){
       // ใช้ .range() เพื่อดึงครบทุก row แม้ Supabase project มี custom row limit ต่ำ
       const p = await sb.from('properties')
         .select('*')
+        .eq('status','approved')      // public: เห็นเฉพาะ approved
         .order('created_at',{ascending:false})
         .range(0, 999); // ดึงสูงสุด 1,000 rows — ป้องกัน PostgREST default limit ตัด
       if(p.data){ props = p.data.map(mapProp); console.log(`✅ Properties loaded: ${props.length}`); }
@@ -10859,7 +10868,8 @@ async function submitDep(){
       photos: photoUrls,
       status:'รอตรวจสอบ',
       consent_given: true,
-      consent_timestamp: new Date().toISOString()
+      consent_timestamp: new Date().toISOString(),
+      ...(typeof user !== 'undefined' && user ? { user_id: user.id } : {})
     }, turnstileToken, $('d-honeypot')?.value);
     resetTurnstile('dep');
     $('dep-form').style.display='none'; $('dep-ok').style.display='block';
@@ -10950,7 +10960,8 @@ async function submitWish(){
       details: sanitize($('w-detail').value),
       status:'ใหม่',
       consent_given: true,
-      consent_timestamp: new Date().toISOString()
+      consent_timestamp: new Date().toISOString(),
+      ...(typeof user !== 'undefined' && user ? { user_id: user.id } : {})
     }, turnstileToken, $('w-honeypot')?.value);
     resetTurnstile('wish');
     $('wish-form').style.display='none'; $('wish-ok').style.display='block';
@@ -17783,10 +17794,11 @@ async function _renderAdminPanel(panel){
   if(!_adminDevMode && sb){
     try{
       // Admin ดึงทุก properties รวม pending/rejected (ไม่กรอง status)
+      // ใช้ range(0,999) ป้องกัน PostgREST default limit ตัด
       const [{data:pData},{data:aData},{data:ptData}] = await Promise.all([
-        sb.from('properties').select('*').order('created_at',{ascending:false}),
-        sb.from('agents').select('*').eq('is_active',true),
-        sb.from('portfolio').select('*').order('created_at',{ascending:false})
+        sb.from('properties').select('*').order('created_at',{ascending:false}).range(0,999),
+        sb.from('agents').select('*').order('created_at',{ascending:false}).range(0,99),
+        sb.from('portfolio').select('*').order('created_at',{ascending:false}).range(0,99)
       ]);
       if(pData && pData.length)  allProps   = pData.map(mapProp);
       if(aData && aData.length)  allAgents  = aData.map(mapAgent);
@@ -17798,7 +17810,7 @@ async function _renderAdminPanel(panel){
   let buyRequests = [];
   if(!_adminDevMode && sb){
     try{
-      const {data} = await sb.from('buy_requests').select('*').order('created_at',{ascending:false});
+      const {data} = await sb.from('buy_requests').select('*').order('created_at',{ascending:false}).range(0,499);
       if(data) buyRequests = data;
     }catch(e){}
   }
@@ -18085,7 +18097,11 @@ function _adminFilterProps(){
 async function adminApprove(id){
   if(!confirm('อนุมัติทรัพย์ #'+id+'?')) return;
   if(!_adminDevMode && sb){
-    try{ await sb.from('properties').update({status:'approved'}).eq('id',id); toast('อนุมัติแล้ว ✅'); }
+    try{
+      await sb.from('properties').update({status:'approved'}).eq('id',id);
+      if(typeof props!=='undefined'){ const p=props.find(x=>String(x.id)===String(id)); if(p) p.status='approved'; }
+      toast('อนุมัติแล้ว ✅');
+    }
     catch(e){ toast('Error: '+e.message); return; }
   } else { toast('DEV: อนุมัติ #'+id+' (ไม่ได้เขียนจริง)'); }
   // อัปเดต local cache
@@ -18433,7 +18449,7 @@ async function adminSaveNewProp(){
   const note     = document.getElementById('aap-note')?.value.trim();
   const errEl    = document.getElementById('aap-err');
   if(!title){ if(errEl){errEl.textContent='กรุณากรอกชื่อทรัพย์';errEl.style.display='block';} return; }
-  const payload = {title, price, tx, type, province, location, description:desc, status, admin_note:note, created_at:new Date().toISOString()};
+  const payload = {title, price, tx, type, province, location, description:desc, status: status||'pending', admin_note:note, created_at:new Date().toISOString()};
   if(img) payload.image_url = img;
   if(!_adminDevMode && sb){
     try{
