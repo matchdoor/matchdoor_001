@@ -11139,15 +11139,35 @@ let _locLevel = 'province'; // 'province' | 'district'
 let _locProv  = '';         // selected province
 let _locDist  = '';         // selected district
 
+// ── Cache for province list HTML (built once, reused) ────────────
+let _cachedAllProvs = null;   // sorted array of province names
+let _cachedProvListHTML = ''; // base HTML string without active class
+
+function _buildProvListCache() {
+  const allProvinces77 = Object.keys(PROVINCE_DISTRICTS);
+  const dbProvs = [...new Set(props.map(p=>p.province).filter(Boolean))];
+  const bkkVariants = ['กรุงเทพฯ','กรุงเทพ','Bangkok','bangkok','BKK'];
+  const normalizeProvince = (pv) => bkkVariants.includes(pv) ? 'กรุงเทพฯ' : pv;
+  const normalizedDb = dbProvs.map(normalizeProvince);
+  _cachedAllProvs = [...new Set([...allProvinces77, ...normalizedDb])]
+    .filter(Boolean).sort((a,b)=>a.localeCompare(b,'th'));
+  // Build static HTML once (active class added dynamically in render)
+  _cachedProvListHTML = _cachedAllProvs.map(p => {
+    const hasDistricts = (PROVINCE_DISTRICTS[p]||[]).length > 0;
+    const esc = p.replace(/'/g,"\\'");
+    return `<div class="loc-item" data-prov="${p}" onclick="locDrillSelectProv('${esc}')">` +
+      `<span style="flex:1">${p}</span>` +
+      (hasDistricts ? '<i class="fas fa-chevron-right" style="font-size:10px;color:#bbb"></i>' : '') +
+      `</div>`;
+  }).join('');
+}
+
 function populateProvinceSelect() {
   // seed hidden select with all 77 provinces (for compatibility)
   const sp = $('s-prov');
   if(!sp) return;
-  const allProvinces77 = Object.keys(PROVINCE_DISTRICTS);
-  const dbProvs = [...new Set(props.map(p=>p.province).filter(Boolean))];
-  const allProvs = [...new Set([...allProvinces77, ...dbProvs])]
-    .filter(p => Boolean(p)).sort((a,b)=>a.localeCompare(b,'th'));
-  sp.innerHTML = '<option value=""></option>' + allProvs.map(p=>`<option value="${p}"></option>`).join('');
+  if(!_cachedAllProvs) _buildProvListCache();
+  sp.innerHTML = '<option value=""></option>' + _cachedAllProvs.map(p=>`<option value="${p}"></option>`).join('');
   locDrillRender();
 }
 
@@ -11159,7 +11179,20 @@ function locDrillToggle() {
   if(isOpen){ locDrillClose(); }
   else {
     panel.style.display='block';
-    locDrillRender();
+    // render ใหม่เฉพาะเมื่อจำเป็น: ถ้าอยู่ระดับ district หรือ list ว่างเปล่า
+    const list = $('loc-drill-list');
+    const needsRender = _locLevel === 'district' || !list || !list.children.length;
+    if(needsRender) locDrillRender();
+    else {
+      // อยู่ระดับ province — แค่ patch active class โดยไม่ rebuild innerHTML
+      if(list) {
+        list.querySelectorAll('.loc-item.active').forEach(el => el.classList.remove('active'));
+        if(_locProv) {
+          const activeEl = list.querySelector(`[data-prov="${_locProv}"]`);
+          if(activeEl) activeEl.classList.add('active');
+        }
+      }
+    }
     // ตรวจสอบว่าพื้นที่ด้านล่างพอหรือไม่
     const btnRect = btn.getBoundingClientRect();
     const panelH  = panel.offsetHeight || 260;
@@ -11190,27 +11223,21 @@ function locDrillRender() {
   let html = '';
 
   if(_locLevel === 'province') {
-    // Level 1: จังหวัด
+    // Level 1: จังหวัด — ใช้ cached HTML แทนการสร้างใหม่ทุกครั้ง
     html += `<div class="loc-drill-section-head">🗺️ ${(typeof ui==='function')?ui('sf.prov.head'):'จังหวัด'}</div>`;
     if(_locProv) {
       html += `<div class="loc-item loc-clear" onclick="locDrillClear()"><i class="fas fa-times-circle"></i> ${(typeof ui==='function')?ui('sf.prov.clear'):'ล้างการเลือกทั้งหมด'}</div>`;
     }
-    const allProvinces77 = Object.keys(PROVINCE_DISTRICTS);
-    const dbProvs = [...new Set(props.map(p=>p.province).filter(Boolean))];
-    // ── normalize Bangkok: map "กรุงเทพ" variants → "กรุงเทพฯ" ──
-    const bkkVariants = ['กรุงเทพฯ','กรุงเทพ','Bangkok','bangkok','BKK'];
-    const normalizeProvince = (pv) => bkkVariants.includes(pv) ? 'กรุงเทพฯ' : pv;
-    const normalizedDb = dbProvs.map(normalizeProvince);
-    const allProvs = [...new Set([...allProvinces77, ...normalizedDb])]
-      .filter(Boolean).sort((a,b)=>a.localeCompare(b,'th'));
-    allProvs.forEach(p => {
-      const active = p === _locProv ? ' active' : '';
-      const hasDistricts = (PROVINCE_DISTRICTS[p]||[]).length > 0;
-      html += `<div class="loc-item${active}" onclick="locDrillSelectProv('${p.replace(/'/g,"\'")}')">
-        <span style="flex:1">${p}</span>
-        ${hasDistricts ? '<i class="fas fa-chevron-right" style="font-size:10px;color:#bbb"></i>' : ''}
-      </div>`;
-    });
+    // Build cache if needed
+    if(!_cachedAllProvs) _buildProvListCache();
+    // Inject cached HTML then patch active class via DOM (no full rebuild)
+    list.innerHTML = html + _cachedProvListHTML;
+    // Patch active item efficiently — no need to re-render entire list
+    if(_locProv) {
+      const activeEl = list.querySelector(`[data-prov="${_locProv}"]`);
+      if(activeEl) activeEl.classList.add('active');
+    }
+    return; // early return — innerHTML already set above
   } else {
     // Level 2: อำเภอ
     const backLabel = (typeof ui==='function')?ui('sf.dist.back'):'กลับ';
@@ -11232,8 +11259,8 @@ function locDrillRender() {
         <span>${d}</span>
       </div>`;
     });
+    list.innerHTML = html;
   }
-  list.innerHTML = html;
 }
 
 function locDrillSelectProv(prov) {
@@ -11270,8 +11297,13 @@ function locDrillClear() {
   _locDist  = '';
   _locLevel = 'province';
   locDrillCommit();
-  locDrillRender();
+  locDrillClose(); // ปิด panel ทันทีแทนการ render ใหม่แบบเปิดค้าง
 }
+
+// debounced filter trigger สำหรับ locDrillCommit — ป้องกัน call ซ้ำขณะ UI update
+const _locDrillFilterDebounced = (typeof debounce === 'function')
+  ? debounce(() => { _filterOnly(); }, 80)
+  : () => { _filterOnly(); };
 
 function locDrillCommit() {
   // sync hidden selects
@@ -11306,7 +11338,7 @@ function locDrillCommit() {
       lbl.textContent = (typeof ui==='function') ? ui('sf.prov.label') : 'จังหวัด';
     }
   }
-  _filterOnly();
+  _locDrillFilterDebounced();
 }
 
 // close panel on outside click — use composedPath so re-rendered innerHTML nodes are handled correctly
