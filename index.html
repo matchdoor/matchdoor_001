@@ -1452,7 +1452,7 @@ footer{background:linear-gradient(135deg,#2d2650 0%,#3d3373 100%);color:rgba(255
 .btn-search:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(255,107,157,.4);opacity:1}
 .btn-line{background:var(--ln);border-radius:8px;padding:0 10px;font-size:12px;font-weight:700;color:#fff;display:flex;align-items:center;gap:4px;height:34px}
 .btn-line-nav{display:none}
-@media(min-width:951px){.btn-line-nav{display:flex}}
+@media(min-width:1201px){.btn-line-nav{display:flex}}
 .view-all:hover{background:var(--p);color:#fff;border-color:transparent}
 /* Pastel badges */
 .pb-new{background:rgba(61,122,85,.9);color:#fff}
@@ -2502,6 +2502,31 @@ footer::after{
   }
 }
 
+/* ══ TABLET LANDSCAPE (951px – 1200px): hamburger mode ══════════
+   Trigger hamburger ที่ <= 1200px เพื่อรองรับ iPad landscape (1024px)
+   และ tablet ต่างๆ ที่กว้างกว่า 950px แต่ไม่ถึง desktop
+   ═══════════════════════════════════════════════════════════════ */
+@media(max-width:1200px){
+  /* ซ่อน nav-links แล้วให้ hamburger เปิด */
+  .nav-links{display:none!important;flex-direction:column;position:absolute;top:64px;left:0;right:0;background:var(--p2);padding:12px;z-index:999}
+  .nav-links.mob-open{display:flex!important}
+  /* แสดง hamburger */
+  .hamburger{display:flex}
+  /* ซ่อน Add LINE ใน navbar */
+  .btn-line-nav{display:none!important}
+  /* ซ่อน text ใน btn-dep เหลือแค่ icon */
+  .btn-dep span{display:none!important}
+  .btn-dep{gap:0}
+  /* ลด gap ใน nav-right */
+  .nav-right{gap:4px}
+}
+
+/* ══ DESKTOP (>1200px): full navbar ════════════════════════════ */
+@media(min-width:1201px){
+  .nav-links{display:flex!important}
+  .hamburger{display:none!important}
+}
+
 /* ปุ่ม login ใน hamburger menu — ขยับห่างจากปุ่มตัวแทน */
 .nav-links.mob-open #auth-ui {
   margin-top: 14px;
@@ -2509,12 +2534,12 @@ footer::after{
   padding: 0 10px;
 }
 /* Fix: Prevent login button from shifting on desktop after hamburger toggle */
-@media(min-width:951px){
+@media(min-width:1201px){
   .nav-links #auth-ui { display: none !important; }
   #auth-ui-desktop { display: flex !important; align-items: center; }
 }
 /* Hide login button in nav-right when hamburger is shown */
-@media(max-width:950px){
+@media(max-width:1200px){
   #auth-ui-desktop { display: none !important; }
 }
 
@@ -5567,9 +5592,11 @@ async function filterProperties(filters={}){
   if(filters.tx && filters.tx!=='ALL') q=q.eq('tx',filters.tx);
   if(filters.type) q=q.eq('type',filters.type);
   if(filters.province) q=q.eq('province',filters.province);
+  // district filter: ลอง ilike บน district column ก่อน (ถ้า DB มี column นั้น)
+  if(filters.district) q=q.or(`district.ilike.%${filters.district}%,amphoe.ilike.%${filters.district}%,location.ilike.%${filters.district}%`);
   if(filters.minPrice) q=q.gte('price',filters.minPrice);
   if(filters.maxPrice && filters.maxPrice<999000000) q=q.lte('price',filters.maxPrice);
-  if(filters.keyword) q=q.or(`title.ilike.%${filters.keyword}%,location.ilike.%${filters.keyword}%`);
+  if(filters.keyword) q=q.or(`title.ilike.%${filters.keyword}%,location.ilike.%${filters.keyword}%,province.ilike.%${filters.keyword}%`);
   q=q.order('created_at',{ascending:false});
   const {data,error}=await q;
   if(error){ console.error('[filterProperties]',error); return null; }
@@ -6718,32 +6745,14 @@ async function applyFilters(){
     };
     // 1. ฟิลเตอร์จังหวัดก่อนเสมอ
     if(pv && !_matchProv()) return false;
-    // 2. ฟิลเตอร์อำเภอ/เขต — แสดงเฉพาะ listing ที่ตรงกับอำเภอที่เลือก
+    // 2. ฟิลเตอร์อำเภอ/เขต — ใช้ logic เดียวกับ popup modalAdvFilter (distHay)
     if(dv){
       const dvL = dv.toLowerCase();
-      // ── Priority 1: มี field district/amphoe ใน data โดยตรง (Supabase column) ──
-      const distDirect = (p.district||p.amphoe||'').toLowerCase().trim();
-      if(distDirect){
-        // match แบบ contains เผื่อค่า db มีรายละเอียดเพิ่ม เช่น "เขตลาดพร้าว"
-        if(!distDirect.includes(dvL)) return false;
-      } else {
-        // ── Priority 2: ไม่มี district field → parse จาก location ──
-        // location รูปแบบ: "[เขต/ย่าน] [จังหวัด]" เช่น "ลาดกระบัง กรุงเทพฯ"
-        // หรือ "[ย่าน] [ซอย]" เช่น "สุขุมวิท 63" หรือแค่ "[ย่าน]" เช่น "สาทร"
-        // strategy: ตัดชื่อจังหวัดทุก variant ออก → เหลือส่วน district/ย่าน → includes match
-        const bkkAll = ['กรุงเทพมหานคร','กรุงเทพฯ','กรุงเทพ','มหานคร','bangkok'];
-        const provRaw = (p.province||'').toLowerCase();
-        let locClean = (p.location||'').toLowerCase();
-        // ตัดชื่อจังหวัด (longest-first กัน partial strip)
-        [...bkkAll, provRaw, _normStr(provRaw)]
-          .filter(Boolean)
-          .sort((a,b) => b.length - a.length)
-          .forEach(w => { locClean = locClean.split(w).join(' '); });
-        locClean = locClean.replace(/\s+/g,' ').trim();
-        // locClean = ส่วน district/ย่าน ล้วนๆ เช่น "ลาดกระบัง", "จตุจักร", "สุขุมวิท 63"
-        // ใช้ includes: dvL ต้องอยู่ใน locClean (district เป็น prefix ของ location เสมอ)
-        if(!locClean.includes(dvL)) return false;
-      }
+      // ── รวม district + amphoe + location เป็น haystack เดียว (เหมือน popup) ──
+      // popup ใช้: distHay = (district||'') + ' ' + (amphoe||'') + ' ' + (location||'')
+      // ซึ่งครอบคลุมทั้ง: Supabase column, parsed district จาก location
+      const distHay = ((p.district||'') + ' ' + (p.amphoe||'') + ' ' + (p.location||'')).toLowerCase();
+      if(distHay.indexOf(dvL) === -1) return false;
     }
     if(kwlOrig){
       const titleL = p.title.toLowerCase();
@@ -6776,10 +6785,19 @@ async function applyFilters(){
   // ── Server-side filter (sync หลัง client) ──────────────────────
   if(sb && props.length && props[0]?.id !== 'p1'){
     try{
-      const data = await filterProperties({tx,type:tp,province:pv,minPrice:min,maxPrice:max,keyword:kwTranslated});
+      const data = await filterProperties({tx,type:tp,province:pv,district:dv,minPrice:min,maxPrice:max,keyword:kwTranslated});
       // อัปเดตเฉพาะเมื่อ server คืนผลมาจริง (ไม่ใช่ null/error)
       if(data!==null && Array.isArray(data)){
-        const serverFiltered = data.map(mapProp);
+        let serverFiltered = data.map(mapProp);
+        // ── ถ้ามี district filter → ต้อง re-apply client-side district filter บน server result ──
+        // เพราะ Supabase อาจไม่มี district column หรือ filter ไม่ครบ
+        if(dv && serverFiltered.length > 0){
+          const dvLSrv = dv.toLowerCase();
+          serverFiltered = serverFiltered.filter(function(p){
+            const dHay = ((p.district||'') + ' ' + (p.amphoe||'') + ' ' + (p.location||'')).toLowerCase();
+            return dHay.indexOf(dvLSrv) !== -1;
+          });
+        }
         // ใช้ผล server ถ้าได้ผลมา หรือถ้าไม่มีผล ให้คงค่า client-side ไว้
         if(serverFiltered.length > 0){
           filtered = serverFiltered;
