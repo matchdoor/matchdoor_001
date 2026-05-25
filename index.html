@@ -4732,7 +4732,40 @@ function modalAdvReset(type){
   if(typeof _syncMapSelectsFromCards === 'function' && typeof _popupLeafletMap !== 'undefined' && _popupLeafletMap){
     _syncMapSelectsFromCards('','','','',0,0);
   }
-  // ── 6. Re-apply filter with cleared values (restores full dataset + refreshes cards + map markers) ──
+  // ── 6. คืน _allData กลับเป็น props ทั้งหมด (ล้างผล filter จาก banner search ด้วย) ──
+  // เมื่อ openAllModal('all') ถูกเรียกหลัง banner filter → _allData = allFiltered (subset)
+  // Reset ต้องคืนกลับเป็น full dataset เสมอ
+  if(window._modalTypeData){
+    var fullData = (typeof props !== 'undefined' && props.length)
+      ? [...props]
+      : (typeof MOCK !== 'undefined' ? [...MOCK.props] : []);
+    if(fullData.length){
+      window._modalTypeData._allData = fullData;
+      window._modalTypeData.data     = fullData;
+    }
+  }
+  // ── 7. Reset banner search bar (home page filter) ด้วย (silent — ไม่ scroll) ──
+  // reset fields ทั้งหมดโดยไม่ trigger scroll เพราะ popup ยังเปิดอยู่
+  try {
+    var _skw = document.getElementById('s-kw');
+    if(_skw){ _skw.value=''; var _al=document.getElementById('ac-list'); if(_al)_al.style.display='none'; }
+    var _stype = document.getElementById('s-type'); if(_stype) _stype.value='';
+    if(typeof locDrillClear==='function') locDrillClear();
+    if(typeof locDrillClose==='function') locDrillClose();
+    var _smn = document.getElementById('s-min'); if(_smn) _smn.selectedIndex=0;
+    var _smx = document.getElementById('s-max'); if(_smx) _smx.selectedIndex=0;
+    // reset tx tabs
+    if(typeof tx !== 'undefined') tx = 'ALL';
+    var _bt = document.querySelectorAll('.tx-tab');
+    if(_bt[0]){ _bt[0].classList.add('active'); if(_bt[1])_bt[1].classList.remove('active'); if(_bt[2])_bt[2].classList.remove('active'); }
+    if(typeof curType !== 'undefined') curType = '';
+    var _cc = document.querySelectorAll('.cat-card'); _cc.forEach(function(c,i){ c.classList.toggle('active', i===0); });
+    // reset adv filter panel ถ้ามี
+    if(typeof resetAdvFilter==='function') resetAdvFilter();
+    // reset home grid ให้แสดงทั้งหมด (ไม่ scroll)
+    if(typeof _renderHomeGrids==='function') _renderHomeGrids();
+  } catch(e){ console.warn('[modalAdvReset] banner reset error:', e); }
+  // ── 8. Re-apply filter with cleared values (restores full dataset + refreshes cards + map markers) ──
   if(typeof modalAdvFilter === 'function') modalAdvFilter(type);
   var bd = document.getElementById('all-body'); if(bd) bd.scrollTop = 0;
 }
