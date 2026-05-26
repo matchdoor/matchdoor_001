@@ -5863,7 +5863,7 @@ function renderMyAccount(){
   <div class="ma-tab-bar" id="ma-tab-bar">
     <button class="ma-tab active" data-tab="profile" onclick="_maTab('profile',this)"><i class="fas fa-user"></i> ${sanitize(t('ma.tab.profile'))}</button>
     <button class="ma-tab" data-tab="favs" onclick="_maTab('favs',this)"><i class="fas fa-heart"></i> ${sanitize(t('ma.tab.favs'))} ${favCount?`<span style="background:var(--a);color:#fff;border-radius:20px;padding:1px 6px;font-size:10px">${favCount}</span>`:''}</button>
-    <button class="ma-tab" data-tab="listings" onclick="_maTab('listings',this)"><i class="fas fa-building"></i> ${sanitize(t('ma.tab.listings'))}</button>
+    <button class="ma-tab" data-tab="listings" onclick="_maTab('listings',this);renderMaListingsPanel()"><i class="fas fa-building"></i> ประกาศของฉัน<span id="ma-token-badge" style="background:#f1c40f;color:#333;border-radius:20px;padding:1px 7px;font-size:10px;font-weight:800;margin-left:2px">${_tokenBalance} T</span></button>
     <button class="ma-tab" data-tab="requests" onclick="_maTab('requests',this)"><i class="fas fa-file-alt"></i> ${sanitize(t('ma.tab.requests'))}</button>
     <button class="ma-tab" data-tab="history" onclick="_maTab('history',this)"><i class="fas fa-history"></i> ${sanitize(t('ma.tab.history'))}</button>
   </div>
@@ -5909,11 +5909,11 @@ function renderMyAccount(){
       ${_maFavHtml(t)}
     </div>
   </div>
-  <!-- Listings panel -->
+  <!-- Listings panel (v15 Token System) -->
   <div class="ma-panel" id="ma-panel-listings">
-    <div class="ma-section">
-      <div class="ma-section-title"><i class="fas fa-building"></i> ${sanitize(t('ma.tab.listings'))}</div>
-      ${_maEmptyPanel('fa-building',t('ma.listings.empty'),'fa-plus-circle',t('ma.listings.add'),"openDepositModal()")}
+    <div style="text-align:center;padding:30px;color:var(--tx2)">
+      <i class="fas fa-spinner fa-spin" style="font-size:24px;opacity:.4"></i>
+      <p style="margin-top:10px;font-size:13px">กำลังโหลด...</p>
     </div>
   </div>
   <!-- Requests panel -->
@@ -5931,6 +5931,868 @@ function renderMyAccount(){
     </div>
   </div>`;
 }
+// ── State ──────────────────────────────────────────────────
+let _tokenBalance     = 0;
+let _tokenPackages    = [];
+let _myUserListings   = [];
+let _myTokenOrders    = [];
+
+// ── โหลดข้อมูล Token ของ User ──────────────────────────────
+async function loadUserTokenData() {
+  if (!user || !sb) return;
+  try {
+    // ยอด Token คงเหลือ
+    const { data: tokData } = await sb
+      .from('user_tokens')
+      .select('balance,total_purchased,total_used')
+      .eq('user_id', user.id)
+      .single();
+    _tokenBalance = tokData?.balance ?? 0;
+
+    // ประกาศของ User
+    const { data: ulData } = await sb
+      .from('user_listings')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false });
+    _myUserListings = ulData || [];
+
+    // ออเดอร์ซื้อ Token
+    const { data: ordData } = await sb
+      .from('token_orders')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false });
+    _myTokenOrders = ordData || [];
+
+  } catch(e) {
+    console.warn('[Token] loadUserTokenData error:', e.message);
+  }
+}
+
+// ── โหลด Token Packages (สำหรับหน้าซื้อ Token) ─────────────
+async function loadTokenPackages() {
+  if (!sb) return;
+  try {
+    const { data } = await sb
+      .from('token_packages')
+      .select('*')
+      .eq('is_active', true)
+      .order('sort_order');
+    _tokenPackages = data || [];
+  } catch(e) {
+    // fallback packages
+    _tokenPackages = [
+      { id:'pkg1', name:'แพ็ก Starter',  tokens:3,  price:199, bonus:0, description:'ลงประกาศได้ 3 รายการ' },
+      { id:'pkg2', name:'แพ็ก Standard', tokens:5,  price:299, bonus:0, description:'ยอดนิยม! ลงประกาศได้ 5 รายการ' },
+      { id:'pkg3', name:'แพ็ก Pro',      tokens:10, price:499, bonus:1, description:'10+1 Token โบนัส ประหยัดสูงสุด' },
+    ];
+  }
+}
+
+// ── เปิด Modal ลงประกาศ (User Listing) ─────────────────────
+async function openUserListingModal() {
+  if (!user) { _openModal('login-modal'); return; }
+  await loadUserTokenData();
+  if (_tokenBalance < 1) {
+    openBuyTokenModal();
+    return;
+  }
+  _openModal('user-listing-modal');
+}
+
+// ── เปิด Modal ซื้อ Token ──────────────────────────────────
+async function openBuyTokenModal() {
+  if (!user) { _openModal('login-modal'); return; }
+  await loadTokenPackages();
+  const pkgHtml = _tokenPackages.map(pkg => `
+    <div class="tok-pkg" onclick="_selectTokenPkg(this,'${pkg.id}','${pkg.tokens+(pkg.bonus||0)}','${pkg.price}')"
+         data-id="${pkg.id}" data-tokens="${pkg.tokens+(pkg.bonus||0)}" data-price="${pkg.price}"
+         style="border:2px solid var(--bd);border-radius:14px;padding:18px;cursor:pointer;transition:.2s;position:relative">
+      ${pkg.tokens>=10?'<div style="position:absolute;top:-10px;right:14px;background:#e67e22;color:#fff;font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px">⭐ คุ้มสุด</div>':''}
+      <div style="font-size:15px;font-weight:800;color:var(--p);margin-bottom:4px">${pkg.name}</div>
+      <div style="font-size:28px;font-weight:900;color:var(--p);margin:8px 0">
+        <i class="fas fa-coins" style="color:#f1c40f;font-size:20px"></i> ${pkg.tokens+(pkg.bonus||0)} Token
+        ${pkg.bonus?`<span style="font-size:13px;color:#2ecc71;font-weight:700"> +${pkg.bonus} โบนัส</span>`:''}
+      </div>
+      <div style="font-size:22px;font-weight:800;color:#c8922a">฿${Number(pkg.price).toLocaleString()}</div>
+      <div style="font-size:12px;color:var(--tx2);margin-top:6px">${pkg.description||''}</div>
+      <div style="font-size:11px;color:rgba(0,0,0,.35);margin-top:8px">${(pkg.price/(pkg.tokens+(pkg.bonus||0))).toFixed(0)} บาท/Token</div>
+    </div>
+  `).join('');
+
+  // สร้าง Modal ถ้ายังไม่มี
+  let m = document.getElementById('buy-token-modal');
+  if (!m) {
+    m = document.createElement('div');
+    m.id = 'buy-token-modal';
+    m.className = 'ov';
+    m.onclick = function(e){ if(e.target===this) _closeModal('buy-token-modal'); };
+    document.body.appendChild(m);
+  }
+  m.innerHTML = `
+    <div class="modal" style="max-width:580px">
+      <div class="mhd">
+        <h2><i class="fas fa-coins" style="color:#f1c40f"></i> ซื้อ Token ลงประกาศ</h2>
+        <span class="mclose" onclick="_closeModal('buy-token-modal')">×</span>
+      </div>
+      <div class="mbody">
+        <div style="background:rgba(27,58,107,.07);border-radius:12px;padding:14px;margin-bottom:20px;text-align:center">
+          <div style="font-size:13px;color:var(--tx2);margin-bottom:4px">Token คงเหลือของคุณ</div>
+          <div style="font-size:32px;font-weight:900;color:var(--p)">
+            <i class="fas fa-coins" style="color:#f1c40f"></i> ${_tokenBalance} Token
+          </div>
+          <div style="font-size:12px;color:var(--tx2);margin-top:4px">1 Token = ลงประกาศได้ 1 รายการ (มีอายุ 90 วัน)</div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:20px">
+          ${pkgHtml}
+        </div>
+        <div id="tok-selected-info" style="display:none;background:var(--lt);border-radius:12px;padding:16px;margin-bottom:16px">
+          <div style="font-weight:700;color:var(--p);margin-bottom:12px"><i class="fas fa-check-circle" style="color:#2ecc71"></i> แพ็กที่เลือก: <span id="tok-sel-name">—</span></div>
+          <div style="font-size:13px;margin-bottom:10px">ราคา: <strong style="color:#c8922a" id="tok-sel-price">—</strong></div>
+          <div style="font-size:12px;color:var(--tx2);margin-bottom:14px">
+            <strong>วิธีชำระเงิน:</strong> โอนเงินผ่าน PromptPay / บัญชีธนาคาร แล้วแนบสลิปด้านล่าง<br>
+            PromptPay: <strong style="color:var(--p)">081-234-5678 (บริษัท แมทช์ดอร์ จำกัด)</strong>
+          </div>
+          <label style="font-size:12px;font-weight:600;display:block;margin-bottom:6px">แนบสลิปการโอนเงิน *</label>
+          <input type="file" id="tok-slip-file" accept="image/*" style="font-size:12px;width:100%">
+          <div style="margin-top:4px;font-size:11px;color:var(--tx2)">รองรับ JPG, PNG ขนาดไม่เกิน 5MB</div>
+        </div>
+        <button id="tok-submit-btn" onclick="submitTokenOrder()" disabled
+          style="width:100%;padding:14px;background:linear-gradient(135deg,var(--p),#2a5298);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;opacity:.5;transition:.2s">
+          <i class="fas fa-paper-plane"></i> ส่งคำสั่งซื้อ (รอ Admin ยืนยัน)
+        </button>
+        <p style="text-align:center;font-size:11px;color:var(--tx2);margin-top:10px">
+          Admin จะยืนยันและเติม Token ภายใน 1-24 ชั่วโมง
+        </p>
+      </div>
+    </div>`;
+  _openModal('buy-token-modal');
+}
+
+let _selPkgId = null, _selPkgTokens = 0, _selPkgPrice = 0;
+function _selectTokenPkg(el, pkgId, tokens, price) {
+  document.querySelectorAll('.tok-pkg').forEach(p => {
+    p.style.borderColor = 'var(--bd)';
+    p.style.background  = '';
+  });
+  el.style.borderColor = 'var(--p)';
+  el.style.background  = 'rgba(27,58,107,.07)';
+  _selPkgId     = pkgId;
+  _selPkgTokens = parseInt(tokens);
+  _selPkgPrice  = parseFloat(price);
+  const pkg = _tokenPackages.find(p => p.id === pkgId);
+  const info = document.getElementById('tok-selected-info');
+  const btn  = document.getElementById('tok-submit-btn');
+  if (info) {
+    info.style.display = 'block';
+    document.getElementById('tok-sel-name').textContent  = pkg?.name || '';
+    document.getElementById('tok-sel-price').textContent = '฿' + Number(_selPkgPrice).toLocaleString();
+  }
+  if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
+}
+
+async function submitTokenOrder() {
+  if (!user || !sb) return;
+  if (!_selPkgId) { toast('กรุณาเลือกแพ็กเกจก่อน', 'warn'); return; }
+  const slipFile = document.getElementById('tok-slip-file')?.files?.[0];
+  if (!slipFile) { toast('กรุณาแนบสลิปการโอนเงิน', 'warn'); return; }
+  const btn = document.getElementById('tok-submit-btn');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังส่ง...'; }
+  try {
+    // อัปโหลดสลิปไป Storage
+    const ext  = slipFile.name.split('.').pop();
+    const path = `token-slips/${user.id}/${Date.now()}.${ext}`;
+    const { error: upErr } = await sb.storage.from('matchdoor-assets').upload(path, slipFile, { upsert: true });
+    if (upErr) throw upErr;
+    const { data: { publicUrl } } = sb.storage.from('matchdoor-assets').getPublicUrl(path);
+
+    // บันทึก order
+    const { error: ordErr } = await sb.from('token_orders').insert({
+      user_id:           user.id,
+      package_id:        _selPkgId,
+      tokens_requested:  _selPkgTokens,
+      price_paid:        _selPkgPrice,
+      payment_method:    'PromptPay',
+      slip_url:          publicUrl,
+      status:            'รอยืนยัน'
+    });
+    if (ordErr) throw ordErr;
+
+    _closeModal('buy-token-modal');
+    toast('✅ ส่งคำสั่งซื้อสำเร็จ! Admin จะยืนยันและเติม Token ภายใน 24 ชั่วโมง', 'success');
+    await loadUserTokenData();
+    // รีเฟรช tab listings ถ้ากำลังดูอยู่
+    const listingPanel = document.getElementById('ma-panel-listings');
+    if (listingPanel?.classList.contains('active')) renderMaListingsPanel();
+
+  } catch(e) {
+    toast('เกิดข้อผิดพลาด: ' + (e.message || 'ไม่ทราบสาเหตุ'), 'error');
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane"></i> ส่งคำสั่งซื้อ (รอ Admin ยืนยัน)'; }
+  }
+}
+
+// ── Submit User Listing Form ────────────────────────────────
+async function submitUserListing() {
+  if (!user || !sb) return;
+  const get = id => document.getElementById(id);
+  const val = id => get(id)?.value?.trim() || '';
+
+  // Validate
+  const title = val('ul-title');
+  const type  = val('ul-type');
+  const phone = val('ul-phone');
+  if (!title) { toast('กรุณากรอกชื่อทรัพย์', 'warn'); return; }
+  if (!type)  { toast('กรุณาเลือกประเภทอสังหาฯ', 'warn'); return; }
+  if (!phone) { toast('กรุณากรอกเบอร์ติดต่อ', 'warn'); return; }
+
+  const btn = get('ul-submit-btn');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังบันทึก...'; }
+
+  try {
+    // อัปโหลดรูปภาพ (ถ้ามี)
+    let photoUrls = [];
+    const photoInput = get('ul-photos');
+    if (photoInput?.files?.length) {
+      for (const file of Array.from(photoInput.files).slice(0, 6)) {
+        const ext  = file.name.split('.').pop();
+        const path = `listings/${user.id}/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+        const { error: upErr } = await sb.storage.from('matchdoor-assets').upload(path, file, { upsert: true });
+        if (!upErr) {
+          const { data: { publicUrl } } = sb.storage.from('matchdoor-assets').getPublicUrl(path);
+          photoUrls.push(publicUrl);
+        }
+      }
+    }
+
+    const listingData = {
+      user_id:       user.id,
+      title,
+      property_type: type,
+      transaction:   val('ul-transaction') || 'BUY',
+      price:         parseFloat(val('ul-price').replace(/,/g,'')) || 0,
+      area:          parseFloat(val('ul-area')) || 0,
+      land_area:     parseFloat(val('ul-land-area')) || 0,
+      bed:           parseInt(val('ul-bed')) || 0,
+      bath:          parseInt(val('ul-bath')) || 0,
+      floor_no:      parseInt(val('ul-floor')) || 0,
+      furniture:     val('ul-furniture'),
+      description:   val('ul-description'),
+      province:      val('ul-province'),
+      location:      val('ul-location'),
+      district:      val('ul-district'),
+      near_bts:      val('ul-near-bts'),
+      contact_name:  val('ul-contact-name') || (user.user_metadata?.display_name || ''),
+      contact_phone: phone,
+      contact_line:  val('ul-contact-line'),
+      photos:        photoUrls,
+      status:        'รอตรวจสอบ'
+    };
+
+    const { error } = await sb.from('user_listings').insert(listingData);
+    if (error) {
+      if (error.message.includes('insufficient_tokens')) {
+        toast('Token ไม่เพียงพอ กรุณาซื้อ Token เพิ่ม', 'warn');
+        _closeModal('user-listing-modal');
+        openBuyTokenModal();
+        return;
+      }
+      throw error;
+    }
+
+    _closeModal('user-listing-modal');
+    toast('✅ ลงประกาศสำเร็จ! รอ Admin ตรวจสอบและอนุมัติ (ภายใน 24 ชั่วโมง)', 'success');
+    await loadUserTokenData();
+    renderMaListingsPanel();
+
+  } catch(e) {
+    toast('เกิดข้อผิดพลาด: ' + (e.message || 'ไม่ทราบสาเหตุ'), 'error');
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane"></i> ลงประกาศ (หัก 1 Token)'; }
+  }
+}
+
+// ── Render Tab "ประกาศของฉัน" ───────────────────────────────
+async function renderMaListingsPanel() {
+  const panel = document.getElementById('ma-panel-listings');
+  if (!panel) return;
+  await loadUserTokenData();
+
+  const statusBadge = s => {
+    const map = {
+      'รอตรวจสอบ': ['#f39c12','fa-clock','รอตรวจสอบ'],
+      'อนุมัติ':    ['#2ecc71','fa-check-circle','อนุมัติแล้ว'],
+      'ปฏิเสธ':    ['#e74c3c','fa-times-circle','ปฏิเสธ'],
+      'ปิด':        ['#95a5a6','fa-ban','ปิดแล้ว'],
+      'หมดอายุ':   ['#7f8c8d','fa-hourglass-end','หมดอายุ'],
+    };
+    const [c,ic,lb] = map[s] || ['#bbb','fa-circle',s];
+    return `<span style="background:${c}22;color:${c};border:1px solid ${c}44;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;display:inline-flex;align-items:center;gap:4px"><i class="fas ${ic}" style="font-size:9px"></i>${lb}</span>`;
+  };
+
+  const listingsHtml = _myUserListings.length
+    ? _myUserListings.map(ul => {
+        const photo = (ul.photos||[])[0]||'';
+        const priceStr = ul.price >= 1e6 ? (ul.price/1e6).toFixed(1)+'M' : (ul.price||0).toLocaleString();
+        const txLabel = ul.transaction === 'RENT' ? 'ให้เช่า' : 'ขาย';
+        const exp = ul.expires_at ? new Date(ul.expires_at).toLocaleDateString('th-TH') : '';
+        return `<div style="border:1.5px solid var(--bd);border-radius:14px;overflow:hidden;display:grid;grid-template-columns:110px 1fr;gap:0;margin-bottom:12px">
+          <div style="background:var(--lt);display:flex;align-items:center;justify-content:center;min-height:100px">
+            ${photo ? `<img src="${photo}" style="width:110px;height:100%;min-height:100px;object-fit:cover;display:block">` : '<i class="fas fa-home" style="font-size:28px;color:var(--tx2)"></i>'}
+          </div>
+          <div style="padding:14px">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px">
+              <div style="font-weight:700;color:var(--p);font-size:14px;line-height:1.3">${sanitize(ul.title)}</div>
+              ${statusBadge(ul.status)}
+            </div>
+            <div style="font-size:12px;color:var(--tx2);margin-bottom:4px">
+              <i class="fas fa-tag" style="color:#c8922a"></i> ${sanitize(ul.property_type)} · ${txLabel} · ฿${priceStr}
+            </div>
+            <div style="font-size:12px;color:var(--tx2);margin-bottom:4px">
+              <i class="fas fa-map-marker-alt"></i> ${sanitize(ul.province||'')} ${sanitize(ul.location||'')}
+            </div>
+            ${ul.admin_note ? `<div style="font-size:11px;color:#e74c3c;margin-top:4px;padding:6px 10px;background:#e74c3c11;border-radius:6px"><i class="fas fa-comment"></i> ${sanitize(ul.admin_note)}</div>` : ''}
+            <div style="font-size:11px;color:rgba(0,0,0,.4);margin-top:8px">
+              ลงวันที่: ${new Date(ul.created_at).toLocaleDateString('th-TH')}
+              ${exp ? ` · หมดอายุ: ${exp}` : ''}
+            </div>
+            ${ul.status === 'อนุมัติ' && ul.property_id ? `<button onclick="openModal('${ul.property_id}')" style="margin-top:8px;font-size:11px;padding:5px 12px;background:var(--p);color:#fff;border:none;border-radius:8px;cursor:pointer"><i class="fas fa-eye"></i> ดูประกาศ</button>` : ''}
+          </div>
+        </div>`;
+      }).join('')
+    : `<div style="text-align:center;padding:40px 20px;color:var(--tx2)">
+        <i class="fas fa-building" style="font-size:36px;opacity:.3;margin-bottom:12px"></i>
+        <p style="margin-bottom:16px">ยังไม่มีประกาศ กด "ลงประกาศ" เพื่อเริ่มต้น</p>
+      </div>`;
+
+  // ประวัติออเดอร์ซื้อ Token
+  const ordersHtml = _myTokenOrders.length
+    ? `<div style="margin-top:20px">
+        <div style="font-weight:700;color:var(--p);font-size:13px;margin-bottom:10px"><i class="fas fa-receipt"></i> ประวัติการซื้อ Token</div>
+        ${_myTokenOrders.slice(0,5).map(o => {
+          const stMap = {'รอยืนยัน':['#f39c12','fa-clock'],'ยืนยันแล้ว':['#2ecc71','fa-check'],'ปฏิเสธ':['#e74c3c','fa-times']};
+          const [sc,sic] = stMap[o.status]||['#bbb','fa-circle'];
+          return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border:1px solid var(--bd);border-radius:8px;margin-bottom:6px;font-size:12px">
+            <div>
+              <strong>${o.tokens_requested} Token</strong> · ฿${Number(o.price_paid).toLocaleString()}
+              <span style="font-size:11px;color:var(--tx2);margin-left:8px">${new Date(o.created_at).toLocaleDateString('th-TH')}</span>
+            </div>
+            <span style="color:${sc};font-size:11px;font-weight:700"><i class="fas ${sic}"></i> ${o.status}</span>
+          </div>`;
+        }).join('')}
+      </div>` : '';
+
+  panel.innerHTML = `
+    <div class="ma-section">
+      <!-- Token Balance Bar -->
+      <div style="background:linear-gradient(135deg,var(--p),#2a5298);border-radius:14px;padding:18px;margin-bottom:16px;color:#fff;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+        <div>
+          <div style="font-size:12px;opacity:.7;margin-bottom:4px">Token คงเหลือ</div>
+          <div style="font-size:32px;font-weight:900"><i class="fas fa-coins" style="color:#f1c40f"></i> ${_tokenBalance} Token</div>
+          <div style="font-size:11px;opacity:.6;margin-top:4px">1 Token = ลงประกาศได้ 1 รายการ (90 วัน)</div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button onclick="openBuyTokenModal()" style="background:#fff;color:var(--p);border:none;border-radius:10px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px">
+            <i class="fas fa-plus-circle" style="color:#f39c12"></i> เติม Token
+          </button>
+          <button onclick="openUserListingModal()" ${_tokenBalance<1?'disabled style="opacity:.5;cursor:not-allowed"':''} 
+            style="background:rgba(255,255,255,.15);color:#fff;border:2px solid rgba(255,255,255,.35);border-radius:10px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px">
+            <i class="fas fa-plus"></i> ลงประกาศ ${_tokenBalance<1?'(Token ไม่พอ)':''}
+          </button>
+        </div>
+      </div>
+      <!-- ประกาศของฉัน -->
+      <div style="font-weight:700;color:var(--p);font-size:14px;margin-bottom:12px">
+        <i class="fas fa-building"></i> ประกาศของฉัน (${_myUserListings.length})
+      </div>
+      ${listingsHtml}
+      ${ordersHtml}
+    </div>`;
+}
+
+// ══════════════════════════════════════════════════════════════
+//  MODAL HTML: User Listing Form (แทรกที่ท้าย body ก่อน </body>)
+//  หรือแทรกหลัง <div class="ov" id="login-modal" ...>
+// ══════════════════════════════════════════════════════════════
+function _injectUserListingModal() {
+  if (document.getElementById('user-listing-modal')) return; // มีแล้วไม่สร้างซ้ำ
+  const m = document.createElement('div');
+  m.id = 'user-listing-modal';
+  m.className = 'ov';
+  m.onclick = function(e){ if(e.target===this) _closeModal('user-listing-modal'); };
+  m.innerHTML = `
+    <div class="modal" style="max-width:600px;max-height:90vh;overflow-y:auto">
+      <div class="mhd">
+        <h2><i class="fas fa-home" style="color:var(--p)"></i> ลงประกาศขาย/เช่า</h2>
+        <span class="mclose" onclick="_closeModal('user-listing-modal')">×</span>
+      </div>
+      <div class="mbody">
+        <div style="background:#fff9e6;border:1px solid #f1c40f44;border-radius:10px;padding:12px 16px;margin-bottom:18px;font-size:12px;color:#856404;display:flex;align-items:center;gap:10px">
+          <i class="fas fa-coins" style="color:#f39c12;font-size:18px"></i>
+          <div>การลงประกาศจะหัก <strong>1 Token</strong> อัตโนมัติ หลัง Admin อนุมัติ ประกาศจะแสดงบนเว็บ 90 วัน</div>
+        </div>
+        <!-- ข้อมูลทรัพย์ -->
+        <div style="font-size:12px;font-weight:700;color:var(--p);margin-bottom:10px;padding-bottom:6px;border-bottom:1.5px solid var(--lt)">
+          <i class="fas fa-building"></i> ข้อมูลทรัพย์
+        </div>
+        <div class="ma-field">
+          <label>ชื่อประกาศ / ชื่อทรัพย์ *</label>
+          <input type="text" id="ul-title" placeholder="เช่น คอนโด Ashton Asoke 2 Bed ใกล้ BTS อโศก">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="ma-field">
+            <label>ประเภทอสังหาฯ *</label>
+            <select id="ul-type" class="ma-input" style="width:100%;padding:10px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px">
+              <option value="">-- เลือก --</option>
+              <option>บ้านเดี่ยว</option><option>ทาวน์โฮม</option><option>คอนโด</option>
+              <option>ที่ดิน</option><option>อาคารพาณิชย์</option><option>วิลล่า</option>
+            </select>
+          </div>
+          <div class="ma-field">
+            <label>ประเภทธุรกรรม</label>
+            <select id="ul-transaction" class="ma-input" style="width:100%;padding:10px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px">
+              <option value="BUY">ขาย</option>
+              <option value="RENT">ให้เช่า</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+          <div class="ma-field">
+            <label>ราคา (บาท)</label>
+            <input type="number" id="ul-price" placeholder="3500000" min="0">
+          </div>
+          <div class="ma-field">
+            <label>พื้นที่ใช้สอย (ตร.ม.)</label>
+            <input type="number" id="ul-area" placeholder="65" min="0">
+          </div>
+          <div class="ma-field">
+            <label>ที่ดิน (ตร.วา)</label>
+            <input type="number" id="ul-land-area" placeholder="50" min="0">
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px">
+          <div class="ma-field">
+            <label>ห้องนอน</label>
+            <input type="number" id="ul-bed" placeholder="2" min="0" max="20">
+          </div>
+          <div class="ma-field">
+            <label>ห้องน้ำ</label>
+            <input type="number" id="ul-bath" placeholder="1" min="0" max="20">
+          </div>
+          <div class="ma-field">
+            <label>ชั้นที่</label>
+            <input type="number" id="ul-floor" placeholder="5" min="0">
+          </div>
+          <div class="ma-field">
+            <label>เฟอร์นิเจอร์</label>
+            <select id="ul-furniture" style="width:100%;padding:10px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px">
+              <option value="">ไม่ระบุ</option>
+              <option value="เฟอร์นิเจอร์ครบ">เฟอร์นิเจอร์ครบ</option>
+              <option value="เฟอร์นิเจอร์บางส่วน">เฟอร์นิเจอร์บางส่วน</option>
+              <option value="ไม่มีเฟอร์นิเจอร์">ไม่มีเฟอร์นิเจอร์</option>
+            </select>
+          </div>
+        </div>
+        <div class="ma-field">
+          <label>รายละเอียดเพิ่มเติม</label>
+          <textarea id="ul-description" rows="3" style="width:100%;padding:10px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;resize:vertical" placeholder="รายละเอียดทรัพย์, สิ่งอำนวยความสะดวก, เงื่อนไขพิเศษ..."></textarea>
+        </div>
+        <!-- ที่ตั้ง -->
+        <div style="font-size:12px;font-weight:700;color:var(--p);margin:14px 0 10px;padding-bottom:6px;border-bottom:1.5px solid var(--lt)">
+          <i class="fas fa-map-marker-alt"></i> ที่ตั้ง
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="ma-field">
+            <label>จังหวัด</label>
+            <input type="text" id="ul-province" placeholder="กรุงเทพมหานคร">
+          </div>
+          <div class="ma-field">
+            <label>ย่าน / แขวง</label>
+            <input type="text" id="ul-district" placeholder="สุขุมวิท">
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="ma-field">
+            <label>ที่อยู่ / ละแวกใกล้เคียง</label>
+            <input type="text" id="ul-location" placeholder="เช่น ซอยสุขุมวิท 24">
+          </div>
+          <div class="ma-field">
+            <label>BTS/MRT ที่ใกล้ที่สุด</label>
+            <input type="text" id="ul-near-bts" placeholder="BTS อโศก (500ม.)">
+          </div>
+        </div>
+        <!-- รูปภาพ -->
+        <div style="font-size:12px;font-weight:700;color:var(--p);margin:14px 0 10px;padding-bottom:6px;border-bottom:1.5px solid var(--lt)">
+          <i class="fas fa-images"></i> รูปภาพ (สูงสุด 6 รูป)
+        </div>
+        <input type="file" id="ul-photos" accept="image/*" multiple
+          style="width:100%;padding:10px;border:1.5px dashed var(--bd);border-radius:8px;font-size:12px;cursor:pointer;margin-bottom:4px">
+        <div style="font-size:11px;color:var(--tx2);margin-bottom:14px">รองรับ JPG, PNG · แนะนำรูปแรกเป็นรูปหน้าปก</div>
+        <!-- ช่องทางติดต่อ -->
+        <div style="font-size:12px;font-weight:700;color:var(--p);margin:14px 0 10px;padding-bottom:6px;border-bottom:1.5px solid var(--lt)">
+          <i class="fas fa-phone"></i> ช่องทางติดต่อ
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+          <div class="ma-field">
+            <label>ชื่อผู้ติดต่อ</label>
+            <input type="text" id="ul-contact-name" placeholder="คุณสมชาย">
+          </div>
+          <div class="ma-field">
+            <label>เบอร์โทร *</label>
+            <input type="tel" id="ul-phone" placeholder="081-234-5678">
+          </div>
+          <div class="ma-field">
+            <label>LINE ID</label>
+            <input type="text" id="ul-contact-line" placeholder="@yourline">
+          </div>
+        </div>
+        <!-- Submit -->
+        <button id="ul-submit-btn" onclick="submitUserListing()"
+          style="width:100%;padding:15px;background:linear-gradient(135deg,var(--p),#2a5298);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:10px">
+          <i class="fas fa-paper-plane"></i> ลงประกาศ (หัก 1 Token)
+        </button>
+        <p style="text-align:center;font-size:11px;color:var(--tx2);margin-top:8px">
+          Token คงเหลือของคุณ: <strong style="color:var(--p)">${_tokenBalance} Token</strong>
+        </p>
+      </div>
+    </div>`;
+  document.body.appendChild(m);
+}
+
+// inject modal ทันทีที่โหลด script
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', _injectUserListingModal);
+} else {
+  _injectUserListingModal();
+}
+
+
+// ══════════════════════════════════════════════════════════════
+//  ADMIN PANEL — ระบบ Token Orders + User Listings
+//  ฟังก์ชันสำหรับ _renderAdminPanel()
+// ══════════════════════════════════════════════════════════════
+
+// ── Render Admin: Token Orders ─────────────────────────────
+async function _renderAdminTokenOrders(el, devBanner) {
+  let orders = [];
+  if (!_adminDevMode && sb) {
+    try {
+      const { data } = await sb
+        .from('token_orders')
+        .select('*, user_profiles(display_name,phone), auth_users:user_id(email)')
+        .order('created_at', { ascending: false })
+        .range(0, 199);
+      orders = data || [];
+    } catch(e) {
+      // ดึงแบบ simple ถ้า join ไม่ work
+      try {
+        const { data } = await sb.from('token_orders').select('*').order('created_at', { ascending: false }).range(0, 199);
+        orders = data || [];
+      } catch(e2) {}
+    }
+  }
+
+  const badge = s => {
+    const map = {'รอยืนยัน':['#f39c12','รอยืนยัน'],'ยืนยันแล้ว':['#2ecc71','ยืนยันแล้ว'],'ปฏิเสธ':['#e74c3c','ปฏิเสธ']};
+    const [c,l] = map[s]||['#bbb',s];
+    return `<span style="background:${c}22;color:${c};border:1px solid ${c}44;border-radius:20px;padding:3px 10px;font-size:10px;font-weight:700">${l}</span>`;
+  };
+
+  el.innerHTML = devBanner + `
+    <div class="admin-section">
+      <div class="admin-section-head">
+        <div class="admin-section-title"><i class="fas fa-coins" style="color:#f1c40f"></i> Token Orders — รออนุมัติ (${orders.filter(o=>o.status==='รอยืนยัน').length})</div>
+        <button class="admin-btn admin-btn-ghost" style="font-size:11px;padding:5px 10px" onclick="adminNav('token-orders',null)"><i class="fas fa-sync"></i> Refresh</button>
+      </div>
+      <div class="admin-search-bar">
+        <select class="admin-filter-select" id="tok-ord-filter" onchange="_adminFilterTokenOrders()" style="padding:8px;border-radius:8px">
+          <option value="">ทุกสถานะ</option>
+          <option value="รอยืนยัน">รอยืนยัน</option>
+          <option value="ยืนยันแล้ว">ยืนยันแล้ว</option>
+          <option value="ปฏิเสธ">ปฏิเสธ</option>
+        </select>
+      </div>
+      <div id="admin-tok-orders-table">
+        <table class="admin-table">
+          <thead><tr>
+            <th>#</th><th>User</th><th>Token</th><th>ราคา</th><th>สลิป</th><th>วันที่</th><th>สถานะ</th><th>Action</th>
+          </tr></thead>
+          <tbody id="admin-tok-orders-tbody">
+            ${orders.map((o,i) => `<tr>
+              <td style="color:rgba(255,255,255,.3);font-size:11px">${i+1}</td>
+              <td style="font-size:12px">
+                <div style="font-weight:600;color:#fff">${sanitize(o.user_profiles?.display_name || o.user_id?.slice(0,8)+'...' || '-')}</div>
+                <div style="font-size:10px;color:rgba(255,255,255,.4)">${o.user_id?.slice(0,16)}...</div>
+              </td>
+              <td style="font-size:16px;font-weight:800;color:#f1c40f">${o.tokens_requested}</td>
+              <td style="color:#c8922a;font-weight:700">฿${Number(o.price_paid).toLocaleString()}</td>
+              <td>${o.slip_url ? `<a href="${o.slip_url}" target="_blank" style="color:var(--a);font-size:12px"><i class="fas fa-image"></i> ดูสลิป</a>` : '<span style="color:rgba(255,255,255,.3);font-size:11px">ไม่มี</span>'}</td>
+              <td style="font-size:11px;color:rgba(255,255,255,.4)">${o.created_at ? new Date(o.created_at).toLocaleDateString('th-TH') : '-'}</td>
+              <td>${badge(o.status)}</td>
+              <td>
+                ${o.status === 'รอยืนยัน' ? `
+                  <div class="admin-action-btns">
+                    <button class="admin-action-btn approve" onclick="adminApproveTokenOrder('${o.id}')"><i class="fas fa-check"></i> อนุมัติ</button>
+                    <button class="admin-action-btn reject"  onclick="adminRejectTokenOrder('${o.id}')"><i class="fas fa-times"></i> ปฏิเสธ</button>
+                  </div>` : '<span style="font-size:11px;color:rgba(255,255,255,.3)">—</span>'}
+              </td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+        ${!orders.length ? '<div class="admin-empty"><i class="fas fa-inbox"></i><p>ไม่มี Token Orders</p></div>' : ''}
+      </div>
+    </div>`;
+  window._adminAllTokenOrders = orders;
+}
+
+// ── Render Admin: User Listings ────────────────────────────
+async function _renderAdminUserListings(el, devBanner) {
+  let userListings = [];
+  if (!_adminDevMode && sb) {
+    try {
+      const { data } = await sb
+        .from('v_admin_user_listings')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .range(0, 299);
+      userListings = data || [];
+    } catch(e) {
+      try {
+        const { data } = await sb.from('user_listings').select('*').order('created_at', { ascending: false }).range(0, 299);
+        userListings = data || [];
+      } catch(e2) {}
+    }
+  }
+
+  const badge = s => {
+    const map = {
+      'รอตรวจสอบ': ['#f39c12','fa-clock'],
+      'อนุมัติ':   ['#2ecc71','fa-check'],
+      'ปฏิเสธ':   ['#e74c3c','fa-times'],
+      'ปิด':       ['#95a5a6','fa-ban'],
+    };
+    const [c,ic] = map[s]||['#bbb','fa-circle'];
+    return `<span style="background:${c}22;color:${c};border:1px solid ${c}44;border-radius:20px;padding:3px 10px;font-size:10px;font-weight:700"><i class="fas ${ic}" style="font-size:8px"></i> ${s}</span>`;
+  };
+
+  el.innerHTML = devBanner + `
+    <div class="admin-section">
+      <div class="admin-section-head">
+        <div class="admin-section-title"><i class="fas fa-home"></i> User Listings — รออนุมัติ (${userListings.filter(u=>u.status==='รอตรวจสอบ').length})</div>
+        <button class="admin-btn admin-btn-ghost" style="font-size:11px;padding:5px 10px" onclick="adminNav('user-listings',null)"><i class="fas fa-sync"></i> Refresh</button>
+      </div>
+      <div class="admin-search-bar">
+        <input class="admin-search-input" id="ul-search" placeholder="🔍 ค้นหาชื่อทรัพย์..." oninput="_adminFilterUserListings()">
+        <select class="admin-filter-select" id="ul-filter" onchange="_adminFilterUserListings()">
+          <option value="">ทุกสถานะ</option>
+          <option value="รอตรวจสอบ">รอตรวจสอบ</option>
+          <option value="อนุมัติ">อนุมัติแล้ว</option>
+          <option value="ปฏิเสธ">ปฏิเสธ</option>
+        </select>
+      </div>
+      <div id="admin-ul-table">
+        <table class="admin-table">
+          <thead><tr>
+            <th>#</th><th>ทรัพย์</th><th>User</th><th>ราคา</th><th>จังหวัด</th><th>วันที่</th><th>สถานะ</th><th>Action</th>
+          </tr></thead>
+          <tbody id="admin-ul-tbody">
+            ${_adminULRows(userListings)}
+          </tbody>
+        </table>
+        ${!userListings.length ? '<div class="admin-empty"><i class="fas fa-inbox"></i><p>ไม่มี User Listings</p></div>' : ''}
+      </div>
+    </div>`;
+  window._adminAllUserListings = userListings;
+}
+
+function _adminULRows(data) {
+  return data.map((ul,i) => `<tr>
+    <td style="color:rgba(255,255,255,.3);font-size:11px">${i+1}</td>
+    <td style="max-width:180px">
+      <strong style="color:#fff;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${sanitize(ul.title||'-')}</strong>
+      <span style="font-size:11px;color:rgba(255,255,255,.3)">${sanitize(ul.property_type||'')} · ${ul.transaction==='RENT'?'เช่า':'ขาย'}</span>
+    </td>
+    <td style="font-size:12px">
+      <div style="color:#fff">${sanitize(ul.user_display_name||ul.contact_name||'-')}</div>
+      <div style="font-size:10px;color:rgba(255,255,255,.4)">${sanitize(ul.contact_phone||ul.user_phone||'-')}</div>
+    </td>
+    <td style="color:#c8922a;font-weight:700;white-space:nowrap">${ul.price?'฿'+(ul.price>=1e6?(ul.price/1e6).toFixed(1)+'M':Number(ul.price).toLocaleString()):'-'}</td>
+    <td style="font-size:12px;color:rgba(255,255,255,.5)">${sanitize(ul.province||'-')}</td>
+    <td style="font-size:11px;color:rgba(255,255,255,.4)">${ul.created_at?new Date(ul.created_at).toLocaleDateString('th-TH'):'-'}</td>
+    <td>${(()=>{const map={'รอตรวจสอบ':['#f39c12','fa-clock'],'อนุมัติ':['#2ecc71','fa-check'],'ปฏิเสธ':['#e74c3c','fa-times'],'ปิด':['#95a5a6','fa-ban']};const [c,ic]=map[ul.status]||['#bbb','fa-circle'];return`<span style="background:${c}22;color:${c};border:1px solid ${c}44;border-radius:20px;padding:3px 10px;font-size:10px;font-weight:700"><i class="fas ${ic}" style="font-size:8px"></i> ${ul.status}</span>`;})()}</td>
+    <td>
+      <div class="admin-action-btns">
+        <button class="admin-action-btn edit" onclick="adminPreviewUserListing('${ul.id}')"><i class="fas fa-eye"></i></button>
+        ${ul.status==='รอตรวจสอบ'?`
+        <button class="admin-action-btn approve" onclick="adminApproveUserListing('${ul.id}')"><i class="fas fa-check"></i> อนุมัติ</button>
+        <button class="admin-action-btn reject"  onclick="adminRejectUserListing('${ul.id}')"><i class="fas fa-times"></i> ปฏิเสธ</button>
+        `:'<span style="font-size:11px;color:rgba(255,255,255,.3)">—</span>'}
+      </div>
+    </td>
+  </tr>`).join('');
+}
+
+function _adminFilterUserListings() {
+  const kw  = (document.getElementById('ul-search')?.value||'').toLowerCase();
+  const st  = document.getElementById('ul-filter')?.value||'';
+  const data = (window._adminAllUserListings||[]).filter(ul =>
+    (!kw || (ul.title||'').toLowerCase().includes(kw) || (ul.province||'').toLowerCase().includes(kw)) &&
+    (!st || ul.status === st)
+  );
+  const tbody = document.getElementById('admin-ul-tbody');
+  if (tbody) tbody.innerHTML = _adminULRows(data);
+}
+
+function _adminFilterTokenOrders() {
+  const st = document.getElementById('tok-ord-filter')?.value||'';
+  const data = (window._adminAllTokenOrders||[]).filter(o => !st || o.status === st);
+  const tbody = document.getElementById('admin-tok-orders-tbody');
+  if (tbody) {
+    // Re-render rows
+    adminNav('token-orders', null); // simple: reload whole panel
+  }
+}
+
+// ── Admin Actions: Token Orders ────────────────────────────
+async function adminApproveTokenOrder(orderId) {
+  if (!confirm('ยืนยันการอนุมัติ Token Order นี้?\nระบบจะเติม Token ให้ User อัตโนมัติ')) return;
+  try {
+    const { error } = await sb.from('token_orders').update({
+      status:       'ยืนยันแล้ว',
+      processed_by: user.id,
+      processed_at: new Date().toISOString()
+    }).eq('id', orderId);
+    if (error) throw error;
+    toast('✅ อนุมัติและเติม Token ให้ User แล้ว', 'success');
+    adminNav('token-orders', null);
+  } catch(e) { toast('เกิดข้อผิดพลาด: ' + e.message, 'error'); }
+}
+
+async function adminRejectTokenOrder(orderId) {
+  const note = prompt('เหตุผลที่ปฏิเสธ (ส่งให้ User เห็น):');
+  if (note === null) return;
+  try {
+    const { error } = await sb.from('token_orders').update({
+      status:       'ปฏิเสธ',
+      admin_note:   note || 'ปฏิเสธโดย Admin',
+      processed_by: user.id,
+      processed_at: new Date().toISOString()
+    }).eq('id', orderId);
+    if (error) throw error;
+    toast('ปฏิเสธ Order แล้ว', 'warn');
+    adminNav('token-orders', null);
+  } catch(e) { toast('เกิดข้อผิดพลาด: ' + e.message, 'error'); }
+}
+
+// ── Admin Actions: User Listings ───────────────────────────
+function adminPreviewUserListing(ulId) {
+  const ul = (window._adminAllUserListings||[]).find(u => u.id === ulId);
+  if (!ul) { toast('ไม่พบข้อมูล', 'warn'); return; }
+  const photos = (ul.photos||[]).map(p => `<img src="${p}" style="width:120px;height:90px;object-fit:cover;border-radius:8px">`).join('');
+  alert(`📋 รายละเอียดประกาศ\n\n` +
+    `ชื่อ: ${ul.title}\n` +
+    `ประเภท: ${ul.property_type} (${ul.transaction==='RENT'?'เช่า':'ขาย'})\n` +
+    `ราคา: ฿${Number(ul.price||0).toLocaleString()}\n` +
+    `พื้นที่: ${ul.area||0} ตร.ม.\n` +
+    `ห้องนอน: ${ul.bed||0} · ห้องน้ำ: ${ul.bath||0}\n` +
+    `จังหวัด: ${ul.province||'-'} · ย่าน: ${ul.district||'-'}\n` +
+    `BTS/MRT: ${ul.near_bts||'-'}\n` +
+    `รายละเอียด: ${ul.description||'-'}\n\n` +
+    `ผู้ติดต่อ: ${ul.contact_name||ul.user_display_name||'-'}\n` +
+    `โทร: ${ul.contact_phone||ul.user_phone||'-'}\n` +
+    `LINE: ${ul.contact_line||'-'}`
+  );
+}
+
+async function adminApproveUserListing(ulId) {
+  const ul = (window._adminAllUserListings||[]).find(u => u.id === ulId);
+  if (!ul) return;
+  if (!confirm(`อนุมัติประกาศ "${ul.title}"?\nระบบจะสร้าง property ใหม่ในตาราง properties อัตโนมัติ`)) return;
+  try {
+    // 1. สร้าง property record ใหม่
+    const newPropId = 'ul-' + ulId.slice(0,8);
+    const { error: propErr } = await sb.from('properties').insert({
+      id:          newPropId,
+      title:       ul.title,
+      type:        ul.property_type,
+      province:    ul.province,
+      location:    ul.location,
+      district:    ul.district,
+      price:       ul.price,
+      tx:          ul.transaction,
+      bed:         ul.bed,
+      bath:        ul.bath,
+      area:        ul.area,
+      land_area:   ul.land_area,
+      floor_no:    ul.floor_no,
+      furniture:   ul.furniture,
+      description: ul.description,
+      photos:      ul.photos,
+      status:      'approved',
+      admin_note:  'สร้างจาก User Listing #' + ulId.slice(0,8)
+    });
+    if (propErr && !propErr.message.includes('duplicate')) throw propErr;
+
+    // 2. อัปเดต user_listing status
+    const { error: ulErr } = await sb.from('user_listings').update({
+      status:      'อนุมัติ',
+      approved_by: user.id,
+      approved_at: new Date().toISOString(),
+      property_id: newPropId
+    }).eq('id', ulId);
+    if (ulErr) throw ulErr;
+
+    toast('✅ อนุมัติและสร้างประกาศบนเว็บแล้ว!', 'success');
+    adminNav('user-listings', null);
+  } catch(e) {
+    toast('เกิดข้อผิดพลาด: ' + (e.message||'ไม่ทราบสาเหตุ'), 'error');
+  }
+}
+
+async function adminRejectUserListing(ulId) {
+  const note = prompt('เหตุผลที่ปฏิเสธ (User จะเห็น และได้รับ Token คืน):');
+  if (note === null) return;
+  try {
+    const { error } = await sb.from('user_listings').update({
+      status:      'ปฏิเสธ',
+      admin_note:  note || 'ไม่ผ่านเกณฑ์ของ Matchdoor'
+    }).eq('id', ulId);
+    if (error) throw error;
+    toast('ปฏิเสธแล้ว ระบบคืน Token ให้ User อัตโนมัติ', 'warn');
+    adminNav('user-listings', null);
+  } catch(e) { toast('เกิดข้อผิดพลาด: ' + e.message, 'error'); }
+}
+
+// ── Admin: เติม Token ให้ User โดยตรง (ไม่ผ่านออเดอร์) ──────
+async function adminGrantTokens() {
+  const uid   = prompt('กรอก User ID ที่ต้องการเติม Token:');
+  if (!uid) return;
+  const amount = parseInt(prompt('จำนวน Token ที่ต้องการเติม:'));
+  if (!amount || amount <= 0) return;
+  const note = prompt('หมายเหตุ (Admin เติมให้):') || 'Admin เติม Token พิเศษ';
+  try {
+    // เติม user_tokens
+    const { data: cur } = await sb.from('user_tokens').select('balance').eq('user_id', uid).single();
+    const newBal = (cur?.balance||0) + amount;
+    await sb.from('user_tokens').upsert({ user_id: uid, balance: newBal, total_purchased: (cur?.total_purchased||0)+amount, updated_at: new Date().toISOString() }, { onConflict: 'user_id' });
+    // บันทึก transaction
+    await sb.from('token_transactions').insert({ user_id: uid, type: 'ADMIN_GRANT', amount, balance_after: newBal, note });
+    toast(`✅ เติม ${amount} Token ให้ User แล้ว (ยอดใหม่: ${newBal})`, 'success');
+  } catch(e) { toast('เกิดข้อผิดพลาด: ' + e.message, 'error'); }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  Hook เข้า renderMyAccount / _maTab
+// ══════════════════════════════════════════════════════════════
+
+// โหลดข้อมูล Token เมื่อ User login
+const _origOnAuthChange = window.onAuthChange;
+window._onAuthChangeTokenHook = async function(u) {
+  if (u) {
+    await loadUserTokenData();
+  }
+};
+
 function _maTab(name, el){
   document.querySelectorAll('#ma-tab-bar .ma-tab').forEach(b=>b.classList.remove('active'));
   if(el) el.classList.add('active');
@@ -17677,6 +18539,9 @@ document.addEventListener('DOMContentLoaded', renderTransitButtons);
         <div class="admin-nav-section">เครื่องมือ</div>
         <a class="admin-nav-item" onclick="adminNav('analytics',this)"><i class="fas fa-chart-bar"></i> Analytics</a>
         <a class="admin-nav-item" onclick="adminNav('notifications',this)"><i class="fas fa-bell"></i> Notifications</a>
+        <a class="admin-nav-item" onclick="adminNav('token-orders',this)"><i class="fas fa-coins" style="color:#f1c40f"></i> <span>Token Orders</span></a>
+        <a class="admin-nav-item" onclick="adminNav('user-listings',this)"><i class="fas fa-home"></i> <span>User Listings</span></a>
+        <button class="admin-btn admin-btn-ghost" onclick="adminGrantTokens()" style="width:100%;margin-top:12px;font-size:12px;padding:8px;text-align:left;display:flex;gap:8px;align-items:center"><i class="fas fa-plus-circle" style="color:#2ecc71"></i> เติม Token ให้ User</button>
       </nav>
       <div class="admin-sidebar-footer">
         <button onclick="adminLogout()"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ Admin</button>
@@ -17804,8 +18669,8 @@ function adminNav(panel, el){
   _adminCurrentPanel = panel;
   document.querySelectorAll('.admin-nav-item').forEach(i=>i.classList.remove('active'));
   if(el) el.classList.add('active');
-  const icons = {dashboard:'fas fa-tachometer-alt',properties:'fas fa-building',requests:'fas fa-file-alt',agents:'fas fa-users',portfolio:'fas fa-trophy',analytics:'fas fa-chart-bar',notifications:'fas fa-bell'};
-  const titles = {dashboard:'Dashboard',properties:'ประกาศทรัพย์ — จัดการ & อนุมัติ',requests:'Buy Requests — ติดตามลูกค้า',agents:'Agents & Portfolio',portfolio:'ผลงานปิดดีล',analytics:'Analytics Dashboard',notifications:'Broadcast Notifications'};
+  const icons = {dashboard:'fas fa-tachometer-alt',properties:'fas fa-building',requests:'fas fa-file-alt',agents:'fas fa-users',portfolio:'fas fa-trophy',analytics:'fas fa-chart-bar',notifications:'fas fa-bell','token-orders':'fas fa-coins','user-listings':'fas fa-home'};
+  const titles = {dashboard:'Dashboard',properties:'ประกาศทรัพย์ — จัดการ & อนุมัติ',requests:'Buy Requests — ติดตามลูกค้า',agents:'Agents & Portfolio',portfolio:'ผลงานปิดดีล',analytics:'Analytics Dashboard',notifications:'Broadcast Notifications','token-orders':'Token Orders — ยืนยันการซื้อ','user-listings':'User Listings — อนุมัติประกาศ'};
   document.getElementById('admin-topbar-icon').className = (icons[panel]||'fas fa-circle') + ' ';
   document.getElementById('admin-topbar-title').textContent = titles[panel]||panel;
   document.getElementById('admin-topbar-meta').textContent = _adminDevMode ? '⚗️ DEV MODE' : '';
@@ -18032,7 +18897,13 @@ async function _renderAdminPanel(panel){
     </div>`;
   }
 
-  else if(panel==='notifications'){
+  else if(panel==='token-orders'){
+    await _renderAdminTokenOrders(el, devBanner);
+  }
+  else if(panel==='user-listings'){
+    await _renderAdminUserListings(el, devBanner);
+  }
+    else if(panel==='notifications'){
     el.innerHTML = devBanner + `
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start">
       <!-- ฟอร์มส่ง Notification -->
