@@ -5000,52 +5000,8 @@ function _popupRefreshMarkersFromData(data){
 <div class="ov" id="blog-modal" onclick="if(event.target===this)_closeModal('blog-modal')"><div class="modal"><div class="mhd"><h2 id="blog-title"></h2><span class="mclose" onclick="_closeModal('blog-modal')">×</span></div><div class="mbody" id="blog-body"></div></div></div>
 <div class="ov" id="port-modal" onclick="if(event.target===this)_closeModal('port-modal')"><div class="modal"><div class="mhd"><h2 id="port-title"></h2><span class="mclose" onclick="_closeModal('port-modal')">×</span></div><div class="mbody" id="port-body"></div></div></div>
 <div class="ov" id="ag-modal" onclick="if(event.target===this)_closeModal('ag-modal')"><div class="modal"><div class="mhd" style="justify-content:space-between"><h2 id="ag-title" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-right:8px"></h2><span class="mclose" style="flex-shrink:0" onclick="_closeModal('ag-modal')">×</span></div><div class="mbody" id="ag-body"></div></div></div>
-<div class="ov" id="phone-otp-modal" onclick="if(event.target===this)_closeModal('phone-otp-modal')">
-  <div class="modal" style="max-width:400px">
-    <div class="mhd">
-      <h2><i class="fas fa-mobile-alt" style="color:#25D366"></i> เข้าสู่ระบบด้วยโทรศัพท์</h2>
-      <span class="mclose" onclick="_closeModal('phone-otp-modal')">×</span>
-    </div>
-    <div class="mbody">
-      <!-- Step 1: กรอกเบอร์ -->
-      <div id="phone-otp-step1">
-        <p style="margin-bottom:16px;color:var(--tx2);font-size:13px">กรอกเบอร์มือถือของคุณ เราจะส่งรหัส OTP ทาง SMS</p>
-        <input class="login-field" type="tel" id="phone-otp-number" placeholder="เช่น 081-234-5678" maxlength="15"
-          onkeydown="if(event.key==='Enter')sendPhoneOTP()">
-        <div id="phone-otp-err" style="display:none;color:#e53e3e;font-size:12px;margin-bottom:8px"></div>
-        <button class="btn-sub" id="phone-otp-send-btn" onclick="sendPhoneOTP()">
-          <i class="fas fa-paper-plane"></i> ส่งรหัส OTP
-        </button>
-        <div style="margin-top:12px;text-align:center">
-          <button class="auth-link" onclick="_closeModal('phone-otp-modal');_openModal('login-modal')">
-            <i class="fas fa-arrow-left"></i> กลับ
-          </button>
-        </div>
-      </div>
-      <!-- Step 2: กรอก OTP -->
-      <div id="phone-otp-step2" style="display:none">
-        <p style="margin-bottom:8px;color:var(--tx2);font-size:13px">
-          ส่งรหัส OTP ไปที่ <strong id="phone-otp-display"></strong> แล้ว<br>
-          กรุณากรอกรหัส 6 หลักที่ได้รับ
-        </p>
-        <input class="login-field" type="number" id="phone-otp-code" placeholder="รหัส OTP 6 หลัก" maxlength="6"
-          style="letter-spacing:6px;font-size:22px;text-align:center;font-weight:700"
-          onkeydown="if(event.key==='Enter')verifyPhoneOTP()">
-        <div id="phone-otp-err2" style="display:none;color:#e53e3e;font-size:12px;margin-bottom:8px"></div>
-        <button class="btn-sub" id="phone-otp-verify-btn" onclick="verifyPhoneOTP()">
-          <i class="fas fa-check-circle"></i> ยืนยัน OTP
-        </button>
-        <div style="margin-top:10px;text-align:center">
-          <button class="auth-link" onclick="phoneOtpBack()">
-            <i class="fas fa-redo"></i> เปลี่ยนเบอร์ / ส่ง OTP ใหม่
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-<div class="ov" id="login-modal" onclick="if(event.target===this)_closeModal('login-modal')"><div class="modal" style="max-width:400px"><div class="mhd"><h2><i class="fas fa-sign-in-alt" style="color:var(--p)"></i> เข้าสู่ระบบ</h2><span class="mclose" onclick="_closeModal('login-modal')">×</span></div><div class="mbody"><p style="margin-bottom:16px;color:var(--tx2);font-size:13px">กรุณาเข้าสู่ระบบก่อนส่งข้อมูลฝากทรัพย์หรือฝากความต้องการ</p><div class="login-btns"><button class="login-provider" onclick="loginWith('google')"><i class="fab fa-google" style="color:#DB4437"></i> เข้าสู่ระบบด้วย Google</button><!-- [PHONE-LOGIN] ซ่อนชั่วคราว — ยังไม่เปิดใช้งาน --><button class="login-provider" onclick="loginPhone()" style="display:none"><i class="fas fa-mobile-alt" style="color:#25D366"></i> เข้าสู่ระบบด้วยโทรศัพท์</button></div><div class="login-sep">หรือ</div><div class="login-toggle"><button id="lt-pw-btn" class="active" onclick="setLoginTab('pw')">รหัสผ่าน</button><button id="lt-magic-btn" onclick="setLoginTab('magic')">Magic Link</button></div><input class="login-field" type="email" id="login-email" placeholder="อีเมล"><div id="lt-pw-section"><input class="login-field" type="password" id="login-pw" placeholder="รหัสผ่าน"><div style="text-align:right;margin-top:-4px;margin-bottom:10px"><button class="auth-link" onclick="resetPassword()">ลืมรหัสผ่าน?</button></div><button class="btn-sub" onclick="loginEmail()"><i class="fas fa-sign-in-alt"></i> เข้าสู่ระบบ</button></div><div id="lt-magic-section" style="display:none"><p class="magic-notice">เราจะส่งลิงก์เข้าสู่ระบบไปที่อีเมลโดยไม่ต้องใช้รหัสผ่าน</p><button class="btn-sub" onclick="loginMagicLink()"><i class="fas fa-magic"></i> ส่ง Magic Link</button></div><div style="margin-top:12px;text-align:center;font-size:12px">ยังไม่มีบัญชี? <a href="#" onclick="showSignup()" style="color:var(--a)">สมัครสมาชิก</a></div><div style="margin-top:10px;text-align:center"><button class="auth-link" style="font-size:12px;color:var(--gr)" onclick="_closeModal('login-modal');showPage('listings')"><i class="fas fa-search"></i> <span id="login-modal-browse-lbl">ดูประกาศก่อน ไม่ต้อง Login</span></button></div></div></div></div>
-<div class="ov" id="signup-modal" onclick="if(event.target===this)_closeModal('signup-modal')"><div class="modal" style="max-width:400px"><div class="mhd"><h2><i class="fas fa-user-plus" style="color:var(--p)"></i> สมัครสมาชิก</h2><span class="mclose" onclick="_closeModal('signup-modal')">×</span></div><div class="mbody"><div class="login-btns"><button class="login-provider" onclick="loginWith('google')"><i class="fab fa-google" style="color:#DB4437"></i> สมัครด้วย Google</button><!-- [PHONE-LOGIN] ซ่อนชั่วคราว — ยังไม่เปิดใช้งาน --><button class="login-provider" onclick="loginPhone()" style="display:none"><i class="fas fa-mobile-alt" style="color:#25D366"></i> สมัคร/เข้าสู่ระบบด้วยโทรศัพท์</button></div><div class="login-sep">หรือสมัครด้วยอีเมล</div><input class="login-field" type="email" id="su-email" placeholder="อีเมล"><input class="login-field" type="password" id="su-pw" placeholder="รหัสผ่าน (อย่างน้อย 6 ตัว)"><button class="btn-sub" onclick="signupEmail()"><i class="fas fa-user-plus"></i> สมัครสมาชิก</button><div style="margin-top:12px;text-align:center;font-size:12px">มีบัญชีแล้ว? <a href="#" onclick="showLogin()" style="color:var(--a)">เข้าสู่ระบบ</a></div></div></div></div>
+<div class="ov" id="login-modal" onclick="if(event.target===this)_closeModal('login-modal')"><div class="modal" style="max-width:400px"><div class="mhd"><h2><i class="fas fa-sign-in-alt" style="color:var(--p)"></i> เข้าสู่ระบบ</h2><span class="mclose" onclick="_closeModal('login-modal')">×</span></div><div class="mbody"><p style="margin-bottom:16px;color:var(--tx2);font-size:13px">กรุณาเข้าสู่ระบบก่อนส่งข้อมูลฝากทรัพย์หรือฝากความต้องการ</p><div class="login-btns"><button class="login-provider" onclick="loginWith('google')"><i class="fab fa-google" style="color:#DB4437"></i> เข้าสู่ระบบด้วย Google</button><button class="login-provider" onclick="loginWith('facebook')"><i class="fab fa-facebook" style="color:var(--fb)"></i> เข้าสู่ระบบด้วย Facebook</button></div><div class="login-sep">หรือ</div><div class="login-toggle"><button id="lt-pw-btn" class="active" onclick="setLoginTab('pw')">รหัสผ่าน</button><button id="lt-magic-btn" onclick="setLoginTab('magic')">Magic Link</button></div><input class="login-field" type="email" id="login-email" placeholder="อีเมล"><div id="lt-pw-section"><input class="login-field" type="password" id="login-pw" placeholder="รหัสผ่าน"><div style="text-align:right;margin-top:-4px;margin-bottom:10px"><button class="auth-link" onclick="resetPassword()">ลืมรหัสผ่าน?</button></div><button class="btn-sub" onclick="loginEmail()"><i class="fas fa-sign-in-alt"></i> เข้าสู่ระบบ</button></div><div id="lt-magic-section" style="display:none"><p class="magic-notice">เราจะส่งลิงก์เข้าสู่ระบบไปที่อีเมลโดยไม่ต้องใช้รหัสผ่าน</p><button class="btn-sub" onclick="loginMagicLink()"><i class="fas fa-magic"></i> ส่ง Magic Link</button></div><div style="margin-top:12px;text-align:center;font-size:12px">ยังไม่มีบัญชี? <a href="#" onclick="showSignup()" style="color:var(--a)">สมัครสมาชิก</a></div><div style="margin-top:10px;text-align:center"><button class="auth-link" style="font-size:12px;color:var(--gr)" onclick="_closeModal('login-modal');showPage('listings')"><i class="fas fa-search"></i> <span id="login-modal-browse-lbl">ดูประกาศก่อน ไม่ต้อง Login</span></button></div></div></div></div>
+<div class="ov" id="signup-modal" onclick="if(event.target===this)_closeModal('signup-modal')"><div class="modal" style="max-width:400px"><div class="mhd"><h2><i class="fas fa-user-plus" style="color:var(--p)"></i> สมัครสมาชิก</h2><span class="mclose" onclick="_closeModal('signup-modal')">×</span></div><div class="mbody"><div class="login-btns"><button class="login-provider" onclick="loginWith('google')"><i class="fab fa-google" style="color:#DB4437"></i> สมัครด้วย Google</button><button class="login-provider" onclick="loginWith('facebook')"><i class="fab fa-facebook" style="color:var(--fb)"></i> สมัครด้วย Facebook</button></div><div class="login-sep">หรือสมัครด้วยอีเมล</div><input class="login-field" type="email" id="su-email" placeholder="อีเมล"><input class="login-field" type="password" id="su-pw" placeholder="รหัสผ่าน (อย่างน้อย 6 ตัว)"><button class="btn-sub" onclick="signupEmail()"><i class="fas fa-user-plus"></i> สมัครสมาชิก</button><div style="margin-top:12px;text-align:center;font-size:12px">มีบัญชีแล้ว? <a href="#" onclick="showLogin()" style="color:var(--a)">เข้าสู่ระบบ</a></div></div></div></div>
 <!-- Reset Password Modal -->
 <div class="ov" id="reset-pw-modal" onclick="if(event.target===this)_closeModal('reset-pw-modal')"><div class="modal" style="max-width:400px"><div class="mhd"><h2><i class="fas fa-key" style="color:var(--p)"></i> ตั้งรหัสผ่านใหม่</h2><span class="mclose" onclick="_closeModal('reset-pw-modal')">×</span></div><div class="mbody"><p style="margin-bottom:16px;color:var(--tx2);font-size:13px">กรอกรหัสผ่านใหม่ของคุณ (อย่างน้อย 6 ตัวอักษร)</p><input class="login-field" type="password" id="newpw-1" placeholder="รหัสผ่านใหม่"><input class="login-field" type="password" id="newpw-2" placeholder="ยืนยันรหัสผ่านใหม่"><button class="btn-sub" onclick="confirmResetPassword()"><i class="fas fa-check"></i> บันทึกรหัสผ่านใหม่</button></div></div></div>
 <!-- Profile Modal -->
@@ -5406,7 +5362,7 @@ function _popupRefreshMarkersFromData(data){
 // 🔧 จุด CONFIG ทั้งหมด — แก้ไขตรงนี้ที่เดียว
 const C = {
   // --- [1] Supabase Project ---
-  SUPABASE_URL:'https://zifpmwdjyuasegnomgad.supabase.co', // 🔧 [CONFIG-1] Supabase Project URL
+  SUPABASE_URL:'https://zifpmwdjyuasegnomgad.supabase.co, // 🔧 [CONFIG-1] Supabase Project URL
   SUPABASE_KEY:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InppZnBtd2RqeXVhc2Vnbm9tZ2FkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NzM2MjIsImV4cCI6MjA5NTQ0OTYyMn0.LMNtmI3eO9l__vVQgevI_tDkeT9QgbRdWP4W1CMRCMk', // 🔧 [CONFIG-2] Supabase Anon/Public Key เท่านั้น!
 
   // --- [2] Supabase Storage ---
@@ -7471,72 +7427,6 @@ async function loginWith(p){
   });
   if(error){ toast(error.message,true); if(btn){btn.disabled=false; btn.innerHTML=p==='google'?'<i class="fab fa-google" style="color:#DB4437"></i> เข้าสู่ระบบด้วย Google':'<i class="fab fa-facebook" style="color:var(--fb)"></i> เข้าสู่ระบบด้วย Facebook';} }
 }
-// ── Phone OTP Login ──────────────────────────────────────────
-function loginPhone(){
-  if(!sb){ toast('ระบบยังไม่ได้เชื่อมต่อ Supabase',true); return; }
-  _closeModal('login-modal');
-  _closeModal('signup-modal');
-  _openModal('phone-otp-modal');
-  setTimeout(()=>{ document.getElementById('phone-otp-number')?.focus(); }, 300);
-}
-
-async function sendPhoneOTP(){
-  if(!sb){ toast('ระบบยังไม่ได้เชื่อมต่อ Supabase',true); return; }
-  const phoneRaw = document.getElementById('phone-otp-number').value.trim();
-  const errEl = document.getElementById('phone-otp-err');
-  const btn = document.getElementById('phone-otp-send-btn');
-  errEl.style.display='none';
-  // แปลงเบอร์ไทย 0XX → +66XX
-  let phone = phoneRaw.replace(/[^0-9+]/g,'');
-  if(phone.startsWith('0')) phone = '+66' + phone.slice(1);
-  if(!/^\+\d{10,15}$/.test(phone)){
-    errEl.textContent = 'กรุณากรอกเบอร์โทรให้ถูกต้อง เช่น 081-234-5678';
-    errEl.style.display='block'; return;
-  }
-  btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> กำลังส่ง OTP...';
-  const {error} = await sb.auth.signInWithOtp({ phone });
-  btn.disabled=false; btn.innerHTML='<i class="fas fa-paper-plane"></i> ส่งรหัส OTP';
-  if(error){
-    errEl.textContent = error.message.includes('rate') ? 'ส่ง OTP บ่อยเกินไป กรุณารอสักครู่' : error.message;
-    errEl.style.display='block'; return;
-  }
-  // เก็บเบอร์ไว้ใช้ตอน verify
-  window._phoneOtpTarget = phone;
-  document.getElementById('phone-otp-step1').style.display='none';
-  document.getElementById('phone-otp-step2').style.display='block';
-  document.getElementById('phone-otp-display').textContent = phone;
-  setTimeout(()=>{ document.getElementById('phone-otp-code')?.focus(); }, 200);
-}
-
-async function verifyPhoneOTP(){
-  if(!sb){ toast('ระบบยังไม่ได้เชื่อมต่อ Supabase',true); return; }
-  const token = document.getElementById('phone-otp-code').value.trim();
-  const errEl = document.getElementById('phone-otp-err2');
-  const btn = document.getElementById('phone-otp-verify-btn');
-  errEl.style.display='none';
-  if(!token || token.length < 4){ errEl.textContent='กรุณากรอกรหัส OTP'; errEl.style.display='block'; return; }
-  btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> กำลังตรวจสอบ...';
-  const {error} = await sb.auth.verifyOtp({
-    phone: window._phoneOtpTarget,
-    token,
-    type: 'sms'
-  });
-  btn.disabled=false; btn.innerHTML='<i class="fas fa-check-circle"></i> ยืนยัน OTP';
-  if(error){
-    errEl.textContent = error.message.includes('expired') ? 'รหัส OTP หมดอายุ กรุณาส่งใหม่' :
-                        error.message.includes('invalid') ? 'รหัส OTP ไม่ถูกต้อง' : error.message;
-    errEl.style.display='block'; return;
-  }
-  _closeModal('phone-otp-modal');
-  toast('เข้าสู่ระบบสำเร็จ ✅');
-}
-
-function phoneOtpBack(){
-  document.getElementById('phone-otp-step1').style.display='block';
-  document.getElementById('phone-otp-step2').style.display='none';
-  document.getElementById('phone-otp-code').value='';
-}
-
 async function loginEmail(){
   if(!sb){ toast('ระบบยังไม่ได้เชื่อมต่อ Supabase',true); return; }
   const e=document.getElementById('login-email').value.trim();
@@ -19275,7 +19165,8 @@ document.addEventListener('DOMContentLoaded', renderTransitButtons);
 
 // Admin config — อีเมลที่มีสิทธิ์ admin (เปลี่ยนได้)
 const ADMIN_EMAILS = [
-  'contact.matchdoor@gmail.com'
+  'admin@matchdoor.co',
+  'dev@matchdoor.co',
   // เพิ่มอีเมล admin ที่นี่
 ];
 
