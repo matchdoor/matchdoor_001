@@ -359,6 +359,52 @@
 
   แล้วเรียกก่อน insert ใน submitDep/submitWish ถ้าต้องการ verify เต็มรูปแบบ
 ═══════════════════════════════════════════════════════════════════
+
+  USER LISTINGS — SQL Migration (รัน 1 ครั้งใน Supabase SQL Editor)
+═══════════════════════════════════════════════════════════════════
+
+  -- เพิ่ม column ใหม่ใน user_listings (full listing form v2)
+  ALTER TABLE user_listings
+    ADD COLUMN IF NOT EXISTS floors            INT DEFAULT 0,
+    ADD COLUMN IF NOT EXISTS parking           INT DEFAULT 0,
+    ADD COLUMN IF NOT EXISTS pets_allowed      BOOLEAN DEFAULT false,
+    ADD COLUMN IF NOT EXISTS appliances        JSONB DEFAULT '[]',
+    ADD COLUMN IF NOT EXISTS amenities         JSONB DEFAULT '[]',
+    ADD COLUMN IF NOT EXISTS near_bts          TEXT,
+    ADD COLUMN IF NOT EXISTS nearby_places     JSONB,
+    ADD COLUMN IF NOT EXISTS deposit           NUMERIC,
+    ADD COLUMN IF NOT EXISTS advance_payment   NUMERIC,
+    ADD COLUMN IF NOT EXISTS service_fee       NUMERIC,
+    ADD COLUMN IF NOT EXISTS electric_rate     NUMERIC,
+    ADD COLUMN IF NOT EXISTS water_rate        NUMERIC,
+    ADD COLUMN IF NOT EXISTS min_lease_months  INT,
+    ADD COLUMN IF NOT EXISTS contact_name      TEXT,
+    ADD COLUMN IF NOT EXISTS contact_phone     TEXT,
+    ADD COLUMN IF NOT EXISTS contact_line      TEXT;
+
+  -- เพิ่ม column ใหม่ใน properties (สำหรับ Admin approve → สร้างจาก user_listings)
+  ALTER TABLE properties
+    ADD COLUMN IF NOT EXISTS floors            INT DEFAULT 0,
+    ADD COLUMN IF NOT EXISTS parking           INT DEFAULT 0,
+    ADD COLUMN IF NOT EXISTS pets_allowed      BOOLEAN DEFAULT false,
+    ADD COLUMN IF NOT EXISTS appliances        JSONB DEFAULT '[]',
+    ADD COLUMN IF NOT EXISTS amenities         JSONB DEFAULT '[]',
+    ADD COLUMN IF NOT EXISTS near_bts          TEXT,
+    ADD COLUMN IF NOT EXISTS nearby_places     JSONB,
+    ADD COLUMN IF NOT EXISTS deposit           NUMERIC,
+    ADD COLUMN IF NOT EXISTS advance_payment   NUMERIC,
+    ADD COLUMN IF NOT EXISTS service_fee       NUMERIC,
+    ADD COLUMN IF NOT EXISTS electric_rate     NUMERIC,
+    ADD COLUMN IF NOT EXISTS water_rate        NUMERIC,
+    ADD COLUMN IF NOT EXISTS min_lease_months  INT,
+    ADD COLUMN IF NOT EXISTS contact_name      TEXT,
+    ADD COLUMN IF NOT EXISTS contact_phone     TEXT,
+    ADD COLUMN IF NOT EXISTS contact_line      TEXT;
+
+  -- เพิ่ม column welcome_bonus ใน user_tokens
+  ALTER TABLE user_tokens
+    ADD COLUMN IF NOT EXISTS welcome_bonus_given BOOLEAN NOT NULL DEFAULT false;
+═══════════════════════════════════════════════════════════════════
 -->
 <style>
 /* ══ MOBILE PERFORMANCE PATCH v4 — iOS Freeze Fix ══════════════ */
@@ -3653,35 +3699,118 @@ footer::after{
    </div>
    <div class="nav-dd">
     <button class="btn-dep" onclick="toggleDD('dd-dep')"><i class="fas fa-tag"></i> <span data-i18n="nav.deposit">ฝากทรัพย์</span></button>
-    <div class="dd-panel right dep-panel" id="dd-dep">
+    <div class="dd-panel right dep-panel" id="dd-dep" style="width:520px;max-height:85vh;overflow-y:auto">
      <div class="dp">
       <h3><i class="fas fa-home" style="color:var(--a)"></i> ฝากทรัพย์กับเรา</h3>
       <p>กรอกข้อมูลเบื้องต้น ทีมงานติดต่อกลับโดยเร็ว</p>
       <div id="dep-form">
-       <div class="frow"><div class="fg"><label>ชื่อ-นามสกุล *</label><input id="d-name" placeholder="ชื่อของคุณ"></div><div class="fg"><label>เบอร์โทร *</label><input type="tel" id="d-phone" placeholder="08X-XXX-XXXX"></div></div>
-       <div class="frow"><div class="fg"><label>ประเภท</label><select id="d-type"><option value="">-- เลือก --</option><option>บ้านเดี่ยว</option><option>ทาวน์โฮม</option><option>คอนโด</option><option>อาคารพาณิชย์</option><option>ที่ดิน</option></select></div><div class="fg"><label>ราคา (บาท)</label><input type="number" id="d-price" placeholder="3500000"></div></div>
-       <div class="frow"><div class="fg"><label>จังหวัด</label><input id="d-prov" placeholder="กรุงเทพฯ"></div><div class="fg"><label>ต้องการ</label><select id="d-tx"><option value="ขาย">ขาย</option><option value="เช่า">ให้เช่า</option></select></div></div>
-       <div class="frow full"><div class="fg"><label>รายละเอียด</label><textarea id="d-detail" rows="2" placeholder="ขนาด ทำเล จำนวนห้อง..." style="resize:none"></textarea></div></div>
-       <div class="fg"><label>อัปโหลดรูป (สูงสุด 5 รูป)</label>
-        <div class="dropzone" id="dropzone" onclick="document.getElementById('d-photo').click()">
+
+       <!-- ── ข้อมูลผู้ติดต่อ ── -->
+       <div style="font-size:11px;font-weight:700;color:var(--p);margin:0 0 8px;padding-bottom:5px;border-bottom:1.5px solid var(--lt);display:flex;align-items:center;gap:5px"><i class="fas fa-user"></i> ข้อมูลผู้ติดต่อ</div>
+       <div class="frow"><div class="fg"><label>ชื่อ-นามสกุล <span style="color:#e05">*</span></label><input id="d-name" placeholder="ชื่อของคุณ"></div><div class="fg"><label>เบอร์โทร <span style="color:#e05">*</span></label><input type="tel" id="d-phone" placeholder="08X-XXX-XXXX"></div></div>
+       <div class="frow"><div class="fg"><label>Your Line ID</label><input id="d-line" placeholder="@yourline"></div><div class="fg"><label>Your email</label><input type="email" id="d-email" placeholder="email@example.com"></div></div>
+
+       <!-- ── ข้อมูลทรัพย์ ── -->
+       <div style="font-size:11px;font-weight:700;color:var(--p);margin:12px 0 8px;padding-bottom:5px;border-bottom:1.5px solid var(--lt);display:flex;align-items:center;gap:5px"><i class="fas fa-building"></i> ข้อมูลทรัพย์</div>
+       <div class="frow full"><div class="fg"><label>ชื่อประกาศ / ชื่อทรัพย์</label><input id="d-title" placeholder="เช่น คอนโด Ashton Asoke 2 Bed ใกล้ BTS อโศก"></div></div>
+       <div class="frow">
+         <div class="fg"><label>ประเภทอสังหาฯ <span style="color:#e05">*</span></label>
+           <select id="d-type">
+             <option value="">-- เลือก --</option>
+             <option value="คอนโด">🏙️ คอนโด</option>
+             <option value="บ้านเดี่ยว">🏠 บ้านเดี่ยว</option>
+             <option value="ทาวน์โฮม">🏘️ ทาวน์โฮม</option>
+             <option value="ที่ดิน">🗺️ ที่ดิน</option>
+             <option value="อาคารพาณิชย์">🏪 อาคารพาณิชย์</option>
+             <option value="วิลล่า">🏖️ วิลล่า</option>
+             <option value="รีสอร์ท">🏨 รีสอร์ท</option>
+           </select>
+         </div>
+         <div class="fg"><label>ประเภทธุรกรรม</label>
+           <select id="d-tx">
+             <option value="ขาย">🏷️ ขาย</option>
+             <option value="เช่า">🔑 ให้เช่า</option>
+             <option value="ขาย/เช่า">🔄 ขาย/เช่า</option>
+           </select>
+         </div>
+       </div>
+       <div class="frow">
+         <div class="fg"><label>ราคา (บาท) <span style="color:#e05">*</span></label><input type="number" id="d-price" placeholder="3500000" min="0"></div>
+         <div class="fg"><label>พื้นที่ใช้สอย (ตร.ม.)</label><input type="number" id="d-area" placeholder="65" min="0"></div>
+       </div>
+       <div class="frow" style="grid-template-columns:1fr 1fr 1fr 1fr">
+         <div class="fg"><label>ห้องนอน</label><input type="number" id="d-bed" placeholder="2" min="0" max="20"></div>
+         <div class="fg"><label>ห้องน้ำ</label><input type="number" id="d-bath" placeholder="1" min="0" max="20"></div>
+         <div class="fg"><label>ชั้นที่ตั้ง</label><input type="number" id="d-floor" placeholder="5" min="0"></div>
+         <div class="fg"><label>ที่จอดรถ</label><input type="number" id="d-parking" placeholder="1" min="0"></div>
+       </div>
+       <div class="frow">
+         <div class="fg"><label>เฟอร์นิเจอร์</label>
+           <select id="d-furniture">
+             <option value="">ไม่ระบุ</option>
+             <option value="full">🛋️ ครบ (Full Furnished)</option>
+             <option value="partial">🪑 บางส่วน (Partial)</option>
+             <option value="none">📦 ไม่มีเฟอร์นิเจอร์</option>
+           </select>
+         </div>
+         <div class="fg" style="display:flex;align-items:center;gap:8px;padding-top:18px">
+           <input type="checkbox" id="d-pets" style="width:15px;height:15px;cursor:pointer">
+           <label for="d-pets" style="cursor:pointer;font-size:13px">🐾 อนุญาตให้เลี้ยงสัตว์</label>
+         </div>
+       </div>
+
+       <!-- ── ที่ตั้ง ── -->
+       <div style="font-size:11px;font-weight:700;color:var(--p);margin:12px 0 8px;padding-bottom:5px;border-bottom:1.5px solid var(--lt);display:flex;align-items:center;gap:5px"><i class="fas fa-map-marker-alt"></i> ที่ตั้ง</div>
+       <div class="frow">
+         <div class="fg"><label>จังหวัด</label><input id="d-prov" placeholder="กรุงเทพฯ"></div>
+         <div class="fg"><label>ย่าน / แขวง</label><input id="d-district" placeholder="สุขุมวิท"></div>
+       </div>
+       <div class="frow">
+         <div class="fg"><label>ที่อยู่ / ซอย / โครงการ</label><input id="d-location" placeholder="เช่น ซอยสุขุมวิท 24"></div>
+         <div class="fg"><label>BTS/MRT ที่ใกล้ที่สุด</label><input id="d-bts" placeholder="BTS อโศก (500ม.)"></div>
+       </div>
+
+       <!-- ── รายละเอียดเพิ่มเติม ── -->
+       <div style="font-size:11px;font-weight:700;color:var(--p);margin:12px 0 8px;padding-bottom:5px;border-bottom:1.5px solid var(--lt);display:flex;align-items:center;gap:5px"><i class="fas fa-align-left"></i> รายละเอียดเพิ่มเติม</div>
+       <div class="frow full"><div class="fg"><textarea id="d-detail" rows="3" placeholder="รายละเอียดทรัพย์, สิ่งอำนวยความสะดวก, เงื่อนไขพิเศษ, จุดเด่น..." style="resize:vertical"></textarea></div></div>
+
+       <!-- ── รูปภาพ ── -->
+       <div style="font-size:11px;font-weight:700;color:var(--p);margin:12px 0 8px;padding-bottom:5px;border-bottom:1.5px solid var(--lt);display:flex;align-items:center;gap:5px"><i class="fas fa-images"></i> รูปภาพ (สูงสุด 10 รูป)</div>
+       <div class="fg">
+        <div class="dropzone" id="dropzone" onclick="document.getElementById('d-photo').click()" style="min-height:80px">
          <div class="dz-icon"><i class="fas fa-cloud-upload-alt"></i></div>
          <div style="font-size:13px">ลากวาง หรือคลิกเพื่อเลือกรูป</div>
-         <div style="font-size:11px;color:var(--gr)">JPG/PNG ขนาดสูงสุด 5MB</div>
+         <div style="font-size:11px;color:var(--gr)">JPG, PNG, WEBP · สูงสุด 10 รูป</div>
         </div>
-        <input type="file" id="d-photo" multiple accept="image/*" style="display:none">
-        <div class="preview-grid" id="prev-grid"></div>
+        <input type="file" id="d-photo" multiple accept="image/*" style="display:none" onchange="_depPreviewPhotos(this)">
+        <div id="prev-grid" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px"></div>
        </div>
+
+       <!-- ── ต้องการตัวแทน ── -->
+       <div style="font-size:11px;font-weight:700;color:var(--p);margin:12px 0 8px;padding-bottom:5px;border-bottom:1.5px solid var(--lt);display:flex;align-items:center;gap:5px"><i class="fas fa-user-tie"></i> รับตัวแทน <span style="font-size:10px;font-weight:400;color:var(--tx2);margin-left:3px">(เพิ่มโอกาสปิดการขายได้ไวขึ้น)</span></div>
+       <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:8px">
+         <div style="position:relative;width:38px;height:22px;flex-shrink:0">
+           <input type="checkbox" id="d-want-agent" onchange="_depToggleAgent(this)" style="opacity:0;width:0;height:0;position:absolute">
+           <span id="d-agent-track" style="position:absolute;inset:0;background:#ccc;border-radius:11px;transition:.2s;cursor:pointer"></span>
+           <span id="d-agent-thumb" style="position:absolute;top:3px;left:3px;width:16px;height:16px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.3)"></span>
+         </div>
+         <span style="font-size:13px;color:var(--tx)">ต้องการให้ตัวแทนช่วยขาย/เช่า</span>
+       </label>
+       <div id="d-agent-note" style="display:none;background:rgba(27,58,107,.06);border:1px solid rgba(27,58,107,.15);border-radius:8px;padding:9px 12px;font-size:12px;color:var(--p);margin-bottom:4px">
+         <i class="fas fa-info-circle"></i> ทีมตัวแทน Matchdoor จะติดต่อกลับเพื่อนัดเข้าดูทรัพย์และดำเนินการต่อ
+       </div>
+
        <div class="consent-row">
          <input type="checkbox" id="d-consent">
          <label for="d-consent">ฉันยินยอมให้ Matchdoor เก็บและใช้ข้อมูลส่วนบุคคลรวมถึงรูปภาพทรัพย์ เพื่อบริการฝากทรัพย์ ตาม<a href="javascript:void(0)" onclick="openPrivacyModal();event.stopPropagation()">นโยบายความเป็นส่วนตัว</a></label>
        </div>
        <div class="consent-err" id="d-consent-err">⚠️ กรุณายินยอมก่อนส่งข้อมูล</div>
-       <!-- Honeypot: ซ่อนจากผู้ใช้จริง — bot จะกรอก, คนจริงไม่เห็น -->
+       <!-- Honeypot -->
        <div style="position:absolute;left:-9999px;opacity:0;pointer-events:none" aria-hidden="true">
          <label>Leave this empty</label>
          <input type="text" name="website" id="d-honeypot" tabindex="-1" autocomplete="off">
        </div>
-       <!-- Turnstile invisible widget สำหรับฟอร์มฝากทรัพย์ -->
+       <!-- Turnstile -->
        <div id="turnstile-dep" style="margin-bottom:4px"></div>
        <button class="btn-sub" id="dep-btn" onclick="submitDep()"><i class="fas fa-lock btn-icon"></i><span class="btn-spinner"></span> <span id="dep-btn-text">เข้าสู่ระบบเพื่อส่งข้อมูล</span></button>
       </div>
@@ -5665,6 +5794,8 @@ function initAuthListener(){
       _closeModal('login-modal');
       _closeModal('signup-modal');
       toast('เข้าสู่ระบบสำเร็จ ✅');
+      // ── Welcome Bonus: ตรวจและเติม Token ฟรีสำหรับ User ใหม่ ──
+      if(session?.user?.id) grantWelcomeBonus(session.user.id);
       // If user came from my-account FAB, navigate to my-account page
       if(document.getElementById('page-my-account')?.classList.contains('active')){
         renderMyAccount();
@@ -5770,6 +5901,15 @@ function _updateProfileFab(){
 window._maDevBypass = false;
 function _toggleMaDevBypass(){
   window._maDevBypass = !window._maDevBypass;
+  // ── Dev mode: จำลอง Token 20 เหรียญให้ทดลองลงประกาศได้ ──
+  if(window._maDevBypass && !user){
+    _tokenBalance = 20;
+    _myUserListings = [];
+    _myTokenOrders  = [];
+    console.info('[DEV] Token balance set to 20 (mock)');
+  } else if(!window._maDevBypass && !user){
+    _tokenBalance = 0;
+  }
   renderMyAccount();
 }
 
@@ -5848,7 +5988,7 @@ function renderMyAccount(){
   const email = sanitize(_u.email||'');
   const joinDate = _u.created_at ? new Date(_u.created_at).toLocaleDateString(_lang==='th'?'th-TH':_lang==='ja'?'ja-JP':_lang==='cn'?'zh-CN':'en-US',{year:'numeric',month:'long'}) : '';
   const favCount = (typeof favs!=='undefined' ? favs : []).length;
-  const devBanner = isDevMode ? `<div class="ma-dev-banner"><i class="fas fa-flask"></i> DEV MODE — ดูหน้านี้โดยไม่ต้อง Login (ข้อมูลเป็น mock) กดปุ่ม "DEV: ON" ที่ banner อีกครั้งเพื่อปิด</div>` : '';
+  const devBanner = isDevMode ? `<div class="ma-dev-banner"><i class="fas fa-flask"></i> DEV MODE — จำลอง <strong>${_tokenBalance} Token</strong> · ลงประกาศได้โดยไม่บันทึก DB จริง · กด "DEV: ON" เพื่อปิด</div>` : '';
   wrap.innerHTML = `
   ${devBanner}
   <div class="ma-hero">
@@ -5970,6 +6110,82 @@ async function loadUserTokenData() {
   }
 }
 
+// ── Welcome Bonus: เติม 20 Token ให้ User ที่ Login ครั้งแรก ──
+const WELCOME_BONUS_TOKENS = 20;
+const WELCOME_BONUS_KEY    = 'md_welcome_bonus_claimed'; // localStorage key (กัน double-trigger)
+
+async function grantWelcomeBonus(uid) {
+  if (!sb || !uid) return;
+
+  // ── ตรวจ localStorage ก่อน (ป้องกัน re-trigger ใน session เดิม) ──
+  const localKey = WELCOME_BONUS_KEY + '_' + uid;
+  if (localStorage.getItem(localKey)) return;
+
+  try {
+    // ── ตรวจว่ามี row ใน user_tokens แล้วหรือยัง ──
+    const { data: existing, error: fetchErr } = await sb
+      .from('user_tokens')
+      .select('balance, total_purchased, welcome_bonus_given')
+      .eq('user_id', uid)
+      .maybeSingle();
+
+    if (fetchErr) throw fetchErr;
+
+    // ── ถ้ามี row แล้ว และ welcome_bonus_given = true → ข้ามทันที ──
+    if (existing && existing.welcome_bonus_given) {
+      localStorage.setItem(localKey, '1');
+      return;
+    }
+
+    if (!existing) {
+      // ── User ใหม่: INSERT row พร้อม bonus ──
+      const { error: insErr } = await sb.from('user_tokens').insert({
+        user_id:             uid,
+        balance:             WELCOME_BONUS_TOKENS,
+        total_purchased:     WELCOME_BONUS_TOKENS,
+        total_used:          0,
+        welcome_bonus_given: true,
+        created_at:          new Date().toISOString()
+      });
+      if (insErr) throw insErr;
+    } else {
+      // ── User เก่า (มี row แต่ยังไม่ได้รับ bonus): UPDATE ──
+      const { error: updErr } = await sb.from('user_tokens').update({
+        balance:             (existing.balance || 0) + WELCOME_BONUS_TOKENS,
+        total_purchased:     (existing.total_purchased || 0) + WELCOME_BONUS_TOKENS,
+        welcome_bonus_given: true
+      }).eq('user_id', uid);
+      if (updErr) throw updErr;
+    }
+
+    // ── บันทึก token_orders เพื่อ audit log ──
+    await sb.from('token_orders').insert({
+      user_id:          uid,
+      package_id:       'welcome_bonus',
+      tokens_requested: WELCOME_BONUS_TOKENS,
+      price_paid:       0,
+      status:           'ยืนยันแล้ว',
+      admin_note:       '🎁 Welcome Bonus — Login ครั้งแรก',
+      processed_at:     new Date().toISOString(),
+      created_at:       new Date().toISOString()
+    }).then(() => {}); // fire-and-forget; ไม่ block UX
+
+    // ── อัปเดต in-memory balance ──
+    _tokenBalance = (existing?.balance || 0) + WELCOME_BONUS_TOKENS;
+
+    // ── Mark ใน localStorage ──
+    localStorage.setItem(localKey, '1');
+
+    // ── แสดง toast แจ้ง User ──
+    setTimeout(() => {
+      toast(`🎁 ยินดีต้อนรับ! คุณได้รับ ${WELCOME_BONUS_TOKENS} Token ฟรีสำหรับการลงประกาศครั้งแรก`, 'success');
+    }, 800);
+
+  } catch(e) {
+    console.warn('[WelcomeBonus] error:', e.message);
+  }
+}
+
 // ── โหลด Token Packages (สำหรับหน้าซื้อ Token) ─────────────
 async function loadTokenPackages() {
   if (!sb) return;
@@ -5992,12 +6208,16 @@ async function loadTokenPackages() {
 
 // ── เปิด Modal ลงประกาศ (User Listing) ─────────────────────
 async function openUserListingModal() {
-  if (!user) { _openModal('login-modal'); return; }
-  await loadUserTokenData();
+  if (!user && !window._maDevBypass) { _openModal('login-modal'); return; }
+  if (!window._maDevBypass) await loadUserTokenData();
   if (_tokenBalance < 1) {
     openBuyTokenModal();
     return;
   }
+  // ── reset form state ──
+  window._ulNearbyList = [];
+  // inject modal if not already
+  _injectUserListingModal();
   _openModal('user-listing-modal');
 }
 
@@ -6134,79 +6354,129 @@ async function submitTokenOrder() {
 
 // ── Submit User Listing Form ────────────────────────────────
 async function submitUserListing() {
-  if (!user || !sb) return;
-  const get = id => document.getElementById(id);
-  const val = id => get(id)?.value?.trim() || '';
+  const isDev = window._maDevBypass && !user;
+  if (!isDev && (!user || !sb)) return;
 
-  // Validate
+  const get = id => document.getElementById(id);
+  const val = id => (get(id)?.value||'').trim();
+  const num = id => parseFloat(val(id).replace(/,/g,''))||0;
+  const int = id => parseInt(val(id))||0;
+
+  // ── Validate ──
   const title = val('ul-title');
   const type  = val('ul-type');
   const phone = val('ul-phone');
-  if (!title) { toast('กรุณากรอกชื่อทรัพย์', 'warn'); return; }
-  if (!type)  { toast('กรุณาเลือกประเภทอสังหาฯ', 'warn'); return; }
-  if (!phone) { toast('กรุณากรอกเบอร์ติดต่อ', 'warn'); return; }
+  const errEl = get('ul-error');
+  const showErr = msg => { if(errEl){ errEl.textContent=msg; errEl.style.display='block'; errEl.scrollIntoView({behavior:'smooth',block:'nearest'}); } };
+  if(errEl) errEl.style.display='none';
+  if (!title) { showErr('กรุณากรอกชื่อทรัพย์'); return; }
+  if (!type)  { showErr('กรุณาเลือกประเภทอสังหาฯ'); return; }
+  if (!phone) { showErr('กรุณากรอกเบอร์ติดต่อ'); return; }
 
   const btn = get('ul-submit-btn');
   if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังบันทึก...'; }
 
   try {
-    // อัปโหลดรูปภาพ (ถ้ามี)
+    // ── Collect checkboxes ──
+    const appliances  = Array.from(document.querySelectorAll('input[name="ul-appliance"]:checked')).map(c=>c.value);
+    const amenities   = Array.from(document.querySelectorAll('input[name="ul-amenity"]:checked')).map(c=>c.value);
+    const nearby      = window._ulNearbyList ? [...window._ulNearbyList] : [];
+    const tx          = val('ul-transaction') || 'BUY';
+    const isRent      = tx === 'RENT';
+
+    // ── อัปโหลดรูปภาพ (ถ้ามี) ──
     let photoUrls = [];
-    const photoInput = get('ul-photos');
-    if (photoInput?.files?.length) {
-      for (const file of Array.from(photoInput.files).slice(0, 6)) {
-        const ext  = file.name.split('.').pop();
-        const path = `listings/${user.id}/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
-        const { error: upErr } = await sb.storage.from('matchdoor-assets').upload(path, file, { upsert: true });
-        if (!upErr) {
-          const { data: { publicUrl } } = sb.storage.from('matchdoor-assets').getPublicUrl(path);
-          photoUrls.push(publicUrl);
+    if (!isDev) {
+      const photoInput = get('ul-photos');
+      if (photoInput?.files?.length) {
+        for (const file of Array.from(photoInput.files).slice(0, 10)) {
+          const ext  = file.name.split('.').pop().toLowerCase();
+          const path = `listings/${user.id}/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+          const { error: upErr } = await sb.storage.from('matchdoor-assets').upload(path, file, { upsert: true });
+          if (!upErr) {
+            const { data: { publicUrl } } = sb.storage.from('matchdoor-assets').getPublicUrl(path);
+            photoUrls.push(publicUrl);
+          }
         }
       }
     }
 
     const listingData = {
-      user_id:       user.id,
+      // ── Core ──
+      user_id:           isDev ? 'dev-user' : user.id,
       title,
-      property_type: type,
-      transaction:   val('ul-transaction') || 'BUY',
-      price:         parseFloat(val('ul-price').replace(/,/g,'')) || 0,
-      area:          parseFloat(val('ul-area')) || 0,
-      land_area:     parseFloat(val('ul-land-area')) || 0,
-      bed:           parseInt(val('ul-bed')) || 0,
-      bath:          parseInt(val('ul-bath')) || 0,
-      floor_no:      parseInt(val('ul-floor')) || 0,
-      furniture:     val('ul-furniture'),
-      description:   val('ul-description'),
-      province:      val('ul-province'),
-      location:      val('ul-location'),
-      district:      val('ul-district'),
-      near_bts:      val('ul-near-bts'),
-      contact_name:  val('ul-contact-name') || (user.user_metadata?.display_name || ''),
-      contact_phone: phone,
-      contact_line:  val('ul-contact-line'),
-      photos:        photoUrls,
-      status:        'รอตรวจสอบ'
+      property_type:     type,
+      transaction:       tx,
+      price:             num('ul-price'),
+      // ── Size ──
+      area:              num('ul-area'),
+      land_area:         num('ul-land-area'),
+      bed:               int('ul-bed'),
+      bath:              int('ul-bath'),
+      floors:            int('ul-floors'),
+      floor_no:          int('ul-floor'),
+      parking:           int('ul-parking'),
+      // ── Features ──
+      furniture:         val('ul-furniture'),
+      pets_allowed:      get('ul-pets')?.checked || false,
+      appliances:        appliances,
+      amenities:         amenities,
+      description:       val('ul-description'),
+      // ── Location ──
+      province:          val('ul-province'),
+      district:          val('ul-district'),
+      location:          val('ul-location'),
+      near_bts:          val('ul-near-bts'),
+      nearby_places:     nearby.length ? nearby : null,
+      // ── Rent extras ──
+      deposit:           isRent ? (num('ul-deposit') || null) : null,
+      advance_payment:   isRent ? (num('ul-advance') || null) : null,
+      service_fee:       isRent ? (num('ul-svc-fee') || null) : null,
+      electric_rate:     isRent ? (num('ul-elec') || null) : null,
+      water_rate:        isRent ? (num('ul-water') || null) : null,
+      min_lease_months:  isRent ? (int('ul-min-lease') || null) : null,
+      // ── Contact ──
+      contact_name:      val('ul-contact-name') || (isDev ? 'Dev User' : (user.user_metadata?.display_name || '')),
+      contact_phone:     phone,
+      contact_line:      val('ul-contact-line'),
+      photos:            photoUrls,
+      status:            'รอตรวจสอบ'
     };
 
+    // ── DEV MODE: จำลองการส่งโดยไม่เขียน DB ──
+    if (isDev) {
+      await new Promise(r => setTimeout(r, 700));
+      _tokenBalance = Math.max(0, _tokenBalance - 1);
+      const mockListing = { id: 'dev-' + Date.now(), ...listingData, created_at: new Date().toISOString(), admin_note: '' };
+      _myUserListings.unshift(mockListing);
+      _closeModal('user-listing-modal');
+      window._ulNearbyList = [];
+      toast('✅ [DEV] จำลองลงประกาศสำเร็จ! (ไม่ได้บันทึกจริง)', 'success');
+      renderMaListingsPanel();
+      return;
+    }
+
+    // ── Real Supabase insert ──
     const { error } = await sb.from('user_listings').insert(listingData);
     if (error) {
       if (error.message.includes('insufficient_tokens')) {
-        toast('Token ไม่เพียงพอ กรุณาซื้อ Token เพิ่ม', 'warn');
-        _closeModal('user-listing-modal');
-        openBuyTokenModal();
+        showErr('Token ไม่เพียงพอ กรุณาซื้อ Token เพิ่ม');
+        setTimeout(() => { _closeModal('user-listing-modal'); openBuyTokenModal(); }, 1200);
         return;
       }
       throw error;
     }
 
+    window._ulNearbyList = [];
     _closeModal('user-listing-modal');
     toast('✅ ลงประกาศสำเร็จ! รอ Admin ตรวจสอบและอนุมัติ (ภายใน 24 ชั่วโมง)', 'success');
     await loadUserTokenData();
     renderMaListingsPanel();
 
   } catch(e) {
-    toast('เกิดข้อผิดพลาด: ' + (e.message || 'ไม่ทราบสาเหตุ'), 'error');
+    const errEl2 = document.getElementById('ul-error');
+    if(errEl2){ errEl2.textContent = 'เกิดข้อผิดพลาด: ' + (e.message||'ไม่ทราบสาเหตุ'); errEl2.style.display='block'; }
+    else toast('เกิดข้อผิดพลาด: ' + (e.message || 'ไม่ทราบสาเหตุ'), 'error');
   } finally {
     if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane"></i> ลงประกาศ (หัก 1 Token)'; }
   }
@@ -6216,7 +6486,8 @@ async function submitUserListing() {
 async function renderMaListingsPanel() {
   const panel = document.getElementById('ma-panel-listings');
   if (!panel) return;
-  await loadUserTokenData();
+  // ── Dev mode: ใช้ mock Token ที่ set ไว้แล้ว ไม่ต้อง query DB ──
+  if (!window._maDevBypass) await loadUserTokenData();
 
   const statusBadge = s => {
     const map = {
@@ -6311,152 +6582,396 @@ async function renderMaListingsPanel() {
 }
 
 // ══════════════════════════════════════════════════════════════
-//  MODAL HTML: User Listing Form (แทรกที่ท้าย body ก่อน </body>)
-//  หรือแทรกหลัง <div class="ov" id="login-modal" ...>
+//  MODAL HTML: User Listing Form — Full Version (เชื่อมโยงกับ propCard + openModal)
 // ══════════════════════════════════════════════════════════════
 function _injectUserListingModal() {
-  if (document.getElementById('user-listing-modal')) return; // มีแล้วไม่สร้างซ้ำ
+  if (document.getElementById('user-listing-modal')) return;
   const m = document.createElement('div');
   m.id = 'user-listing-modal';
   m.className = 'ov';
   m.onclick = function(e){ if(e.target===this) _closeModal('user-listing-modal'); };
   m.innerHTML = `
-    <div class="modal" style="max-width:600px;max-height:90vh;overflow-y:auto">
-      <div class="mhd">
-        <h2><i class="fas fa-home" style="color:var(--p)"></i> ลงประกาศขาย/เช่า</h2>
+    <div class="modal" style="max-width:680px;max-height:92vh;overflow-y:auto;border-radius:18px">
+      <div class="mhd" style="position:sticky;top:0;z-index:10;background:#fff;border-bottom:1.5px solid var(--lt)">
+        <h2 style="display:flex;align-items:center;gap:8px"><i class="fas fa-home" style="color:var(--p)"></i> ลงประกาศขาย/เช่า</h2>
         <span class="mclose" onclick="_closeModal('user-listing-modal')">×</span>
       </div>
-      <div class="mbody">
-        <div style="background:#fff9e6;border:1px solid #f1c40f44;border-radius:10px;padding:12px 16px;margin-bottom:18px;font-size:12px;color:#856404;display:flex;align-items:center;gap:10px">
-          <i class="fas fa-coins" style="color:#f39c12;font-size:18px"></i>
-          <div>การลงประกาศจะหัก <strong>1 Token</strong> อัตโนมัติ หลัง Admin อนุมัติ ประกาศจะแสดงบนเว็บ 90 วัน</div>
+      <div class="mbody" style="padding:20px">
+
+        <!-- Token notice -->
+        <div style="background:linear-gradient(135deg,#fffbeb,#fef3c7);border:1px solid #f1c40f88;border-radius:12px;padding:12px 16px;margin-bottom:22px;font-size:12px;color:#856404;display:flex;align-items:center;gap:10px">
+          <i class="fas fa-coins" style="color:#f39c12;font-size:20px;flex-shrink:0"></i>
+          <div>การลงประกาศจะหัก <strong>1 Token</strong> อัตโนมัติ · หลัง Admin อนุมัติ ประกาศจะแสดงบนเว็บ <strong>90 วัน</strong> · Token คงเหลือ: <strong id="ul-token-display" style="color:var(--p)">${_tokenBalance} Token</strong></div>
         </div>
-        <!-- ข้อมูลทรัพย์ -->
-        <div style="font-size:12px;font-weight:700;color:var(--p);margin-bottom:10px;padding-bottom:6px;border-bottom:1.5px solid var(--lt)">
-          <i class="fas fa-building"></i> ข้อมูลทรัพย์
-        </div>
+
+        <!-- ── Section 1: ข้อมูลทรัพย์ ── -->
+        <div class="ul-sec-hd"><i class="fas fa-building"></i> ข้อมูลทรัพย์</div>
+
         <div class="ma-field">
-          <label>ชื่อประกาศ / ชื่อทรัพย์ *</label>
-          <input type="text" id="ul-title" placeholder="เช่น คอนโด Ashton Asoke 2 Bed ใกล้ BTS อโศก">
+          <label>ชื่อประกาศ / ชื่อทรัพย์ <span style="color:#e05">*</span></label>
+          <input type="text" id="ul-title" placeholder="เช่น คอนโด Ashton Asoke 2 Bed ใกล้ BTS อโศก" style="width:100%;padding:10px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;box-sizing:border-box">
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-          <div class="ma-field">
-            <label>ประเภทอสังหาฯ *</label>
-            <select id="ul-type" class="ma-input" style="width:100%;padding:10px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px">
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+          <div class="ma-field" style="margin:0">
+            <label>ประเภทอสังหาฯ <span style="color:#e05">*</span></label>
+            <select id="ul-type" style="width:100%;padding:10px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px">
               <option value="">-- เลือก --</option>
-              <option>บ้านเดี่ยว</option><option>ทาวน์โฮม</option><option>คอนโด</option>
-              <option>ที่ดิน</option><option>อาคารพาณิชย์</option><option>วิลล่า</option>
+              <option value="คอนโด">🏙️ คอนโด</option>
+              <option value="บ้านเดี่ยว">🏠 บ้านเดี่ยว</option>
+              <option value="ทาวน์โฮม">🏘️ ทาวน์โฮม</option>
+              <option value="ที่ดิน">🗺️ ที่ดิน</option>
+              <option value="อาคารพาณิชย์">🏪 อาคารพาณิชย์</option>
+              <option value="วิลล่า">🏖️ วิลล่า</option>
+              <option value="รีสอร์ท">🏨 รีสอร์ท</option>
             </select>
           </div>
-          <div class="ma-field">
+          <div class="ma-field" style="margin:0">
             <label>ประเภทธุรกรรม</label>
-            <select id="ul-transaction" class="ma-input" style="width:100%;padding:10px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px">
-              <option value="BUY">ขาย</option>
-              <option value="RENT">ให้เช่า</option>
+            <select id="ul-transaction" style="width:100%;padding:10px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px" onchange="_ulToggleRentFields()">
+              <option value="BUY">🏷️ ขาย</option>
+              <option value="RENT">🔑 ให้เช่า</option>
             </select>
           </div>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
-          <div class="ma-field">
-            <label>ราคา (บาท)</label>
-            <input type="number" id="ul-price" placeholder="3500000" min="0">
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px">
+          <div class="ma-field" style="margin:0">
+            <label>ราคา (บาท) <span style="color:#e05">*</span></label>
+            <input type="number" id="ul-price" placeholder="3500000" min="0" style="width:100%;padding:10px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;box-sizing:border-box">
           </div>
-          <div class="ma-field">
+          <div class="ma-field" style="margin:0">
             <label>พื้นที่ใช้สอย (ตร.ม.)</label>
-            <input type="number" id="ul-area" placeholder="65" min="0">
+            <input type="number" id="ul-area" placeholder="65" min="0" style="width:100%;padding:10px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;box-sizing:border-box">
           </div>
-          <div class="ma-field">
+          <div class="ma-field" style="margin:0">
             <label>ที่ดิน (ตร.วา)</label>
-            <input type="number" id="ul-land-area" placeholder="50" min="0">
+            <input type="number" id="ul-land-area" placeholder="50" min="0" style="width:100%;padding:10px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;box-sizing:border-box">
           </div>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px">
-          <div class="ma-field">
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:10px;margin-bottom:12px">
+          <div class="ma-field" style="margin:0">
             <label>ห้องนอน</label>
-            <input type="number" id="ul-bed" placeholder="2" min="0" max="20">
+            <input type="number" id="ul-bed" placeholder="2" min="0" max="20" style="width:100%;padding:10px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;box-sizing:border-box">
           </div>
-          <div class="ma-field">
+          <div class="ma-field" style="margin:0">
             <label>ห้องน้ำ</label>
-            <input type="number" id="ul-bath" placeholder="1" min="0" max="20">
+            <input type="number" id="ul-bath" placeholder="1" min="0" max="20" style="width:100%;padding:10px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;box-sizing:border-box">
           </div>
-          <div class="ma-field">
-            <label>ชั้นที่</label>
-            <input type="number" id="ul-floor" placeholder="5" min="0">
+          <div class="ma-field" style="margin:0">
+            <label>จำนวนชั้น</label>
+            <input type="number" id="ul-floors" placeholder="20" min="0" style="width:100%;padding:10px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;box-sizing:border-box">
           </div>
-          <div class="ma-field">
+          <div class="ma-field" style="margin:0">
+            <label>ชั้นที่ตั้ง</label>
+            <input type="number" id="ul-floor" placeholder="5" min="0" style="width:100%;padding:10px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;box-sizing:border-box">
+          </div>
+          <div class="ma-field" style="margin:0">
+            <label>ที่จอดรถ</label>
+            <input type="number" id="ul-parking" placeholder="1" min="0" style="width:100%;padding:10px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;box-sizing:border-box">
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+          <div class="ma-field" style="margin:0">
             <label>เฟอร์นิเจอร์</label>
             <select id="ul-furniture" style="width:100%;padding:10px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px">
               <option value="">ไม่ระบุ</option>
-              <option value="เฟอร์นิเจอร์ครบ">เฟอร์นิเจอร์ครบ</option>
-              <option value="เฟอร์นิเจอร์บางส่วน">เฟอร์นิเจอร์บางส่วน</option>
-              <option value="ไม่มีเฟอร์นิเจอร์">ไม่มีเฟอร์นิเจอร์</option>
+              <option value="full">🛋️ ครบ (Full Furnished)</option>
+              <option value="partial">🪑 บางส่วน (Partial)</option>
+              <option value="none">📦 ไม่มีเฟอร์นิเจอร์</option>
             </select>
           </div>
+          <div class="ma-field" style="margin:0;display:flex;align-items:center;gap:10px;padding-top:20px">
+            <input type="checkbox" id="ul-pets" style="width:16px;height:16px;cursor:pointer">
+            <label for="ul-pets" style="cursor:pointer;font-size:13px">🐾 อนุญาตให้เลี้ยงสัตว์</label>
+          </div>
         </div>
+
+        <!-- Appliances checkboxes -->
+        <div class="ma-field">
+          <label>เครื่องใช้ไฟฟ้า / สิ่งอำนวยความสะดวกในห้อง</label>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px" id="ul-appliances-wrap">
+            ${['แอร์','ตู้เย็น','เครื่องซักผ้า','ไมโครเวฟ','เตาไฟฟ้า','โทรทัศน์','เครื่องทำน้ำอุ่น','ระบบรักษาความปลอดภัย'].map(a=>`
+              <label style="display:flex;align-items:center;gap:5px;background:var(--lt);padding:6px 12px;border-radius:20px;cursor:pointer;font-size:12px;border:1.5px solid transparent;transition:.15s" class="ul-chip-label">
+                <input type="checkbox" name="ul-appliance" value="${a}" style="width:13px;height:13px"> ${a}
+              </label>`).join('')}
+          </div>
+        </div>
+
+        <!-- Amenities -->
+        <div class="ma-field">
+          <label>สิ่งอำนวยความสะดวกส่วนกลาง</label>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px" id="ul-amenities-wrap">
+            ${['สระว่ายน้ำ','ฟิตเนส','ลิฟต์','ห้องซาวน่า','ห้องประชุม','Co-Working Space','ร้านสะดวกซื้อ','รักษาความปลอดภัย 24 ชม.','ที่จอดรถใต้ดิน','สวนหย่อม'].map(a=>`
+              <label style="display:flex;align-items:center;gap:5px;background:var(--lt);padding:6px 12px;border-radius:20px;cursor:pointer;font-size:12px;border:1.5px solid transparent;transition:.15s" class="ul-chip-label">
+                <input type="checkbox" name="ul-amenity" value="${a}" style="width:13px;height:13px"> ${a}
+              </label>`).join('')}
+          </div>
+        </div>
+
         <div class="ma-field">
           <label>รายละเอียดเพิ่มเติม</label>
-          <textarea id="ul-description" rows="3" style="width:100%;padding:10px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;resize:vertical" placeholder="รายละเอียดทรัพย์, สิ่งอำนวยความสะดวก, เงื่อนไขพิเศษ..."></textarea>
+          <textarea id="ul-description" rows="3" style="width:100%;padding:10px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;resize:vertical;box-sizing:border-box" placeholder="รายละเอียดทรัพย์, สิ่งอำนวยความสะดวก, เงื่อนไขพิเศษ, จุดเด่น..."></textarea>
         </div>
-        <!-- ที่ตั้ง -->
-        <div style="font-size:12px;font-weight:700;color:var(--p);margin:14px 0 10px;padding-bottom:6px;border-bottom:1.5px solid var(--lt)">
-          <i class="fas fa-map-marker-alt"></i> ที่ตั้ง
+
+        <!-- ── Section 2: ค่าใช้จ่าย (เช่า) ── -->
+        <div id="ul-rent-section" style="display:none">
+          <div class="ul-sec-hd"><i class="fas fa-receipt"></i> รายละเอียดค่าใช้จ่าย (สำหรับให้เช่า)</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px">
+            <div class="ma-field" style="margin:0">
+              <label>เงินประกัน (บาท)</label>
+              <input type="number" id="ul-deposit" placeholder="2 เดือน = 70000" min="0" style="width:100%;padding:10px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;box-sizing:border-box">
+            </div>
+            <div class="ma-field" style="margin:0">
+              <label>ล่วงหน้า (บาท)</label>
+              <input type="number" id="ul-advance" placeholder="35000" min="0" style="width:100%;padding:10px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;box-sizing:border-box">
+            </div>
+            <div class="ma-field" style="margin:0">
+              <label>ค่าส่วนกลาง/เดือน (บาท)</label>
+              <input type="number" id="ul-svc-fee" placeholder="1500" min="0" style="width:100%;padding:10px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;box-sizing:border-box">
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px">
+            <div class="ma-field" style="margin:0">
+              <label>ค่าไฟ (บาท/หน่วย)</label>
+              <input type="number" id="ul-elec" placeholder="6" min="0" step="0.01" style="width:100%;padding:10px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;box-sizing:border-box">
+            </div>
+            <div class="ma-field" style="margin:0">
+              <label>ค่าน้ำ (บาท/หน่วย)</label>
+              <input type="number" id="ul-water" placeholder="18" min="0" step="0.01" style="width:100%;padding:10px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;box-sizing:border-box">
+            </div>
+            <div class="ma-field" style="margin:0">
+              <label>ระยะเช่าขั้นต่ำ (เดือน)</label>
+              <input type="number" id="ul-min-lease" placeholder="12" min="1" style="width:100%;padding:10px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;box-sizing:border-box">
+            </div>
+          </div>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-          <div class="ma-field">
+
+        <!-- ── Section 3: ที่ตั้ง ── -->
+        <div class="ul-sec-hd"><i class="fas fa-map-marker-alt"></i> ที่ตั้ง</div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+          <div class="ma-field" style="margin:0">
             <label>จังหวัด</label>
-            <input type="text" id="ul-province" placeholder="กรุงเทพมหานคร">
+            <input type="text" id="ul-province" placeholder="กรุงเทพมหานคร" style="width:100%;padding:10px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;box-sizing:border-box">
           </div>
-          <div class="ma-field">
-            <label>ย่าน / แขวง</label>
-            <input type="text" id="ul-district" placeholder="สุขุมวิท">
+          <div class="ma-field" style="margin:0">
+            <label>ย่าน / แขวง / อำเภอ</label>
+            <input type="text" id="ul-district" placeholder="สุขุมวิท" style="width:100%;padding:10px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;box-sizing:border-box">
           </div>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-          <div class="ma-field">
-            <label>ที่อยู่ / ละแวกใกล้เคียง</label>
-            <input type="text" id="ul-location" placeholder="เช่น ซอยสุขุมวิท 24">
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+          <div class="ma-field" style="margin:0">
+            <label>ที่อยู่ / ซอย / โครงการ</label>
+            <input type="text" id="ul-location" placeholder="เช่น ซอยสุขุมวิท 24" style="width:100%;padding:10px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;box-sizing:border-box">
           </div>
-          <div class="ma-field">
+          <div class="ma-field" style="margin:0">
             <label>BTS/MRT ที่ใกล้ที่สุด</label>
-            <input type="text" id="ul-near-bts" placeholder="BTS อโศก (500ม.)">
+            <input type="text" id="ul-near-bts" placeholder="BTS อโศก (500ม.)" style="width:100%;padding:10px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;box-sizing:border-box">
           </div>
         </div>
-        <!-- รูปภาพ -->
-        <div style="font-size:12px;font-weight:700;color:var(--p);margin:14px 0 10px;padding-bottom:6px;border-bottom:1.5px solid var(--lt)">
-          <i class="fas fa-images"></i> รูปภาพ (สูงสุด 6 รูป)
+
+        <!-- Nearby places -->
+        <div class="ma-field">
+          <label>สถานที่ใกล้เคียง (เพิ่มทีละแห่ง กด Enter)</label>
+          <div style="display:flex;gap:8px;margin-bottom:6px">
+            <input type="text" id="ul-nearby-input" placeholder="เช่น Central World (1.2 กม.)" style="flex:1;padding:9px 12px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px" onkeydown="if(event.key==='Enter'){event.preventDefault();_ulAddNearby()}">
+            <button type="button" onclick="_ulAddNearby()" style="padding:9px 14px;background:var(--p);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px;white-space:nowrap"><i class="fas fa-plus"></i></button>
+          </div>
+          <div id="ul-nearby-chips" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+          <div id="ul-nearby-hidden"></div>
         </div>
-        <input type="file" id="ul-photos" accept="image/*" multiple
-          style="width:100%;padding:10px;border:1.5px dashed var(--bd);border-radius:8px;font-size:12px;cursor:pointer;margin-bottom:4px">
-        <div style="font-size:11px;color:var(--tx2);margin-bottom:14px">รองรับ JPG, PNG · แนะนำรูปแรกเป็นรูปหน้าปก</div>
-        <!-- ช่องทางติดต่อ -->
-        <div style="font-size:12px;font-weight:700;color:var(--p);margin:14px 0 10px;padding-bottom:6px;border-bottom:1.5px solid var(--lt)">
-          <i class="fas fa-phone"></i> ช่องทางติดต่อ
+
+        <!-- ── Section: รับตัวแทน ── -->
+        <div class="ul-sec-hd"><i class="fas fa-user-tie"></i> รับตัวแทน <span style="font-size:11px;font-weight:400;color:var(--tx2);margin-left:4px">(เพิ่มโอกาสปิดการขายได้ไวขึ้น)</span></div>
+
+        <div id="ul-agent-toggle-wrap" style="margin-bottom:14px">
+          <!-- Toggle switch -->
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:10px">
+            <div style="position:relative;width:42px;height:24px;flex-shrink:0">
+              <input type="checkbox" id="ul-want-agent" onchange="_ulToggleAgentSection(this)" style="opacity:0;width:0;height:0;position:absolute">
+              <span id="ul-agent-track" style="position:absolute;inset:0;background:#ccc;border-radius:12px;transition:.25s;cursor:pointer"></span>
+              <span id="ul-agent-thumb" style="position:absolute;top:3px;left:3px;width:18px;height:18px;background:#fff;border-radius:50%;transition:.25s;box-shadow:0 1px 3px rgba(0,0,0,.25)"></span>
+            </div>
+            <span style="font-size:13px;font-weight:600;color:var(--tx)">ต้องการให้ตัวแทนช่วยขาย/เช่า</span>
+          </label>
+
+          <!-- Agent cards slider (hidden by default) -->
+          <div id="ul-agent-slider-wrap" style="display:none">
+            <p style="font-size:12px;color:var(--tx2);margin:0 0 10px">เลือกตัวแทนที่ต้องการ (เลือกได้มากกว่า 1)</p>
+            <div id="ul-agent-cards" style="display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;scrollbar-width:thin;-webkit-overflow-scrolling:touch">
+              <!-- Cards injected by _ulRenderAgentCards() -->
+            </div>
+          </div>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
-          <div class="ma-field">
+
+        <!-- ── Section 4: รูปภาพ ── -->
+        <div class="ul-sec-hd"><i class="fas fa-images"></i> รูปภาพ (สูงสุด 10 รูป)</div>
+
+        <label id="ul-photo-dropzone" style="display:flex;flex-direction:column;align-items:center;justify-content:center;border:2px dashed var(--bd);border-radius:12px;padding:24px;cursor:pointer;background:var(--lt);transition:.2s;min-height:100px;margin-bottom:10px" for="ul-photos" onmouseover="this.style.borderColor='var(--a)'" onmouseout="this.style.borderColor='var(--bd)'">
+          <i class="fas fa-cloud-upload-alt" style="font-size:28px;color:var(--p);margin-bottom:8px"></i>
+          <div style="font-size:13px;font-weight:600;color:var(--p)">คลิกหรือลากรูปมาวางที่นี่</div>
+          <div style="font-size:11px;color:var(--tx2);margin-top:4px">JPG, PNG, WEBP · แนะนำรูปแรกเป็นรูปหน้าปก · สูงสุด 10 รูป</div>
+        </label>
+        <input type="file" id="ul-photos" accept="image/*" multiple style="display:none" onchange="_ulPreviewPhotos(this)">
+        <div id="ul-photo-preview" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px"></div>
+
+        <!-- ── Section 5: ช่องทางติดต่อ ── -->
+        <div class="ul-sec-hd"><i class="fas fa-phone"></i> ช่องทางติดต่อ</div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:8px">
+          <div class="ma-field" style="margin:0">
             <label>ชื่อผู้ติดต่อ</label>
-            <input type="text" id="ul-contact-name" placeholder="คุณสมชาย">
+            <input type="text" id="ul-contact-name" placeholder="คุณสมชาย" style="width:100%;padding:10px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;box-sizing:border-box">
           </div>
-          <div class="ma-field">
-            <label>เบอร์โทร *</label>
-            <input type="tel" id="ul-phone" placeholder="081-234-5678">
+          <div class="ma-field" style="margin:0">
+            <label>เบอร์โทร <span style="color:#e05">*</span></label>
+            <input type="tel" id="ul-phone" placeholder="081-234-5678" style="width:100%;padding:10px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;box-sizing:border-box">
           </div>
-          <div class="ma-field">
+          <div class="ma-field" style="margin:0">
             <label>LINE ID</label>
-            <input type="text" id="ul-contact-line" placeholder="@yourline">
+            <input type="text" id="ul-contact-line" placeholder="@yourline" style="width:100%;padding:10px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;box-sizing:border-box">
           </div>
         </div>
+
+        <!-- Error message -->
+        <div id="ul-error" style="display:none;background:#fef2f2;border:1px solid #fca5a5;border-radius:8px;padding:10px 14px;font-size:13px;color:#dc2626;margin-bottom:10px"></div>
+
         <!-- Submit -->
         <button id="ul-submit-btn" onclick="submitUserListing()"
-          style="width:100%;padding:15px;background:linear-gradient(135deg,var(--p),#2a5298);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:10px">
+          style="width:100%;padding:16px;background:linear-gradient(135deg,var(--p),#2a5298);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;margin-top:6px;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 4px 14px rgba(27,58,107,.3)">
           <i class="fas fa-paper-plane"></i> ลงประกาศ (หัก 1 Token)
         </button>
         <p style="text-align:center;font-size:11px;color:var(--tx2);margin-top:8px">
-          Token คงเหลือของคุณ: <strong style="color:var(--p)">${_tokenBalance} Token</strong>
+          Token คงเหลือ: <strong id="ul-token-foot" style="color:var(--p)">${_tokenBalance} Token</strong> · ระบบจะหัก Token หลัง Admin อนุมัติประกาศ
         </p>
       </div>
     </div>`;
   document.body.appendChild(m);
+
+  // ── Chip styling on hover/check ──
+  m.querySelectorAll('.ul-chip-label').forEach(lbl => {
+    const cb = lbl.querySelector('input[type=checkbox]');
+    cb.addEventListener('change', () => {
+      lbl.style.borderColor  = cb.checked ? 'var(--p)' : 'transparent';
+      lbl.style.background   = cb.checked ? 'rgba(27,58,107,.08)' : 'var(--lt)';
+      lbl.style.fontWeight   = cb.checked ? '700' : '';
+      lbl.style.color        = cb.checked ? 'var(--p)' : '';
+    });
+  });
+}
+
+// ── CSS for section headers ──
+(function(){
+  const st = document.createElement('style');
+  st.textContent = `.ul-sec-hd{font-size:12px;font-weight:700;color:var(--p);margin:18px 0 10px;padding-bottom:6px;border-bottom:1.5px solid var(--lt);display:flex;align-items:center;gap:6px}`;
+  document.head.appendChild(st);
+})();
+
+// ── Toggle เช่า/ขาย fields ──
+function _ulToggleRentFields(){
+  const tx = document.getElementById('ul-transaction')?.value;
+  const sec = document.getElementById('ul-rent-section');
+  if(sec) sec.style.display = tx === 'RENT' ? 'block' : 'none';
+}
+
+// ── Photo preview ──
+function _ulPreviewPhotos(input){
+  const wrap = document.getElementById('ul-photo-preview');
+  const zone = document.getElementById('ul-photo-dropzone');
+  if(!wrap) return;
+  const files = Array.from(input.files).slice(0,10);
+  wrap.innerHTML = '';
+  files.forEach((f,i) => {
+    const url = URL.createObjectURL(f);
+    const div = document.createElement('div');
+    div.style.cssText = 'position:relative;width:90px;height:70px;border-radius:8px;overflow:hidden;border:1.5px solid var(--bd)';
+    div.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover">
+      ${i===0?'<div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.55);color:#fff;font-size:9px;text-align:center;padding:2px">หน้าปก</div>':''}
+      <button type="button" onclick="this.parentNode.remove()" style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,.55);color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center"><i class="fas fa-times"></i></button>`;
+    wrap.appendChild(div);
+  });
+  if(zone && files.length) zone.style.borderColor = 'var(--p)';
+}
+
+// ── Agent toggle ──
+function _ulToggleAgentSection(cb){
+  const track = document.getElementById('ul-agent-track');
+  const thumb = document.getElementById('ul-agent-thumb');
+  const wrap  = document.getElementById('ul-agent-slider-wrap');
+  if(cb.checked){
+    if(track){ track.style.background='var(--p)'; }
+    if(thumb){ thumb.style.transform='translateX(18px)'; }
+    if(wrap){ wrap.style.display='block'; }
+    _ulRenderAgentCards();
+  } else {
+    if(track){ track.style.background='#ccc'; }
+    if(thumb){ thumb.style.transform='translateX(0)'; }
+    if(wrap){ wrap.style.display='none'; }
+  }
+}
+
+// ── Render agent cards slider ──
+window._ulSelectedAgents = new Set();
+function _ulRenderAgentCards(){
+  const container = document.getElementById('ul-agent-cards');
+  if(!container) return;
+  // Use live agents array if available, else fallback placeholders
+  const list = (typeof agents !== 'undefined' && agents && agents.length)
+    ? agents.filter(a => a.is_active !== false).slice(0, 10)
+    : [
+        { id:'a1', name:'ทีม Matchdoor', title:'Senior Agent', rating:4.9, deals:120, photo_url:'' },
+        { id:'a2', name:'พิมพ์ชนก', title:'Condo Specialist', rating:4.8, deals:87, photo_url:'' },
+        { id:'a3', name:'ธนกร', title:'Property Consultant', rating:4.7, deals:64, photo_url:'' },
+      ];
+  container.innerHTML = list.map(a => {
+    const initials = (a.name||'?').slice(0,2);
+    const stars = '★'.repeat(Math.round(a.rating||5));
+    const sel = window._ulSelectedAgents.has(String(a.id));
+    return `<div id="ul-agcard-${a.id}" onclick="_ulToggleAgentCard('${a.id}')" style="flex:0 0 130px;border:2px solid ${sel?'var(--p)':'var(--bd)'};border-radius:12px;padding:12px 10px;text-align:center;cursor:pointer;background:${sel?'rgba(27,58,107,.07)':'var(--lt)'};transition:.18s;position:relative">
+      ${sel?`<span style="position:absolute;top:6px;right:6px;background:var(--p);color:#fff;border-radius:50%;width:18px;height:18px;font-size:10px;display:flex;align-items:center;justify-content:center"><i class="fas fa-check"></i></span>`:''}
+      <div style="width:48px;height:48px;border-radius:50%;margin:0 auto 8px;overflow:hidden;background:linear-gradient(135deg,var(--p),#2a5298);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:15px">
+        ${a.photo_url?`<img src="${a.photo_url}" style="width:100%;height:100%;object-fit:cover">`:`<span>${initials}</span>`}
+      </div>
+      <div style="font-size:12px;font-weight:700;color:var(--tx);line-height:1.3;margin-bottom:2px">${a.name||''}</div>
+      <div style="font-size:10px;color:var(--tx2);margin-bottom:4px">${a.title||'Agent'}</div>
+      <div style="font-size:10px;color:#f5a623">${stars}</div>
+      <div style="font-size:10px;color:var(--tx2);margin-top:2px">${a.deals||0} ดีล</div>
+    </div>`;
+  }).join('');
+}
+function _ulToggleAgentCard(id){
+  const sid = String(id);
+  if(window._ulSelectedAgents.has(sid)) window._ulSelectedAgents.delete(sid);
+  else window._ulSelectedAgents.add(sid);
+  _ulRenderAgentCards();
+}
+
+// ── Add nearby place chip ──
+window._ulNearbyList = [];
+function _ulAddNearby(){
+  const inp = document.getElementById('ul-nearby-input');
+  const val = inp?.value?.trim();
+  if(!val) return;
+  window._ulNearbyList.push(val);
+  inp.value = '';
+  _ulRenderNearbyChips();
+}
+function _ulRemoveNearby(idx){
+  window._ulNearbyList.splice(idx,1);
+  _ulRenderNearbyChips();
+}
+function _ulRenderNearbyChips(){
+  const wrap = document.getElementById('ul-nearby-chips');
+  if(!wrap) return;
+  wrap.innerHTML = window._ulNearbyList.map((v,i)=>`
+    <span style="display:inline-flex;align-items:center;gap:5px;background:rgba(27,58,107,.08);border:1px solid rgba(27,58,107,.2);color:var(--p);padding:5px 10px;border-radius:20px;font-size:12px">
+      <i class="fas fa-map-marker-alt" style="font-size:10px"></i> ${v}
+      <button type="button" onclick="_ulRemoveNearby(${i})" style="background:none;border:none;cursor:pointer;color:#999;font-size:11px;padding:0;line-height:1"><i class="fas fa-times"></i></button>
+    </span>`).join('');
 }
 
 // inject modal ทันทีที่โหลด script
@@ -6709,31 +7224,48 @@ async function adminApproveUserListing(ulId) {
   if (!ul) return;
   if (!confirm(`อนุมัติประกาศ "${ul.title}"?\nระบบจะสร้าง property ใหม่ในตาราง properties อัตโนมัติ`)) return;
   try {
-    // 1. สร้าง property record ใหม่
+    // 1. สร้าง property record — map ทุก field จาก user_listings → properties
     const newPropId = 'ul-' + ulId.slice(0,8);
     const { error: propErr } = await sb.from('properties').insert({
-      id:          newPropId,
-      title:       ul.title,
-      type:        ul.property_type,
-      province:    ul.province,
-      location:    ul.location,
-      district:    ul.district,
-      price:       ul.price,
-      tx:          ul.transaction,
-      bed:         ul.bed,
-      bath:        ul.bath,
-      area:        ul.area,
-      land_area:   ul.land_area,
-      floor_no:    ul.floor_no,
-      furniture:   ul.furniture,
-      description: ul.description,
-      photos:      ul.photos,
-      status:      'approved',
-      admin_note:  'สร้างจาก User Listing #' + ulId.slice(0,8)
+      id:                newPropId,
+      title:             ul.title,
+      type:              ul.property_type,
+      province:          ul.province,
+      location:          ul.location,
+      district:          ul.district,
+      price:             ul.price,
+      tx:                ul.transaction,
+      bed:               ul.bed     || 0,
+      bath:              ul.bath    || 0,
+      area:              ul.area    || 0,
+      land_area:         ul.land_area || 0,
+      floors:            ul.floors  || 0,
+      floor_no:          ul.floor_no || 0,
+      parking:           ul.parking || 0,
+      furniture:         ul.furniture || '',
+      pets_allowed:      ul.pets_allowed || false,
+      appliances:        ul.appliances   || [],
+      amenities:         ul.amenities    || [],
+      description:       ul.description  || '',
+      near_bts:          ul.near_bts     || '',
+      nearby_places:     ul.nearby_places || null,
+      deposit:           ul.deposit           || null,
+      advance_payment:   ul.advance_payment   || null,
+      service_fee:       ul.service_fee       || null,
+      electric_rate:     ul.electric_rate     || null,
+      water_rate:        ul.water_rate        || null,
+      min_lease_months:  ul.min_lease_months  || null,
+      contact_name:      ul.contact_name      || '',
+      contact_phone:     ul.contact_phone     || '',
+      contact_line:      ul.contact_line      || '',
+      photos:            ul.photos            || [],
+      status:            'approved',
+      is_new:            true,
+      admin_note:        'อนุมัติจาก User Listing #' + ulId.slice(0,8)
     });
     if (propErr && !propErr.message.includes('duplicate')) throw propErr;
 
-    // 2. อัปเดต user_listing status
+    // 2. อัปเดต user_listing status + หัก 1 Token
     const { error: ulErr } = await sb.from('user_listings').update({
       status:      'อนุมัติ',
       approved_by: user.id,
@@ -6742,7 +7274,19 @@ async function adminApproveUserListing(ulId) {
     }).eq('id', ulId);
     if (ulErr) throw ulErr;
 
-    toast('✅ อนุมัติและสร้างประกาศบนเว็บแล้ว!', 'success');
+    // 3. หัก 1 Token จาก user_tokens
+    const ownerId = ul.user_id;
+    if (ownerId) {
+      const { data: tokRow } = await sb.from('user_tokens').select('balance,total_used').eq('user_id', ownerId).maybeSingle();
+      if (tokRow) {
+        await sb.from('user_tokens').update({
+          balance:    Math.max(0, (tokRow.balance||0) - 1),
+          total_used: (tokRow.total_used||0) + 1
+        }).eq('user_id', ownerId);
+      }
+    }
+
+    toast('✅ อนุมัติ + หัก 1 Token + สร้างประกาศบนเว็บแล้ว!', 'success');
     adminNav('user-listings', null);
   } catch(e) {
     toast('เกิดข้อผิดพลาด: ' + (e.message||'ไม่ทราบสาเหตุ'), 'error');
@@ -7489,7 +8033,7 @@ function _refreshPriceOpts(){
 function setPriceRange(val){ const parts=(val||'0|0').split('|'); const mn=parseInt(parts[0])||0; const mx=parseInt(parts[1])||999000000; $('s-min').value=String(mn); $('s-max').value=String(mx||999000000); }
 function updatePriceMax(){const min=+$('s-min').value;$$('#s-max option').forEach(o=>{o.disabled=+o.value>0&&+o.value<min;});}
 
-function setTx(t,el){ tx=t; $$('.tx-tab').forEach(b=>b.classList.remove('active')); el.classList.add('active'); const pb=$('price-buy-section'),pr=$('price-rent-section'); if(pb&&pr){ pb.style.display=t==='RENT'?'none':'block'; pr.style.display=t==='RENT'?'block':'none'; } if(typeof _refreshPriceOpts==='function') _refreshPriceOpts(); applyFilters().catch(console.error); }
+function setTx(t,el){ tx=t; $$('.tx-tab').forEach(b=>b.classList.remove('active')); el.classList.add('active'); const pb=$('price-buy-section'),pr=$('price-rent-section'); if(pb&&pr){ pb.style.display=t==='RENT'?'none':'block'; pr.style.display=t==='RENT'?'block':'none'; } if(typeof _refreshPriceOpts==='function') _refreshPriceOpts(); applyFilters().catch(console.error); const _heroStats=document.getElementById('hero-stat-counters'); if(_heroStats){ if(window._dataReady && typeof syncAllStats==='function'){ syncAllStats(); } else if(typeof animateStatCounters==='function'){ animateStatCounters(_heroStats.closest('.page')||document); } } }
 function setCat(type,el){ curType=type; $$('.cat-card').forEach(c=>c.classList.remove('active')); if(el)el.classList.add('active'); applyFilters().catch(console.error); scrollToEl('all-sec'); }
 function setCatNav(t){ showPage('home'); setTimeout(()=>{curType=t;applyFilters().catch(console.error);scrollToEl('all-sec');},100); }
 function _syncTxTabs(newTx){
@@ -11559,7 +12103,7 @@ function openDepositModal(){
       <p style="font-size:13px;color:var(--tx2);margin-bottom:16px">กรอกข้อมูลเบื้องต้น ทีมงานติดต่อกลับโดยเร็ว</p>
       <div id="dep-modal-form">
         <div class="frow"><div class="fg"><label>ชื่อ-นามสกุล *</label><input id="dm-name" placeholder="ชื่อของคุณ"></div><div class="fg"><label>เบอร์โทร *</label><input type="tel" id="dm-phone" placeholder="08X-XXX-XXXX"></div></div>
-        <div class="frow"><div class="fg"><label>ประเภท</label><select id="dm-type"><option value="">-- เลือก --</option><option>บ้านเดี่ยว</option><option>ทาวน์โฮม</option><option>คอนโด</option><option>อาคารพาณิชย์</option><option>ที่ดิน</option></select></div><div class="fg"><label>ราคา (บาท)</label><input type="number" id="dm-price" placeholder="3500000"></div></div>
+        <div class="frow"><div class="fg"><label>Your Line ID</label><input id="dm-line" placeholder="@yourline"></div><div class="fg"><label>Your email</label><input type="email" id="dm-email" placeholder="email@example.com"></div></div>
         <div class="frow"><div class="fg"><label>จังหวัด</label><input id="dm-prov" placeholder="กรุงเทพฯ"></div><div class="fg"><label>ต้องการ</label><select id="dm-tx"><option value="ขาย">ขาย</option><option value="เช่า">ให้เช่า</option></select></div></div>
         <div class="frow full"><div class="fg"><label>รายละเอียด</label><textarea id="dm-detail" rows="2" placeholder="ขนาด ทำเล จำนวนห้อง..." style="resize:none"></textarea></div></div>
         <div class="fg"><label>อัปโหลดรูป (สูงสุด 5 รูป)</label>
@@ -11635,6 +12179,41 @@ async function submitDepModal(){
   document.getElementById('deposit-modal')?.remove();
   window._dmUploads=[];
   await submitDep();
+}
+
+// ── Deposit dropdown: photo preview ──
+function _depPreviewPhotos(input){
+  const grid = document.getElementById('prev-grid');
+  if(!grid) return;
+  const files = Array.from(input.files).slice(0,10);
+  // store for upload
+  if(typeof uploads !== 'undefined') uploads = files;
+  grid.innerHTML = '';
+  files.forEach((f,i) => {
+    const url = URL.createObjectURL(f);
+    const div = document.createElement('div');
+    div.style.cssText = 'position:relative;width:72px;height:56px;border-radius:6px;overflow:hidden;border:1.5px solid var(--bd)';
+    div.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover">
+      ${i===0?'<div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.55);color:#fff;font-size:9px;text-align:center;padding:1px">หน้าปก</div>':''}
+      <button type="button" onclick="this.parentNode.remove()" style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,.5);color:#fff;border:none;border-radius:50%;width:15px;height:15px;font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center"><i class="fas fa-times"></i></button>`;
+    grid.appendChild(div);
+  });
+}
+
+// ── Deposit dropdown: agent toggle ──
+function _depToggleAgent(cb){
+  const track = document.getElementById('d-agent-track');
+  const thumb = document.getElementById('d-agent-thumb');
+  const note  = document.getElementById('d-agent-note');
+  if(cb && cb.checked){
+    if(track) track.style.background='var(--p)';
+    if(thumb) thumb.style.transform='translateX(16px)';
+    if(note)  note.style.display='block';
+  } else {
+    if(track) track.style.background='#ccc';
+    if(thumb) thumb.style.transform='translateX(0)';
+    if(note)  note.style.display='none';
+  }
 }
 
 async function submitDep(){
@@ -11722,11 +12301,25 @@ async function submitDep(){
     // ── Layer 3: ส่งผ่าน sbInsertRateLimited พร้อม token + honeypot ──
     await sbInsertRateLimited('listings', {
       name, phone,
+      line_id: sanitize($('d-line')?.value?.trim()||''),
+      email: sanitize($('d-email')?.value?.trim()||''),
+      listing_title: sanitize($('d-title')?.value?.trim()||''),
       property_type: sanitize($('d-type').value),
       price: price,
+      area: parseFloat($('d-area')?.value)||null,
+      bedrooms: parseInt($('d-bed')?.value)||null,
+      bathrooms: parseInt($('d-bath')?.value)||null,
+      floor: parseInt($('d-floor')?.value)||null,
+      parking: parseInt($('d-parking')?.value)||null,
+      furniture: sanitize($('d-furniture')?.value||''),
+      pets_allowed: !!$('d-pets')?.checked,
       province: prov,
+      district: sanitize($('d-district')?.value?.trim()||''),
+      location: sanitize($('d-location')?.value?.trim()||''),
+      bts_mrt: sanitize($('d-bts')?.value?.trim()||''),
       transaction: sanitize($('d-tx').value),
       details: detail,
+      want_agent: !!$('d-want-agent')?.checked,
       photos: photoUrls,
       status:'รอตรวจสอบ',
       consent_given: true,
@@ -11744,7 +12337,9 @@ async function submitDep(){
       closeAllDD();
       setTimeout(()=>{
         $('dep-form').style.display=''; $('dep-ok').style.display='none';
-        ['d-name','d-phone','d-price','d-prov','d-detail'].forEach(id=>{const el=$(id);if(el){el.value='';el.classList.remove('valid','invalid');}});
+        ['d-name','d-phone','d-price','d-prov','d-detail','d-line','d-email','d-title','d-area','d-bed','d-bath','d-floor','d-parking','d-district','d-location','d-bts'].forEach(id=>{const el=$(id);if(el){el.value='';el.classList.remove('valid','invalid');}});
+        if($('d-pets')) $('d-pets').checked=false;
+        if($('d-want-agent')) { $('d-want-agent').checked=false; _depToggleAgent($('d-want-agent')); }
         if($('d-consent')) $('d-consent').checked=false;
         uploads=[]; renderPrev(); $('d-photo').value='';
       },400);
@@ -14343,7 +14938,7 @@ const UI_TEXT = {
     /* deposit / wish forms */
     'form.dep.title':'ฝากทรัพย์กับเรา','form.dep.sub':'กรอกข้อมูลเบื้องต้น ทีมงานติดต่อกลับโดยเร็ว',
     'form.wish.title':'ฝากความต้องการซื้ออสังหา','form.wish.sub':'บอกรายละเอียดที่ต้องการ เราจะหาให้',
-    'form.name':'ชื่อ-นามสกุล *','form.phone':'เบอร์โทร *','form.lineid':'Line ID',
+    'form.name':'ชื่อ-นามสกุล *','form.phone':'เบอร์โทร *','form.lineid':'Line ID','form.lineid2':'Your Line ID','form.email2':'Your email',
     'form.type':'ประเภทอสังหา','form.type2':'ประเภท','form.budget':'งบประมาณสูงสุด (บาท)',
     'form.prov':'จังหวัด','form.tx':'ต้องการ','form.tx2':'ซื้อ / เช่า',
     'form.detail':'รายละเอียด','form.detail2':'รายละเอียดเพิ่มเติม',
@@ -14552,7 +15147,7 @@ const UI_TEXT = {
     'ft.copy':'© ' + new Date().getFullYear() + ' Matchdoor. All Rights Reserved.',
     'form.dep.title':'List Your Property','form.dep.sub':'Fill in basic info — our team will contact you shortly',
     'form.wish.title':'Property Wishlist','form.wish.sub':'Tell us what you need and we\'ll find it',
-    'form.name':'Full Name *','form.phone':'Phone *','form.lineid':'Line ID',
+    'form.name':'Full Name *','form.phone':'Phone *','form.lineid':'Line ID','form.lineid2':'Your Line ID','form.email2':'Your email',
     'form.type':'Property Type','form.type2':'Type','form.budget':'Max Budget (THB)',
     'form.prov':'Province','form.tx':'Purpose','form.tx2':'Buy / Rent',
     'form.detail':'Details','form.detail2':'Additional Details',
@@ -14743,7 +15338,7 @@ const UI_TEXT = {
     'ft.copy':'© ' + new Date().getFullYear() + ' Matchdoor. 版权所有。',
     'form.dep.title':'委托房产','form.dep.sub':'填写基本信息，我们将尽快联系您',
     'form.wish.title':'购房意向登记','form.wish.sub':'告诉我们您的需求，我们来为您寻找',
-    'form.name':'姓名 *','form.phone':'电话 *','form.lineid':'Line ID',
+    'form.name':'姓名 *','form.phone':'电话 *','form.lineid':'Line ID','form.lineid2':'Your Line ID','form.email2':'Your email',
     'form.type':'房产类型','form.type2':'类型','form.budget':'最高预算（铢）',
     'form.prov':'省份','form.tx':'目的','form.tx2':'购买 / 租赁',
     'form.detail':'详情','form.detail2':'更多详情',
@@ -14934,7 +15529,7 @@ const UI_TEXT = {
     'ft.copy':'© ' + new Date().getFullYear() + ' Matchdoor. All Rights Reserved.',
     'form.dep.title':'物件登録','form.dep.sub':'基本情報をご入力ください。担当者よりご連絡いたします',
     'form.wish.title':'購入希望登録','form.wish.sub':'ご希望の条件をお知らせください。物件を探します',
-    'form.name':'氏名 *','form.phone':'電話番号 *','form.lineid':'Line ID',
+    'form.name':'氏名 *','form.phone':'電話番号 *','form.lineid':'Line ID','form.lineid2':'Your Line ID','form.email2':'Your email',
     'form.type':'物件タイプ','form.type2':'タイプ','form.budget':'上限予算（バーツ）',
     'form.prov':'県','form.tx':'目的','form.tx2':'購入 / 賃貸',
     'form.detail':'詳細','form.detail2':'追加詳細',
@@ -15309,7 +15904,7 @@ function applyLang(){
     function setLabel(sel,txt){const e=document.querySelector(sel);if(e)e.textContent=txt;}
     // deposit form labels
     const depLabels=document.querySelectorAll('#dep-form label');
-    const depLabelKeys=['form.name','form.phone','form.type2','form.price','form.prov','form.tx','form.detail'];
+    const depLabelKeys=['form.name','form.phone','form.lineid2','form.email2','form.prov','form.tx','form.detail'];
     depLabels.forEach((lbl,i)=>{if(depLabelKeys[i])lbl.textContent=ui(depLabelKeys[i]);});
     const dName=document.getElementById('d-name');if(dName)dName.placeholder=ui('form.name.ph');
     const dPhone=document.getElementById('d-phone');if(dPhone)dPhone.placeholder='08X-XXX-XXXX';
