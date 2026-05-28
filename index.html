@@ -5860,44 +5860,50 @@ function initAuthListener(){
     }
   });
 }
-function renderAuthUI(){
-  const el=$('auth-ui'); const elD=$('auth-ui-desktop'); let html='';
-  if(user){
-    const init=(user.email||'U')[0].toUpperCase();
-    const dispName = user.user_metadata?.display_name || user.email.split('@')[0];
-    const avatarUrl = user.user_metadata?.avatar_url || user.user_metadata?.picture || '';
-    const avatarHtml = avatarUrl
-      ? `<img src="${avatarUrl}" alt="${sanitize(dispName)}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid var(--bd)">`
-      : `<div style="width:40px;height:40px;border-radius:50%;background:var(--p);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff">${init}</div>`;
-    html=`<div class="user-nav" id="user-nav-wrap">
-      <div class="user-av" onclick="toggleUserMenu(event)" title="เมนูผู้ใช้">${init}</div>
-      <div class="user-email" onclick="toggleUserMenu(event)" style="cursor:pointer">${sanitize(dispName)}</div>
-      <div class="user-menu" id="user-menu">
-        <div style="display:flex;align-items:center;gap:10px;padding:12px 16px 10px;border-bottom:1px solid var(--bd);margin-bottom:4px">
-          ${avatarHtml}
-          <div style="overflow:hidden">
-            <div style="font-size:13px;font-weight:600;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px">${sanitize(dispName)}</div>
-            <div style="font-size:11px;color:var(--gr);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px">${sanitize(user.email||'')}</div>
-          </div>
+function _buildUserMenuHtml(suffix, user){
+  const init=(user.email||'U')[0].toUpperCase();
+  const dispName = user.user_metadata?.display_name || user.email.split('@')[0];
+  const avatarUrl = user.user_metadata?.avatar_url || user.user_metadata?.picture || '';
+  const avatarHtml = avatarUrl
+    ? `<img src="${avatarUrl}" alt="${sanitize(dispName)}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid var(--bd)">`
+    : `<div style="width:40px;height:40px;border-radius:50%;background:var(--p);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff">${init}</div>`;
+  return `<div class="user-nav" id="user-nav-wrap-${suffix}">
+    <div class="user-av" onclick="toggleUserMenu(event,'${suffix}')" title="เมนูผู้ใช้">${init}</div>
+    <div class="user-email" onclick="toggleUserMenu(event,'${suffix}')" style="cursor:pointer">${sanitize(dispName)}</div>
+    <div class="user-menu" id="user-menu-${suffix}">
+      <div style="display:flex;align-items:center;gap:10px;padding:12px 16px 10px;border-bottom:1px solid var(--bd);margin-bottom:4px">
+        ${avatarHtml}
+        <div style="overflow:hidden">
+          <div style="font-size:13px;font-weight:600;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px">${sanitize(dispName)}</div>
+          <div style="font-size:11px;color:var(--gr);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px">${sanitize(user.email||'')}</div>
         </div>
-        <button class="user-menu-item" onclick="toggleUserMenu(event);showPage('my-account')"><i class="fas fa-user-circle"></i> บัญชีของฉัน</button>
-        <hr class="user-menu-sep">
-        <button class="user-menu-item" style="color:#e05" onclick="logout()"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</button>
       </div>
-    </div>`;
-  } else {
-    html=`<button class="btn-login" onclick="_openModal('login-modal')"><i class="fas fa-sign-in-alt"></i> LogIn</button>`;
-  }
-  if(el)el.innerHTML=html;
-  if(elD)elD.innerHTML=html;
+      <button class="user-menu-item" onclick="toggleUserMenu(event,'${suffix}');showPage('my-account')"><i class="fas fa-user-circle"></i> บัญชีของฉัน</button>
+      <hr class="user-menu-sep">
+      <button class="user-menu-item" style="color:#e05" onclick="logout()"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</button>
+    </div>
+  </div>`;
+}
+function renderAuthUI(){
+  const el=$('auth-ui'); const elD=$('auth-ui-desktop');
+  const loginBtn=`<button class="btn-login" onclick="_openModal('login-modal')"><i class="fas fa-sign-in-alt"></i> LogIn</button>`;
+  if(el)  el.innerHTML  = user ? _buildUserMenuHtml('mob', user) : loginBtn;
+  if(elD) elD.innerHTML = user ? _buildUserMenuHtml('desk', user) : loginBtn;
   /* re-bind close-on-outside-click after innerHTML swap */
   _bindUserMenuDismiss();
   /* sync profile FAB icon */
   _updateProfileFab();
 }
-function toggleUserMenu(e){
+function toggleUserMenu(e, suffix){
   e.stopPropagation();
-  const m=document.getElementById('user-menu');
+  // ปิด menu อีกฝั่งก่อน (ป้องกันทั้ง 2 เปิดพร้อมกัน)
+  ['mob','desk'].forEach(s=>{
+    if(s !== suffix){
+      const other = document.getElementById('user-menu-'+s);
+      if(other) other.classList.remove('open');
+    }
+  });
+  const m = document.getElementById('user-menu-'+(suffix||'desk'));
   if(m) m.classList.toggle('open');
 }
 function _bindUserMenuDismiss(){
@@ -5905,15 +5911,16 @@ function _bindUserMenuDismiss(){
   document.addEventListener('click',_userMenuDismissHandler);
 }
 function _userMenuDismissHandler(e){
-  const wrap=document.getElementById('user-nav-wrap');
-  if(wrap && !wrap.contains(e.target)){
-    const m=document.getElementById('user-menu');
-    if(m) m.classList.remove('open');
-  }
+  ['mob','desk'].forEach(s=>{
+    const wrap = document.getElementById('user-nav-wrap-'+s);
+    if(wrap && !wrap.contains(e.target)){
+      const m = document.getElementById('user-menu-'+s);
+      if(m) m.classList.remove('open');
+    }
+  });
 }
 function openProfileModal(){
-  const m=document.getElementById('user-menu');
-  if(m) m.classList.remove('open');
+  ['mob','desk'].forEach(s=>{ const m=document.getElementById('user-menu-'+s); if(m) m.classList.remove('open'); });
   if(!user) return;
   const init=(user.email||'U')[0].toUpperCase();
   const circle=document.getElementById('profile-av-circle');
@@ -7971,6 +7978,11 @@ function afterLoad(){
 
   loading(false);
 
+  // ── Auth: register listener และ check session ทันที — ต้องทำก่อน idle ──
+  // initAuthListener() ต้อง register ก่อนที่ Supabase จะ process OAuth hash
+  // ถ้าวางใน idle callback อาจช้าเกินไปและ SIGNED_IN event หายไป
+  if(sb){ initAuthListener(); checkAuth(); }
+
   // ── defer secondary sections — ไม่บล็อก first paint ──────────────
   const idle = window.requestIdleCallback || (cb => setTimeout(cb, 100));
   idle(()=>{
@@ -7979,7 +7991,6 @@ function afterLoad(){
     renderGalleryCarousel();
     renderHomePortfolio();
     setTimeout(()=>{ initHGallerySwipe('new-track-wrap'); initHGallerySwipe('osrv-track-wrap'); }, 200);
-    if(sb){ checkAuth(); initAuthListener(); }
   });
 
   // ── listings page init ───────────────────────────────────────────
@@ -8820,9 +8831,9 @@ function _silentShowPage(name, skipScrollTop) {
 // Read URL on page load and navigate to correct section
 function _initRouteFromUrl() {
   // ── ถ้ามี OAuth hash (#access_token=...) ให้ Supabase จัดการ session เอง
-  // เราแค่ clean URL แล้วรอ onAuthStateChange พา user ไปหน้าหลัก
+  // ❌ ห้าม replaceState ที่นี่ — Supabase ยังไม่ได้อ่าน hash เลย (defer script โหลดทีหลัง)
+  // Supabase จะ clean hash เองอัตโนมัติหลัง process session เสร็จ
   if (location.hash && location.hash.includes('access_token=')) {
-    history.replaceState(null, '', window.location.origin + '/');
     _silentShowPage('home');
     return;
   }
