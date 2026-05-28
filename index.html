@@ -4986,9 +4986,7 @@ function _popupRefreshMarkersFromData(data){
       <button class="back-btn" onclick="showPage('home')"><i class="fas fa-arrow-left"></i> <span data-i18n="ph.ma.back">กลับหน้าหลัก</span></button>
       <h1 style="margin-top:10px"><i class="fas fa-user-circle"></i> <span data-i18n="ph.ma.h1">บัญชีของฉัน</span></h1>
     </div>
-    <button class="ma-dev-bypass-btn" id="ma-dev-bypass-btn" onclick="_toggleMaDevBypass()" title="Dev Preview — คลิกเพื่อดูหน้าโดยไม่ต้อง Login (ลบทิ้งก่อน production)">
-      <i class="fas fa-flask"></i> <span id="ma-dev-bypass-lbl">DEV Preview</span>
-    </button>
+
   </div>
   <div class="my-account-wrap" id="my-account-content">
     <!-- Filled by renderMyAccount() -->
@@ -5867,11 +5865,22 @@ function renderAuthUI(){
   if(user){
     const init=(user.email||'U')[0].toUpperCase();
     const dispName = user.user_metadata?.display_name || user.email.split('@')[0];
+    const avatarUrl = user.user_metadata?.avatar_url || user.user_metadata?.picture || '';
+    const avatarHtml = avatarUrl
+      ? `<img src="${avatarUrl}" alt="${sanitize(dispName)}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid var(--bd)">`
+      : `<div style="width:40px;height:40px;border-radius:50%;background:var(--p);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff">${init}</div>`;
     html=`<div class="user-nav" id="user-nav-wrap">
       <div class="user-av" onclick="toggleUserMenu(event)" title="เมนูผู้ใช้">${init}</div>
       <div class="user-email" onclick="toggleUserMenu(event)" style="cursor:pointer">${sanitize(dispName)}</div>
       <div class="user-menu" id="user-menu">
-        <button class="user-menu-item" onclick="openProfileModal()"><i class="fas fa-user-circle"></i> โปรไฟล์ของฉัน</button>
+        <div style="display:flex;align-items:center;gap:10px;padding:12px 16px 10px;border-bottom:1px solid var(--bd);margin-bottom:4px">
+          ${avatarHtml}
+          <div style="overflow:hidden">
+            <div style="font-size:13px;font-weight:600;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px">${sanitize(dispName)}</div>
+            <div style="font-size:11px;color:var(--gr);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px">${sanitize(user.email||'')}</div>
+          </div>
+        </div>
+        <button class="user-menu-item" onclick="toggleUserMenu(event);showPage('my-account')"><i class="fas fa-user-circle"></i> บัญชีของฉัน</button>
         <hr class="user-menu-sep">
         <button class="user-menu-item" style="color:#e05" onclick="logout()"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</button>
       </div>
@@ -19210,9 +19219,7 @@ document.addEventListener('DOMContentLoaded', renderTransitButtons);
       <button class="admin-login-submit" onclick="adminLogin()">
         <i class="fas fa-sign-in-alt"></i>&nbsp; เข้าสู่ระบบ Admin
       </button>
-      <button class="admin-dev-bypass" onclick="adminDevBypass()" id="admin-dev-btn">
-        <i class="fas fa-flask"></i>&nbsp; DEV Preview — เข้าดูโดยไม่ต้อง Login
-      </button>
+
       <p style="text-align:center;margin-top:14px;font-size:11px;color:rgba(255,255,255,.2)">
         <i class="fas fa-info-circle"></i> ระบบนี้ใช้ Supabase Auth — log จะถูกบันทึกทุกครั้ง
       </p>
