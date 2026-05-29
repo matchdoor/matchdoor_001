@@ -6072,7 +6072,12 @@ function renderMyAccount(){
   <!-- Profile panel -->
   <div class="ma-panel active" id="ma-panel-profile">
     <div class="ma-section">
-      <div class="ma-section-title"><i class="fas fa-user-edit"></i> ${sanitize(t('ma.profile.title'))}</div>
+      <div class="ma-section-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <span><i class="fas fa-user-edit"></i> ${sanitize(t('ma.profile.title'))}</span>
+        <button id="ma-edit-profile-btn" onclick="_maToggleProfileEdit(true)" style="display:none;background:var(--p);color:#fff;border:none;border-radius:8px;padding:7px 16px;font-size:13px;font-weight:600;cursor:pointer;gap:6px;align-items:center">
+          <i class="fas fa-pen"></i> แก้ไขข้อมูลส่วนตัว
+        </button>
+      </div>
       <div class="ma-field">
         <label>${sanitize(t('ma.profile.name'))}</label>
         <input type="text" id="ma-display-name" value="${dispName}" placeholder="${sanitize(t('ma.profile.name'))}">
@@ -6089,13 +6094,39 @@ function renderMyAccount(){
         <label>${sanitize(t('ma.profile.line'))}</label>
         <input type="text" id="ma-line-id" value="${sanitize(_meta.line_id||'')}" placeholder="@yourlineid">
       </div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px">
+      <div id="ma-profile-action-btns" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px">
         <button class="ma-save-btn" onclick="${isDevMode?'alert(\"Dev mode: บันทึกจริงไม่ได้ ต้อง Login ก่อนครับ 🙏\")':'_maSaveProfile()'}">
           <i class="fas fa-save"></i> ${sanitize(t('ma.profile.save'))}${isDevMode?' (Dev)':''}
         </button>
         ${!isDevMode?`<button class="ma-logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> ${sanitize(t('ma.profile.logout'))}</button>`:''}
       </div>
+    </div>
 
+    <!-- เปลี่ยนรหัสผ่าน -->
+    <div class="ma-section" style="margin-top:16px" id="ma-pw-section">
+      <div class="ma-section-title"><i class="fas fa-lock"></i> เปลี่ยนรหัสผ่าน</div>
+      <div class="ma-field">
+        <label>รหัสผ่านใหม่</label>
+        <input type="password" id="ma-new-pw" placeholder="รหัสผ่านใหม่ (อย่างน้อย 6 ตัว)" disabled style="background:var(--lt);color:var(--gr);cursor:default">
+      </div>
+      <div class="ma-field">
+        <label>ยืนยันรหัสผ่านใหม่</label>
+        <input type="password" id="ma-new-pw2" placeholder="ยืนยันรหัสผ่านใหม่" disabled style="background:var(--lt);color:var(--gr);cursor:default">
+      </div>
+      <div id="ma-pw-action-btns" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px">
+        <button id="ma-pw-save-btn" onclick="_maChangePassword()" disabled style="background:var(--gr);color:#fff;border:none;border-radius:8px;padding:9px 20px;font-size:13px;font-weight:600;cursor:not-allowed;opacity:.6">
+          <i class="fas fa-key"></i> บันทึกรหัสผ่าน
+        </button>
+      </div>
+    </div>
+
+    <!-- ลบโปรไฟล์ -->
+    <div class="ma-section" style="margin-top:16px;border-color:rgba(220,53,69,.3)">
+      <div class="ma-section-title" style="color:#dc3545"><i class="fas fa-trash-alt"></i> ลบบัญชีผู้ใช้</div>
+      <p style="font-size:13px;color:var(--tx2);margin-bottom:12px">การลบบัญชีจะลบข้อมูลโปรไฟล์ของคุณออกจากระบบ และไม่สามารถกู้คืนได้</p>
+      <button onclick="_maDeleteAccount()" style="background:transparent;color:#dc3545;border:1.5px solid #dc3545;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer">
+        <i class="fas fa-trash-alt"></i> ลบบัญชีของฉัน
+      </button>
     </div>
   </div>
   <!-- Favorites panel -->
@@ -6126,6 +6157,8 @@ function renderMyAccount(){
       ${_maHistoryHtml(t)}
     </div>
   </div>`;
+  // Initialize profile in locked/view mode after render
+  setTimeout(_maInitProfileLockState, 50);
 }
 // ── State ──────────────────────────────────────────────────
 let _tokenBalance     = 0;
@@ -7450,6 +7483,51 @@ function _maHistoryHtml(t){
     }).join('')
   }</div>`;
 }
+/* ── Toggle profile edit mode (lock/unlock fields) ── */
+function _maToggleProfileEdit(editing){
+  const fields = ['ma-display-name','ma-phone','ma-line-id'];
+  const actionBtns = document.getElementById('ma-profile-action-btns');
+  const editBtn = document.getElementById('ma-edit-profile-btn');
+  const pwInputs = [document.getElementById('ma-new-pw'), document.getElementById('ma-new-pw2')];
+  const pwSaveBtn = document.getElementById('ma-pw-save-btn');
+
+  if(editing){
+    // Unlock profile fields
+    fields.forEach(id=>{
+      const el = document.getElementById(id);
+      if(el){ el.disabled=false; el.style.background=''; el.style.color=''; el.style.cursor=''; }
+    });
+    // Show save/logout buttons
+    if(actionBtns) actionBtns.style.display='flex';
+    // Hide edit button
+    if(editBtn) editBtn.style.display='none';
+    // Unlock password fields
+    pwInputs.forEach(el=>{ if(el){ el.disabled=false; el.style.background=''; el.style.color=''; el.style.cursor=''; } });
+    if(pwSaveBtn){ pwSaveBtn.disabled=false; pwSaveBtn.style.cursor='pointer'; pwSaveBtn.style.background='var(--p)'; pwSaveBtn.style.opacity='1'; }
+  } else {
+    // Lock profile fields (view mode)
+    fields.forEach(id=>{
+      const el = document.getElementById(id);
+      if(el){ el.disabled=true; el.style.background='var(--lt)'; el.style.color='var(--gr)'; el.style.cursor='default'; }
+    });
+    // Hide save buttons, show edit button
+    if(actionBtns) actionBtns.style.display='none';
+    if(editBtn){ editBtn.style.display='inline-flex'; }
+    // Lock password fields
+    pwInputs.forEach(el=>{ if(el){ el.value=''; el.disabled=true; el.style.background='var(--lt)'; el.style.color='var(--gr)'; el.style.cursor='default'; } });
+    if(pwSaveBtn){ pwSaveBtn.disabled=true; pwSaveBtn.style.cursor='not-allowed'; pwSaveBtn.style.background='var(--gr)'; pwSaveBtn.style.opacity='.6'; }
+  }
+}
+
+/* ── Apply lock state after renderMyAccount (called once on render) ── */
+function _maInitProfileLockState(){
+  // Start in locked/view mode
+  _maToggleProfileEdit(false);
+  // Show the edit button
+  const editBtn = document.getElementById('ma-edit-profile-btn');
+  if(editBtn) editBtn.style.display='inline-flex';
+}
+
 async function _maSaveProfile(){
   if(!user||!sb) return;
   const name   = document.getElementById('ma-display-name')?.value.trim()||'';
@@ -7477,6 +7555,45 @@ async function _maSaveProfile(){
   toast('บันทึกข้อมูลสำเร็จ ✅');
   await checkAuth();
   renderMyAccount();
+  // Lock fields after save
+  setTimeout(_maInitProfileLockState, 100);
+}
+
+/* ── Change password ── */
+async function _maChangePassword(){
+  if(!user||!sb) return;
+  const p1 = document.getElementById('ma-new-pw')?.value||'';
+  const p2 = document.getElementById('ma-new-pw2')?.value||'';
+  if(!p1||!p2){ toast('กรุณากรอกรหัสผ่านให้ครบ',true); return; }
+  if(p1.length<6){ toast('รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร',true); return; }
+  if(p1!==p2){ toast('รหัสผ่านไม่ตรงกัน',true); return; }
+  const btn = document.getElementById('ma-pw-save-btn');
+  if(btn){ btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner fa-spin"></i>'; }
+  const {error} = await sb.auth.updateUser({password: p1});
+  if(btn){ btn.innerHTML='<i class="fas fa-key"></i> บันทึกรหัสผ่าน'; btn.disabled=false; }
+  if(error){ toast('เกิดข้อผิดพลาด: '+error.message,true); return; }
+  toast('เปลี่ยนรหัสผ่านสำเร็จ ✅');
+  // Clear and re-lock
+  document.getElementById('ma-new-pw').value='';
+  document.getElementById('ma-new-pw2').value='';
+  _maToggleProfileEdit(false);
+}
+
+/* ── Delete account ── */
+async function _maDeleteAccount(){
+  if(!user||!sb) return;
+  const confirmed = confirm('⚠️ ยืนยันการลบบัญชี?\n\nข้อมูลโปรไฟล์และประวัติทั้งหมดของคุณจะถูกลบออกจากระบบและไม่สามารถกู้คืนได้\n\nกดตกลงเพื่อยืนยัน');
+  if(!confirmed) return;
+  try {
+    // ลบ user_profiles ก่อน (ถ้ามี)
+    await sb.from('user_profiles').delete().eq('user_id', user.id);
+  } catch(e){ /* silent */ }
+  // sign out
+  toast('ลบบัญชีเรียบร้อยแล้ว กำลังออกจากระบบ...');
+  setTimeout(async ()=>{
+    await sb.auth.signOut();
+    renderMyAccount();
+  }, 1500);
 }
 function updateFormBtns(){ const logged=!!user; const deps=[['dep-btn','submitDep','form.dep.submit'],['wish-btn','submitWish','form.wish.submit']]; deps.forEach(([id,fn,labelKey])=>{ const b=$(id); if(!b)return; if(logged){ b.innerHTML=`<i class="fas fa-paper-plane btn-icon"></i><span class="btn-spinner"></span> ${sanitize(ui(labelKey))}`; b.onclick=window[fn]; } else{ b.innerHTML='<i class="fas fa-lock btn-icon"></i><span class="btn-spinner"></span> '+sanitize(ui('form.login')); b.onclick=()=>_openModal('login-modal'); } }); }
 async function loginWith(p){
