@@ -4861,11 +4861,11 @@ footer::after{
         <div class="md-story-bar">
           <div class="md-story-bar-hd">
             <span>📹 Story ทรัพย์แนะนำ</span>
-            <a onclick="window.openDepPanel()" style="cursor:pointer">+ ลงประกาศ Story</a>
+            <a onclick="window.openShareStoryModal()" style="cursor:pointer">+ ลงประกาศ Story</a>
           </div>
           <div class="md-stories-scroll" id="md-stories-scroll">
             <!-- Add story card -->
-            <div class="md-story-card add-story" onclick="window.openDepPanel()">
+            <div class="md-story-card add-story" onclick="window.openShareStoryModal()">
               <div class="md-story-add-icon"><i class="fas fa-plus"></i></div>
               <div class="md-story-add-label">ลง Story ทรัพย์ของคุณ</div>
             </div>
@@ -4911,18 +4911,18 @@ footer::after{
             <div class="md-compose-av" id="md-compose-av">
               <i class="fas fa-user"></i>
             </div>
-            <div class="md-compose-input" onclick="window.openDepPanel()">
+            <div class="md-compose-input" onclick="window.openComposeModal('text')">
               คุณมีทรัพย์อยากแชร์? โพสต์ประกาศหรือถามเรื่องบ้าน...
             </div>
           </div>
           <div class="md-compose-tools">
-            <div class="md-compose-tool video" onclick="window.openDepPanel()">
+            <div class="md-compose-tool video" onclick="window.openComposeModal('video')">
               <i class="fas fa-video"></i> วิดีโอ
             </div>
-            <div class="md-compose-tool photo" onclick="window.openDepPanel()">
+            <div class="md-compose-tool photo" onclick="window.openComposeModal('photo')">
               <i class="fas fa-images"></i> รูปภาพ
             </div>
-            <div class="md-compose-tool listing" onclick="window.openDepPanel()">
+            <div class="md-compose-tool listing" onclick="window.openComposeModal('listing')">
               <i class="fas fa-building"></i> ลงประกาศ
             </div>
           </div>
@@ -5384,6 +5384,379 @@ footer::after{
   };
 
   /* ─────────────────────────────────────────────────────────────
+     openComposeModal(type)
+     ปุ่ม Compose: text | photo | video | listing
+     - text/photo/video → modal "แชร์ทรัพย์ / ถามเรื่องบ้าน"
+     - listing → ไปหน้า my-account > tab ลงประกาศ (ถ้า login)
+  ───────────────────────────────────────────────────────────── */
+  window.openComposeModal = function(type){
+    // "listing" → เปิดหน้าบัญชี > ลงประกาศ
+    if(type === 'listing'){
+      if(typeof user !== 'undefined' && user){
+        if(typeof showPage === 'function') showPage('my-account');
+        setTimeout(function(){
+          var btn = document.querySelector('[data-tab="listings"]');
+          if(btn && typeof _maTab === 'function'){
+            _maTab('listings', btn);
+            if(typeof renderMaListingsPanel === 'function') renderMaListingsPanel();
+          }
+        }, 200);
+      } else {
+        if(typeof _openModal === 'function') _openModal('login-modal');
+        else openDepositModal();
+      }
+      return;
+    }
+
+    // text / photo / video → เปิด Compose modal
+    var existing = document.getElementById('md-compose-modal');
+    if(existing) existing.remove();
+
+    var iconMap = { text:'fas fa-pen', photo:'fas fa-images', video:'fas fa-video' };
+    var titleMap = { text:'โพสต์ข้อความ / ถามเรื่องบ้าน', photo:'แชร์รูปทรัพย์', video:'แชร์วิดีโอทรัพย์' };
+    var placeholderMap = {
+      text:'คุณมีทรัพย์อยากแชร์? ถามเรื่องบ้าน? หรือต้องการซื้อ/เช่า? เขียนได้เลยครับ...',
+      photo:'บรรยายรูปที่อยากแชร์ เช่น "คอนโด Ashton Asoke วิวสวย ชั้น 22 ราคาพิเศษ"',
+      video:'บรรยายวิดีโอ เช่น "Tour บ้านเดี่ยว 3 ห้องนอน ลาดพร้าว"'
+    };
+
+    var showUpload = (type === 'photo' || type === 'video');
+    var accept = type === 'video' ? 'video/*' : 'image/*';
+    var uploadLabel = type === 'video' ? 'อัปโหลดวิดีโอ (MP4, สูงสุด 50MB)' : 'อัปโหลดรูปภาพ (JPG/PNG สูงสุด 5MB ต่อไฟล์)';
+    var icon = iconMap[type] || 'fas fa-pen';
+    var title = titleMap[type] || 'โพสต์';
+    var placeholder = placeholderMap[type] || '';
+
+    var mo = document.createElement('div');
+    mo.className = 'ov'; mo.id = 'md-compose-modal';
+    mo.style.cssText = 'display:flex;z-index:3700';
+    mo.innerHTML = '<div class="modal" style="max-width:520px">'
+      + '<div class="mhd">'
+        + '<h2><i class="' + icon + '" style="color:var(--a)"></i> ' + title + '</h2>'
+        + '<span class="mclose" onclick="document.getElementById('md-compose-modal').remove()">×</span>'
+      + '</div>'
+      + '<div class="mbody">'
+        + '<div id="md-compose-form">'
+          // User row
+          + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">'
+            + '<div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--p),#2a5298);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff;flex-shrink:0" id="cm-av-icon"><i class="fas fa-user"></i></div>'
+            + '<div><div style="font-size:13px;font-weight:700;color:var(--tx)" id="cm-user-name">คุณ</div>'
+            + '<div style="font-size:11px;color:var(--gr)">โพสต์ใน Matchdoor Community</div></div>'
+          + '</div>'
+          // Textarea
+          + '<textarea id="cm-text" rows="4" placeholder="' + placeholder + '" style="width:100%;border:1.5px solid var(--bd);border-radius:10px;padding:12px;font-size:14px;font-family:inherit;resize:none;box-sizing:border-box;outline:none;transition:.2s" onfocus="this.style.borderColor='var(--p)'" onblur="this.style.borderColor='var(--bd)'"></textarea>'
+          // Upload section
+          + (showUpload ? '<div style="margin-top:10px"><label style="font-size:12px;font-weight:600;color:var(--tx2);display:block;margin-bottom:6px"><i class="' + (type==='video'?'fas fa-video':'fas fa-images') + '"></i> ' + uploadLabel + '</label>'
+            + '<div class="dropzone" id="cm-dropzone" onclick="document.getElementById('cm-file').click()" style="padding:16px;text-align:center;cursor:pointer">'
+              + '<i class="fas fa-cloud-upload-alt" style="font-size:24px;color:var(--gr);margin-bottom:6px;display:block"></i>'
+              + '<div style="font-size:13px;color:var(--gr)">คลิกหรือลากไฟล์มาวาง</div>'
+            + '</div>'
+            + '<input type="file" id="cm-file" accept="' + accept + '" multiple style="display:none" onchange="window._cmHandleFiles(this.files,'' + type + '')">'
+            + '<div id="cm-preview" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"></div>'
+          + '</div>') : '')
+          // Contact info
+          + '<div class="frow" style="margin-top:12px">'
+            + '<div class="fg"><label style="font-size:12px">ชื่อ-นามสกุล <span style="color:#e05">*</span></label><input id="cm-name" placeholder="ชื่อของคุณ" style="width:100%"></div>'
+            + '<div class="fg"><label style="font-size:12px">เบอร์โทร <span style="color:#e05">*</span></label><input id="cm-phone" type="tel" placeholder="08X-XXX-XXXX" style="width:100%"></div>'
+          + '</div>'
+          // Consent
+          + '<div class="consent-row" style="margin-top:10px">'
+            + '<input type="checkbox" id="cm-consent">'
+            + '<label for="cm-consent" style="font-size:12px">ฉันยินยอมให้ Matchdoor เก็บข้อมูลและรูปภาพ เพื่อนำเสนอทรัพย์ ตาม<a href="javascript:void(0)" onclick="if(typeof openPrivacyModal==='function')openPrivacyModal()" style="color:var(--a)">นโยบายความเป็นส่วนตัว</a></label>'
+          + '</div>'
+          // Submit button
+          + '<button class="btn-sub" id="cm-submit-btn" style="margin-top:12px" onclick="window._submitComposeModal('' + type + '')">'
+            + '<i class="fas fa-paper-plane btn-icon"></i><span class="btn-spinner"></span> ส่งข้อมูล'
+          + '</button>'
+        + '</div>'
+        + '<div class="form-ok" id="cm-ok" style="display:none;text-align:center;padding:24px"><i class="fas fa-check-circle" style="color:#28a745;font-size:36px"></i><div style="margin-top:10px;font-weight:700;font-size:16px">ส่งข้อมูลสำเร็จ! ✅</div><div style="color:var(--tx2);font-size:13px;margin-top:6px">ทีมงาน Matchdoor จะติดต่อกลับโดยเร็วครับ</div></div>'
+      + '</div>'
+    + '</div>';
+
+    mo.onclick = function(e){ if(e.target===mo) mo.remove(); };
+    document.body.appendChild(mo);
+
+    // Setup dropzone drag & drop
+    if(showUpload){
+      var dz = document.getElementById('cm-dropzone');
+      if(dz){
+        ['dragenter','dragover','dragleave','drop'].forEach(function(ev){
+          dz.addEventListener(ev, function(e){ e.preventDefault(); e.stopPropagation(); });
+        });
+        dz.addEventListener('dragenter', function(){ dz.classList.add('dragover'); });
+        dz.addEventListener('dragleave', function(){ dz.classList.remove('dragover'); });
+        dz.addEventListener('drop', function(e){ dz.classList.remove('dragover'); window._cmHandleFiles(e.dataTransfer.files, type); });
+      }
+    }
+
+    // Pre-fill user info if logged in
+    if(typeof user !== 'undefined' && user){
+      var nm = document.getElementById('cm-name');
+      var av = document.getElementById('cm-av-icon');
+      var unEl = document.getElementById('cm-user-name');
+      var fullName = (user.user_metadata && user.user_metadata.full_name) ? user.user_metadata.full_name : user.email;
+      if(nm && !nm.value) nm.value = fullName || '';
+      if(unEl) unEl.textContent = fullName || 'คุณ';
+      if(av){
+        var initChar = fullName ? fullName.charAt(0).toUpperCase() : '?';
+        av.innerHTML = initChar;
+        av.style.fontSize = '18px';
+      }
+      var ph = document.getElementById('cm-phone');
+      if(ph && !ph.value){
+        var meta = typeof _userMeta !== 'undefined' ? _userMeta : {};
+        if(meta.phone) ph.value = meta.phone;
+      }
+    }
+
+    // Focus textarea
+    setTimeout(function(){ var t = document.getElementById('cm-text'); if(t) t.focus(); }, 100);
+  };
+
+  // Handle file uploads for compose modal
+  window._cmFiles = [];
+  window._cmHandleFiles = function(files, type){
+    var isVideo = (type === 'video');
+    var maxSize = isVideo ? 50*1024*1024 : 5*1024*1024;
+    var maxCount = isVideo ? 1 : 5;
+    var arr = Array.from(files);
+    if(window._cmFiles.length + arr.length > maxCount){
+      if(typeof toast === 'function') toast('อัปโหลดได้สูงสุด ' + maxCount + ' ไฟล์', true);
+      return;
+    }
+    for(var i=0;i<arr.length;i++){
+      if(arr[i].size > maxSize){
+        if(typeof toast === 'function') toast(arr[i].name + ' ขนาดเกิน ' + (maxSize/1024/1024) + 'MB', true);
+        return;
+      }
+    }
+    window._cmFiles.push.apply(window._cmFiles, arr);
+    var grid = document.getElementById('cm-preview');
+    if(grid){
+      grid.innerHTML = window._cmFiles.map(function(f,i){
+        var url = URL.createObjectURL(f);
+        var thumb = f.type.startsWith('image/')
+          ? '<img src="'+url+'" style="width:72px;height:56px;object-fit:cover;border-radius:6px;display:block">'
+          : '<div style="width:72px;height:56px;display:flex;align-items:center;justify-content:center;background:#1B3A6B;border-radius:6px"><i class="fas fa-play-circle" style="color:#fff;font-size:22px"></i></div>';
+        return '<div style="position:relative">' + thumb
+          + '<button onclick="window._cmFiles.splice('+i+',1);window._cmHandleFiles([],''+type+'')" style="position:absolute;top:-4px;right:-4px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:16px;height:16px;font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center"><i class="fas fa-times"></i></button>'
+          + '</div>';
+      }).join('');
+    }
+  };
+
+  // Submit compose modal
+  window._submitComposeModal = async function(type){
+    var nameRaw  = (document.getElementById('cm-name')||{}).value || '';
+    var phoneRaw = (document.getElementById('cm-phone')||{}).value || '';
+    var textVal  = (document.getElementById('cm-text')||{}).value || '';
+    var consent  = (document.getElementById('cm-consent')||{}).checked;
+
+    nameRaw = nameRaw.trim(); phoneRaw = phoneRaw.trim(); textVal = textVal.trim();
+
+    if(nameRaw.length < 2){ if(typeof toast==='function') toast('กรุณากรอกชื่อ', true); return; }
+    if(!phoneRaw){ if(typeof toast==='function') toast('กรุณากรอกเบอร์โทร', true); return; }
+    if(!textVal){ if(typeof toast==='function') toast('กรุณาเขียนข้อความก่อน', true); return; }
+    if(!consent){ if(typeof toast==='function') toast('กรุณายินยอมการเก็บข้อมูลก่อน', true); return; }
+
+    // Auth check
+    if(typeof user === 'undefined' || !user){
+      if(typeof toast==='function') toast('กรุณาเข้าสู่ระบบก่อน', true);
+      document.getElementById('md-compose-modal')?.remove();
+      if(typeof _openModal==='function') _openModal('login-modal');
+      return;
+    }
+
+    var btn = document.getElementById('cm-submit-btn');
+    if(btn){ btn.disabled = true; btn.classList.add('loading'); }
+
+    // Upload files if any
+    var photoUrls = [];
+    if(window._cmFiles.length && typeof sb !== 'undefined' && sb){
+      for(var i=0;i<window._cmFiles.length;i++){
+        var f = window._cmFiles[i];
+        try{
+          var ext = f.name.split('.').pop().toLowerCase();
+          var folder = type === 'video' ? 'videos' : 'listings';
+          var safeName = folder + '/' + Date.now() + '_' + Math.random().toString(36).slice(2,6) + '.' + ext;
+          var C = typeof window.C !== 'undefined' ? window.C : {};
+          var bucket = C.STORAGE_BUCKET || 'matchdoor-assets';
+          var upRes = await sb.storage.from(bucket).upload(safeName, f, {cacheControl:'3600',upsert:false});
+          if(!upRes.error) photoUrls.push(safeName);
+        }catch(ue){ console.warn('[cm-upload]', ue); }
+      }
+    }
+
+    // Build details string
+    var typeLabel = {text:'ข้อความ/คำถาม', photo:'แชร์รูปทรัพย์', video:'แชร์วิดีโอทรัพย์'}[type] || type;
+    var details = '[' + typeLabel + '] ' + textVal;
+
+    try{
+      if(typeof sbInsertRateLimited === 'function'){
+        await sbInsertRateLimited('listings', {
+          name: typeof sanitize==='function' ? sanitize(nameRaw) : nameRaw,
+          phone: typeof sanitize==='function' ? sanitize(phoneRaw) : phoneRaw,
+          details: details,
+          photos: photoUrls,
+          status: 'รอตรวจสอบ',
+          consent_given: true,
+          consent_timestamp: new Date().toISOString(),
+          user_id: user.id
+        }, null, null);
+      }
+      // Show success
+      var form = document.getElementById('md-compose-form');
+      var ok = document.getElementById('cm-ok');
+      if(form) form.style.display = 'none';
+      if(ok) ok.style.display = 'block';
+      if(typeof toast==='function') toast('ส่งข้อมูลสำเร็จ ✅');
+      window._cmFiles = [];
+      setTimeout(function(){ document.getElementById('md-compose-modal')?.remove(); }, 2500);
+    } catch(e){
+      if(typeof toast==='function') toast('ส่งไม่สำเร็จ: ' + (e.message||''), true);
+      if(btn){ btn.disabled = false; btn.classList.remove('loading'); }
+    }
+  };
+
+  /* ─────────────────────────────────────────────────────────────
+     openShareStoryModal()
+     ปุ่ม "+ ลงประกาศ Story" / "ลง Story ทรัพย์ของคุณ"
+     → เปิด form ฝากทรัพย์เต็มรูปแบบ พร้อม note ว่าจะลง Story
+  ───────────────────────────────────────────────────────────── */
+  window.openShareStoryModal = function(){
+    var existing = document.getElementById('md-story-modal');
+    if(existing) existing.remove();
+
+    var mo = document.createElement('div');
+    mo.className = 'ov'; mo.id = 'md-story-modal';
+    mo.style.cssText = 'display:flex;z-index:3700';
+    mo.innerHTML = '<div class="modal" style="max-width:480px">'
+      + '<div class="mhd">'
+        + '<h2><i class="fas fa-film" style="color:var(--a)"></i> ลง Story ทรัพย์ของคุณ</h2>'
+        + '<span class="mclose" onclick="document.getElementById('md-story-modal').remove()">×</span>'
+      + '</div>'
+      + '<div class="mbody">'
+        + '<div style="background:linear-gradient(135deg,rgba(200,146,42,.12),rgba(27,58,107,.08));border:1.5px solid rgba(200,146,42,.3);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:13px;color:var(--tx2)">'
+          + '<i class="fas fa-star" style="color:var(--a);margin-right:6px"></i>'
+          + 'กรอกข้อมูลทรัพย์ด้านล่าง ทีมงานจะนำทรัพย์ของคุณขึ้น <strong style="color:var(--p)">Story ทรัพย์แนะนำ</strong> ในหน้า Community'
+        + '</div>'
+        + '<div id="md-story-form">'
+          + '<div class="frow"><div class="fg"><label>ชื่อ-นามสกุล <span style="color:#e05">*</span></label><input id="st-name" placeholder="ชื่อของคุณ"></div><div class="fg"><label>เบอร์โทร <span style="color:#e05">*</span></label><input id="st-phone" type="tel" placeholder="08X-XXX-XXXX"></div></div>'
+          + '<div class="frow full"><div class="fg"><label>ชื่อทรัพย์ที่ต้องการลง Story <span style="color:#e05">*</span></label><input id="st-title" placeholder="เช่น คอนโด The Loft สุขุมวิท 22 ชั้น 20 วิวสวย"></div></div>'
+          + '<div class="frow"><div class="fg"><label>ประเภท</label><select id="st-type"><option>คอนโด</option><option>บ้านเดี่ยว</option><option>ทาวน์โฮม</option><option>ที่ดิน</option><option>อาคารพาณิชย์</option><option>วิลล่า</option></select></div><div class="fg"><label>ราคา</label><input id="st-price" type="number" placeholder="ราคา (บาท)"></div></div>'
+          + '<div class="frow full"><div class="fg"><label>อัปโหลดรูปหน้าปก Story (แนะนำ)</label>'
+            + '<div class="dropzone" id="st-dz" onclick="document.getElementById('st-file').click()" style="padding:14px;text-align:center;cursor:pointer"><i class="fas fa-camera" style="color:var(--gr);font-size:20px;display:block;margin-bottom:4px"></i><span style="font-size:12px;color:var(--gr)">คลิกเลือกรูปหน้าปก</span></div>'
+            + '<input type="file" id="st-file" accept="image/*" style="display:none" onchange="window._stHandleFile(this.files)">'
+            + '<div id="st-preview"></div>'
+          + '</div></div>'
+          + '<div class="consent-row" style="margin-top:8px"><input type="checkbox" id="st-consent"><label for="st-consent" style="font-size:12px">ยินยอมให้ Matchdoor เก็บข้อมูลและแสดงทรัพย์ใน Story ตาม<a href="javascript:void(0)" onclick="if(typeof openPrivacyModal==='function')openPrivacyModal()" style="color:var(--a)">นโยบายความเป็นส่วนตัว</a></label></div>'
+          + '<button class="btn-sub" id="st-submit" style="margin-top:12px" onclick="window._submitStoryModal()"><i class="fas fa-paper-plane btn-icon"></i><span class="btn-spinner"></span> ส่งคำขอลง Story</button>'
+        + '</div>'
+        + '<div class="form-ok" id="st-ok" style="display:none;text-align:center;padding:24px"><i class="fas fa-check-circle" style="color:#28a745;font-size:36px"></i><div style="margin-top:10px;font-weight:700;font-size:16px">ส่งคำขอสำเร็จ! ✅</div><div style="color:var(--tx2);font-size:13px;margin-top:6px">ทีมงานจะนำทรัพย์ของคุณขึ้น Story โดยเร็วครับ</div></div>'
+      + '</div>'
+    + '</div>';
+    mo.onclick = function(e){ if(e.target===mo) mo.remove(); };
+    document.body.appendChild(mo);
+
+    // Setup dropzone
+    var dz = document.getElementById('st-dz');
+    if(dz){
+      ['dragenter','dragover','dragleave','drop'].forEach(function(ev){
+        dz.addEventListener(ev, function(e){ e.preventDefault(); e.stopPropagation(); });
+      });
+      dz.addEventListener('dragenter', function(){ dz.classList.add('dragover'); });
+      dz.addEventListener('dragleave', function(){ dz.classList.remove('dragover'); });
+      dz.addEventListener('drop', function(e){ dz.classList.remove('dragover'); window._stHandleFile(e.dataTransfer.files); });
+    }
+
+    // Pre-fill from user
+    if(typeof user !== 'undefined' && user){
+      var nm = document.getElementById('st-name');
+      var fullName = (user.user_metadata && user.user_metadata.full_name) ? user.user_metadata.full_name : '';
+      if(nm && !nm.value && fullName) nm.value = fullName;
+      var ph = document.getElementById('st-phone');
+      if(ph && !ph.value){ var meta = typeof _userMeta!=='undefined'?_userMeta:{}; if(meta.phone) ph.value=meta.phone; }
+    }
+  };
+
+  window._stFile = null;
+  window._stHandleFile = function(files){
+    var f = files[0]; if(!f) return;
+    if(f.size > 5*1024*1024){ if(typeof toast==='function') toast('รูปใหญ่เกิน 5MB', true); return; }
+    window._stFile = f;
+    var prev = document.getElementById('st-preview');
+    if(prev) prev.innerHTML = '<div style="position:relative;display:inline-block;margin-top:8px">'
+      + '<img src="'+URL.createObjectURL(f)+'" style="width:100%;max-height:140px;object-fit:cover;border-radius:8px">'
+      + '<button onclick="window._stFile=null;document.getElementById('st-preview').innerHTML=''" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:10px;cursor:pointer"><i class="fas fa-times"></i></button>'
+      + '</div>';
+  };
+
+  window._submitStoryModal = async function(){
+    var nameRaw  = (document.getElementById('st-name')||{}).value?.trim() || '';
+    var phoneRaw = (document.getElementById('st-phone')||{}).value?.trim() || '';
+    var titleVal = (document.getElementById('st-title')||{}).value?.trim() || '';
+    var typeVal  = (document.getElementById('st-type')||{}).value || '';
+    var priceVal = parseFloat((document.getElementById('st-price')||{}).value) || 0;
+    var consent  = (document.getElementById('st-consent')||{}).checked;
+
+    if(nameRaw.length < 2){ if(typeof toast==='function') toast('กรุณากรอกชื่อ', true); return; }
+    if(!phoneRaw){ if(typeof toast==='function') toast('กรุณากรอกเบอร์โทร', true); return; }
+    if(!titleVal){ if(typeof toast==='function') toast('กรุณากรอกชื่อทรัพย์', true); return; }
+    if(!consent){ if(typeof toast==='function') toast('กรุณายินยอมการเก็บข้อมูลก่อน', true); return; }
+
+    if(typeof user === 'undefined' || !user){
+      if(typeof toast==='function') toast('กรุณาเข้าสู่ระบบก่อน', true);
+      document.getElementById('md-story-modal')?.remove();
+      if(typeof _openModal==='function') _openModal('login-modal');
+      return;
+    }
+
+    var btn = document.getElementById('st-submit');
+    if(btn){ btn.disabled=true; btn.classList.add('loading'); }
+
+    // Upload cover image
+    var photoUrls = [];
+    if(window._stFile && typeof sb !== 'undefined' && sb){
+      try{
+        var ext = window._stFile.name.split('.').pop().toLowerCase();
+        var C = typeof window.C !== 'undefined' ? window.C : {};
+        var bucket = C.STORAGE_BUCKET || 'matchdoor-assets';
+        var safeName = 'stories/'+Date.now()+'_'+Math.random().toString(36).slice(2,6)+'.'+ext;
+        var upRes = await sb.storage.from(bucket).upload(safeName, window._stFile, {cacheControl:'3600',upsert:false});
+        if(!upRes.error) photoUrls.push(safeName);
+      }catch(ue){ console.warn('[st-upload]',ue); }
+    }
+
+    try{
+      if(typeof sbInsertRateLimited === 'function'){
+        await sbInsertRateLimited('listings', {
+          name: typeof sanitize==='function' ? sanitize(nameRaw) : nameRaw,
+          phone: typeof sanitize==='function' ? sanitize(phoneRaw) : phoneRaw,
+          listing_title: typeof sanitize==='function' ? sanitize(titleVal) : titleVal,
+          property_type: typeVal,
+          price: priceVal,
+          details: '[Story Request] ' + titleVal,
+          photos: photoUrls,
+          status: 'รอตรวจสอบ',
+          consent_given: true,
+          consent_timestamp: new Date().toISOString(),
+          user_id: user.id
+        }, null, null);
+      }
+      var form = document.getElementById('md-story-form');
+      var ok = document.getElementById('st-ok');
+      if(form) form.style.display='none';
+      if(ok) ok.style.display='block';
+      if(typeof toast==='function') toast('ส่งคำขอลง Story สำเร็จ ✅');
+      window._stFile = null;
+      setTimeout(function(){ document.getElementById('md-story-modal')?.remove(); }, 2500);
+    }catch(e){
+      if(typeof toast==='function') toast('ส่งไม่สำเร็จ: '+(e.message||''), true);
+      if(btn){ btn.disabled=false; btn.classList.remove('loading'); }
+    }
+  };
+
+  /* ─────────────────────────────────────────────────────────────
      openAgentModal(agentObj)
      คลิกรายชื่อตัวแทนใน sidebar → เปิด ag-modal ด้วย showAgentDetail
   ───────────────────────────────────────────────────────────── */
@@ -5488,24 +5861,48 @@ footer::after{
   ───────────────────────────────────────────────────────────── */
   function bindComposeInput(){
     var input = document.querySelector('#page-social .md-compose-input');
-    if(!input) return;
-    // Remove old inline onclick, replace with better handler
-    input.onclick = null;
-    input.setAttribute('onclick','');
-    input.addEventListener('click', function(e){
-      e.stopPropagation();
-      window.openDepPanel();
-    });
-    // Also bind compose tool buttons
-    var tools = document.querySelectorAll('#page-social .md-compose-tool');
-    tools.forEach(function(tool){
-      tool.onclick = null;
-      tool.setAttribute('onclick','');
-      tool.addEventListener('click', function(e){
+    if(input){
+      input.onclick = null;
+      input.setAttribute('onclick','');
+      input.addEventListener('click', function(e){
         e.stopPropagation();
-        window.openDepPanel();
+        window.openComposeModal('text');
       });
+    }
+    // Bind compose tool buttons by their class
+    var toolMap = { video: 'video', photo: 'photo', listing: 'listing' };
+    Object.keys(toolMap).forEach(function(cls){
+      var tool = document.querySelector('#page-social .md-compose-tool.' + cls);
+      if(tool){
+        tool.onclick = null;
+        tool.setAttribute('onclick','');
+        tool.addEventListener('click', function(e){
+          e.stopPropagation();
+          window.openComposeModal(toolMap[cls]);
+        });
+      }
     });
+    // Bind add-story card
+    var addStory = document.querySelector('#page-social .md-story-card.add-story');
+    if(addStory){
+      addStory.onclick = null;
+      addStory.setAttribute('onclick','');
+      addStory.addEventListener('click', function(e){
+        e.stopPropagation();
+        window.openShareStoryModal();
+      });
+    }
+    // Bind "+ ลงประกาศ Story" link
+    var storyLink = document.querySelector('#page-social .md-story-bar-hd a');
+    if(storyLink){
+      storyLink.onclick = null;
+      storyLink.setAttribute('onclick','');
+      storyLink.addEventListener('click', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        window.openShareStoryModal();
+      });
+    }
   }
 
   /* ─────────────────────────────────────────────────────────────
