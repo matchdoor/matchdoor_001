@@ -3582,6 +3582,368 @@ footer::after{
 .madv-loc-item.loc-clear:hover { background:#fff5f5; color:#c0392b; }
 .madv-loc-sep { height:1px; background:#eee; margin:2px 0; }
 </style>
+
+<style>
+/* ══════════════════════════════════════════════════
+   MATCHDOOR SOCIAL FEED — Facebook-style Layout
+   3-column: Agents Left | Feed Center | Ads+SEO Right
+══════════════════════════════════════════════════ */
+.md-fb-layout{
+  display:grid;
+  grid-template-columns:290px 1fr 300px;
+  gap:18px;
+  max-width:1320px;
+  margin:0 auto;
+  padding:20px 16px 40px;
+  align-items:start;
+}
+@media(max-width:1200px){
+  .md-fb-layout{grid-template-columns:260px 1fr 280px}
+}
+@media(max-width:960px){
+  .md-fb-layout{grid-template-columns:1fr;padding:12px}
+  .md-fb-col-left{display:none}
+  .md-fb-col-right{display:none}
+}
+
+/* ─── Shared card base ─── */
+.md-fb-card{
+  background:#fff;
+  border-radius:12px;
+  border:1px solid #E4E6EB;
+  overflow:hidden;
+  margin-bottom:12px;
+}
+
+/* ─── LEFT COLUMN ─── */
+.md-fb-col-left{display:flex;flex-direction:column}
+.md-fb-col-right{display:flex;flex-direction:column}
+.md-fb-col-center{display:flex;flex-direction:column}
+
+/* Team hero panel */
+.md-team-hero{
+  background:linear-gradient(135deg,#0F2548 0%,#1B3A6B 60%,#2a5298 100%);
+  padding:20px 18px 16px;
+  border-bottom:3px solid #C8922A;
+  color:#fff;
+}
+.md-team-hero h3{
+  font-size:15px;font-weight:800;margin-bottom:3px;
+  display:flex;align-items:center;gap:7px;
+}
+.md-team-hero p{font-size:11px;opacity:.75;margin-bottom:14px}
+.md-stat-row{display:flex;gap:8px;margin-bottom:14px}
+.md-stat-pill{
+  flex:1;background:rgba(255,255,255,.1);
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:8px;padding:8px 6px;text-align:center;
+}
+.md-stat-pill .md-snum{font-size:16px;font-weight:800;color:#C8922A}
+.md-stat-pill .md-slbl{font-size:9px;opacity:.8;line-height:1.3;margin-top:2px}
+.md-apply-btns{display:flex;gap:7px}
+.md-apply-btn{
+  flex:1;padding:8px 6px;border-radius:20px;font-size:11px;font-weight:700;
+  cursor:pointer;text-align:center;border:none;font-family:inherit;transition:.15s;
+}
+.md-apply-btn.primary{background:#C8922A;color:#fff}
+.md-apply-btn.primary:hover{background:#b07a20}
+.md-apply-btn.outline{background:transparent;border:1.5px solid rgba(255,255,255,.5);color:#fff}
+.md-apply-btn.outline:hover{background:rgba(255,255,255,.1)}
+
+/* Agent list */
+.md-agent-list{padding:8px 6px}
+.md-agent-item{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 8px;border-radius:8px;cursor:pointer;transition:.15s;
+}
+.md-agent-item:hover{background:#F0F2F5}
+.md-agent-av{
+  width:46px;height:46px;border-radius:50%;
+  background:linear-gradient(135deg,#1B3A6B,#7C6FCD);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-weight:700;font-size:14px;flex-shrink:0;overflow:hidden;
+  border:2px solid #E4E6EB;
+}
+.md-agent-av img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.md-agent-info{flex:1;min-width:0}
+.md-agent-name{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.md-agent-role{font-size:11px;color:#65676B}
+.md-agent-stars{font-size:11px;color:#C8922A;margin-top:1px}
+.md-online-dot{width:10px;height:10px;background:#10b981;border:2px solid #fff;border-radius:50%;flex-shrink:0}
+.md-online-dot.away{background:#facc15}
+.md-online-dot.offline{background:#d1d5db}
+
+/* Side nav menu */
+.md-side-nav{padding:8px}
+.md-side-nav-item{
+  display:flex;align-items:center;gap:10px;padding:10px 12px;
+  border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;
+  color:#1C1E21;transition:.15s;
+}
+.md-side-nav-item:hover{background:#F0F2F5}
+.md-side-nav-item.active{background:#E7F3FF;color:#1877F2}
+.md-side-nav-item i{font-size:18px;width:22px;text-align:center;color:#65676B}
+.md-side-nav-item.active i{color:#1877F2}
+.md-side-divider{height:1px;background:#E4E6EB;margin:4px 10px}
+.md-see-more{
+  text-align:center;padding:10px 12px;font-size:13px;color:#1877F2;
+  font-weight:600;cursor:pointer;border-top:1px solid #E4E6EB;transition:.15s;
+}
+.md-see-more:hover{background:#F0F2F5}
+
+/* ─── Story Bar ─── */
+.md-story-bar{padding:14px 14px 10px}
+.md-story-bar-hd{
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:14px;font-weight:700;margin-bottom:12px;
+}
+.md-story-bar-hd a{font-size:13px;color:#1877F2;font-weight:600;cursor:pointer}
+.md-stories-scroll{
+  display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;
+}
+.md-stories-scroll::-webkit-scrollbar{height:3px}
+.md-stories-scroll::-webkit-scrollbar-thumb{background:#E4E6EB;border-radius:99px}
+.md-story-card{
+  flex-shrink:0;width:94px;height:136px;border-radius:10px;
+  position:relative;overflow:hidden;cursor:pointer;
+  border:2.5px solid #C8922A;
+  background:linear-gradient(160deg,#1B3A6B,#2a5298);
+  transition:.2s;
+}
+.md-story-card:hover{transform:scale(1.03)}
+.md-story-card.add-story{background:#fff;border:2px dashed #C8D0DA}
+.md-story-card.add-story:hover{background:#F0F2F5}
+.md-story-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.65) 0%,transparent 55%)}
+.md-story-av{
+  position:absolute;top:8px;left:8px;width:34px;height:34px;
+  border-radius:50%;border:2.5px solid #C8922A;
+  background:#fff;overflow:hidden;display:flex;align-items:center;
+  justify-content:center;font-size:12px;font-weight:700;color:#1B3A6B;
+}
+.md-story-av img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.md-story-label{
+  position:absolute;bottom:7px;left:0;right:0;padding:0 6px;
+  font-size:10px;font-weight:700;color:#fff;line-height:1.3;text-align:center;
+}
+.md-story-add-icon{
+  width:38px;height:38px;background:#1877F2;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:22px;margin:26px auto 8px;border:3px solid #fff;
+}
+.md-story-add-label{font-size:11px;font-weight:600;color:#1C1E21;text-align:center;padding:0 4px}
+.md-story-play{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  opacity:0;transition:.2s;
+}
+.md-story-card:hover .md-story-play{opacity:1}
+.md-story-play-btn{
+  width:36px;height:36px;background:rgba(255,255,255,.9);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  color:#1B3A6B;font-size:16px;
+}
+
+/* ─── Compose Box ─── */
+.md-compose{padding:12px 16px}
+.md-compose-row{display:flex;align-items:center;gap:10px}
+.md-compose-av{
+  width:42px;height:42px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,#1B3A6B,#7C6FCD);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-weight:700;font-size:15px;overflow:hidden;
+}
+.md-compose-av img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.md-compose-input{
+  flex:1;background:#F0F2F5;border:none;border-radius:22px;
+  padding:10px 16px;font-size:14px;cursor:pointer;color:#65676B;
+  font-family:inherit;transition:.15s;
+}
+.md-compose-input:hover{background:#E4E6EB}
+.md-compose-tools{
+  display:flex;gap:2px;padding:8px 0 0;
+  border-top:1px solid #E4E6EB;margin-top:10px;
+}
+.md-compose-tool{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:6px;
+  padding:8px 4px;border-radius:8px;cursor:pointer;
+  font-size:12px;font-weight:700;color:#65676B;transition:.15s;
+}
+.md-compose-tool:hover{background:#F0F2F5}
+.md-compose-tool i{font-size:18px}
+.md-compose-tool.video i{color:#f43f5e}
+.md-compose-tool.photo i{color:#10b981}
+.md-compose-tool.listing i{color:#C8922A}
+
+/* ─── Post Card ─── */
+.md-post-card{border:1px solid #E4E6EB}
+.md-post-hd{
+  display:flex;align-items:center;gap:10px;padding:12px 16px;
+  justify-content:space-between;
+}
+.md-post-author{display:flex;align-items:center;gap:10px}
+.md-post-av{
+  width:44px;height:44px;border-radius:50%;flex-shrink:0;overflow:hidden;
+  background:linear-gradient(135deg,#C8922A,#e07b1a);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-weight:700;font-size:16px;
+}
+.md-post-av img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.md-post-name{font-size:14px;font-weight:700;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.md-post-meta{font-size:12px;color:#65676B;display:flex;align-items:center;gap:4px;margin-top:2px}
+.md-verified{
+  background:#C8922A;color:#fff;border-radius:4px;
+  padding:1px 7px;font-size:9px;font-weight:700;
+}
+.md-verified.member{background:#10b981}
+.md-post-more{
+  background:none;border:none;color:#65676B;cursor:pointer;
+  padding:6px;border-radius:50%;font-size:18px;transition:.15s;
+}
+.md-post-more:hover{background:#F0F2F5}
+.md-post-text{padding:0 16px 10px;font-size:14px;line-height:1.65;color:#1C1E21}
+.md-post-text .md-hashtag{color:#1877F2;font-weight:600}
+.md-post-media{position:relative;overflow:hidden}
+.md-post-media img{width:100%;display:block;max-height:420px;object-fit:cover}
+.md-media-overlay{
+  position:absolute;inset:0;background:rgba(0,0,0,.28);
+  display:flex;align-items:center;justify-content:center;
+}
+.md-play-btn{
+  width:56px;height:56px;background:rgba(255,255,255,.92);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  color:#1B3A6B;font-size:24px;cursor:pointer;transition:.15s;
+}
+.md-play-btn:hover{transform:scale(1.1)}
+.md-prop-tag{
+  position:absolute;bottom:10px;left:10px;
+  background:rgba(27,58,107,.9);color:#fff;border-radius:6px;
+  padding:4px 11px;font-size:12px;font-weight:700;backdrop-filter:blur(4px);
+}
+.md-price-tag{
+  position:absolute;bottom:10px;right:10px;
+  background:#C8922A;color:#fff;border-radius:6px;
+  padding:4px 11px;font-size:12px;font-weight:700;
+}
+.md-price-tag.sold{background:#10b981}
+.md-reaction-count{
+  padding:6px 16px 4px;font-size:13px;color:#65676B;
+  border-bottom:1px solid #E4E6EB;
+}
+.md-reaction-count span{color:#1C1E21;font-weight:600}
+.md-post-actions{display:flex;gap:2px;padding:4px 8px;border-bottom:1px solid #E4E6EB}
+.md-post-action{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:5px;
+  padding:8px 4px;border-radius:8px;cursor:pointer;
+  font-size:13px;font-weight:600;color:#65676B;transition:.15s;
+}
+.md-post-action:hover{background:#F0F2F5}
+.md-post-action i{font-size:18px}
+.md-post-action.liked{color:#f43f5e}
+.md-post-action.liked i{color:#f43f5e}
+.md-post-action.contact-btn{color:#1B3A6B}
+.md-post-action.contact-btn i{color:#C8922A}
+
+/* Comments */
+.md-comments{padding:8px 14px 10px}
+.md-comment-item{display:flex;align-items:flex-start;gap:8px;margin-bottom:7px}
+.md-comment-av{
+  width:32px;height:32px;border-radius:50%;flex-shrink:0;
+  background:#E4E6EB;display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:#65676B;overflow:hidden;
+}
+.md-comment-av img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.md-comment-bubble{
+  background:#F0F2F5;border-radius:0 12px 12px 12px;
+  padding:7px 12px;font-size:13px;flex:1;
+}
+.md-comment-bubble b{display:block;font-weight:700;font-size:12px;margin-bottom:2px}
+.md-comment-box{
+  display:flex;align-items:center;gap:8px;padding:8px 14px 12px;
+}
+.md-comment-input{
+  flex:1;background:#F0F2F5;border:none;border-radius:20px;
+  padding:9px 14px;font-size:13px;font-family:inherit;outline:none;
+}
+.md-comment-input:focus{background:#E4E6EB}
+.md-comment-send{
+  background:#1B3A6B;border:none;border-radius:50%;width:32px;height:32px;
+  color:#fff;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;
+  transition:.15s;flex-shrink:0;
+}
+.md-comment-send:hover{background:#C8922A}
+
+/* ─── Right Column ─── */
+.md-ad-card{padding:14px 14px 8px}
+.md-ad-title{font-size:13px;font-weight:700;color:#1C1E21;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.md-ad-unit{
+  border:1px solid #E4E6EB;border-radius:8px;overflow:hidden;
+  margin-bottom:8px;cursor:pointer;transition:.15s;
+}
+.md-ad-unit:hover{border-color:#C8922A;box-shadow:0 2px 12px rgba(200,146,42,.15)}
+.md-ad-img{
+  width:100%;height:80px;
+  background:linear-gradient(135deg,#1B3A6B,#2a5298);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:24px;
+}
+.md-ad-body{padding:8px 10px}
+.md-ad-name{font-size:12px;font-weight:700;color:#1C1E21}
+.md-ad-sub{font-size:11px;color:#65676B;margin-top:2px}
+.md-ad-badge{
+  display:inline-block;border-radius:4px;padding:1px 6px;
+  font-size:10px;font-weight:700;margin-top:4px;
+}
+.md-ad-badge.sponsored{background:#FFF3CD;color:#856404}
+.md-ad-badge.hot{background:#FFE4E4;color:#c0392b}
+.md-ad-badge.premium{background:#E8F5E9;color:#1a7a3c}
+
+.md-seo-card{padding:14px}
+.md-seo-title{font-size:13px;font-weight:700;margin-bottom:10px;color:#1C1E21}
+.md-seo-links{display:flex;flex-direction:column;gap:4px}
+.md-seo-link{
+  padding:7px 10px;border-radius:8px;font-size:12px;
+  color:#1B3A6B;font-weight:600;cursor:pointer;transition:.15s;
+  border:1px solid #E4E6EB;display:flex;align-items:center;gap:7px;
+}
+.md-seo-link:hover{background:#E7F3FF;border-color:#b8d4f5;color:#1877F2}
+.md-seo-link i{color:#C8922A;font-size:13px}
+
+.md-online-sec{padding:12px 14px 10px}
+.md-online-title{
+  font-size:11px;color:#65676B;margin-bottom:10px;
+  text-transform:uppercase;letter-spacing:.5px;font-weight:700;
+}
+.md-online-item{display:flex;align-items:center;gap:9px;padding:5px 0;cursor:pointer}
+.md-online-item:hover .md-online-name{color:#1877F2}
+.md-online-av{
+  width:30px;height:30px;border-radius:50%;background:#E4E6EB;
+  position:relative;overflow:hidden;display:flex;align-items:center;
+  justify-content:center;font-size:11px;font-weight:700;color:#65676B;flex-shrink:0;
+}
+.md-online-av img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.md-online-av .md-dot{
+  position:absolute;bottom:0;right:0;width:9px;height:9px;
+  background:#10b981;border:1.5px solid #fff;border-radius:50%;
+}
+.md-online-av .md-dot.away{background:#facc15}
+.md-online-name{font-size:13px;font-weight:600;color:#1C1E21}
+
+.md-footer-links{padding:10px 14px;display:flex;flex-wrap:wrap;gap:4px 10px}
+.md-footer-links a{font-size:11px;color:#65676B;cursor:pointer;text-decoration:none}
+.md-footer-links a:hover{text-decoration:underline}
+.md-footer-copy{padding:2px 14px 12px;font-size:11px;color:#65676B}
+
+/* ─── Ads banner (post-style) ─── */
+.md-promoted-badge{
+  background:rgba(200,146,42,.12);color:#C8922A;border-radius:4px;
+  padding:1px 7px;font-size:10px;font-weight:700;
+}
+
+/* Mobile compact story */
+@media(max-width:960px){
+  .md-fb-layout{padding:10px 0}
+  .md-fb-col-center{padding:0 6px}
+}
+</style>
 </head>
 <body>
 
@@ -4155,6 +4517,520 @@ footer::after{
     <div class="pg-controls" id="all-pg-controls"></div>
   </div>
 </div>
+<!-- ═══════════════════════════════════════════════════════════
+     MATCHDOOR SOCIAL FEED — Facebook-style 3-column layout
+     Left: Team/Agents | Center: Feed | Right: Ads + SEO
+═══════════════════════════════════════════════════════════ -->
+<div id="md-social-feed-section" style="background:#F0F2F5;padding:0 0 4px;border-top:2px solid #E4E6EB">
+  <div class="md-fb-layout">
+
+    <!-- ════ LEFT COLUMN: Team + Nav ════ -->
+    <div class="md-fb-col-left">
+
+      <!-- Team Panel -->
+      <div class="md-fb-card">
+        <div class="md-team-hero">
+          <h3><i class="fas fa-users"></i> ทีมตัวแทนของเรา</h3>
+          <p>มืออาชีพพร้อมดูแลทุกขั้นตอน</p>
+          <div class="md-stat-row">
+            <div class="md-stat-pill">
+              <div class="md-snum" id="md-stat-listings">135+</div>
+              <div class="md-slbl">รายการทั้งหมด</div>
+            </div>
+            <div class="md-stat-pill">
+              <div class="md-snum" id="md-stat-deals">12+</div>
+              <div class="md-slbl">ปิดดีลแล้ว</div>
+            </div>
+            <div class="md-stat-pill">
+              <div class="md-snum" id="md-stat-agents">7+</div>
+              <div class="md-slbl">ตัวแทน</div>
+            </div>
+          </div>
+          <div class="md-apply-btns">
+            <div class="md-apply-btn primary" onclick="openApplyModal && openApplyModal('agent')">
+              <i class="fas fa-user-tie"></i> สมัครตัวแทน
+            </div>
+            <div class="md-apply-btn outline" onclick="openApplyModal && openApplyModal('other')">
+              <i class="fas fa-briefcase"></i> สมัครงาน
+            </div>
+          </div>
+        </div>
+        <!-- Agent list rendered by JS -->
+        <div class="md-agent-list" id="md-agent-list-sidebar">
+          <div style="padding:16px;text-align:center;color:#65676B;font-size:13px">
+            <i class="fas fa-spinner fa-spin" style="margin-bottom:8px;display:block;font-size:20px;color:#C8922A"></i>
+            กำลังโหลดข้อมูลทีม...
+          </div>
+        </div>
+        <div class="md-see-more" onclick="showPage('agents')">ดูตัวแทนทั้งหมด →</div>
+      </div>
+
+      <!-- Side Nav -->
+      <div class="md-fb-card">
+        <div class="md-side-nav">
+          <div class="md-side-nav-item active" onclick="scrollTo({top:0,behavior:'smooth'})">
+            <i class="fas fa-home"></i> หน้าแรก
+          </div>
+          <div class="md-side-nav-item" onclick="openAllModal('all')">
+            <i class="fas fa-building"></i> ประกาศทั้งหมด
+          </div>
+          <div class="md-side-nav-item" onclick="openAllModal('all')">
+            <i class="fas fa-map-marker-alt"></i> ค้นหาตามทำเล
+          </div>
+          <div class="md-side-nav-item" onclick="openAllModal('fav')">
+            <i class="fas fa-heart"></i> รายการโปรด
+          </div>
+          <div class="md-side-divider"></div>
+          <div class="md-side-nav-item" onclick="showPage('portfolio')">
+            <i class="fas fa-trophy" style="color:#C8922A"></i> ผลงานของเรา
+          </div>
+          <div class="md-side-nav-item" onclick="openAllModal('blog')">
+            <i class="fas fa-newspaper"></i> ข่าวอสังหาฯ
+          </div>
+          <div class="md-side-nav-item" onclick="scrollToEl('contact-sec')">
+            <i class="fas fa-calculator"></i> บริการครบวงจร
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end left col -->
+
+    <!-- ════ CENTER COLUMN: Feed ════ -->
+    <div class="md-fb-col-center">
+
+      <!-- Story / Video Bar -->
+      <div class="md-fb-card">
+        <div class="md-story-bar">
+          <div class="md-story-bar-hd">
+            <span>📹 Story ทรัพย์แนะนำ</span>
+            <a onclick="openDepPanel && openDepPanel()">+ ลงประกาศ Story</a>
+          </div>
+          <div class="md-stories-scroll" id="md-stories-scroll">
+            <!-- Add story card -->
+            <div class="md-story-card add-story" onclick="openDepPanel && openDepPanel()">
+              <div class="md-story-add-icon"><i class="fas fa-plus"></i></div>
+              <div class="md-story-add-label">ลง Story ทรัพย์ของคุณ</div>
+            </div>
+            <!-- Story cards — rendered dynamically + static placeholders -->
+            <div class="md-story-card" style="background:linear-gradient(160deg,#0f2027,#203a43)">
+              <div class="md-story-av">พ</div>
+              <div class="md-story-overlay"></div>
+              <div class="md-story-play"><div class="md-play-btn"><i class="fas fa-play"></i></div></div>
+              <div class="md-story-label">The Loft สุขุมวิท ชั้น 22</div>
+            </div>
+            <div class="md-story-card" style="background:linear-gradient(160deg,#1a1a2e,#16213e)">
+              <div class="md-story-av">ส</div>
+              <div class="md-story-overlay"></div>
+              <div class="md-story-play"><div class="md-play-btn"><i class="fas fa-play"></i></div></div>
+              <div class="md-story-label">Ideo อโศก 1 ห้องนอน</div>
+            </div>
+            <div class="md-story-card" style="background:linear-gradient(160deg,#0d3b2e,#1a5c42)">
+              <div class="md-story-av">จ</div>
+              <div class="md-story-overlay"></div>
+              <div class="md-story-play"><div class="md-play-btn"><i class="fas fa-play"></i></div></div>
+              <div class="md-story-label">บ้านสวน ลาดพร้าว 2 ชั้น</div>
+            </div>
+            <div class="md-story-card" style="background:linear-gradient(160deg,#3d1a00,#7a3200)">
+              <div class="md-story-av">ก</div>
+              <div class="md-story-overlay"></div>
+              <div class="md-story-play"><div class="md-play-btn"><i class="fas fa-play"></i></div></div>
+              <div class="md-story-label">ทาวน์โฮม พระราม 9 ใหม่</div>
+            </div>
+            <div class="md-story-card" style="background:linear-gradient(160deg,#1B3A6B,#2a5298)">
+              <div class="md-story-av">อ</div>
+              <div class="md-story-overlay"></div>
+              <div class="md-story-play"><div class="md-play-btn"><i class="fas fa-play"></i></div></div>
+              <div class="md-story-label">แมนชั่น ทองหล่อ หรู</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Compose Box -->
+      <div class="md-fb-card">
+        <div class="md-compose">
+          <div class="md-compose-row">
+            <div class="md-compose-av" id="md-compose-av">
+              <i class="fas fa-user"></i>
+            </div>
+            <div class="md-compose-input" onclick="openDepPanel && openDepPanel()">
+              คุณมีทรัพย์อยากแชร์? โพสต์ประกาศหรือถามเรื่องบ้าน...
+            </div>
+          </div>
+          <div class="md-compose-tools">
+            <div class="md-compose-tool video" onclick="openDepPanel && openDepPanel()">
+              <i class="fas fa-video"></i> วิดีโอ
+            </div>
+            <div class="md-compose-tool photo" onclick="openDepPanel && openDepPanel()">
+              <i class="fas fa-images"></i> รูปภาพ
+            </div>
+            <div class="md-compose-tool listing" onclick="openDepPanel && openDepPanel()">
+              <i class="fas fa-building"></i> ลงประกาศ
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feed Posts container — populated by JS -->
+      <div id="md-feed-posts"></div>
+
+      <!-- Load more -->
+      <div style="text-align:center;padding:12px 0 4px">
+        <button onclick="mdLoadMorePosts()" style="background:#fff;border:1.5px solid #E4E6EB;border-radius:8px;padding:10px 28px;font-size:14px;font-weight:700;color:#1B3A6B;cursor:pointer;font-family:inherit;transition:.15s" onmouseover="this.style.background='#F0F2F5'" onmouseout="this.style.background='#fff'">
+          <i class="fas fa-redo" style="margin-right:6px;color:#C8922A"></i> โหลดโพสต์เพิ่มเติม
+        </button>
+      </div>
+
+    </div><!-- end center col -->
+
+    <!-- ════ RIGHT COLUMN: Ads + SEO ════ -->
+    <div class="md-fb-col-right">
+
+      <!-- Sponsored Ads -->
+      <div class="md-fb-card">
+        <div class="md-ad-card">
+          <div class="md-ad-title"><i class="fas fa-bullhorn" style="color:#C8922A"></i> โฆษณาแนะนำ</div>
+          <div class="md-ad-unit" onclick="">
+            <div class="md-ad-img" style="background:linear-gradient(135deg,#1B3A6B,#2a5298)">🏗️</div>
+            <div class="md-ad-body">
+              <div class="md-ad-name">Nue Vibe สุขุมวิท 50</div>
+              <div class="md-ad-sub">เริ่ม 2.9 ล้าน · ใกล้ BTS ออนนุช</div>
+              <div class="md-ad-badge sponsored">Sponsored</div>
+            </div>
+          </div>
+          <div class="md-ad-unit">
+            <div class="md-ad-img" style="background:linear-gradient(135deg,#7C6FCD,#5b4fcf)">🏢</div>
+            <div class="md-ad-body">
+              <div class="md-ad-name">Origin Place พระราม 9</div>
+              <div class="md-ad-sub">Pre-Sale ราคาพิเศษ ลดสูงสุด 20%</div>
+              <div class="md-ad-badge hot">Hot Deal</div>
+            </div>
+          </div>
+          <div class="md-ad-unit">
+            <div class="md-ad-img" style="background:linear-gradient(135deg,#0f6e56,#1D9E75)">🌿</div>
+            <div class="md-ad-body">
+              <div class="md-ad-name">The Forestias บางนา</div>
+              <div class="md-ad-sub">บ้านหรูติดป่า เริ่ม 15 ล้าน</div>
+              <div class="md-ad-badge premium">Premium</div>
+            </div>
+          </div>
+        </div>
+        <div class="md-see-more" style="border-top:1px solid #E4E6EB" onclick="">ลงโฆษณากับเรา →</div>
+      </div>
+
+      <!-- SEO Quick Links -->
+      <div class="md-fb-card">
+        <div class="md-seo-card">
+          <div class="md-seo-title">🔍 ค้นหายอดนิยม</div>
+          <div class="md-seo-links">
+            <div class="md-seo-link" onclick="quickSearch && quickSearch('คอนโด สุขุมวิท')"><i class="fas fa-building"></i> คอนโดใกล้ BTS สุขุมวิท</div>
+            <div class="md-seo-link" onclick="quickSearch && quickSearch('บ้านเดี่ยว กรุงเทพ')"><i class="fas fa-home"></i> บ้านเดี่ยวกรุงเทพ</div>
+            <div class="md-seo-link" onclick="quickSearch && quickSearch('คอนโด พระราม 9')"><i class="fas fa-subway"></i> คอนโดใกล้ MRT พระราม 9</div>
+            <div class="md-seo-link" onclick="quickSearch && quickSearch('ทาวน์โฮม ลาดพร้าว')"><i class="fas fa-city"></i> ทาวน์โฮมลาดพร้าว</div>
+            <div class="md-seo-link" onclick="quickSearch && quickSearch('ที่ดิน กรุงเทพ')"><i class="fas fa-map"></i> ที่ดินกรุงเทพ</div>
+            <div class="md-seo-link" onclick="quickSearch && quickSearch('เช่าคอนโด ทองหล่อ')"><i class="fas fa-key"></i> เช่าคอนโดทองหล่อ</div>
+            <div class="md-seo-link" onclick="quickSearch && quickSearch('คอนโด ราคา ต่ำกว่า 2000000')"><i class="fas fa-tag"></i> คอนโดราคาต่ำกว่า 2 ล้าน</div>
+            <div class="md-seo-link" onclick="quickSearch && quickSearch('บ้าน ใกล้รถไฟฟ้า')"><i class="fas fa-train"></i> บ้านใกล้รถไฟฟ้า</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Online Agents -->
+      <div class="md-fb-card">
+        <div class="md-online-sec">
+          <div class="md-online-title">ตัวแทนออนไลน์</div>
+          <div id="md-online-agents-list">
+            <div style="font-size:12px;color:#65676B;padding:4px 0">
+              <i class="fas fa-spinner fa-spin" style="color:#C8922A;margin-right:6px"></i> กำลังโหลด...
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer SEO links -->
+      <div class="md-fb-card">
+        <div class="md-footer-links">
+          <a onclick="showPage && showPage('home')">หน้าแรก</a>
+          <a>เกี่ยวกับเรา</a>
+          <a>ความเป็นส่วนตัว</a>
+          <a>เงื่อนไขการใช้งาน</a>
+          <a onclick="openDepPanel && openDepPanel()">ลงโฆษณา</a>
+          <a onclick="openApplyModal && openApplyModal('agent')">สมัครตัวแทน</a>
+          <a onclick="openAllModal && openAllModal('blog')">บทความ</a>
+          <a onclick="scrollToEl('contact-sec')">ติดต่อเรา</a>
+        </div>
+        <div class="md-footer-copy">© 2025 Matchdoor — Real Estate Platform</div>
+      </div>
+
+    </div><!-- end right col -->
+
+  </div><!-- end md-fb-layout -->
+</div><!-- end md-social-feed-section -->
+
+<!-- ═══ SOCIAL FEED JS ═══════════════════════════════════ -->
+<script>
+(function(){
+  /* ── helpers ── */
+  function el(id){ return document.getElementById(id); }
+  function esc(s){ return String(s||'').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function timeAgo(d){
+    if(!d) return '';
+    var diff = (Date.now() - new Date(d)) / 1000;
+    if(diff < 60) return 'เมื่อสักครู่';
+    if(diff < 3600) return Math.floor(diff/60) + ' นาทีที่แล้ว';
+    if(diff < 86400) return Math.floor(diff/3600) + ' ชั่วโมงที่แล้ว';
+    return Math.floor(diff/86400) + ' วันที่แล้ว';
+  }
+
+  /* ── Render Agent sidebar ── */
+  function renderAgentSidebar(){
+    var listEl = el('md-agent-list-sidebar');
+    var onlineEl = el('md-online-agents-list');
+    if(!listEl) return;
+    // read from global agents array if available
+    var agArr = (typeof agents !== 'undefined' && Array.isArray(agents)) ? agents : [];
+    if(!agArr.length){
+      // retry after agents load
+      setTimeout(renderAgentSidebar, 1200);
+      return;
+    }
+    // update stats
+    var statAg = el('md-stat-agents');
+    var statDeals = el('md-stat-deals');
+    var statList = el('md-stat-listings');
+    if(statAg) statAg.textContent = agArr.length + '+';
+    if(statDeals){
+      var totalDeals = agArr.reduce(function(a,ag){ return a + (ag.deals||0); },0);
+      statDeals.textContent = totalDeals + '+';
+    }
+    // render top 4 agents
+    var top4 = agArr.slice(0, 4);
+    var dotColors = ['#10b981','#10b981','#facc15','#d1d5db'];
+    listEl.innerHTML = top4.map(function(ag, i){
+      var avHtml = ag.photo_url
+        ? '<img src="' + esc(ag.photo_url) + '" alt="' + esc(ag.name) + '" onerror="this.parentNode.textContent=\'' + esc((ag.name||'A').charAt(0)) + '\'">'
+        : (ag.name||'A').charAt(0);
+      var stars = '';
+      var r = parseFloat(ag.rating||5);
+      for(var s=1;s<=5;s++) stars += s <= Math.round(r) ? '★' : '☆';
+      return '<div class="md-agent-item" onclick="openAgentModal && openAgentModal(' + JSON.stringify(ag) + ')">'
+        + '<div class="md-agent-av">' + avHtml + '</div>'
+        + '<div class="md-agent-info">'
+          + '<div class="md-agent-name">' + esc(ag.name) + '</div>'
+          + '<div class="md-agent-role">' + esc(ag.title||'ตัวแทนอสังหาฯ') + '</div>'
+          + '<div class="md-agent-stars">' + stars + ' <span style="color:#65676B;font-size:10px">' + r.toFixed(1) + '</span></div>'
+        + '</div>'
+        + '<div class="md-online-dot' + (i < 2 ? '' : i===2 ? ' away' : ' offline') + '"></div>'
+        + '</div>';
+    }).join('');
+
+    // Online agents (right col)
+    if(onlineEl){
+      var onlineAgents = agArr.filter(function(_,i){ return i < 3; });
+      var awayStatus = [false, false, true];
+      onlineEl.innerHTML = onlineAgents.map(function(ag, i){
+        var avHtml = ag.photo_url
+          ? '<img src="' + esc(ag.photo_url) + '" alt="">'
+          : (ag.name||'A').charAt(0);
+        return '<div class="md-online-item">'
+          + '<div class="md-online-av">' + avHtml + '<div class="md-dot' + (awayStatus[i]?' away':'') + '"></div></div>'
+          + '<div class="md-online-name">' + esc(ag.name) + (awayStatus[i]?' <span style="color:#65676B;font-size:11px">(ไม่ว่าง)</span>':'') + '</div>'
+          + '</div>';
+      }).join('');
+    }
+  }
+
+  /* ── Build post card HTML ── */
+  function buildPostCard(p, ag){
+    var agName = ag ? (ag.name||'ตัวแทน Matchdoor') : 'สมาชิก Matchdoor';
+    var isAgent = !!ag;
+    var avHtml = (ag && ag.photo_url)
+      ? '<img src="' + esc(ag.photo_url) + '" alt="" onerror="this.parentNode.innerHTML=\'<i class=&quot;fas fa-user&quot;></i>\'">'
+      : '<i class="fas fa-user"></i>';
+
+    var imgHtml = '';
+    if(p.images && p.images[0]){
+      imgHtml = '<div class="md-post-media">'
+        + '<img src="' + esc(p.images[0]) + '" alt="' + esc(p.title) + '" loading="lazy" onerror="this.parentNode.style.display=\'none\'">'
+        + (p.tx === 'RENT' || p.tx === 'SELL' ?
+          '<div class="md-prop-tag">' + (p.prop_type||p.type||'อสังหาฯ') + ' · ' + esc(p.location||p.district||'') + '</div>' : '')
+        + (p.price ?
+          '<div class="md-price-tag">' + (parseInt(p.price) >= 1000000
+            ? '฿' + (parseInt(p.price)/1000000).toFixed(1) + ' ล้าน'
+            : '฿' + parseInt(p.price).toLocaleString('th-TH')) + '</div>' : '')
+        + '</div>';
+    }
+
+    var textContent = p.title || '';
+    var hashtags = [];
+    if(p.district) hashtags.push('#' + p.district.replace(/\s/g,''));
+    if(p.prop_type || p.type) hashtags.push('#' + (p.prop_type||p.type||'').replace(/\s/g,''));
+    if(p.near_bts) hashtags.push('#ใกล้BTS' + p.near_bts.replace(/\s/g,''));
+    hashtags.push('#Matchdoor');
+
+    var hashtagHtml = hashtags.map(function(h){
+      return '<span class="md-hashtag">' + esc(h) + '</span>';
+    }).join(' ');
+
+    var likes = Math.floor(Math.random()*80) + 5;
+    var cmts = Math.floor(Math.random()*20) + 1;
+
+    return '<div class="md-fb-card md-post-card" data-pid="' + esc(p.id) + '">'
+      + '<div class="md-post-hd">'
+        + '<div class="md-post-author">'
+          + '<div class="md-post-av">' + avHtml + '</div>'
+          + '<div>'
+            + '<div class="md-post-name">' + esc(agName)
+              + ' <span class="md-verified' + (isAgent ? '' : ' member') + '">'
+              + (isAgent ? '✓ ตัวแทน' : '✓ สมาชิก') + '</span></div>'
+            + '<div class="md-post-meta">'
+              + '<i class="fas fa-clock" style="font-size:11px"></i> '
+              + timeAgo(p.created_at||p.updated_at)
+              + ' · <i class="fas fa-globe-asia" style="font-size:11px"></i>'
+            + '</div>'
+          + '</div>'
+        + '</div>'
+        + '<button class="md-post-more" onclick="event.stopPropagation()">···</button>'
+      + '</div>'
+      + '<div class="md-post-text">'
+        + esc(textContent)
+        + (p.desc ? '<br><span style="color:#65676B;font-size:13px">' + esc(p.desc.substring(0,120)) + (p.desc.length>120?'...':'') + '</span>' : '')
+        + '<br>' + hashtagHtml
+      + '</div>'
+      + imgHtml
+      + '<div class="md-reaction-count"><span>❤️ ' + likes + '</span> · ความคิดเห็น ' + cmts + ' · แชร์ ' + Math.floor(Math.random()*10+1) + '</div>'
+      + '<div class="md-post-actions">'
+        + '<div class="md-post-action" onclick="mdToggleLike(this)"><i class="far fa-heart"></i> ถูกใจ</div>'
+        + '<div class="md-post-action" onclick="mdToggleComment(this)"><i class="far fa-comment"></i> คอมเมนต์</div>'
+        + '<div class="md-post-action" onclick="mdSharePost(\'' + esc(p.id) + '\')"><i class="fas fa-share"></i> แชร์</div>'
+        + '<div class="md-post-action contact-btn" onclick="openPropModal && openPropModal(' + JSON.stringify(p) + ')"><i class="fas fa-phone-alt"></i> ติดต่อ</div>'
+      + '</div>'
+      + '<div class="md-comment-collapse" style="display:none">'
+        + '<div class="md-comments">'
+          + '<div class="md-comment-item">'
+            + '<div class="md-comment-av"><i class="fas fa-user" style="font-size:11px"></i></div>'
+            + '<div class="md-comment-bubble"><b>สมาชิก</b>ราคาสามารถต่อรองได้ไหมครับ? 🙏</div>'
+          + '</div>'
+        + '</div>'
+        + '<div class="md-comment-box">'
+          + '<div class="md-compose-av" style="width:32px;height:32px;font-size:13px"><i class="fas fa-user"></i></div>'
+          + '<input class="md-comment-input" placeholder="เขียนความคิดเห็น...">'
+          + '<button class="md-comment-send"><i class="fas fa-paper-plane"></i></button>'
+        + '</div>'
+      + '</div>'
+      + '</div>';
+  }
+
+  /* ── Render feed ── */
+  var mdPostPage = 0;
+  var mdPostsPerPage = 5;
+
+  function renderFeedPosts(append){
+    var feedEl = el('md-feed-posts');
+    if(!feedEl) return;
+    var props = (typeof properties !== 'undefined' && Array.isArray(properties)) ? properties : [];
+    if(!props.length){ setTimeout(renderFeedPosts, 1200); return; }
+
+    var agArr = (typeof agents !== 'undefined' && Array.isArray(agents)) ? agents : [];
+    var start = append ? mdPostPage * mdPostsPerPage : 0;
+    if(!append){ feedEl.innerHTML = ''; mdPostPage = 0; }
+
+    var slice = props.slice(start, start + mdPostsPerPage);
+    if(!slice.length) return;
+
+    var html = '';
+    slice.forEach(function(p){
+      var ag = agArr.find(function(a){ return String(a.id) === String(p.agent_id); }) || agArr[0] || null;
+      html += buildPostCard(p, ag);
+      // inject a promoted ad every 3 posts
+      if(slice.indexOf(p) === 2){
+        html += '<div class="md-fb-card md-post-card" style="border:2px solid rgba(200,146,42,.3)">'
+          + '<div class="md-post-hd">'
+            + '<div class="md-post-author">'
+              + '<div class="md-post-av" style="background:linear-gradient(135deg,#C8922A,#a07020)"><i class="fas fa-star"></i></div>'
+              + '<div>'
+                + '<div class="md-post-name">Origin Property <span class="md-promoted-badge">โฆษณา</span></div>'
+                + '<div class="md-post-meta">โครงการพรีเมียม · สนใจติดต่อได้เลย</div>'
+              + '</div>'
+            + '</div>'
+          + '</div>'
+          + '<div class="md-post-text">🏙️ <strong>Origin Place พระราม 9</strong> — คอนโดหรูใจกลางเมือง ราคา Pre-Sale พิเศษ เริ่ม <strong>3.2 ล้านบาท</strong><br>'
+          + '<span class="md-hashtag">#พระราม9</span> <span class="md-hashtag">#MRTพระราม9</span> <span class="md-hashtag">#PreSale</span></div>'
+          + '<div class="md-post-media" style="background:linear-gradient(135deg,#1B3A6B,#7C6FCD);height:160px;display:flex;align-items:center;justify-content:center;color:#fff">'
+            + '<div style="text-align:center"><div style="font-size:36px;margin-bottom:8px">🏢</div>'
+            + '<div style="font-weight:700">Origin Place · พระราม 9</div>'
+            + '<div style="font-size:12px;opacity:.8;margin-top:4px">เริ่ม 3.2 ล้านบาท · ลดสูงสุด 20%</div></div>'
+          + '</div>'
+          + '<div class="md-post-actions">'
+            + '<div class="md-post-action" style="flex:2;color:#1B3A6B;font-weight:700"><i class="fas fa-phone-alt" style="color:#C8922A"></i> โทรสอบถามเลย</div>'
+            + '<div class="md-post-action"><i class="fas fa-share"></i> แชร์</div>'
+          + '</div>'
+          + '</div>';
+      }
+    });
+    feedEl.insertAdjacentHTML('beforeend', html);
+    mdPostPage++;
+  }
+
+  /* ── Like toggle ── */
+  window.mdToggleLike = function(btn){
+    var icon = btn.querySelector('i');
+    var isLiked = btn.classList.contains('liked');
+    btn.classList.toggle('liked');
+    if(icon){ icon.className = isLiked ? 'far fa-heart' : 'fas fa-heart'; }
+    btn.innerHTML = (isLiked ? '<i class="far fa-heart"></i>' : '<i class="fas fa-heart" style="color:#f43f5e"></i>') + ' ถูกใจ';
+    if(!isLiked) btn.style.color = '#f43f5e'; else btn.style.color = '';
+  };
+
+  /* ── Toggle comment ── */
+  window.mdToggleComment = function(btn){
+    var card = btn.closest('.md-post-card');
+    var collapse = card && card.querySelector('.md-comment-collapse');
+    if(collapse){
+      var isHidden = collapse.style.display === 'none';
+      collapse.style.display = isHidden ? 'block' : 'none';
+    }
+  };
+
+  /* ── Share post ── */
+  window.mdSharePost = function(pid){
+    if(navigator.share){
+      navigator.share({ title: 'Matchdoor — ทรัพย์น่าสนใจ', url: location.href });
+    } else {
+      navigator.clipboard && navigator.clipboard.writeText(location.href).then(function(){ typeof toast === 'function' && toast('คัดลอก URL แล้ว ✅'); });
+    }
+  };
+
+  /* ── Load more posts ── */
+  window.mdLoadMorePosts = function(){
+    renderFeedPosts(true);
+  };
+
+  /* ── Init on page ready / after data loads ── */
+  function initSocialFeed(){
+    renderAgentSidebar();
+    renderFeedPosts(false);
+  }
+
+  // If properties already loaded, run now; else wait for custom event or retry
+  if(typeof properties !== 'undefined' && Array.isArray(properties) && properties.length){
+    initSocialFeed();
+  } else {
+    // Retry loop — properties array might load async
+    var retries = 0;
+    var retryTimer = setInterval(function(){
+      retries++;
+      var propsReady = typeof properties !== 'undefined' && Array.isArray(properties) && properties.length;
+      var agentsReady = typeof agents !== 'undefined' && Array.isArray(agents);
+      if(propsReady || retries > 20){
+        clearInterval(retryTimer);
+        initSocialFeed();
+      }
+    }, 600);
+  }
+})();
+</script>
+
  <div id="osrv-sec" class="osrv-sec" style="padding:32px 0 28px">
   <div style="max-width:1320px;margin:0 auto;padding:0 20px">
     <div class="sec-hd">
