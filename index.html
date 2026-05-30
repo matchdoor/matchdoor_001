@@ -4517,6 +4517,19 @@ footer::after{
     <div class="pg-controls" id="all-pg-controls"></div>
   </div>
 </div>
+<!-- ═══ SOCIAL PAGE — แยกหน้า Community Feed ═══ -->
+<div class="page" id="page-social">
+  <!-- Page Hero Banner -->
+  <div class="page-hero" style="background:linear-gradient(135deg,#1877F2 0%,#1B3A6B 55%,#0d3b2e 100%);min-height:120px;display:flex;align-items:center;position:relative">
+    <div class="page-hero-content" style="padding:20px 20px 16px">
+      <button class="back-btn" onclick="showPage('my-account')"><i class="fas fa-arrow-left"></i> กลับบัญชีของฉัน</button>
+      <div style="display:flex;align-items:center;gap:12px;margin-top:10px;flex-wrap:wrap">
+        <h1 style="font-size:clamp(20px,4vw,28px);font-weight:800;color:#fff;margin:0"><i class="fab fa-facebook" style="margin-right:8px;color:#64b5f6"></i> ฟีดชุมชน Matchdoor</h1>
+        <span style="background:rgba(255,255,255,.15);color:#fff;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600;border:1px solid rgba(255,255,255,.25)"><i class="fas fa-users" style="margin-right:4px"></i> Community</span>
+      </div>
+      <p style="color:rgba(255,255,255,.75);font-size:13px;margin:6px 0 0">แชร์ทรัพย์ ถามตอบ ติดตามข่าวสาร อสังหาฯ กับชุมชน Matchdoor</p>
+    </div>
+  </div>
 <!-- ═══════════════════════════════════════════════════════════
      MATCHDOOR SOCIAL FEED — Facebook-style 3-column layout
      Left: Team/Agents | Center: Feed | Right: Ads + SEO
@@ -5011,6 +5024,8 @@ footer::after{
     renderAgentSidebar();
     renderFeedPosts(false);
   }
+  // Expose globally so showPage('social') can re-init
+  window.initSocialFeed = initSocialFeed;
 
   // If properties already loaded, run now; else wait for custom event or retry
   if(typeof properties !== 'undefined' && Array.isArray(properties) && properties.length){
@@ -5030,6 +5045,80 @@ footer::after{
   }
 })();
 </script>
+
+  <!-- SEO Quick Links for social page -->
+  <div class="flink-sec"><div class="flink-inner">
+    <div>
+      <h4>🏠 ซื้อ-ขาย กรุงเทพฯ</h4>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(()=>quickSearch('คอนโด กรุงเทพ'),100)">ขายคอนโด กรุงเทพฯ</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(()=>quickSearch('บ้านเดี่ยว กรุงเทพ'),100)">ขายบ้านเดี่ยว กรุงเทพฯ</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(()=>quickSearch('ที่ดิน กรุงเทพ'),100)">ขายที่ดิน กรุงเทพฯ</a>
+    </div>
+    <div>
+      <h4>🔑 เช่า กรุงเทพฯ</h4>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(()=>quickSearch('เช่าคอนโด สุขุมวิท'),100)">เช่าคอนโดสุขุมวิท</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(()=>quickSearch('เช่าคอนโด อโศก'),100)">เช่าคอนโดอโศก</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(()=>quickSearch('เช่าบ้านเดี่ยว กรุงเทพ'),100)">เช่าบ้านเดี่ยว กรุงเทพฯ</a>
+    </div>
+    <div>
+      <h4>📍 ทำเลยอดนิยม</h4>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(()=>quickSearch('สุขุมวิท'),100)">คอนโดย่านสุขุมวิท</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(()=>quickSearch('พระราม 9'),100)">อสังหาฯ พระราม 9</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(()=>quickSearch('ทองหล่อ'),100)">คอนโดทองหล่อ</a>
+    </div>
+  </div></div>
+  <!-- Footer for social page -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-brand-col">
+        <div class="footer-logo">
+          <div class="footer-logo-icon-wrap">
+            <div class="logo-img-wrap" style="width:52px;height:52px">
+              <div class="logo-door-glow"></div>
+              <img class="logo-img-base" src="LogoWeb.webp" alt="matchdoor logo" loading="lazy" style="opacity:1;visibility:visible">
+            </div>
+          </div>
+          <div>
+            <div class="ft">Matchdoor</div>
+            <div class="footer-logo-sub">REAL ESTATE APP</div>
+          </div>
+        </div>
+        <div class="footer-social-grid">
+          <a href="https://www.instagram.com/matchdoor/" target="_blank" class="ftr-icon-btn" title="Instagram">
+            <span class="fb-ico" style="background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);color:#fff"><i class="fab fa-instagram"></i></span>
+          </a>
+          <a href="https://www.facebook.com/matchdoor" target="_blank" class="ftr-icon-btn" title="Facebook">
+            <span class="fb-ico" style="background:var(--fb);color:#fff"><i class="fab fa-facebook-f"></i></span>
+          </a>
+          <a href="https://www.youtube.com/@Matchdoorhome" target="_blank" rel="noopener" class="ftr-icon-btn" title="YouTube">
+            <span class="fb-ico" style="background:#FF0000;color:#fff"><i class="fab fa-youtube"></i></span>
+          </a>
+          <a href="https://www.tiktok.com/@matchdoor" target="_blank" rel="noopener" class="ftr-icon-btn" title="TikTok">
+            <span class="fb-ico" style="background:#010101;color:#fff"><i class="fab fa-tiktok"></i></span>
+          </a>
+        </div>
+      </div>
+      <div>
+        <h4>เมนูหลัก</h4>
+        <a href="/" onclick="event.preventDefault();showPage('home')">หน้าหลัก</a>
+        <a href="/portfolio" onclick="event.preventDefault();showPage('portfolio')">ผลงาน</a>
+        <a href="/agents" onclick="event.preventDefault();showPage('agents')">ตัวแทน</a>
+        <a onclick="openDepPanel && openDepPanel()">ลงประกาศ</a>
+        <a href="/my-account" onclick="event.preventDefault();showPage('my-account')">บัญชีของฉัน</a>
+      </div>
+      <div>
+        <h4>ประเภท</h4>
+        <a href="javascript:void(0)" onclick="setCatNav('บ้านเดี่ยว')">บ้านเดี่ยว</a>
+        <a href="javascript:void(0)" onclick="setCatNav('ทาวน์โฮม')">ทาวน์โฮม</a>
+        <a href="javascript:void(0)" onclick="setCatNav('คอนโด')">คอนโด</a>
+        <a href="javascript:void(0)" onclick="setCatNav('ที่ดิน')">ที่ดิน</a>
+      </div>
+    </div>
+    <div class="footer-legal-bar">
+      <span style="opacity:.7;font-size:12px">© 2025 Matchdoor — Real Estate Platform · Community Feed</span>
+    </div>
+  </footer>
+</div><!-- end page-social -->
 
  <div id="osrv-sec" class="osrv-sec" style="padding:32px 0 28px">
   <div style="max-width:1320px;margin:0 auto;padding:0 20px">
@@ -7215,6 +7304,9 @@ function renderMyAccount(){
   <div class="ma-hero">
     <div class="ma-hero-cover">
       <div class="ma-hero-cover-btns">
+        <button class="ma-hero-cover-btn" style="background:linear-gradient(135deg,#1877F2,#0d5dc7);border:none;color:#fff;display:inline-flex;align-items:center;gap:6px;font-weight:700" onclick="showPage('social')">
+          <i class="fab fa-facebook" style="font-size:13px"></i> ฟีดชุมชน
+        </button>
         <button class="ma-hero-cover-btn" onclick="_maTab('listings',document.querySelector('[data-tab=\\'listings\\']'));renderMaListingsPanel()">
           <i class="fas fa-plus"></i> ลงประกาศ
         </button>
@@ -10455,6 +10547,7 @@ const PAGE_ROUTES = {
   'favorites':  { path: '/favorites',  title: 'รายการโปรดอสังหาฯ — Matchdoor',                                       desc: 'อสังหาริมทรัพย์กรุงเทพที่คุณบันทึกไว้ใน Matchdoor บ้าน คอนโด ที่ดิน ใกล้ BTS MRT' },
   'careers':    { path: '/careers',    title: 'สมัครงานตัวแทนอสังหาฯ กรุงเทพ — Matchdoor',                desc: 'เปิดรับสมัครตัวแทนอสังหาริมทรัพย์กรุงเทพ รายได้ดี ทำงานอิสระ ร่วมทีม Matchdoor' },
   'my-account': { path: '/my-account', title: 'บัญชีของฉัน — Matchdoor',                                 desc: 'จัดการโปรไฟล์ รายการโปรด และประกาศของคุณบน Matchdoor' },
+  'social':     { path: '/social',     title: 'ฟีดชุมชน Matchdoor — อสังหาฯ บ้าน คอนโด กรุงเทพ',    desc: 'ชุมชนอสังหาริมทรัพย์ Matchdoor แชร์ทรัพย์ ถามตอบ ติดตามข่าวสารอสังหาฯ กรุงเทพ' },
 };
 
 // Section → filter context for "buy" / "rent" sub-pages
@@ -10727,6 +10820,12 @@ function _silentShowPage(name, skipScrollTop) {
   }
   else if (name === 'my-account') {
     renderMyAccount();
+  }
+  else if (name === 'social') {
+    // Re-init social feed if needed
+    if(typeof initSocialFeed === 'function') {
+      setTimeout(function(){ initSocialFeed && initSocialFeed(); }, 100);
+    }
   }
   // seo-toggle-btn: แสดงบนหน้า home และ listings เท่านั้น
   const _seoBtn = document.getElementById('seo-toggle-btn');
