@@ -6355,7 +6355,7 @@ function renderMyAccount(){
           </div>
         </div>
         ${joinDate?`<div style="font-size:11px;opacity:.6;margin-top:8px"><i class="fas fa-calendar-alt" style="margin-right:4px"></i>${sanitize(t('ma.member.since'))} ${joinDate}</div>`:''}
-        ${_meta.role==='agent'?`<button onclick="event.preventDefault();_showMyProfileOnAgentsPage()" style="margin-top:10px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;border:none;border-radius:20px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 2px 8px rgba(16,185,129,.4);transition:opacity .2s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'"><i class="fas fa-id-badge"></i> แสดงโปรไฟล์ที่หน้าตัวแทน</button>`:''}
+        ${_meta.role==='agent'?`<button id="btn-toggle-agent-profile" onclick="event.preventDefault();_toggleMyAgentProfile(this)" style="margin-top:10px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;border:none;border-radius:20px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 2px 8px rgba(16,185,129,.4);transition:all .25s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'"><i class="fas fa-id-badge"></i> แสดงโปรไฟล์ที่หน้าตัวแทน</button>`:''}
       </div>
     </div>
   </div>
@@ -7930,6 +7930,19 @@ function _maInitProfileLockState(){
   if(editBtn) editBtn.style.display='flex';
   const heroBtn = document.getElementById('ma-edit-profile-btn-hero');
   if(heroBtn){ heroBtn.style.display='flex'; heroBtn.innerHTML='<i class="fas fa-pen"></i> แก้ไขข้อมูล'; }
+  // Restore agent-profile toggle button state
+  const toggleBtn = document.getElementById('btn-toggle-agent-profile');
+  if(toggleBtn){
+    if(window._myAgentProfileShown){
+      toggleBtn.style.background = 'linear-gradient(135deg,#e74c3c,#c0392b)';
+      toggleBtn.style.boxShadow = '0 2px 8px rgba(231,76,60,.4)';
+      toggleBtn.innerHTML = '<i class="fas fa-eye-slash"></i> ยกเลิกแสดงโปรไฟล์';
+    } else {
+      toggleBtn.style.background = 'linear-gradient(135deg,#10b981,#059669)';
+      toggleBtn.style.boxShadow = '0 2px 8px rgba(16,185,129,.4)';
+      toggleBtn.innerHTML = '<i class="fas fa-id-badge"></i> แสดงโปรไฟล์ที่หน้าตัวแทน';
+    }
+  }
   // Render listings in right panel
   _maRenderProfileListings();
 }
@@ -12885,43 +12898,61 @@ function showPortDetail(p){
   _openModal('port-modal');
 }
 
-function _showMyProfileOnAgentsPage(){
-  // ดึงข้อมูลผู้ใช้ปัจจุบัน
-  const _u = window._currentUser || (typeof sb !== 'undefined' && sb?.auth?.getUser ? null : null);
+function _toggleMyAgentProfile(btn){
+  const _u = window._currentUser;
   const _meta = window._currentMeta || {};
   const dispName = _meta.display_name || (_u?.email?.split('@')[0]) || 'ฉัน';
   const email = _u?.email || '';
-  const init = (dispName||'U')[0].toUpperCase();
-  const phone = _meta.phone || '';
-  const lineId = _meta.line_id || _meta.lineId || '';
-  const bio = _meta.bio || '';
-  const avatar_url = _meta.avatar_url || '';
+  const uid = email || dispName;
 
-  // ตรวจว่ามี entry ของ user นี้ใน agents แล้วหรือยัง
-  const existIdx = agents.findIndex(a => a._isMember && a._uid === (email || dispName));
-  const memberAgent = {
-    id: 'member_' + (email || dispName),
-    _isMember: true,          // flag แยกประเภท
-    _uid: email || dispName,
-    name: dispName,
-    title: _meta.agent_title || 'นายหน้าอิสระ',
-    phone: phone,
-    lineId: lineId,
-    initials: init + (dispName[1]||''),
-    color: '#10b981',
-    avatar_url: avatar_url,
-    photos: [],
-    rating: Number(_meta.rating) || 5.0,
-    propIds: (typeof _myUserListings !== 'undefined' ? _myUserListings : []).map(p=>p.id),
-    deals: Number(_meta.deals) || 0,
-    bio: bio
-  };
+  const existIdx = agents.findIndex(a => a._isMember && a._uid === uid);
 
-  if(existIdx >= 0) agents[existIdx] = memberAgent;
-  else agents.unshift(memberAgent);  // วางไว้อันดับแรก
+  if(existIdx >= 0){
+    // ── ยกเลิก: ลบออกจาก agents ──
+    agents.splice(existIdx, 1);
+    window._myAgentProfileShown = false;
+    if(btn){
+      btn.style.background = 'linear-gradient(135deg,#10b981,#059669)';
+      btn.style.boxShadow = '0 2px 8px rgba(16,185,129,.4)';
+      btn.innerHTML = '<i class="fas fa-id-badge"></i> แสดงโปรไฟล์ที่หน้าตัวแทน';
+    }
+    toast('ซ่อนโปรไฟล์ของคุณจากหน้าตัวแทนแล้ว');
+  } else {
+    // ── แสดง: เพิ่มเข้า agents ──
+    const init = (dispName||'U')[0].toUpperCase();
+    const memberAgent = {
+      id: 'member_' + uid,
+      _isMember: true,
+      _uid: uid,
+      name: dispName,
+      title: _meta.agent_title || 'นายหน้าอิสระ',
+      phone: _meta.phone || '',
+      lineId: _meta.line_id || _meta.lineId || '',
+      initials: init + (dispName[1]||''),
+      color: '#10b981',
+      avatar_url: _meta.avatar_url || '',
+      photos: [],
+      rating: Number(_meta.rating) || 5.0,
+      propIds: (typeof _myUserListings !== 'undefined' ? _myUserListings : []).map(p=>p.id),
+      deals: Number(_meta.deals) || 0,
+      bio: _meta.bio || ''
+    };
+    agents.unshift(memberAgent);
+    window._myAgentProfileShown = true;
+    if(btn){
+      btn.style.background = 'linear-gradient(135deg,#e74c3c,#c0392b)';
+      btn.style.boxShadow = '0 2px 8px rgba(231,76,60,.4)';
+      btn.innerHTML = '<i class="fas fa-eye-slash"></i> ยกเลิกแสดงโปรไฟล์';
+    }
+    showPage('agents');
+    setTimeout(()=>{ if(typeof renderAgents==='function') renderAgents(); }, 80);
+    toast('แสดงโปรไฟล์ของคุณที่หน้าตัวแทนแล้ว ✅');
+  }
+}
 
-  showPage('agents');
-  setTimeout(()=>{ if(typeof renderAgents==='function') renderAgents(); }, 80);
+function _showMyProfileOnAgentsPage(){
+  // kept for backward compat — delegate to toggle
+  _toggleMyAgentProfile(document.getElementById('btn-toggle-agent-profile'));
 }
 
 function renderAgents(){
