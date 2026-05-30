@@ -2243,6 +2243,8 @@ footer::after{
 .gal-body{padding:14px}
 .gal-price{font-size:17px;font-weight:700;color:var(--a);margin-bottom:4px}
 .agent-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:18px}
+.agent-member-tag{display:inline-flex;align-items:center;gap:4px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;border-radius:20px;padding:3px 10px;font-size:10px;font-weight:700;margin-bottom:6px;letter-spacing:.3px}
+.agent-company-tag{display:inline-flex;align-items:center;gap:4px;background:linear-gradient(135deg,#1B3A6B,#2a5298);color:#fff;border-radius:20px;padding:3px 10px;font-size:10px;font-weight:700;margin-bottom:6px;letter-spacing:.3px}
 .agent-card{background:#fff;border-radius:var(--rl);border:2px solid var(--bd);overflow:hidden;cursor:pointer;transition:.25s;text-align:center}
 .agent-card:hover{box-shadow:0 12px 40px rgba(124,111,205,.2);border-color:#c3b7ff;transform:translateY(-3px)}
 .agent-photo-wrap{width:100%;height:260px;overflow:hidden;background:linear-gradient(to bottom,var(--pastel5),var(--pastel1));position:relative;display:flex;align-items:flex-end;justify-content:center}
@@ -6300,6 +6302,9 @@ function renderMyAccount(){
   };
   // merge profile DB → user_metadata (กัน race condition)
   const _meta = { ...(_u.user_metadata||{}), ...(_profile||{}) };
+  // Expose globally for _showMyProfileOnAgentsPage
+  window._currentUser = _u;
+  window._currentMeta = _meta;
   // Logged in (or dev bypass) — render full dashboard
   const init = (_u.email||'U')[0].toUpperCase();
   const dispName = sanitize(_meta.display_name || _u.email?.split('@')[0] || 'User');
@@ -6350,6 +6355,7 @@ function renderMyAccount(){
           </div>
         </div>
         ${joinDate?`<div style="font-size:11px;opacity:.6;margin-top:8px"><i class="fas fa-calendar-alt" style="margin-right:4px"></i>${sanitize(t('ma.member.since'))} ${joinDate}</div>`:''}
+        ${_meta.role==='agent'?`<button onclick="event.preventDefault();_showMyProfileOnAgentsPage()" style="margin-top:10px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;border:none;border-radius:20px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 2px 8px rgba(16,185,129,.4);transition:opacity .2s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'"><i class="fas fa-id-badge"></i> แสดงโปรไฟล์ที่หน้าตัวแทน</button>`:''}
       </div>
     </div>
   </div>
@@ -12879,10 +12885,52 @@ function showPortDetail(p){
   _openModal('port-modal');
 }
 
+function _showMyProfileOnAgentsPage(){
+  // ดึงข้อมูลผู้ใช้ปัจจุบัน
+  const _u = window._currentUser || (typeof sb !== 'undefined' && sb?.auth?.getUser ? null : null);
+  const _meta = window._currentMeta || {};
+  const dispName = _meta.display_name || (_u?.email?.split('@')[0]) || 'ฉัน';
+  const email = _u?.email || '';
+  const init = (dispName||'U')[0].toUpperCase();
+  const phone = _meta.phone || '';
+  const lineId = _meta.line_id || _meta.lineId || '';
+  const bio = _meta.bio || '';
+  const avatar_url = _meta.avatar_url || '';
+
+  // ตรวจว่ามี entry ของ user นี้ใน agents แล้วหรือยัง
+  const existIdx = agents.findIndex(a => a._isMember && a._uid === (email || dispName));
+  const memberAgent = {
+    id: 'member_' + (email || dispName),
+    _isMember: true,          // flag แยกประเภท
+    _uid: email || dispName,
+    name: dispName,
+    title: _meta.agent_title || 'นายหน้าอิสระ',
+    phone: phone,
+    lineId: lineId,
+    initials: init + (dispName[1]||''),
+    color: '#10b981',
+    avatar_url: avatar_url,
+    photos: [],
+    rating: Number(_meta.rating) || 5.0,
+    propIds: (typeof _myUserListings !== 'undefined' ? _myUserListings : []).map(p=>p.id),
+    deals: Number(_meta.deals) || 0,
+    bio: bio
+  };
+
+  if(existIdx >= 0) agents[existIdx] = memberAgent;
+  else agents.unshift(memberAgent);  // วางไว้อันดับแรก
+
+  showPage('agents');
+  setTimeout(()=>{ if(typeof renderAgents==='function') renderAgents(); }, 80);
+}
+
 function renderAgents(){
   $('agent-grid').innerHTML=agents.length?agents.map(a=>{
-    const myProps=props.filter(p=>p.agentId===a.id);
+    const myProps=props.filter(p=>p.agentId===a.id || a.propIds?.includes(p.id));
     const allPhotos=[a.avatar_url,...(a.photos||[])].filter(Boolean);
+    const tagHtml = a._isMember
+      ? `<div class="agent-member-tag"><i class="fas fa-user-check"></i> สมาชิก Matchdoor</div>`
+      : `<div class="agent-company-tag"><i class="fas fa-building"></i> ทีม Matchdoor</div>`;
     let photoHtml;
     if(allPhotos.length>1){
       const uid='ag'+Math.random().toString(36).slice(2,7);
@@ -12895,6 +12943,7 @@ function renderAgents(){
     return `<div class="agent-card" onclick='showAgentDetail(${JSON.stringify(a)})'>
       <div class="agent-photo-wrap" style="position:relative;overflow:hidden">${photoHtml}</div>
       <div class="agent-info-area">
+        ${tagHtml}
         <div class="agent-name">${a.name}</div>
         <div class="agent-role">${a.title}</div>
         <div class="agent-rating"><span class="stars">${'★'.repeat(Math.min(5,Math.round(a.rating||4.5)))}</span><span class="rating-num">${(a.rating||4.5).toFixed(1)}</span></div>
