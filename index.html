@@ -5237,7 +5237,26 @@ function _popupRefreshMarkersFromData(data){
 <div class="ov" id="srv-modal" onclick="if(event.target===this)_closeModal('srv-modal')"><div class="modal"><div class="mhd"><h2 id="srv-title2"></h2><span class="mclose" onclick="_closeModal('srv-modal')">×</span></div><div class="mbody" id="srv-body"></div></div></div>
 <div class="ov" id="blog-modal" onclick="if(event.target===this)_closeModal('blog-modal')"><div class="modal"><div class="mhd"><h2 id="blog-title"></h2><span class="mclose" onclick="_closeModal('blog-modal')">×</span></div><div class="mbody" id="blog-body"></div></div></div>
 <div class="ov" id="port-modal" onclick="if(event.target===this)_closeModal('port-modal')"><div class="modal"><div class="mhd"><h2 id="port-title"></h2><span class="mclose" onclick="_closeModal('port-modal')">×</span></div><div class="mbody" id="port-body"></div></div></div>
-<div class="ov" id="ag-modal" onclick="if(event.target===this)_closeModal('ag-modal')"><div class="modal"><div class="mhd" style="justify-content:space-between"><h2 id="ag-title" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-right:8px"></h2><span class="mclose" style="flex-shrink:0" onclick="_closeModal('ag-modal')">×</span></div><div class="mbody" id="ag-body"></div></div></div>
+<div class="ov" id="ag-modal" onclick="if(event.target===this)_closeModal('ag-modal')">
+  <div class="modal" style="max-width:680px;width:95vw;max-height:92vh;overflow:hidden;display:flex;flex-direction:column;padding:0">
+    <!-- Hero Banner -->
+    <div id="ag-modal-hero" style="background:linear-gradient(135deg,#1B3A6B 0%,#2a5298 60%,#10b981 100%);padding:28px 24px 20px;position:relative;flex-shrink:0">
+      <span class="mclose" style="position:absolute;top:12px;right:14px;color:#fff;opacity:.8;font-size:22px;line-height:1;cursor:pointer;background:rgba(0,0,0,.2);width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center" onclick="_closeModal('ag-modal')">×</span>
+      <div style="display:flex;align-items:flex-end;gap:16px">
+        <div id="ag-modal-av" style="width:80px;height:80px;border-radius:50%;border:3px solid rgba(255,255,255,.8);overflow:hidden;flex-shrink:0;background:#1B3A6B;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:#fff;box-shadow:0 4px 16px rgba(0,0,0,.25)"></div>
+        <div style="flex:1;min-width:0">
+          <div id="ag-modal-tag" style="margin-bottom:6px"></div>
+          <div id="ag-modal-name" style="font-size:20px;font-weight:800;color:#fff;line-height:1.2;margin-bottom:3px"></div>
+          <div id="ag-modal-title" style="font-size:13px;color:rgba(255,255,255,.75);margin-bottom:6px"></div>
+          <div id="ag-modal-rating" style="display:flex;align-items:center;gap:6px"></div>
+        </div>
+      </div>
+      <div id="ag-modal-stats" style="display:flex;gap:16px;margin-top:16px"></div>
+    </div>
+    <!-- Scrollable body -->
+    <div class="mbody" id="ag-body" style="overflow-y:auto;flex:1;padding:20px 24px;-webkit-overflow-scrolling:touch"></div>
+  </div>
+</div>
 <div class="ov" id="phone-otp-modal" onclick="if(event.target===this)_closeModal('phone-otp-modal')">
   <div class="modal" style="max-width:400px">
     <div class="mhd">
@@ -13003,37 +13022,101 @@ function _agUpdateScrollBtns() {
   if (next) next.style.opacity = atEnd   ? '0.3' : '1';
 }
 
-function showAgentDetail(a){ 
-  const myProps=props.filter(p=>a.propIds?.includes(p.id)||p.agentId===a.id); 
-  $('ag-title').textContent=a.name; 
+function showAgentDetail(a){
+  // ── ถ้าเป็นโปรไฟล์ตัวเอง → ไปหน้า my-account เลย ──
+  const myUid = window._currentUser?.email || window._currentMeta?.display_name;
+  if(a._isMember && myUid && a._uid === myUid){
+    showPage('my-account');
+    return;
+  }
+
+  const myProps = props.filter(p => a.propIds?.includes(p.id) || p.agentId === a.id);
+  const isMember = !!a._isMember;
+
+  // ── Hero section ──
+  const avEl = document.getElementById('ag-modal-av');
+  if(avEl){
+    avEl.innerHTML = a.avatar_url
+      ? `<img src="${sanitize(a.avatar_url)}" style="width:100%;height:100%;object-fit:cover">`
+      : `<span>${a.initials || (a.name||'?')[0]}</span>`;
+    avEl.style.background = a.avatar_url ? 'transparent' : (a.color || '#1B3A6B');
+  }
+
+  const tagEl = document.getElementById('ag-modal-tag');
+  if(tagEl) tagEl.innerHTML = isMember
+    ? `<span class="agent-member-tag" style="font-size:11px"><i class="fas fa-user-check"></i> สมาชิก Matchdoor</span>`
+    : `<span class="agent-company-tag" style="font-size:11px"><i class="fas fa-building"></i> ทีม Matchdoor</span>`;
+
+  const nameEl = document.getElementById('ag-modal-name');
+  if(nameEl) nameEl.textContent = a.name || '';
+
+  const titleEl = document.getElementById('ag-modal-title');
+  if(titleEl) titleEl.textContent = a.title || '';
+
+  const ratingEl = document.getElementById('ag-modal-rating');
+  const stars = Math.min(5, Math.round(a.rating || 4.5));
+  if(ratingEl) ratingEl.innerHTML = `
+    <span style="color:#f1c40f;font-size:14px">${'★'.repeat(stars)}${'☆'.repeat(5-stars)}</span>
+    <span style="color:rgba(255,255,255,.9);font-size:13px;font-weight:700">${(a.rating||4.5).toFixed(1)}</span>`;
+
+  const statsEl = document.getElementById('ag-modal-stats');
+  if(statsEl) statsEl.innerHTML = `
+    <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:8px 16px;text-align:center;min-width:70px">
+      <div style="font-size:20px;font-weight:800;color:#fff">${myProps.length}</div>
+      <div style="font-size:10px;color:rgba(255,255,255,.7)">ทรัพย์</div>
+    </div>
+    <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:8px 16px;text-align:center;min-width:70px">
+      <div style="font-size:20px;font-weight:800;color:#fff">${a.deals || 0}</div>
+      <div style="font-size:10px;color:rgba(255,255,255,.7)">ปิดดีล</div>
+    </div>
+    ${a.phone ? `<div style="background:rgba(255,255,255,.15);border-radius:10px;padding:8px 16px;text-align:center;min-width:70px">
+      <div style="font-size:12px;font-weight:700;color:#fff">${sanitize(a.phone)}</div>
+      <div style="font-size:10px;color:rgba(255,255,255,.7)">โทรศัพท์</div>
+    </div>` : ''}`;
+
+  // ── Body ──
+  const bioHtml = a.bio
+    ? `<div style="background:var(--lt);border-radius:12px;padding:14px 16px;margin-bottom:20px">
+        <div style="font-size:11px;font-weight:700;color:var(--p);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px"><i class="fas fa-user-circle"></i> เกี่ยวกับ</div>
+        <p style="font-size:13px;color:var(--tx2);line-height:1.7;margin:0">${sanitize(a.bio)}</p>
+      </div>` : '';
+
+  const contactHtml = (a.phone || a.lineId)
+    ? `<div class="cta-row" style="margin-bottom:20px">
+        ${a.lineId ? `<a class="btn-cta cta-ln" href="${lineUrl(a.lineId)}" target="_blank"><i class="fab fa-line"></i> แชท Line</a>` : ''}
+        ${a.phone ? `<a class="btn-cta cta-tel" href="tel:${sanitize(a.phone)}"><i class="fas fa-mobile-alt"></i> โทรสอบถาม</a>` : ''}
+      </div>` : '';
+
+  // ── ทรัพย์ grid ──
   const propsHtml = myProps.length ? `
-    <div style="margin-bottom:16px">
-      <div style="font-size:11px;font-weight:800;color:var(--p);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;display:flex;align-items:center;gap:6px">
-        <i class="fas fa-home" style="color:var(--a)"></i> ทรัพย์ที่ดูแล (${myProps.length} รายการ)
+    <div style="margin-bottom:8px">
+      <div style="font-size:12px;font-weight:800;color:var(--p);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;display:flex;align-items:center;gap:6px">
+        <i class="fas fa-home" style="color:var(--a)"></i> ทรัพย์ที่ดูแล <span style="background:var(--p);color:#fff;border-radius:20px;padding:1px 8px;font-size:10px">${myProps.length}</span>
       </div>
-      <div style="position:relative">
-        <button onclick="agScrollProps(-1)" id="ag-scroll-prev" style="position:absolute;left:-4px;top:50%;transform:translateY(-50%);z-index:2;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.95);border:1.5px solid var(--bd);box-shadow:0 2px 8px rgba(0,0,0,.15);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--p);font-size:11px;transition:.15s" onmouseover="this.style.background='var(--p)';this.style.color='#fff'" onmouseout="this.style.background='rgba(255,255,255,.95)';this.style.color='var(--p)'"><i class="fas fa-chevron-left"></i></button>
-        <div style="display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;padding-left:2px;padding-right:2px;-ms-overflow-style:none;scrollbar-width:none;scroll-behavior:smooth" class="agent-props-scroll" id="ag-props-scroll">
-          ${myProps.map(p=>`<div class="nearby-mini-card" onclick="_closeModal('ag-modal');setTimeout(()=>openModal('${p.id}'),200)" style="flex-shrink:0;cursor:pointer">
-            <div class="nearby-mini-img">${p.photos?.[0]?`<img src="${p.photos[0]}" loading="lazy">`:`<span style="font-size:22px">${p.icon||typeIcon(p.type)}</span>`}</div>
-            <div class="nearby-mini-body">
-              <div class="nearby-mini-price">${fmtPrice(p.price,p.tx)}</div>
-              <div class="nearby-mini-title">${sanitize(p.title||'')}</div>
-              <div class="nearby-mini-loc"><i class="fas fa-map-marker-alt"></i> ${sanitize(p.location||'')}</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px">
+        ${myProps.map(p=>`
+          <div onclick="_closeModal('ag-modal');setTimeout(()=>openModal('${p.id}'),220)"
+               style="border:1.5px solid var(--bd);border-radius:12px;overflow:hidden;cursor:pointer;transition:.2s;background:#fff"
+               onmouseover="this.style.borderColor='var(--p)';this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 20px rgba(124,111,205,.15)'"
+               onmouseout="this.style.borderColor='var(--bd)';this.style.transform='';this.style.boxShadow=''">
+            <div style="height:110px;overflow:hidden;background:var(--lt);display:flex;align-items:center;justify-content:center">
+              ${p.photos?.[0]
+                ? `<img src="${sanitize(p.photos[0])}" loading="lazy" style="width:100%;height:100%;object-fit:cover">`
+                : `<span style="font-size:36px">${typeIcon(p.type)}</span>`}
+            </div>
+            <div style="padding:10px">
+              <div style="font-size:13px;font-weight:700;color:var(--p);margin-bottom:2px">${fmtPrice(p.price,p.tx)}</div>
+              <div style="font-size:12px;font-weight:600;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${sanitize(p.title||'')}</div>
+              <div style="font-size:11px;color:var(--gr);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+                <i class="fas fa-map-marker-alt" style="color:var(--a);font-size:9px"></i> ${sanitize(p.location||'')}
+              </div>
             </div>
           </div>`).join('')}
-        </div>
-        <button onclick="agScrollProps(1)" id="ag-scroll-next" style="position:absolute;right:-4px;top:50%;transform:translateY(-50%);z-index:2;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.95);border:1.5px solid var(--bd);box-shadow:0 2px 8px rgba(0,0,0,.15);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--p);font-size:11px;transition:.15s" onmouseover="this.style.background='var(--p)';this.style.color='#fff'" onmouseout="this.style.background='rgba(255,255,255,.95)';this.style.color='var(--p)'"><i class="fas fa-chevron-right"></i></button>
       </div>
-    </div>` : '';
-  $('ag-body').innerHTML=`<div style="text-align:center;margin-bottom:16px">${a.avatar_url?`<img src="${a.avatar_url}" loading="lazy" style="width:100px;height:100px;border-radius:50%;object-fit:cover;border:3px solid var(--pastel5);box-shadow:0 4px 16px rgba(124,111,205,.2)">`:`<div style="width:100px;height:100px;border-radius:50%;background:${a.color||'#7c6fcd'};display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:700;color:#fff;margin:0 auto">${a.initials||a.name[0]}</div>`}</div><div style="text-align:center;margin-bottom:14px"><div style="font-size:18px;font-weight:700">${a.name}</div><div style="color:var(--gr)">${a.title}</div></div><div style="background:var(--bg);padding:12px 16px;border-radius:10px;margin-bottom:16px"><div style="margin-bottom:6px"><strong>${ui('ag.detail.phone')}:</strong> ${a.phone}</div><div style="margin-bottom:6px"><strong>${ui('ag.detail.line')}:</strong> ${a.lineId}</div><div style="margin-bottom:6px"><strong>${ui('ag.detail.props')}:</strong> ${myProps.length}</div><div><strong>${ui('ag.detail.deals')}:</strong> ${port.length}</div></div>${a.bio?`<p style="font-size:13px;color:var(--tx2);margin-bottom:16px">${a.bio}</p>`:''}${propsHtml}<div class="cta-row"><a class="btn-cta cta-ln" href="${lineUrl(a.lineId)}" target="_blank"><i class="fab fa-line"></i> ${ui('cta.line')}</a><a class="btn-cta cta-tel" href="tel:${a.phone}"><i class="fas fa-mobile-alt"></i> ${ui('cta.call')}</a></div>`; 
+    </div>` : `<div style="text-align:center;padding:20px;color:var(--gr);font-size:13px"><i class="fas fa-home" style="font-size:28px;opacity:.3;display:block;margin-bottom:8px"></i>ยังไม่มีทรัพย์ที่ดูแล</div>`;
+
+  $('ag-body').innerHTML = bioHtml + contactHtml + propsHtml;
   _openModal('ag-modal');
-  // init scroll buttons state หลัง render
-  setTimeout(() => {
-    _agUpdateScrollBtns();
-    const sc = document.getElementById('ag-props-scroll');
-    if (sc) sc.addEventListener('scroll', _agUpdateScrollBtns, { passive: true });
-  }, 80);
 }
 
 // Sanitize: strip HTML tags to prevent XSS injection
