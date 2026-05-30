@@ -4973,7 +4973,7 @@ footer::after{
             </div>
           </div>
         </div>
-        <div class="md-see-more" style="border-top:1px solid #E4E6EB" onclick="window.openDepPanel()">ลงโฆษณากับเรา →</div>
+        <div class="md-see-more" style="border-top:1px solid #E4E6EB" onclick="window.openAdContact()">ลงโฆษณากับเรา →</div>
       </div>
 
       <!-- SEO Quick Links -->
@@ -5012,7 +5012,7 @@ footer::after{
           <a onclick="openAcceptableUseModal && openAcceptableUseModal()">เกี่ยวกับเรา</a>
           <a onclick="openPrivacyModal && openPrivacyModal()">ความเป็นส่วนตัว</a>
           <a onclick="openTermsModal && openTermsModal()">เงื่อนไขการใช้งาน</a>
-          <a onclick="window.openDepPanel()">ลงโฆษณา</a>
+          <a onclick="window.openAdContact()" style="cursor:pointer">ลงโฆษณา</a>
           <a onclick="openApplyModal && openApplyModal('agent')">สมัครตัวแทน</a>
           <a onclick="gotoBlog && gotoBlog()">บทความ</a>
           <a onclick="showPage('home');setTimeout(function(){scrollToEl('contact-sec')},100)">ติดต่อเรา</a>
@@ -5338,12 +5338,49 @@ footer::after{
      ปุ่ม "ฝากทรัพย์" ใน navbar (toggleDD)
   ───────────────────────────────────────────────────────────── */
   window.openDepPanel = function(){
-    if(typeof toggleDD === 'function'){
-      // ปิด page-social ชั่วคราวไม่ได้ เพราะ dd-dep อยู่ใน navbar
-      // ต้อง scroll ขึ้นไปก่อนแล้ว open
+    // ใช้ openDepositModal() ซึ่งเป็น overlay modal ทำงานได้จากทุกตำแหน่งในหน้า
+    // ไม่ต้อง scroll to top เพื่อให้ user experience ดีขึ้น
+    if(typeof openDepositModal === 'function'){
+      openDepositModal();
+    } else if(typeof toggleDD === 'function'){
+      // fallback: เปิด navbar dropdown
       window.scrollTo({ top: 0, behavior: 'smooth' });
       setTimeout(function(){ toggleDD('dd-dep'); }, 300);
     }
+  };
+
+  /* ─────────────────────────────────────────────────────────────
+     openAdContact()
+     ปุ่ม "ลงโฆษณากับเรา" / "ลงโฆษณา" → เปิด modal ติดต่อทีมงาน
+  ───────────────────────────────────────────────────────────── */
+  window.openAdContact = function(){
+    const existing = document.getElementById('ad-contact-modal');
+    if(existing){ existing.remove(); return; }
+    const mo = document.createElement('div');
+    mo.className = 'ov'; mo.id = 'ad-contact-modal';
+    mo.style.cssText = 'display:flex;z-index:3700';
+    mo.innerHTML = `<div class="modal" style="max-width:400px">
+      <div class="mhd">
+        <h2><i class="fas fa-bullhorn" style="color:var(--a)"></i> ลงโฆษณากับ Matchdoor</h2>
+        <span class="mclose" onclick="document.getElementById('ad-contact-modal').remove()">×</span>
+      </div>
+      <div class="mbody">
+        <p style="font-size:14px;color:var(--tx2);margin-bottom:16px">ต้องการลงโฆษณาโครงการ หรือประกาศ Sponsored บนแพลตฟอร์มของเรา ติดต่อทีมงานได้เลยครับ</p>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <a href="https://line.me/ti/p/~matchdoor" target="_blank" rel="noopener"
+            style="display:flex;align-items:center;gap:10px;background:#00C300;color:#fff;border-radius:10px;padding:12px 16px;font-weight:700;text-decoration:none;font-size:14px">
+            <i class="fab fa-line" style="font-size:20px"></i> ติดต่อผ่าน LINE
+          </a>
+          <a href="mailto:ads@matchdoor.com"
+            style="display:flex;align-items:center;gap:10px;background:var(--p);color:#fff;border-radius:10px;padding:12px 16px;font-weight:700;text-decoration:none;font-size:14px">
+            <i class="fas fa-envelope" style="font-size:16px"></i> อีเมล: ads@matchdoor.com
+          </a>
+        </div>
+        <p style="font-size:11px;color:var(--gr);margin-top:14px;text-align:center">ทีมงานตอบกลับภายใน 1 วันทำการ</p>
+      </div>
+    </div>`;
+    mo.onclick = function(e){ if(e.target===mo) mo.remove(); };
+    document.body.appendChild(mo);
   };
 
   /* ─────────────────────────────────────────────────────────────
@@ -14661,7 +14698,8 @@ function openDepositModal(){
           <label for="dm-consent">ฉันยินยอมให้ Matchdoor เก็บและใช้ข้อมูลส่วนบุคคลรวมถึงรูปภาพทรัพย์ เพื่อบริการฝากทรัพย์ ตาม<a href="javascript:void(0)" onclick="openPrivacyModal();event.stopPropagation()">นโยบายความเป็นส่วนตัว</a></label>
         </div>
         <div class="consent-err" id="dm-consent-err" style="display:none">⚠️ กรุณายินยอมก่อนส่งข้อมูล</div>
-        <button class="btn-sub" id="dep-modal-btn" onclick="submitDepModal()" style="margin-top:10px"><i class="fas fa-lock btn-icon"></i><span class="btn-spinner"></span> <span id="dep-modal-btn-text">ส่งข้อมูลฝากทรัพย์</span></button>
+        <button class="btn-sub" id="dep-modal-btn" onclick="submitDepModal()" style="margin-top:10px"><i class="fas fa-paper-plane btn-icon"></i><span class="btn-spinner"></span> <span id="dep-modal-btn-text">ส่งข้อมูลฝากทรัพย์</span></button>
+        <div id="dep-modal-ok" style="display:none;text-align:center;padding:20px"><i class="fas fa-check-circle" style="color:#28a745;font-size:32px"></i><div style="margin-top:8px;font-weight:600">ส่งข้อมูลสำเร็จ!</div></div>
       </div>
       <div class="form-ok" id="dep-modal-ok" style="display:none"><i class="fas fa-check-circle"></i><div>ส่งข้อมูลสำเร็จ!</div></div>
     </div>
@@ -14697,29 +14735,81 @@ function handleDepModalFiles(files){
   if(grid) grid.innerHTML = window._dmUploads.map((f,i)=>`<div class="prev-item"><img src="${URL.createObjectURL(f)}"><div class="prev-rm" onclick="window._dmUploads.splice(${i},1);handleDepModalFiles([])"><i class="fas fa-times"></i></div></div>`).join('');
 }
 async function submitDepModal(){
-  const name = document.getElementById('dm-name')?.value.trim();
-  const phone = document.getElementById('dm-phone')?.value.trim();
-  const type = document.getElementById('dm-type')?.value;
-  const price = document.getElementById('dm-price')?.value;
-  const prov = document.getElementById('dm-prov')?.value.trim();
-  const tx = document.getElementById('dm-tx')?.value;
-  const detail = document.getElementById('dm-detail')?.value.trim();
-  const consent = document.getElementById('dm-consent')?.checked;
+  const nameRaw  = document.getElementById('dm-name')?.value.trim();
+  const phoneRaw = document.getElementById('dm-phone')?.value.trim();
+  const lineVal  = document.getElementById('dm-line')?.value.trim()||'';
+  const emailVal = document.getElementById('dm-email')?.value.trim()||'';
+  const provVal  = document.getElementById('dm-prov')?.value.trim()||'';
+  const txVal    = document.getElementById('dm-tx')?.value||'ขาย';
+  const detailVal= document.getElementById('dm-detail')?.value.trim()||'';
+  const consent  = document.getElementById('dm-consent')?.checked;
   const consentErr = document.getElementById('dm-consent-err');
-  if(!name||!phone){toast('กรุณากรอกชื่อและเบอร์โทร',true);return;}
-  if(!consent){if(consentErr)consentErr.style.display='block';return;}
+
+  // Validation
+  if(!nameRaw||nameRaw.length<2){toast('กรุณากรอกชื่อ (อย่างน้อย 2 ตัวอักษร)',true);return;}
+  if(!phoneRaw){toast('กรุณากรอกเบอร์โทร',true);return;}
+  if(!consent){if(consentErr)consentErr.style.display='block';toast('กรุณายินยอมการเก็บข้อมูลก่อน',true);return;}
   if(consentErr)consentErr.style.display='none';
-  // reuse existing submitDep logic: pre-fill main form fields then call submitDep
-  const _setVal=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v||'';};
-  _setVal('d-name',name);_setVal('d-phone',phone);_setVal('d-type',type);
-  _setVal('d-price',price);_setVal('d-prov',prov);_setVal('d-tx',tx);_setVal('d-detail',detail);
-  const dc=document.getElementById('d-consent');if(dc)dc.checked=true;
-  // copy uploads
-  if(window._dmUploads.length){uploads=[...window._dmUploads];renderPrev();}
-  // close modal and trigger main submit
-  document.getElementById('deposit-modal')?.remove();
-  window._dmUploads=[];
-  await submitDep();
+
+  // Auth check
+  if(!user){toast('กรุณาเข้าสู่ระบบก่อนฝากทรัพย์',true);document.getElementById('deposit-modal')?.remove();_openModal('login-modal');return;}
+
+  // Disable button
+  const btn = document.getElementById('dep-modal-btn');
+  const btnTxt = document.getElementById('dep-modal-btn-text');
+  if(btn){btn.disabled=true;btn.classList.add('loading');}
+
+  // Turnstile token (non-blocking)
+  let turnstileToken=null;
+  try{turnstileToken=await getTurnstileToken('dep');}catch(e){}
+
+  // Upload photos
+  const photoUrls=[];
+  if(window._dmUploads.length && sb){
+    for(const f of window._dmUploads){
+      try{
+        const ext=f.name.split('.').pop().toLowerCase();
+        const safeName=`listings/${Date.now()}_${Math.random().toString(36).slice(2,7)}.${ext}`;
+        const{data:upData,error:upErr}=await sb.storage.from(C.STORAGE_BUCKET).upload(safeName,f,{cacheControl:'3600',upsert:false});
+        if(!upErr)photoUrls.push(safeName);
+      }catch(ue){console.warn('[dm-upload]',ue);}
+    }
+  }
+  if(!photoUrls.length && window._dmUploads.length){
+    for(const f of window._dmUploads){
+      const b=await new Promise(r=>{const fr=new FileReader();fr.onload=e=>r(e.target.result);fr.readAsDataURL(f)});
+      photoUrls.push(b);
+    }
+  }
+
+  try{
+    await sbInsertRateLimited('listings',{
+      name:sanitize(nameRaw),
+      phone:sanitize(phoneRaw),
+      line_id:sanitize(lineVal),
+      email:sanitize(emailVal),
+      province:sanitize(provVal),
+      transaction:sanitize(txVal),
+      details:sanitize(detailVal),
+      photos:photoUrls,
+      status:'รอตรวจสอบ',
+      consent_given:true,
+      consent_timestamp:new Date().toISOString(),
+      ...(user?{user_id:user.id}:{})
+    },turnstileToken,null);
+    // Success UI
+    const form=document.getElementById('dep-modal-form');
+    const ok=document.getElementById('dep-modal-ok');
+    if(form)form.style.display='none';
+    if(ok)ok.style.display='block';
+    toast('ส่งข้อมูลฝากทรัพย์สำเร็จ ✅');
+    window._dmUploads=[];
+    // Auto-close after 2.5s
+    setTimeout(()=>{document.getElementById('deposit-modal')?.remove();},2500);
+  }catch(e){
+    toast('ส่งข้อมูลล้มเหลว: '+sanitize(e.message),true);
+    if(btn){btn.disabled=false;btn.classList.remove('loading');}
+  }
 }
 
 // ── Deposit dropdown: photo preview ──
