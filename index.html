@@ -2274,7 +2274,10 @@ footer::after{
 .profile-fab-btn:hover{transform:scale(1.07);box-shadow:0 6px 22px rgba(26,122,74,.45)}
 .profile-fab-btn .pfab-av{font-size:13px;font-weight:700;width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;border:2px solid rgba(255,255,255,.6)}
 /* My Account page */
-.my-account-wrap{max-width:860px;margin:0 auto;padding:32px 16px 60px}
+.my-account-wrap{max-width:1100px;margin:0 auto;padding:32px 20px 60px}
+.ma-profile-grid{display:grid;grid-template-columns:300px 1fr;gap:24px;align-items:start}
+.ma-profile-sidebar{display:flex;flex-direction:column;gap:16px}
+.ma-profile-main{display:flex;flex-direction:column;gap:16px}
 .ma-hero{background:linear-gradient(135deg,var(--p) 0%,#2a5298 60%,#1a7a4a 100%);border-radius:20px;padding:32px 28px;margin-bottom:28px;color:#fff;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
 .ma-av-ring{width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,.18);border:3px solid rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:700;flex-shrink:0;color:#fff;position:relative;overflow:hidden}
 .ma-av-ring img{width:100%;height:100%;object-fit:cover;border-radius:50%}
@@ -2341,6 +2344,7 @@ footer::after{
   .ma-tab{min-width:60px;font-size:11px;padding:8px 5px}
   .ma-tab i{font-size:14px}
   .my-account-wrap{padding:20px 10px 50px}
+  .ma-profile-grid{grid-template-columns:1fr}
 }
 .float-grp{position:relative;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
 .float-items{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
@@ -2456,6 +2460,7 @@ footer::after{
   .price-grid{grid-template-columns:repeat(2,1fr)}
   .res-count-home{display:none!important}
   .btn-search,.btn-reset-search{justify-content:center}
+  .ma-profile-grid{grid-template-columns:1fr}
   /* Footer mobile: 2+2 layout - เมนูหลัก+ประเภท side by side, ข้อมูล+brand */
   .footer-inner{grid-template-columns:1fr 1fr!important}
   .footer-brand-col{text-align:left}
@@ -5005,6 +5010,158 @@ function _popupRefreshMarkersFromData(data){
     <!-- Filled by renderMyAccount() -->
     <div class="ma-empty" style="padding:80px 20px"><i class="fas fa-spinner fa-spin"></i></div>
   </div>
+  <!-- SEO Quick Links — same as home page -->
+  <div class="flink-sec"><div class="flink-inner">
+    <div>
+      <h4>🏠 ซื้อ-ขาย กรุงเทพฯ</h4>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(()=>quickSearch('บ้านเดี่ยว กรุงเทพ'),100)">ขายบ้านเดี่ยว กรุงเทพฯ</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(()=>quickSearch('ทาวน์โฮม กรุงเทพ'),100)">ขายทาวน์โฮม กรุงเทพฯ</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(()=>quickSearch('คอนโด กรุงเทพ'),100)">ขายคอนโด กรุงเทพฯ</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(()=>quickSearch('ที่ดิน กรุงเทพ'),100)">ขายที่ดิน กรุงเทพฯ</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(()=>quickSearch('อาคารพาณิชย์ กรุงเทพ'),100)">ขายอาคารพาณิชย์ กทม.</a>
+    </div>
+    <div>
+      <h4>🏡 ซื้อ-ขาย นนทบุรี</h4>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(()=>quickSearch('บ้านเดี่ยว นนทบุรี'),100)">ขายบ้านเดี่ยว นนทบุรี</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(()=>quickSearch('ทาวน์โฮม นนทบุรี'),100)">ขายทาวน์โฮม นนทบุรี</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(()=>quickSearch('คอนโด นนทบุรี'),100)">ขายคอนโด นนทบุรี</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(()=>quickSearch('ที่ดิน นนทบุรี'),100)">ขายที่ดิน นนทบุรี</a>
+    </div>
+    <div>
+      <h4>🌊 ซื้อ-ขาย ชลบุรี</h4>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(()=>quickSearch('บ้านเดี่ยว ชลบุรี'),100)">ขายบ้านเดี่ยว ชลบุรี</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(()=>quickSearch('ทาวน์โฮม ชลบุรี'),100)">ขายทาวน์โฮม ชลบุรี</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(()=>quickSearch('คอนโด ชลบุรี'),100)">ขายคอนโด ชลบุรี</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(()=>quickSearch('พัทยา'),100)">อสังหาฯ พัทยา</a>
+    </div>
+    <div>
+      <h4>🔑 เช่า กรุงเทพฯ</h4>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(()=>quickSearch('เช่าบ้านเดี่ยว กรุงเทพ'),100)">เช่าบ้านเดี่ยว กรุงเทพฯ</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(()=>quickSearch('เช่าทาวน์โฮม กรุงเทพ'),100)">เช่าทาวน์โฮม กรุงเทพฯ</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(()=>quickSearch('เช่าคอนโด กรุงเทพ'),100)">เช่าคอนโด กรุงเทพฯ</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(()=>quickSearch('เช่าคอนโด สุขุมวิท'),100)">เช่าคอนโดสุขุมวิท</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(()=>quickSearch('เช่าคอนโด อโศก'),100)">เช่าคอนโดอโศก</a>
+    </div>
+    <div>
+      <h4>📍 ทำเลยอดนิยม</h4>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(()=>quickSearch('สุขุมวิท'),100)">คอนโดย่านสุขุมวิท</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(()=>quickSearch('สาทร'),100)">อสังหาฯ ย่านสาทร</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(()=>quickSearch('รัชดา'),100)">บ้าน-คอนโด รัชดา</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(()=>quickSearch('ลาดพร้าว'),100)">ทรัพย์ย่านลาดพร้าว</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(()=>quickSearch('พระราม 9'),100)">อสังหาฯ พระราม 9</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(()=>quickSearch('ทองหล่อ'),100)">คอนโดทองหล่อ</a>
+    </div>
+    <div>
+      <h4>🎓 ใกล้มหาวิทยาลัย</h4>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(()=>quickSearch('จุฬาลงกรณ์'),100)">คอนโดใกล้จุฬาฯ</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(()=>quickSearch('ธรรมศาสตร์'),100)">ห้องเช่าใกล้ธรรมศาสตร์</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(()=>quickSearch('เกษตรศาสตร์'),100)">ทรัพย์ใกล้เกษตรฯ</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(()=>quickSearch('มหิดล'),100)">คอนโดใกล้มหิดล</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(()=>quickSearch('รังสิต'),100)">ห้องเช่าใกล้ ม.รังสิต</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(()=>quickSearch('ABAC'),100)">อสังหาฯ ใกล้ ABAC</a>
+    </div>
+  </div></div>
+  <!-- Footer — same as home page -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-brand-col">
+        <div class="footer-logo">
+          <div class="footer-logo-icon-wrap">
+            <div class="logo-img-wrap" style="width:52px;height:52px">
+              <div class="logo-door-glow"></div>
+              <img class="logo-img-base" src="LogoWeb.webp" alt="matchdoor logo" loading="lazy" style="opacity:1;visibility:visible">
+            </div>
+          </div>
+          <div>
+            <div class="ft">Matchdoor</div>
+            <div class="footer-logo-sub">REAL ESTATE APP</div>
+          </div>
+        </div>
+        <p class="footer-addr" id="ma-footer-addr"></p>
+        <p id="ma-footer-phone" style="font-size:12px;opacity:.6;margin-top:6px"></p>
+        <div class="footer-social-grid">
+          <a href="https://www.instagram.com/matchdoor/" target="_blank" class="ftr-icon-btn" title="Instagram">
+            <span class="fb-ico" style="background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);color:#fff"><i class="fab fa-instagram"></i></span>
+          </a>
+          <a id="ma-ftr-fb" href="#" target="_blank" class="ftr-icon-btn" title="Facebook">
+            <span class="fb-ico" style="background:var(--fb);color:#fff"><i class="fab fa-facebook-f"></i></span>
+          </a>
+          <a id="ma-ftr-ln" href="#" target="_blank" class="ftr-icon-btn" title="Line">
+            <span class="fb-ico" style="background:var(--ln);color:#fff"><i class="fab fa-line"></i></span>
+          </a>
+          <a id="ma-ftr-tel" href="#" class="ftr-icon-btn" title="โทรศัพท์">
+            <span class="fb-ico" style="background:var(--p);color:#fff"><i class="fas fa-mobile-alt"></i></span>
+          </a>
+          <a href="https://www.youtube.com/@Matchdoorhome" target="_blank" rel="noopener" class="ftr-icon-btn" title="YouTube">
+            <span class="fb-ico" style="background:#FF0000;color:#fff"><i class="fab fa-youtube"></i></span>
+          </a>
+          <a href="https://www.tiktok.com/@matchdoor" target="_blank" rel="noopener" class="ftr-icon-btn" title="TikTok">
+            <span class="fb-ico" style="background:#010101;color:#fff"><i class="fab fa-tiktok"></i></span>
+          </a>
+        </div>
+      </div>
+      <div>
+        <h4 data-i18n="ft.col.main">เมนูหลัก</h4>
+        <a href="/" onclick="event.preventDefault();showPage('home')" data-i18n="ft.col.home">หน้าหลัก</a>
+        <a href="javascript:void(0)" onclick="gotoNew()" data-i18n="ft.col.new">มาใหม่</a>
+        <a href="javascript:void(0)" onclick="gotoRec()">Hot 🔥</a>
+        <a href="/portfolio" onclick="event.preventDefault();showPage('portfolio')" data-i18n="ft.col.portfolio">ผลงาน</a>
+        <a href="javascript:void(0)" onclick="gotoBlog()" data-i18n="ft.col.blog">บทความ</a>
+        <a href="/agents" onclick="event.preventDefault();showPage('agents')" data-i18n="ft.col.agents">ตัวแทน</a>
+        <a href="/listings" onclick="event.preventDefault();showListingsPage(ui('ft.col.listings'))" data-i18n="ft.col.listings">ประกาศทั้งหมด</a>
+        <a href="javascript:void(0)" onclick="openAdminLogin()" class="ft-admin-btn"><i class="fas fa-shield-alt"></i> Admin</a>
+      </div>
+      <div>
+        <h4 data-i18n="ft.col.type">ประเภท</h4>
+        <a href="javascript:void(0)" onclick="setCatNav('บ้านเดี่ยว')" data-i18n="ft.type.house">บ้านเดี่ยว</a>
+        <a href="javascript:void(0)" onclick="setCatNav('ทาวน์โฮม')" data-i18n="ft.type.town">ทาวน์โฮม</a>
+        <a href="javascript:void(0)" onclick="setCatNav('คอนโด')" data-i18n="ft.type.condo">คอนโด</a>
+        <a href="javascript:void(0)" onclick="setCatNav('อาคารพาณิชย์')" data-i18n="ft.type.comm">อาคารพาณิชย์</a>
+        <a href="javascript:void(0)" onclick="setCatNav('ที่ดิน')" data-i18n="ft.type.land">ที่ดิน</a>
+        <a href="javascript:void(0)" onclick="filterTypeDD('');setTx('BUY',document.querySelectorAll('.tx-tab')[0])" data-i18n="ft.type.buy">ซื้อ / ขาย</a>
+        <a href="javascript:void(0)" onclick="filterTypeDD('');setTx('RENT',document.querySelectorAll('.tx-tab')[1])" data-i18n="ft.type.rent">เช่า</a>
+      </div>
+      <div>
+        <h4 data-i18n="ft.col.area">ทำเล</h4>
+        <a href="javascript:void(0)" onclick="showPage('home');setTimeout(()=>quickSearch('สุขุมวิท'),100)" data-i18n="ft.area.sukhumvit">สุขุมวิท</a>
+        <a href="javascript:void(0)" onclick="showPage('home');setTimeout(()=>quickSearch('สาทร'),100)" data-i18n="ft.area.sathorn">สาทร</a>
+        <a href="javascript:void(0)" onclick="showPage('home');setTimeout(()=>quickSearch('รัชดา'),100)" data-i18n="ft.area.rachada">รัชดาภิเษก</a>
+        <a href="javascript:void(0)" onclick="showPage('home');setTimeout(()=>quickSearch('ลาดพร้าว'),100)" data-i18n="ft.area.ladprao">ลาดพร้าว</a>
+        <a href="javascript:void(0)" onclick="showPage('home');setTimeout(()=>quickSearch('พระราม 9'),100)" data-i18n="ft.area.rama9">พระราม 9</a>
+        <a href="javascript:void(0)" onclick="showPage('home');setTimeout(()=>quickSearch('บางนา'),100)" data-i18n="ft.area.bangna">บางนา</a>
+      </div>
+      <div>
+        <h4 data-i18n="ft.col.province">จังหวัด</h4>
+        <a href="javascript:void(0)" onclick="quickProvSearch('กรุงเทพฯ')" data-i18n="ft.prov.bkk">กรุงเทพฯ</a>
+        <a href="javascript:void(0)" onclick="quickProvSearch('นนทบุรี')" data-i18n="ft.prov.nnt">นนทบุรี</a>
+        <a href="javascript:void(0)" onclick="quickProvSearch('ปทุมธานี')" data-i18n="ft.prov.ptm">ปทุมธานี</a>
+        <a href="javascript:void(0)" onclick="quickProvSearch('สมุทรปราการ')" data-i18n="ft.prov.smk">สมุทรปราการ</a>
+        <a href="javascript:void(0)" onclick="quickProvSearch('ชลบุรี')" data-i18n="ft.prov.cbl">ชลบุรี</a>
+        <a href="javascript:void(0)" onclick="quickProvSearch('ภูเก็ต')" data-i18n="ft.prov.pkt">ภูเก็ต</a>
+      </div>
+      <div>
+        <h4 data-i18n="ft.col.info">ข้อมูล</h4>
+        <a href="javascript:void(0)" onclick="openAcceptableUseModal()" data-i18n="ft.legal.aup">นโยบายการใช้งานที่ยอมรับได้</a>
+        <a href="javascript:void(0)" onclick="openTermsModal()" data-i18n="ft.legal.terms2">ข้อตกลงและเงื่อนไข</a>
+        <a href="javascript:void(0)" onclick="openPrivacyModal()" data-i18n="ft.legal.privacy">นโยบายความเป็นส่วนตัว</a>
+        <a href="javascript:void(0)" onclick="openBuySellModal()" data-i18n="ft.legal.buysell">เงื่อนไขการซื้อ-ขาย</a>
+        <a href="javascript:void(0)" onclick="openCookieModal()" data-i18n="ft.legal.cookie">นโยบายคุกกี้</a>
+      </div>
+    </div>
+    <div class="footer-legal-bar">
+      <a href="javascript:void(0)" onclick="openAcceptableUseModal()"><i class="fas fa-check-circle"></i> <span data-i18n="ft.legal.aup">นโยบายการใช้งานที่ยอมรับได้</span></a>
+      <span class="flb-sep">·</span>
+      <a href="javascript:void(0)" onclick="openTermsModal()"><i class="fas fa-file-contract"></i> <span data-i18n="ft.legal.terms2">ข้อตกลงและเงื่อนไข</span></a>
+      <span class="flb-sep">·</span>
+      <a href="javascript:void(0)" onclick="openPrivacyModal()"><i class="fas fa-shield-alt"></i> <span data-i18n="ft.legal.privacy">นโยบายความเป็นส่วนตัว</span></a>
+      <span class="flb-sep">·</span>
+      <a href="javascript:void(0)" onclick="openBuySellModal()"><i class="fas fa-handshake"></i> <span data-i18n="ft.legal.buysell">เงื่อนไขการซื้อ-ขาย</span></a>
+      <span class="flb-sep">·</span>
+      <a href="javascript:void(0)" onclick="openCookieModal()"><i class="fas fa-cookie-bite"></i> <span data-i18n="ft.legal.cookie">นโยบายคุกกี้</span></a>
+    </div>
+    <div class="foot-copy-bottom" style="border-top:1px solid rgba(255,255,255,.08);padding:12px 0 4px;text-align:center;font-size:11px;color:rgba(255,255,255,.4)" id="ma-footer-copy-bottom"></div>
+    <div class="foot-copy" id="ma-footer-copy"></div>
+  </footer>
 </div>
 
 <div class="ov" id="srv-modal" onclick="if(event.target===this)_closeModal('srv-modal')"><div class="modal"><div class="mhd"><h2 id="srv-title2"></h2><span class="mclose" onclick="_closeModal('srv-modal')">×</span></div><div class="mbody" id="srv-body"></div></div></div>
@@ -5056,7 +5213,7 @@ function _popupRefreshMarkersFromData(data){
   </div>
 </div>
 <div class="ov" id="login-modal" onclick="if(event.target===this)_closeModal('login-modal')"><div class="modal" style="max-width:400px"><div class="mhd"><h2><i class="fas fa-sign-in-alt" style="color:var(--p)"></i> เข้าสู่ระบบ</h2><span class="mclose" onclick="_closeModal('login-modal')">×</span></div><div class="mbody"><p style="margin-bottom:16px;color:var(--tx2);font-size:13px">กรุณาเข้าสู่ระบบก่อนส่งข้อมูลฝากทรัพย์หรือฝากความต้องการ</p><div class="login-btns"><button class="login-provider" onclick="loginWith('google')"><i class="fab fa-google" style="color:#DB4437"></i> เข้าสู่ระบบด้วย Google</button><!-- [PHONE-LOGIN] ซ่อนชั่วคราว — ยังไม่เปิดใช้งาน --><button class="login-provider" onclick="loginPhone()" style="display:none"><i class="fas fa-mobile-alt" style="color:#25D366"></i> เข้าสู่ระบบด้วยโทรศัพท์</button></div><div class="login-sep">หรือ</div><div class="login-toggle"><button id="lt-pw-btn" class="active" onclick="setLoginTab('pw')">รหัสผ่าน</button><button id="lt-magic-btn" onclick="setLoginTab('magic')">Magic Link</button></div><input class="login-field" type="email" id="login-email" placeholder="อีเมล"><div id="lt-pw-section"><input class="login-field" type="password" id="login-pw" placeholder="รหัสผ่าน"><div style="text-align:right;margin-top:-4px;margin-bottom:10px"><button class="auth-link" onclick="resetPassword()">ลืมรหัสผ่าน?</button></div><button class="btn-sub" onclick="loginEmail()"><i class="fas fa-sign-in-alt"></i> เข้าสู่ระบบ</button></div><div id="lt-magic-section" style="display:none"><p class="magic-notice">เราจะส่งลิงก์เข้าสู่ระบบไปที่อีเมลโดยไม่ต้องใช้รหัสผ่าน</p><button class="btn-sub" onclick="loginMagicLink()"><i class="fas fa-magic"></i> ส่ง Magic Link</button></div><div style="margin-top:12px;text-align:center;font-size:12px">ยังไม่มีบัญชี? <a href="#" onclick="event.preventDefault();showSignup()" style="color:var(--a)">สมัครสมาชิก</a></div><div style="margin-top:10px;text-align:center"><button class="auth-link" style="font-size:12px;color:var(--gr)" onclick="_closeModal('login-modal');showPage('listings')"><i class="fas fa-search"></i> <span id="login-modal-browse-lbl">ดูประกาศก่อน ไม่ต้อง Login</span></button></div></div></div></div>
-<div class="ov" id="signup-modal" onclick="if(event.target===this)_closeModal('signup-modal')"><div class="modal" style="max-width:400px"><div class="mhd"><h2><i class="fas fa-user-plus" style="color:var(--p)"></i> สมัครสมาชิก</h2><span class="mclose" onclick="_closeModal('signup-modal')">×</span></div><div class="mbody"><div class="login-btns"><button class="login-provider" onclick="loginWith('google')"><i class="fab fa-google" style="color:#DB4437"></i> สมัครด้วย Google</button><!-- [PHONE-LOGIN] ซ่อนชั่วคราว — ยังไม่เปิดใช้งาน --><button class="login-provider" onclick="loginPhone()" style="display:none"><i class="fas fa-mobile-alt" style="color:#25D366"></i> สมัคร/เข้าสู่ระบบด้วยโทรศัพท์</button></div><div class="login-sep">หรือสมัครด้วยอีเมล</div><input class="login-field" type="email" id="su-email" placeholder="อีเมล"><input class="login-field" type="password" id="su-pw" placeholder="รหัสผ่าน (อย่างน้อย 6 ตัว)"><button class="btn-sub" onclick="signupEmail()"><i class="fas fa-user-plus"></i> สมัครสมาชิก</button><div style="margin-top:12px;text-align:center;font-size:12px">มีบัญชีแล้ว? <a href="#" onclick="event.preventDefault();showLogin()" style="color:var(--a)">เข้าสู่ระบบ</a></div></div></div></div>
+<div class="ov" id="signup-modal" onclick="if(event.target===this)_closeModal('signup-modal')"><div class="modal" style="max-width:400px"><div class="mhd"><h2><i class="fas fa-user-plus" style="color:var(--p)"></i> สมัครสมาชิก</h2><span class="mclose" onclick="_closeModal('signup-modal')">×</span></div><div class="mbody"><div class="login-btns"><button class="login-provider" onclick="loginWith('google')"><i class="fab fa-google" style="color:#DB4437"></i> สมัครด้วย Google</button><!-- [PHONE-LOGIN] ซ่อนชั่วคราว — ยังไม่เปิดใช้งาน --><button class="login-provider" onclick="loginPhone()" style="display:none"><i class="fas fa-mobile-alt" style="color:#25D366"></i> สมัคร/เข้าสู่ระบบด้วยโทรศัพท์</button></div><div class="login-sep">หรือสมัครด้วยอีเมล</div><input class="login-field" type="email" id="su-email" placeholder="อีเมล"><input class="login-field" type="password" id="su-pw" placeholder="รหัสผ่าน (อย่างน้อย 6 ตัว)"><div class="consent-row" style="margin-top:4px"><input type="checkbox" id="su-consent-terms"><label for="su-consent-terms">ฉันอ่านและยอมรับ <a href="javascript:void(0)" onclick="openTermsModal();event.stopPropagation()">ข้อตกลงการใช้งาน</a> และ <a href="javascript:void(0)" onclick="openPrivacyModal();event.stopPropagation()">นโยบายความเป็นส่วนตัว</a> <span style="color:var(--red)">*</span></label></div><div class="consent-err" id="su-consent-err">⚠️ กรุณายอมรับข้อตกลงก่อนสมัครสมาชิก</div><div class="consent-row"><input type="checkbox" id="su-consent-marketing"><label for="su-consent-marketing">ฉันยินยอมรับข่าวสาร โปรโมชั่น และบทความอสังหาริมทรัพย์จาก Matchdoor (ไม่บังคับ — ถอนได้ตลอดเวลา)</label></div><button class="btn-sub" onclick="signupEmail()" style="margin-top:8px"><i class="fas fa-user-plus"></i> สมัครสมาชิก</button><div style="margin-top:12px;text-align:center;font-size:12px">มีบัญชีแล้ว? <a href="#" onclick="event.preventDefault();showLogin()" style="color:var(--a)">เข้าสู่ระบบ</a></div></div></div></div>
 <!-- Reset Password Modal -->
 <div class="ov" id="reset-pw-modal" onclick="if(event.target===this)_closeModal('reset-pw-modal')"><div class="modal" style="max-width:400px"><div class="mhd"><h2><i class="fas fa-key" style="color:var(--p)"></i> ตั้งรหัสผ่านใหม่</h2><span class="mclose" onclick="_closeModal('reset-pw-modal')">×</span></div><div class="mbody"><p style="margin-bottom:16px;color:var(--tx2);font-size:13px">กรอกรหัสผ่านใหม่ของคุณ (อย่างน้อย 6 ตัวอักษร)</p><input class="login-field" type="password" id="newpw-1" placeholder="รหัสผ่านใหม่"><input class="login-field" type="password" id="newpw-2" placeholder="ยืนยันรหัสผ่านใหม่"><button class="btn-sub" onclick="confirmResetPassword()"><i class="fas fa-check"></i> บันทึกรหัสผ่านใหม่</button></div></div></div>
 <!-- Profile Modal -->
@@ -5831,9 +5988,14 @@ async function checkAuth(){
   if(!sb) return;
   const {data:{user:u}} = await sb.auth.getUser();
   user = u||null;
-  // [v13] โหลดโปรไฟล์จาก user_profiles table ทุกครั้งที่ auth state เปลี่ยน
+  // Reset cache เสมอก่อนโหลดใหม่ — กัน stale data จาก session ก่อนหน้า
   _cachedUserProfile = null;
-  if(user) await _loadUserProfile(true);
+  if(user){
+    await _loadUserProfile(true);
+  } else {
+    // ไม่มี user — ล้าง metadata ที่อาจค้างอยู่
+    if(u) u.user_metadata = {};
+  }
   renderAuthUI();
   updateFormBtns();
 }
@@ -5862,7 +6024,12 @@ function initAuthListener(){
       }
     }
     if(_event === 'SIGNED_OUT'){
+      // Reset cache ทุกครั้งที่ sign out
+      _cachedUserProfile = null;
+      user = null;
       toast('ออกจากระบบเรียบร้อย');
+      renderAuthUI();
+      updateFormBtns();
       if(document.getElementById('page-my-account')?.classList.contains('active')){
         renderMyAccount();
       }
@@ -6004,12 +6171,17 @@ async function _loadUserProfile(forceRefresh){
       .eq('user_id', user.id)
       .single();
     if(data){
-      // merge ลง user_metadata เพื่อให้ renderAuthUI / renderMyAccount ใช้ได้เลย
+      // Merge DB profile → user_metadata
+      // ล้าง field ที่อาจค้างจาก session เก่าก่อน แล้ว merge ใหม่เสมอ
       user.user_metadata = user.user_metadata || {};
-      if(data.display_name) user.user_metadata.display_name = data.display_name;
-      if(data.phone)        user.user_metadata.phone        = data.phone;
-      if(data.line_id)      user.user_metadata.line_id      = data.line_id;
+      user.user_metadata.display_name = data.display_name || user.user_metadata.display_name || null;
+      user.user_metadata.phone        = data.phone        || null;
+      user.user_metadata.line_id      = data.line_id      || null;
+      user.user_metadata.avatar_url   = data.avatar_url   || user.user_metadata.avatar_url || null;
       _cachedUserProfile = data;
+    } else {
+      // ไม่มีข้อมูลใน user_profiles — ล้าง cache ให้สะอาด
+      _cachedUserProfile = null;
     }
   } catch(e){ /* silent — ใช้ auth.user_metadata เดิมแทน */ }
   return _cachedUserProfile;
@@ -6087,88 +6259,137 @@ function renderMyAccount(){
   </div>
   <!-- Profile panel -->
   <div class="ma-panel active" id="ma-panel-profile">
-    <div class="ma-section">
-      <div class="ma-section-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
-        <span><i class="fas fa-user-edit"></i> ${sanitize(t('ma.profile.title'))}</span>
-        <button id="ma-edit-profile-btn" onclick="_maToggleProfileEdit(true)" style="display:none;background:var(--p);color:#fff;border:none;border-radius:8px;padding:7px 16px;font-size:13px;font-weight:600;cursor:pointer;gap:6px;align-items:center">
-          <i class="fas fa-pen"></i> แก้ไขข้อมูลส่วนตัว
-        </button>
-      </div>
-      <!-- รูปโปรไฟล์ -->
-      <div class="ma-avatar-section" id="ma-avatar-section">
-        <div style="font-size:13px;font-weight:600;margin-bottom:10px;color:var(--tx)"><i class="fas fa-camera" style="color:var(--p);margin-right:6px"></i> รูปโปรไฟล์</div>
-        <div class="ma-avatar-preview-wrap">
-          <div class="ma-avatar-preview" id="ma-avatar-preview">${_meta.avatar_url?`<img src="${sanitize(_meta.avatar_url)}" id="ma-avatar-preview-img" alt="avatar">`:`<span id="ma-avatar-preview-initials">${init}</span>`}</div>
-          <div style="flex:1">
-            <div style="font-size:12px;color:var(--tx2);margin-bottom:8px">อัปโหลดรูปหรือใส่ URL รูปภาพ</div>
-            <label for="ma-avatar-file" style="display:inline-flex;align-items:center;gap:6px;background:var(--p);color:#fff;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;margin-bottom:6px">
-              <i class="fas fa-upload"></i> เลือกรูปภาพ
-            </label>
-            <input type="file" id="ma-avatar-file" accept="image/*" style="display:none" onchange="_maPreviewAvatarFile(event)" disabled>
+    <div class="ma-profile-grid">
+      <!-- LEFT: Sidebar — Avatar + Quick Info + PDPA + Delete -->
+      <div class="ma-profile-sidebar">
+        <!-- Avatar Card -->
+        <div class="ma-section" id="ma-avatar-section">
+          <div class="ma-section-title"><i class="fas fa-camera"></i> รูปโปรไฟล์</div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:14px">
+            <div class="ma-avatar-preview" id="ma-avatar-preview" style="width:110px;height:110px;font-size:36px">${_meta.avatar_url?`<img src="${sanitize(_meta.avatar_url)}" id="ma-avatar-preview-img" alt="avatar">`:`<span id="ma-avatar-preview-initials">${init}</span>`}</div>
+            <div style="text-align:center;width:100%">
+              <label for="ma-avatar-file" style="display:inline-flex;align-items:center;justify-content:center;gap:6px;background:var(--p);color:#fff;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer;width:100%;box-sizing:border-box">
+                <i class="fas fa-upload"></i> เลือกรูปภาพ
+              </label>
+              <input type="file" id="ma-avatar-file" accept="image/*" style="display:none" onchange="_maPreviewAvatarFile(event)" disabled>
+            </div>
+          </div>
+          <div class="ma-field" style="margin-top:12px">
+            <label style="font-size:12px">หรือใส่ URL รูปภาพ</label>
+            <input type="url" id="ma-avatar-url" value="${sanitize(_meta.avatar_url||'')}" placeholder="https://example.com/photo.jpg" disabled style="background:var(--lt);color:var(--gr);cursor:default" oninput="_maPreviewAvatarUrl(this.value)">
           </div>
         </div>
-        <div class="ma-field" style="margin-top:4px">
-          <label style="font-size:12px">หรือใส่ URL รูปภาพ</label>
-          <input type="url" id="ma-avatar-url" value="${sanitize(_meta.avatar_url||'')}" placeholder="https://example.com/photo.jpg" disabled style="background:var(--lt);color:var(--gr);cursor:default" oninput="_maPreviewAvatarUrl(this.value)">
+
+        <!-- Quick Member Stats -->
+        <div class="ma-section">
+          <div class="ma-section-title"><i class="fas fa-chart-bar"></i> สรุปบัญชี</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div style="background:var(--lt);border-radius:10px;padding:12px;text-align:center">
+              <div style="font-size:22px;font-weight:800;color:var(--p)">${favCount}</div>
+              <div style="font-size:11px;color:var(--tx2);margin-top:2px"><i class="fas fa-heart" style="color:#e74c3c"></i> รายการโปรด</div>
+            </div>
+            <div style="background:var(--lt);border-radius:10px;padding:12px;text-align:center">
+              <div style="font-size:22px;font-weight:800;color:var(--a)" id="ma-stat-token">${_tokenBalance}</div>
+              <div style="font-size:11px;color:var(--tx2);margin-top:2px"><i class="fas fa-coins" style="color:#f1c40f"></i> Token คงเหลือ</div>
+            </div>
+          </div>
+          ${joinDate?`<div style="font-size:12px;color:var(--tx2);margin-top:12px;text-align:center"><i class="fas fa-calendar-alt" style="color:var(--p);margin-right:4px"></i> ${sanitize(t('ma.member.since'))} ${joinDate}</div>`:''}
+        </div>
+
+        <!-- PDPA -->
+        <div class="ma-section">
+          <div class="ma-section-title"><i class="fas fa-shield-alt" style="color:var(--p)"></i> สิทธิตาม PDPA</div>
+          <div style="margin-bottom:14px">
+            <div style="font-size:13px;font-weight:600;margin-bottom:6px;color:var(--tx)"><i class="fas fa-download" style="color:var(--p);margin-right:6px"></i> ขอสำเนาข้อมูล</div>
+            <p style="font-size:12px;color:var(--tx2);margin-bottom:10px">ดาวน์โหลดข้อมูลส่วนบุคคลในรูปแบบ JSON</p>
+            <button onclick="_maExportMyData()" style="background:var(--p);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;width:100%;justify-content:center">
+              <i class="fas fa-file-download"></i> Export ข้อมูลของฉัน
+            </button>
+          </div>
+          <hr style="border:none;border-top:1px solid var(--bd);margin:12px 0">
+          <div>
+            <div style="font-size:13px;font-weight:600;margin-bottom:6px;color:var(--tx)"><i class="fas fa-bell" style="color:var(--p);margin-right:6px"></i> รับข่าวสาร</div>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px">
+              <input type="checkbox" id="ma-marketing-consent" style="width:16px;height:16px;accent-color:var(--p)" onchange="_maUpdateMarketingConsent(this.checked)">
+              ยินยอมรับโปรโมชั่น
+            </label>
+            <span id="ma-marketing-consent-ts" style="font-size:11px;color:var(--gr);display:block;margin-top:4px"></span>
+          </div>
+        </div>
+
+        <!-- ลบบัญชี -->
+        <div class="ma-section" style="border-color:rgba(220,53,69,.3)">
+          <div class="ma-section-title" style="color:#dc3545"><i class="fas fa-trash-alt"></i> ลบบัญชีผู้ใช้</div>
+          <p style="font-size:12px;color:var(--tx2);margin-bottom:10px">การลบบัญชีจะลบข้อมูลโปรไฟล์และไม่สามารถกู้คืนได้</p>
+          <button onclick="_maDeleteAccount()" style="background:transparent;color:#dc3545;border:1.5px solid #dc3545;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;width:100%">
+            <i class="fas fa-trash-alt"></i> ลบบัญชีของฉัน
+          </button>
         </div>
       </div>
-      <!-- ข้อมูลทั่วไป -->
-      <div class="ma-field">
-        <label>${sanitize(t('ma.profile.name'))}</label>
-        <input type="text" id="ma-display-name" value="${dispName}" placeholder="${sanitize(t('ma.profile.name'))}">
-      </div>
-      <div class="ma-field">
-        <label>${sanitize(t('ma.profile.email'))}</label>
-        <input type="email" value="${email}" disabled style="background:var(--lt);color:var(--gr);cursor:default">
-      </div>
-      <div class="ma-field">
-        <label>${sanitize(t('ma.profile.phone'))}</label>
-        <input type="tel" id="ma-phone" value="${sanitize(_meta.phone||'')}" placeholder="0812345678">
-      </div>
-      <div class="ma-field">
-        <label>${sanitize(t('ma.profile.line'))}</label>
-        <input type="text" id="ma-line-id" value="${sanitize(_meta.line_id||'')}" placeholder="@yourlineid">
-      </div>
-      <!-- ยอมรับข้อกำหนด -->
-      <div class="ma-terms-box" id="ma-terms-box" style="display:none">
-        <input type="checkbox" id="ma-terms-accept" onchange="_maOnTermsChange()">
-        <label for="ma-terms-accept">
-          ฉันยืนยันว่าข้อมูลที่กรอกถูกต้อง และยอมรับ <a href="#" onclick="return false" style="color:var(--p)">ข้อกำหนดการใช้งาน</a> และ <a href="#" onclick="return false" style="color:var(--p)">นโยบายความเป็นส่วนตัว</a> ของ Matchdoor
-        </label>
-      </div>
-      <div id="ma-profile-action-btns" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px">
-        <button class="ma-save-btn" id="ma-save-profile-btn" onclick="${isDevMode?'alert(\"Dev mode: บันทึกจริงไม่ได้ ต้อง Login ก่อนครับ 🙏\")':'_maSaveProfile()'}" disabled style="opacity:.5;cursor:not-allowed">
-          <i class="fas fa-save"></i> ${sanitize(t('ma.profile.save'))}${isDevMode?' (Dev)':''}
-        </button>
-        ${!isDevMode?`<button class="ma-logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> ${sanitize(t('ma.profile.logout'))}</button>`:''}
-      </div>
-    </div>
 
-    <!-- เปลี่ยนรหัสผ่าน -->
-    <div class="ma-section" style="margin-top:16px" id="ma-pw-section">
-      <div class="ma-section-title"><i class="fas fa-lock"></i> เปลี่ยนรหัสผ่าน</div>
-      <div class="ma-field">
-        <label>รหัสผ่านใหม่</label>
-        <input type="password" id="ma-new-pw" placeholder="รหัสผ่านใหม่ (อย่างน้อย 6 ตัว)" disabled style="background:var(--lt);color:var(--gr);cursor:default">
-      </div>
-      <div class="ma-field">
-        <label>ยืนยันรหัสผ่านใหม่</label>
-        <input type="password" id="ma-new-pw2" placeholder="ยืนยันรหัสผ่านใหม่" disabled style="background:var(--lt);color:var(--gr);cursor:default">
-      </div>
-      <div id="ma-pw-action-btns" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px">
-        <button id="ma-pw-save-btn" onclick="_maChangePassword()" disabled style="background:var(--gr);color:#fff;border:none;border-radius:8px;padding:9px 20px;font-size:13px;font-weight:600;cursor:not-allowed;opacity:.6">
-          <i class="fas fa-key"></i> บันทึกรหัสผ่าน
-        </button>
-      </div>
-    </div>
+      <!-- RIGHT: Main — Profile form + Password -->
+      <div class="ma-profile-main">
+        <!-- Profile Form -->
+        <div class="ma-section">
+          <div class="ma-section-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+            <span><i class="fas fa-user-edit"></i> ${sanitize(t('ma.profile.title'))}</span>
+            <button id="ma-edit-profile-btn" onclick="_maToggleProfileEdit(true)" style="display:none;background:var(--p);color:#fff;border:none;border-radius:8px;padding:7px 16px;font-size:13px;font-weight:600;cursor:pointer;gap:6px;align-items:center">
+              <i class="fas fa-pen"></i> แก้ไขข้อมูลส่วนตัว
+            </button>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
+            <div class="ma-field">
+              <label>${sanitize(t('ma.profile.name'))}</label>
+              <input type="text" id="ma-display-name" value="${dispName}" placeholder="${sanitize(t('ma.profile.name'))}">
+            </div>
+            <div class="ma-field">
+              <label>${sanitize(t('ma.profile.email'))}</label>
+              <input type="email" value="${email}" disabled style="background:var(--lt);color:var(--gr);cursor:default">
+            </div>
+            <div class="ma-field">
+              <label>${sanitize(t('ma.profile.phone'))}</label>
+              <input type="tel" id="ma-phone" value="${sanitize(_meta.phone||'')}" placeholder="0812345678">
+            </div>
+            <div class="ma-field">
+              <label>${sanitize(t('ma.profile.line'))}</label>
+              <input type="text" id="ma-line-id" value="${sanitize(_meta.line_id||'')}" placeholder="@yourlineid">
+            </div>
+          </div>
+          <!-- ยอมรับข้อกำหนด -->
+          <div class="ma-terms-box" id="ma-terms-box" style="display:none">
+            <input type="checkbox" id="ma-terms-accept" onchange="_maOnTermsChange()">
+            <label for="ma-terms-accept">
+              ฉันยืนยันว่าข้อมูลที่กรอกถูกต้อง และยอมรับ <a href="#" onclick="return false" style="color:var(--p)">ข้อกำหนดการใช้งาน</a> และ <a href="#" onclick="return false" style="color:var(--p)">นโยบายความเป็นส่วนตัว</a> ของ Matchdoor
+            </label>
+          </div>
+          <div id="ma-profile-action-btns" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
+            <button class="ma-save-btn" id="ma-save-profile-btn" onclick="${isDevMode?'alert(\"Dev mode: บันทึกจริงไม่ได้ ต้อง Login ก่อนครับ 🙏\")':'_maSaveProfile()'}" disabled style="opacity:.5;cursor:not-allowed">
+              <i class="fas fa-save"></i> ${sanitize(t('ma.profile.save'))}${isDevMode?' (Dev)':''}
+            </button>
+            ${!isDevMode?`<button class="ma-logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> ${sanitize(t('ma.profile.logout'))}</button>`:''}
+          </div>
+        </div>
 
-    <!-- ลบโปรไฟล์ -->
-    <div class="ma-section" style="margin-top:16px;border-color:rgba(220,53,69,.3)">
-      <div class="ma-section-title" style="color:#dc3545"><i class="fas fa-trash-alt"></i> ลบบัญชีผู้ใช้</div>
-      <p style="font-size:13px;color:var(--tx2);margin-bottom:12px">การลบบัญชีจะลบข้อมูลโปรไฟล์ของคุณออกจากระบบ และไม่สามารถกู้คืนได้</p>
-      <button onclick="_maDeleteAccount()" style="background:transparent;color:#dc3545;border:1.5px solid #dc3545;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer">
-        <i class="fas fa-trash-alt"></i> ลบบัญชีของฉัน
-      </button>
+        <!-- เปลี่ยนรหัสผ่าน -->
+        <div class="ma-section" id="ma-pw-section">
+          <div class="ma-section-title"><i class="fas fa-lock"></i> เปลี่ยนรหัสผ่าน</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
+            <div class="ma-field">
+              <label>รหัสผ่านใหม่</label>
+              <input type="password" id="ma-new-pw" placeholder="รหัสผ่านใหม่ (อย่างน้อย 6 ตัว)" disabled style="background:var(--lt);color:var(--gr);cursor:default">
+            </div>
+            <div class="ma-field">
+              <label>ยืนยันรหัสผ่านใหม่</label>
+              <input type="password" id="ma-new-pw2" placeholder="ยืนยันรหัสผ่านใหม่" disabled style="background:var(--lt);color:var(--gr);cursor:default">
+            </div>
+          </div>
+          <div id="ma-pw-action-btns" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px">
+            <button id="ma-pw-save-btn" onclick="_maChangePassword()" disabled style="background:var(--gr);color:#fff;border:none;border-radius:8px;padding:9px 20px;font-size:13px;font-weight:600;cursor:not-allowed;opacity:.6">
+              <i class="fas fa-key"></i> บันทึกรหัสผ่าน
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
   <!-- Favorites panel -->
@@ -6201,6 +6422,8 @@ function renderMyAccount(){
   </div>`;
   // Initialize profile in locked/view mode after render
   setTimeout(_maInitProfileLockState, 50);
+  // โหลดสถานะ marketing consent
+  setTimeout(_maLoadMarketingConsentState, 80);
 }
 // ── State ──────────────────────────────────────────────────
 let _tokenBalance     = 0;
@@ -7717,17 +7940,121 @@ async function _maDeleteAccount(){
   if(!user||!sb) return;
   const confirmed = confirm('⚠️ ยืนยันการลบบัญชี?\n\nข้อมูลโปรไฟล์และประวัติทั้งหมดของคุณจะถูกลบออกจากระบบและไม่สามารถกู้คืนได้\n\nกดตกลงเพื่อยืนยัน');
   if(!confirmed) return;
+
   try {
-    // ลบ user_profiles ก่อน (ถ้ามี)
+    // 1) ลบ user_profiles ใน DB
     await sb.from('user_profiles').delete().eq('user_id', user.id);
   } catch(e){ /* silent */ }
-  // sign out
+
+  try {
+    // 2) ล้าง user_metadata ใน auth.users (กัน metadata เก่าโผล่หลัง login ใหม่)
+    await sb.auth.updateUser({ data: {
+      display_name: null,
+      avatar_url:   null,
+      phone:        null,
+      line_id:      null,
+      picture:      null
+    }});
+  } catch(e){ /* silent */ }
+
+  // 3) Reset in-memory cache ทันที
+  _cachedUserProfile = null;
+  user = null;
+
   toast('ลบบัญชีเรียบร้อยแล้ว กำลังออกจากระบบ...');
+
   setTimeout(async ()=>{
-    await sb.auth.signOut();
+    // 4) Sign out ทุก session (global scope)
+    try { await sb.auth.signOut({ scope: 'global' }); } catch(e){ await sb.auth.signOut(); }
+    // 5) Clear browser storage เพื่อกันข้อมูลค้าง
+    try { localStorage.clear(); } catch(e){}
+    try { sessionStorage.clear(); } catch(e){}
+    renderAuthUI();
     renderMyAccount();
   }, 1500);
 }
+/* ── Export ข้อมูลส่วนบุคคล (สิทธิตาม PDPA มาตรา 63) ── */
+async function _maExportMyData(){
+  if(!user||!sb){ toast('กรุณาเข้าสู่ระบบก่อน',true); return; }
+  toast('กำลังรวบรวมข้อมูล...');
+  const exportData = { exported_at: new Date().toISOString(), user_id: user.id };
+  // ข้อมูล auth
+  exportData.account = {
+    email:      user.email,
+    created_at: user.created_at,
+    last_sign_in_at: user.last_sign_in_at
+  };
+  // ข้อมูล user_profiles
+  try {
+    const { data } = await sb.from('user_profiles')
+      .select('display_name,phone,line_id,avatar_url,terms_consent_at,terms_consent_version,marketing_consent,marketing_consent_at,updated_at')
+      .eq('user_id', user.id).single();
+    exportData.profile = data || {};
+  } catch(e){ exportData.profile = {}; }
+  // ดาวน์โหลดเป็น JSON
+  const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = 'matchdoor-my-data-' + new Date().toISOString().slice(0,10) + '.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('ดาวน์โหลดข้อมูลสำเร็จ ✅');
+}
+
+/* ── อัปเดต marketing consent (ถอน/ให้ความยินยอม) ── */
+async function _maUpdateMarketingConsent(checked){
+  if(!user||!sb){ toast('กรุณาเข้าสู่ระบบก่อน',true); return; }
+  const ts = checked ? new Date().toISOString() : null;
+  const tsEl = document.getElementById('ma-marketing-consent-ts');
+  try {
+    // บันทึกทั้ง user_metadata และ user_profiles
+    await sb.auth.updateUser({ data: {
+      marketing_consent:    checked,
+      marketing_consent_at: ts
+    }});
+    await sb.from('user_profiles').upsert({
+      user_id:              user.id,
+      marketing_consent:    checked,
+      marketing_consent_at: ts,
+      updated_at:           new Date().toISOString()
+    }, { onConflict: 'user_id' });
+    if(tsEl){
+      tsEl.textContent = checked
+        ? 'ยินยอมเมื่อ: ' + new Date(ts).toLocaleDateString('th-TH')
+        : 'ถอนความยินยอมแล้ว';
+    }
+    toast(checked ? 'ยินยอมรับข่าวสารแล้ว ✅' : 'ถอนความยินยอมรับข่าวสารแล้ว ✅');
+  } catch(e){
+    toast('เกิดข้อผิดพลาด: ' + e.message, true);
+  }
+}
+
+/* ── โหลดสถานะ marketing consent มาแสดงผล ── */
+async function _maLoadMarketingConsentState(){
+  if(!user) return;
+  const checkbox = document.getElementById('ma-marketing-consent');
+  const tsEl     = document.getElementById('ma-marketing-consent-ts');
+  if(!checkbox) return;
+  // ดึงจาก _cachedUserProfile หรือ user_metadata
+  const profile = _cachedUserProfile || {};
+  const meta    = user.user_metadata || {};
+  const mConsent   = profile.marketing_consent    ?? meta.marketing_consent    ?? false;
+  const mConsentAt = profile.marketing_consent_at ?? meta.marketing_consent_at ?? null;
+  checkbox.checked = !!mConsent;
+  if(tsEl){
+    if(mConsent && mConsentAt){
+      tsEl.textContent = 'ยินยอมเมื่อ: ' + new Date(mConsentAt).toLocaleDateString('th-TH');
+    } else if(!mConsent && mConsentAt){
+      tsEl.textContent = 'ถอนความยินยอมแล้ว';
+    } else {
+      tsEl.textContent = 'ยังไม่ได้ตั้งค่า';
+    }
+  }
+}
+
 function updateFormBtns(){ const logged=!!user; const deps=[['dep-btn','submitDep','form.dep.submit'],['wish-btn','submitWish','form.wish.submit']]; deps.forEach(([id,fn,labelKey])=>{ const b=$(id); if(!b)return; if(logged){ b.innerHTML=`<i class="fas fa-paper-plane btn-icon"></i><span class="btn-spinner"></span> ${sanitize(ui(labelKey))}`; b.onclick=window[fn]; } else{ b.innerHTML='<i class="fas fa-lock btn-icon"></i><span class="btn-spinner"></span> '+sanitize(ui('form.login')); b.onclick=()=>_openModal('login-modal'); } }); }
 async function loginWith(p){
   if(!sb){ toast('ระบบยังไม่ได้เชื่อมต่อ Supabase',true); return; }
@@ -7828,20 +8155,63 @@ async function signupEmail(){
   if(!sb){ toast('ระบบยังไม่ได้เชื่อมต่อ Supabase',true); return; }
   const e=document.getElementById('su-email').value.trim();
   const p=document.getElementById('su-pw').value;
+  const consentTerms    = document.getElementById('su-consent-terms')?.checked;
+  const consentMarketing= document.getElementById('su-consent-marketing')?.checked;
+  const consentErrEl    = document.getElementById('su-consent-err');
   if(!e||!p){ toast('กรุณากรอกอีเมลและรหัสผ่าน',true); return; }
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)){ toast('รูปแบบอีเมลไม่ถูกต้อง',true); return; }
   if(p.length<6){ toast('รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร',true); return; }
+  // PDPA: ต้องยอมรับ Terms + Privacy ก่อนสมัคร
+  if(!consentTerms){
+    if(consentErrEl){ consentErrEl.classList.add('show'); }
+    toast('กรุณายอมรับข้อตกลงและนโยบายความเป็นส่วนตัวก่อนสมัครสมาชิก',true);
+    return;
+  }
+  if(consentErrEl) consentErrEl.classList.remove('show');
   const btn=document.querySelector('#signup-modal .btn-sub');
   if(btn){ btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> กำลังสมัคร...'; }
-  const {error}=await sb.auth.signUp({email:e,password:p});
+  // บันทึก consent timestamp + version + marketing preference ใน user_metadata
+  const consentTs = new Date().toISOString();
+  const {data, error}=await sb.auth.signUp({
+    email:e, password:p,
+    options:{ data:{
+      terms_consent_at:      consentTs,
+      terms_consent_version: '2025-01',
+      marketing_consent:     consentMarketing ? true : false,
+      marketing_consent_at:  consentMarketing ? consentTs : null
+    }}
+  });
   if(btn){ btn.disabled=false; btn.innerHTML='<i class="fas fa-user-plus"></i> สมัครสมาชิก'; }
-  if(error){ toast(error.message,true); }
-  else{ _closeModal('signup-modal'); toast('สมัครสมาชิกสำเร็จ! กรุณาตรวจสอบอีเมลเพื่อยืนยัน ✅'); }
+  if(error){ toast(error.message,true); return; }
+  // บันทึก consent ลง user_profiles ด้วย (เป็น source of truth สำหรับ audit)
+  if(data?.user?.id){
+    try {
+      await sb.from('user_profiles').upsert({
+        user_id:               data.user.id,
+        terms_consent_at:      consentTs,
+        terms_consent_version: '2025-01',
+        marketing_consent:     consentMarketing ? true : false,
+        marketing_consent_at:  consentMarketing ? consentTs : null,
+        updated_at:            consentTs
+      }, { onConflict: 'user_id' });
+    } catch(e){ /* silent — ถ้า column ยังไม่มีให้เพิ่มใน Supabase ก่อน */ }
+  }
+  _closeModal('signup-modal');
+  toast('สมัครสมาชิกสำเร็จ! กรุณาตรวจสอบอีเมลเพื่อยืนยัน ✅');
 }
 async function logout(){
   if(!sb) return;
-  await sb.auth.signOut();
-  user=null; renderAuthUI(); updateFormBtns();
+  // Reset cache ก่อน signOut เสมอ
+  _cachedUserProfile = null;
+  user = null;
+  try { await sb.auth.signOut(); } catch(e){}
+  // Clear browser storage กัน session เก่าค้าง
+  try {
+    const keys = Object.keys(localStorage).filter(k => k.startsWith('sb-'));
+    keys.forEach(k => localStorage.removeItem(k));
+  } catch(e){}
+  renderAuthUI();
+  updateFormBtns();
 }
 function showSignup(){ _closeModal('login-modal'); _openModal('signup-modal'); }
 function showLogin(){ _closeModal('signup-modal'); _openModal('login-modal'); }
@@ -12784,7 +13154,9 @@ window.addEventListener('resize', () => {
   if(typeof recCarouselIdx !== 'undefined') _applyRecTranslate(false);
 });
 
-function applyConfig(){ $('hero-sub').textContent=C.HERO_SUB; $('srv-title').textContent=C.SRV_TITLE; $('srv-sub').textContent=C.SRV_SUB; $('footer-addr').textContent=C.ADDR; $('footer-phone').textContent=C.PHONE; $('footer-copy').textContent=C.COPYRIGHT; if($('footer-copy-bottom')) $('footer-copy-bottom').textContent=C.COPYRIGHT; if($('footer-copy-inline')) $('footer-copy-inline').textContent=C.COPYRIGHT; [['fb-link',C.FB],['ftr-fb',C.FB]].forEach(([id,href])=>{$(id)&&($(id).href=href)}); const lnUrl=lineUrl(C.LINE); [['ln-link',lnUrl],['ftr-ln',lnUrl],['f-ln',lnUrl]].forEach(([id,href])=>{$(id)&&($(id).href=href)}); const telHref='tel:'+C.PHONE; [['tel-link',telHref],['ftr-tel',telHref],['f-tel',telHref]].forEach(([id,href])=>{$(id)&&($(id).href=href)});  // YouTube embed — lazy load เมื่อ scroll เข้า viewport
+function applyConfig(){ $('hero-sub').textContent=C.HERO_SUB; $('srv-title').textContent=C.SRV_TITLE; $('srv-sub').textContent=C.SRV_SUB; $('footer-addr').textContent=C.ADDR; $('footer-phone').textContent=C.PHONE; $('footer-copy').textContent=C.COPYRIGHT; if($('footer-copy-bottom')) $('footer-copy-bottom').textContent=C.COPYRIGHT; if($('footer-copy-inline')) $('footer-copy-inline').textContent=C.COPYRIGHT; // my-account page footer sync
+  if($('ma-footer-addr')) $('ma-footer-addr').textContent=C.ADDR; if($('ma-footer-phone')) $('ma-footer-phone').textContent=C.PHONE; if($('ma-footer-copy')) $('ma-footer-copy').textContent=C.COPYRIGHT; if($('ma-footer-copy-bottom')) $('ma-footer-copy-bottom').textContent=C.COPYRIGHT;
+  [['fb-link',C.FB],['ftr-fb',C.FB],['ma-ftr-fb',C.FB]].forEach(([id,href])=>{$(id)&&($(id).href=href)}); const lnUrl=lineUrl(C.LINE); [['ln-link',lnUrl],['ftr-ln',lnUrl],['ma-ftr-ln',lnUrl],['f-ln',lnUrl]].forEach(([id,href])=>{$(id)&&($(id).href=href)}); const telHref='tel:'+C.PHONE; [['tel-link',telHref],['ftr-tel',telHref],['ma-ftr-tel',telHref],['f-tel',telHref]].forEach(([id,href])=>{$(id)&&($(id).href=href)});  // YouTube embed — lazy load เมื่อ scroll เข้า viewport
   const ytWrap = $('yt-embed');
   if(ytWrap) {
     ytWrap.setAttribute('data-yt-src', C.YT);
