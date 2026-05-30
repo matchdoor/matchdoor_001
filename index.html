@@ -4524,7 +4524,7 @@ footer::after{
     <div class="page-hero-content" style="padding:20px 20px 16px">
       <button class="back-btn" onclick="showPage('my-account')"><i class="fas fa-arrow-left"></i> กลับบัญชีของฉัน</button>
       <div style="display:flex;align-items:center;gap:12px;margin-top:10px;flex-wrap:wrap">
-        <h1 style="font-size:clamp(20px,4vw,28px);font-weight:800;color:#fff;margin:0"><i class="fab fa-facebook" style="margin-right:8px;color:#64b5f6"></i> ฟีดชุมชน Matchdoor</h1>
+        <h1 style="font-size:clamp(20px,4vw,28px);font-weight:800;color:#fff;margin:0"><img src="LogoWeb.webp" alt="Matchdoor" style="width:28px;height:28px;object-fit:contain;border-radius:5px;vertical-align:middle;margin-right:8px"> ฟีดชุมชน Matchdoor</h1>
         <span style="background:rgba(255,255,255,.15);color:#fff;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600;border:1px solid rgba(255,255,255,.25)"><i class="fas fa-users" style="margin-right:4px"></i> Community</span>
       </div>
       <p style="color:rgba(255,255,255,.75);font-size:13px;margin:6px 0 0">แชร์ทรัพย์ ถามตอบ ติดตามข่าวสาร อสังหาฯ กับชุมชน Matchdoor</p>
@@ -6039,7 +6039,11 @@ function _popupRefreshMarkersFromData(data){
       <button class="back-btn" onclick="showPage('home')"><i class="fas fa-arrow-left"></i> <span data-i18n="ph.ma.back">กลับหน้าหลัก</span></button>
       <h1 style="margin-top:10px"><i class="fas fa-user-circle"></i> <span data-i18n="ph.ma.h1">บัญชีของฉัน</span></h1>
     </div>
-
+    <!-- DEV bypass button — มุมขวาบน hero, แสดงตลอดเวลา -->
+    <button id="ma-dev-bypass-btn" class="ma-dev-bypass-btn" onclick="_toggleMaDevBypass()">
+      <i class="fas fa-flask"></i>
+      <span id="ma-dev-bypass-lbl">DEV Preview</span>
+    </button>
   </div>
   <div class="my-account-wrap" id="my-account-content">
     <!-- Filled by renderMyAccount() -->
@@ -7304,8 +7308,8 @@ function renderMyAccount(){
   <div class="ma-hero">
     <div class="ma-hero-cover">
       <div class="ma-hero-cover-btns">
-        <button class="ma-hero-cover-btn" style="background:linear-gradient(135deg,#1877F2,#0d5dc7);border:none;color:#fff;display:inline-flex;align-items:center;gap:6px;font-weight:700" onclick="showPage('social')">
-          <i class="fab fa-facebook" style="font-size:13px"></i> ฟีดชุมชน
+        <button class="ma-hero-cover-btn" style="background:linear-gradient(135deg,#1B3A6B,#2a5298);border:none;color:#fff;display:inline-flex;align-items:center;gap:6px;font-weight:700" onclick="showPage('social')">
+          <img src="LogoWeb.webp" alt="Matchdoor" style="width:16px;height:16px;object-fit:contain;border-radius:3px;vertical-align:middle"> ฟีดชุมชน
         </button>
         <button class="ma-hero-cover-btn" onclick="_maTab('listings',document.querySelector('[data-tab=\\'listings\\']'));renderMaListingsPanel()">
           <i class="fas fa-plus"></i> ลงประกาศ
@@ -10875,6 +10879,7 @@ function _initRouteFromUrl() {
     '/buy': 'home', '/rent': 'home',
     '/listings': 'listings',
     '/my-account': 'my-account',
+    '/social': 'social',
   };
   const targetPage = sectionMap[path];
   if (targetPage) {
