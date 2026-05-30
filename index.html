@@ -4758,15 +4758,21 @@ footer::after{
 </div><!-- end page-home -->
 <!-- ═══ SOCIAL PAGE — แยกหน้า Community Feed ═══ -->
 <div class="page" id="page-social">
-  <!-- Page Hero Banner -->
-  <div class="page-hero" style="background:linear-gradient(135deg,#1877F2 0%,#1B3A6B 55%,#0d3b2e 100%);min-height:120px;display:flex;align-items:center;position:relative">
-    <div class="page-hero-content" style="padding:20px 20px 16px">
-      <button class="back-btn" onclick="showPage('my-account')"><i class="fas fa-arrow-left"></i> กลับบัญชีของฉัน</button>
-      <div style="display:flex;align-items:center;gap:12px;margin-top:10px;flex-wrap:wrap">
-        <h1 style="font-size:clamp(20px,4vw,28px);font-weight:800;color:#fff;margin:0"><img src="LogoWeb.webp" alt="Matchdoor" style="width:28px;height:28px;object-fit:contain;border-radius:5px;vertical-align:middle;margin-right:8px"> ฟีดชุมชน Matchdoor</h1>
-        <span style="background:rgba(255,255,255,.15);color:#fff;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600;border:1px solid rgba(255,255,255,.25)"><i class="fas fa-users" style="margin-right:4px"></i> Community</span>
+  <!-- Page Hero Banner — Community Feed (compact) -->
+  <div style="background:linear-gradient(135deg,#1B3A6B 0%,#1877F2 60%,#0d3b2e 100%);padding:10px 20px 10px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;border-bottom:2px solid rgba(255,255,255,.1)">
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <button class="back-btn" onclick="showPage('home')" style="margin:0;padding:6px 14px;font-size:12px"><i class="fas fa-arrow-left"></i> หน้าหลัก</button>
+      <div style="display:flex;align-items:center;gap:10px">
+        <img src="LogoWeb.webp" alt="Matchdoor" style="width:32px;height:32px;object-fit:contain;border-radius:6px">
+        <div>
+          <div style="font-size:16px;font-weight:800;color:#fff;line-height:1.2;font-family:'Kanit','Noto Sans Thai',sans-serif">ฟีดชุมชน Matchdoor</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.65);margin-top:1px">แชร์ทรัพย์ · ถามตอบ · ข่าวสารอสังหาฯ</div>
+        </div>
       </div>
-      <p style="color:rgba(255,255,255,.75);font-size:13px;margin:6px 0 0">แชร์ทรัพย์ ถามตอบ ติดตามข่าวสาร อสังหาฯ กับชุมชน Matchdoor</p>
+      <span style="background:rgba(255,255,255,.15);color:#fff;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600;border:1px solid rgba(255,255,255,.2)"><i class="fas fa-users" style="margin-right:4px"></i> Community</span>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button onclick="window.openDepPanel()" style="background:rgba(200,146,42,.9);border:none;border-radius:20px;padding:7px 16px;font-size:12px;font-weight:700;color:#fff;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px"><i class="fas fa-plus"></i> ลงประกาศ</button>
     </div>
   </div>
 <!-- ═══════════════════════════════════════════════════════════
@@ -4855,40 +4861,40 @@ footer::after{
         <div class="md-story-bar">
           <div class="md-story-bar-hd">
             <span>📹 Story ทรัพย์แนะนำ</span>
-            <a onclick="openDepPanel && openDepPanel()">+ ลงประกาศ Story</a>
+            <a onclick="window.openDepPanel()" style="cursor:pointer">+ ลงประกาศ Story</a>
           </div>
           <div class="md-stories-scroll" id="md-stories-scroll">
             <!-- Add story card -->
-            <div class="md-story-card add-story" onclick="openDepPanel && openDepPanel()">
+            <div class="md-story-card add-story" onclick="window.openDepPanel()">
               <div class="md-story-add-icon"><i class="fas fa-plus"></i></div>
               <div class="md-story-add-label">ลง Story ทรัพย์ของคุณ</div>
             </div>
             <!-- Story cards — rendered dynamically + static placeholders -->
-            <div class="md-story-card" style="background:linear-gradient(160deg,#0f2027,#203a43)">
+            <div class="md-story-card" style="background:linear-gradient(160deg,#0f2027,#203a43);cursor:pointer" onclick="mdOpenStory('The Loft สุขุมวิท ชั้น 22','linear-gradient(160deg,#0f2027,#203a43)','พ')">
               <div class="md-story-av">พ</div>
               <div class="md-story-overlay"></div>
               <div class="md-story-play"><div class="md-play-btn"><i class="fas fa-play"></i></div></div>
               <div class="md-story-label">The Loft สุขุมวิท ชั้น 22</div>
             </div>
-            <div class="md-story-card" style="background:linear-gradient(160deg,#1a1a2e,#16213e)">
+            <div class="md-story-card" style="background:linear-gradient(160deg,#1a1a2e,#16213e);cursor:pointer" onclick="mdOpenStory('Ideo อโศก 1 ห้องนอน','linear-gradient(160deg,#1a1a2e,#16213e)','ส')">
               <div class="md-story-av">ส</div>
               <div class="md-story-overlay"></div>
               <div class="md-story-play"><div class="md-play-btn"><i class="fas fa-play"></i></div></div>
               <div class="md-story-label">Ideo อโศก 1 ห้องนอน</div>
             </div>
-            <div class="md-story-card" style="background:linear-gradient(160deg,#0d3b2e,#1a5c42)">
+            <div class="md-story-card" style="background:linear-gradient(160deg,#0d3b2e,#1a5c42);cursor:pointer" onclick="mdOpenStory('บ้านสวน ลาดพร้าว 2 ชั้น','linear-gradient(160deg,#0d3b2e,#1a5c42)','จ')">
               <div class="md-story-av">จ</div>
               <div class="md-story-overlay"></div>
               <div class="md-story-play"><div class="md-play-btn"><i class="fas fa-play"></i></div></div>
               <div class="md-story-label">บ้านสวน ลาดพร้าว 2 ชั้น</div>
             </div>
-            <div class="md-story-card" style="background:linear-gradient(160deg,#3d1a00,#7a3200)">
+            <div class="md-story-card" style="background:linear-gradient(160deg,#3d1a00,#7a3200);cursor:pointer" onclick="mdOpenStory('ทาวน์โฮม พระราม 9 ใหม่','linear-gradient(160deg,#3d1a00,#7a3200)','ก')">
               <div class="md-story-av">ก</div>
               <div class="md-story-overlay"></div>
               <div class="md-story-play"><div class="md-play-btn"><i class="fas fa-play"></i></div></div>
               <div class="md-story-label">ทาวน์โฮม พระราม 9 ใหม่</div>
             </div>
-            <div class="md-story-card" style="background:linear-gradient(160deg,#1B3A6B,#2a5298)">
+            <div class="md-story-card" style="background:linear-gradient(160deg,#1B3A6B,#2a5298);cursor:pointer" onclick="mdOpenStory('แมนชั่น ทองหล่อ หรู','linear-gradient(160deg,#1B3A6B,#2a5298)','อ')">
               <div class="md-story-av">อ</div>
               <div class="md-story-overlay"></div>
               <div class="md-story-play"><div class="md-play-btn"><i class="fas fa-play"></i></div></div>
@@ -4905,18 +4911,18 @@ footer::after{
             <div class="md-compose-av" id="md-compose-av">
               <i class="fas fa-user"></i>
             </div>
-            <div class="md-compose-input" onclick="openDepPanel && openDepPanel()">
+            <div class="md-compose-input" onclick="window.openDepPanel()">
               คุณมีทรัพย์อยากแชร์? โพสต์ประกาศหรือถามเรื่องบ้าน...
             </div>
           </div>
           <div class="md-compose-tools">
-            <div class="md-compose-tool video" onclick="openDepPanel && openDepPanel()">
+            <div class="md-compose-tool video" onclick="window.openDepPanel()">
               <i class="fas fa-video"></i> วิดีโอ
             </div>
-            <div class="md-compose-tool photo" onclick="openDepPanel && openDepPanel()">
+            <div class="md-compose-tool photo" onclick="window.openDepPanel()">
               <i class="fas fa-images"></i> รูปภาพ
             </div>
-            <div class="md-compose-tool listing" onclick="openDepPanel && openDepPanel()">
+            <div class="md-compose-tool listing" onclick="window.openDepPanel()">
               <i class="fas fa-building"></i> ลงประกาศ
             </div>
           </div>
@@ -4942,7 +4948,7 @@ footer::after{
       <div class="md-fb-card">
         <div class="md-ad-card">
           <div class="md-ad-title"><i class="fas fa-bullhorn" style="color:#C8922A"></i> โฆษณาแนะนำ</div>
-          <div class="md-ad-unit" onclick="">
+          <div class="md-ad-unit" onclick="quickSearch && quickSearch('คอนโด สุขุมวิท 50');typeof toast==='function'&&toast('กำลังค้นหา Nue Vibe สุขุมวิท 50 🔍')" style="cursor:pointer">
             <div class="md-ad-img" style="background:linear-gradient(135deg,#1B3A6B,#2a5298)">🏗️</div>
             <div class="md-ad-body">
               <div class="md-ad-name">Nue Vibe สุขุมวิท 50</div>
@@ -4967,7 +4973,7 @@ footer::after{
             </div>
           </div>
         </div>
-        <div class="md-see-more" style="border-top:1px solid #E4E6EB" onclick="">ลงโฆษณากับเรา →</div>
+        <div class="md-see-more" style="border-top:1px solid #E4E6EB" onclick="window.openDepPanel()">ลงโฆษณากับเรา →</div>
       </div>
 
       <!-- SEO Quick Links -->
@@ -5003,13 +5009,13 @@ footer::after{
       <div class="md-fb-card">
         <div class="md-footer-links">
           <a onclick="showPage && showPage('home')">หน้าแรก</a>
-          <a>เกี่ยวกับเรา</a>
-          <a>ความเป็นส่วนตัว</a>
-          <a>เงื่อนไขการใช้งาน</a>
-          <a onclick="openDepPanel && openDepPanel()">ลงโฆษณา</a>
+          <a onclick="openAcceptableUseModal && openAcceptableUseModal()">เกี่ยวกับเรา</a>
+          <a onclick="openPrivacyModal && openPrivacyModal()">ความเป็นส่วนตัว</a>
+          <a onclick="openTermsModal && openTermsModal()">เงื่อนไขการใช้งาน</a>
+          <a onclick="window.openDepPanel()">ลงโฆษณา</a>
           <a onclick="openApplyModal && openApplyModal('agent')">สมัครตัวแทน</a>
-          <a onclick="openAllModal && openAllModal('blog')">บทความ</a>
-          <a onclick="scrollToEl('contact-sec')">ติดต่อเรา</a>
+          <a onclick="gotoBlog && gotoBlog()">บทความ</a>
+          <a onclick="showPage('home');setTimeout(function(){scrollToEl('contact-sec')},100)">ติดต่อเรา</a>
         </div>
         <div class="md-footer-copy">© 2025 Matchdoor — Real Estate Platform</div>
       </div>
@@ -5065,7 +5071,7 @@ footer::after{
       var stars = '';
       var r = parseFloat(ag.rating||5);
       for(var s=1;s<=5;s++) stars += s <= Math.round(r) ? '★' : '☆';
-      return '<div class="md-agent-item" onclick="openAgentModal && openAgentModal(' + JSON.stringify(ag) + ')">'
+      return '<div class="md-agent-item" onclick="window.openAgentModal && window.openAgentModal(' + JSON.stringify(ag) + ')">'
         + '<div class="md-agent-av">' + avHtml + '</div>'
         + '<div class="md-agent-info">'
           + '<div class="md-agent-name">' + esc(ag.name) + '</div>'
@@ -5142,7 +5148,7 @@ footer::after{
             + '</div>'
           + '</div>'
         + '</div>'
-        + '<button class="md-post-more" onclick="event.stopPropagation()">···</button>'
+        + '<button class="md-post-more" onclick="event.stopPropagation();mdPostMore(this,\'' + esc(p.id) + '\')">···</button>'
       + '</div>'
       + '<div class="md-post-text">'
         + esc(textContent)
@@ -5155,7 +5161,7 @@ footer::after{
         + '<div class="md-post-action" onclick="mdToggleLike(this)"><i class="far fa-heart"></i> ถูกใจ</div>'
         + '<div class="md-post-action" onclick="mdToggleComment(this)"><i class="far fa-comment"></i> คอมเมนต์</div>'
         + '<div class="md-post-action" onclick="mdSharePost(\'' + esc(p.id) + '\')"><i class="fas fa-share"></i> แชร์</div>'
-        + '<div class="md-post-action contact-btn" onclick="openPropModal && openPropModal(' + JSON.stringify(p) + ')"><i class="fas fa-phone-alt"></i> ติดต่อ</div>'
+        + '<div class="md-post-action contact-btn" onclick="window.openPropModal && window.openPropModal(' + JSON.stringify(p) + ')"><i class="fas fa-phone-alt"></i> ติดต่อ</div>'
       + '</div>'
       + '<div class="md-comment-collapse" style="display:none">'
         + '<div class="md-comments">'
@@ -5166,8 +5172,8 @@ footer::after{
         + '</div>'
         + '<div class="md-comment-box">'
           + '<div class="md-compose-av" style="width:32px;height:32px;font-size:13px"><i class="fas fa-user"></i></div>'
-          + '<input class="md-comment-input" placeholder="เขียนความคิดเห็น...">'
-          + '<button class="md-comment-send"><i class="fas fa-paper-plane"></i></button>'
+          + '<input class="md-comment-input" placeholder="เขียนความคิดเห็น..." onkeydown="if(event.key===\'Enter\'&&!event.shiftKey){event.preventDefault();mdSendComment(this);}">'
+          + '<button class="md-comment-send" onclick="mdSendComment(this.previousElementSibling)"><i class="fas fa-paper-plane"></i></button>'
         + '</div>'
       + '</div>'
       + '</div>';
@@ -5214,8 +5220,8 @@ footer::after{
             + '<div style="font-size:12px;opacity:.8;margin-top:4px">เริ่ม 3.2 ล้านบาท · ลดสูงสุด 20%</div></div>'
           + '</div>'
           + '<div class="md-post-actions">'
-            + '<div class="md-post-action" style="flex:2;color:#1B3A6B;font-weight:700"><i class="fas fa-phone-alt" style="color:#C8922A"></i> โทรสอบถามเลย</div>'
-            + '<div class="md-post-action"><i class="fas fa-share"></i> แชร์</div>'
+            + '<div class="md-post-action" style="flex:2;color:#1B3A6B;font-weight:700" onclick="quickSearch && quickSearch(\'Origin พระราม 9\');typeof toast===\'function\'&&toast(\'โทรสอบถาม: 061-589-7459 📞\')"><i class="fas fa-phone-alt" style="color:#C8922A"></i> โทรสอบถามเลย</div>'
+            + '<div class="md-post-action" onclick="mdSharePost(\'promo-origin\')"><i class="fas fa-share"></i> แชร์</div>'
           + '</div>'
           + '</div>';
       }
@@ -5224,7 +5230,44 @@ footer::after{
     mdPostPage++;
   }
 
-  /* ── Like toggle ── */
+  /* ── Send comment ── */
+  window.mdSendComment = function(input){
+    if(!input) return;
+    var text = (input.value||'').trim();
+    if(!text) return;
+    var card = input.closest('.md-post-card');
+    var commentsEl = card && card.querySelector('.md-comments');
+    if(commentsEl){
+      var div = document.createElement('div');
+      div.className = 'md-comment-item';
+      div.innerHTML = '<div class="md-comment-av"><i class="fas fa-user" style="font-size:11px"></i></div>'
+        + '<div class="md-comment-bubble"><b>คุณ</b> ' + esc(text) + '</div>';
+      commentsEl.appendChild(div);
+      // update count
+      var countEl = card.querySelector('.md-reaction-count');
+      if(countEl){
+        countEl.innerHTML = countEl.innerHTML.replace(/ความคิดเห็น (\d+)/, function(m,n){ return 'ความคิดเห็น ' + (parseInt(n)+1); });
+      }
+    }
+    input.value = '';
+    typeof toast === 'function' && toast('โพสต์ความคิดเห็นแล้ว 💬');
+  };
+
+  /* ── Post more (···) menu ── */
+  window.mdPostMore = function(btn, pid){
+    var existing = document.getElementById('md-post-menu-' + pid);
+    if(existing){ existing.remove(); return; }
+    var menu = document.createElement('div');
+    menu.id = 'md-post-menu-' + pid;
+    menu.style.cssText = 'position:absolute;right:8px;top:40px;background:#fff;border:1px solid #E4E6EB;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.15);z-index:100;min-width:160px;overflow:hidden';
+    menu.innerHTML = '<div style="padding:10px 14px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px" onclick="mdSharePost(\'' + pid + '\');this.closest(\'[id^=md-post-menu]\').remove()"><i class="fas fa-share" style="color:#1B3A6B;width:16px"></i> แชร์โพสต์นี้</div>'
+      + '<div style="padding:10px 14px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px;color:#e74c3c" onclick="this.closest(\'[id^=md-post-menu]\').remove()"><i class="fas fa-flag" style="width:16px"></i> รายงานโพสต์</div>';
+    var card = btn.closest('.md-post-card');
+    if(card){ card.style.position='relative'; card.appendChild(menu); }
+    setTimeout(function(){ document.addEventListener('click', function rm(e){ if(!menu.contains(e.target) && e.target!==btn){ menu.remove(); document.removeEventListener('click',rm); } }); }, 10);
+  };
+
+
   window.mdToggleLike = function(btn){
     var icon = btn.querySelector('i');
     var isLiked = btn.classList.contains('liked');
@@ -5285,28 +5328,240 @@ footer::after{
 })();
 </script>
 
-  <!-- SEO Quick Links for social page -->
+<!-- ═══ SOCIAL FEED — Missing Function Bridges ══════════════════════════ -->
+<script>
+(function(){
+
+  /* ─────────────────────────────────────────────────────────────
+     openDepPanel()
+     "ฝากทรัพย์ / ลงประกาศ" — เปิด dd-dep dropdown เดียวกับ
+     ปุ่ม "ฝากทรัพย์" ใน navbar (toggleDD)
+  ───────────────────────────────────────────────────────────── */
+  window.openDepPanel = function(){
+    if(typeof toggleDD === 'function'){
+      // ปิด page-social ชั่วคราวไม่ได้ เพราะ dd-dep อยู่ใน navbar
+      // ต้อง scroll ขึ้นไปก่อนแล้ว open
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setTimeout(function(){ toggleDD('dd-dep'); }, 300);
+    }
+  };
+
+  /* ─────────────────────────────────────────────────────────────
+     openAgentModal(agentObj)
+     คลิกรายชื่อตัวแทนใน sidebar → เปิด ag-modal ด้วย showAgentDetail
+  ───────────────────────────────────────────────────────────── */
+  window.openAgentModal = function(agObj){
+    if(typeof showAgentDetail === 'function'){
+      showAgentDetail(agObj);
+    } else {
+      // fallback: ไปหน้า agents
+      if(typeof showPage === 'function') showPage('agents');
+    }
+  };
+
+  /* ─────────────────────────────────────────────────────────────
+     openPropModal(propObj)
+     ปุ่ม "ติดต่อ" ใน feed card → เปิด property modal
+  ───────────────────────────────────────────────────────────── */
+  window.openPropModal = function(propObj){
+    if(!propObj) return;
+    var id = propObj.id || propObj.property_id;
+    if(id && typeof openModal === 'function'){
+      openModal(id);
+    }
+  };
+
+  /* ─────────────────────────────────────────────────────────────
+     Story Viewer — คลิก story card → แสดง lightbox/modal
+  ───────────────────────────────────────────────────────────── */
+  window.mdOpenStory = function(label, bg, initial){
+    // ถ้าเป็น "add story" ให้ไปที่ openDepPanel แทน
+    if(!label){ openDepPanel(); return; }
+    var ov = document.createElement('div');
+    ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9000;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px';
+    ov.onclick = function(e){ if(e.target === ov) ov.remove(); };
+    ov.innerHTML =
+      '<div style="position:relative;width:min(340px,90vw);background:' + (bg || '#1B3A6B') + ';border-radius:16px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.5)">'
+      + '<div style="padding:16px 16px 8px;display:flex;align-items:center;gap:10px">'
+        + '<div style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff">' + (initial||'M') + '</div>'
+        + '<div style="color:#fff;font-size:14px;font-weight:600">' + label + '</div>'
+        + '<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="margin-left:auto;background:rgba(255,255,255,.15);border:none;border-radius:50%;width:28px;height:28px;color:#fff;cursor:pointer;font-size:14px;line-height:1">×</button>'
+      + '</div>'
+      + '<div style="padding:20px 16px 24px;color:rgba(255,255,255,.85);font-size:14px;line-height:1.6">'
+        + '🏠 ' + label + '<br><br>'
+        + '<span style="opacity:.7;font-size:12px">กดปุ่มด้านล่างเพื่อดูรายละเอียดเพิ่มเติมหรือติดต่อตัวแทน</span>'
+      + '</div>'
+      + '<div style="display:flex;gap:8px;padding:0 16px 16px">'
+        + '<button onclick="if(typeof quickSearch===\'function\')quickSearch(\'' + label.replace(/'/g,'') + '\');this.closest(\'div[style*=fixed]\').remove()" style="flex:1;padding:10px;background:#C8922A;border:none;border-radius:8px;color:#fff;font-weight:700;cursor:pointer;font-size:13px">🔍 ค้นหาทรัพย์นี้</button>'
+        + '<button onclick="if(typeof toggleDD===\'function\')toggleDD(\'dd-dep\');this.closest(\'div[style*=fixed]\').remove()" style="flex:1;padding:10px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:8px;color:#fff;font-weight:600;cursor:pointer;font-size:13px">📞 ติดต่อตัวแทน</button>'
+      + '</div>'
+      + '</div>';
+    document.body.appendChild(ov);
+  };
+
+  /* ─────────────────────────────────────────────────────────────
+     Bind story cards after DOM ready
+  ───────────────────────────────────────────────────────────── */
+  function bindStoryCards(){
+    var scroll = document.getElementById('md-stories-scroll');
+    if(!scroll) return;
+    var cards = scroll.querySelectorAll('.md-story-card');
+    cards.forEach(function(card){
+      // skip add-story (already bound to openDepPanel)
+      if(card.classList.contains('add-story')) return;
+      var label = (card.querySelector('.md-story-label')||{}).textContent || '';
+      var initial = (card.querySelector('.md-story-av')||{}).textContent || 'M';
+      var bg = card.style.background || '#1B3A6B';
+      card.style.cursor = 'pointer';
+      card.onclick = function(){ window.mdOpenStory(label, bg, initial); };
+    });
+  }
+
+  /* ─────────────────────────────────────────────────────────────
+     Side Nav active state — highlight ปุ่มที่กด
+  ───────────────────────────────────────────────────────────── */
+  function bindSideNavItems(){
+    var items = document.querySelectorAll('#page-social .md-side-nav-item');
+    items.forEach(function(item){
+      item.addEventListener('click', function(){
+        items.forEach(function(i){ i.classList.remove('active'); });
+        item.classList.add('active');
+      });
+    });
+  }
+
+  /* ─────────────────────────────────────────────────────────────
+     Compose input — ถ้า login แล้ว แสดงชื่อ/avatar ผู้ใช้
+  ───────────────────────────────────────────────────────────── */
+  function updateComposeAvatar(){
+    var av = document.getElementById('md-compose-av');
+    if(!av) return;
+    if(typeof user !== 'undefined' && user && user.email){
+      var initial = (user.user_metadata && user.user_metadata.full_name)
+        ? user.user_metadata.full_name.charAt(0).toUpperCase()
+        : user.email.charAt(0).toUpperCase();
+      av.textContent = initial;
+      av.style.background = 'linear-gradient(135deg,#1B3A6B,#2a5298)';
+      av.style.color = '#fff';
+    }
+  }
+
+  /* ─────────────────────────────────────────────────────────────
+     Compose input → open dep panel with smooth UX
+  ───────────────────────────────────────────────────────────── */
+  function bindComposeInput(){
+    var input = document.querySelector('#page-social .md-compose-input');
+    if(!input) return;
+    // Remove old inline onclick, replace with better handler
+    input.onclick = null;
+    input.setAttribute('onclick','');
+    input.addEventListener('click', function(e){
+      e.stopPropagation();
+      window.openDepPanel();
+    });
+    // Also bind compose tool buttons
+    var tools = document.querySelectorAll('#page-social .md-compose-tool');
+    tools.forEach(function(tool){
+      tool.onclick = null;
+      tool.setAttribute('onclick','');
+      tool.addEventListener('click', function(e){
+        e.stopPropagation();
+        window.openDepPanel();
+      });
+    });
+  }
+
+  /* ─────────────────────────────────────────────────────────────
+     Run all bindings when social page is shown
+  ───────────────────────────────────────────────────────────── */
+  function initSocialBindings(){
+    bindStoryCards();
+    bindSideNavItems();
+    updateComposeAvatar();
+    bindComposeInput();
+  }
+
+  // Run immediately (HTML is already parsed)
+  if(document.readyState !== 'loading'){
+    initSocialBindings();
+  } else {
+    document.addEventListener('DOMContentLoaded', initSocialBindings);
+  }
+
+  // Also re-run whenever showPage('social') is called (page re-shown)
+  var _origShowPage = window.showPage;
+  window.showPage = function(page){
+    if(typeof _origShowPage === 'function') _origShowPage.apply(this, arguments);
+    if(page === 'social'){
+      setTimeout(function(){
+        bindStoryCards();
+        updateComposeAvatar();
+        bindComposeInput();
+        if(typeof window.initSocialFeed === 'function') window.initSocialFeed();
+      }, 120);
+    }
+  };
+
+  // Expose for manual call
+  window.initSocialBindings = initSocialBindings;
+
+})();
+</script>
+
+  <!-- SEO Quick Links for social page — full version matching main page -->
   <div class="flink-sec"><div class="flink-inner">
     <div>
       <h4>🏠 ซื้อ-ขาย กรุงเทพฯ</h4>
-      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(()=>quickSearch('คอนโด กรุงเทพ'),100)">ขายคอนโด กรุงเทพฯ</a>
-      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(()=>quickSearch('บ้านเดี่ยว กรุงเทพ'),100)">ขายบ้านเดี่ยว กรุงเทพฯ</a>
-      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(()=>quickSearch('ที่ดิน กรุงเทพ'),100)">ขายที่ดิน กรุงเทพฯ</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(function(){quickSearch('บ้านเดี่ยว กรุงเทพ')},100)">ขายบ้านเดี่ยว กรุงเทพฯ</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(function(){quickSearch('ทาวน์โฮม กรุงเทพ')},100)">ขายทาวน์โฮม กรุงเทพฯ</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(function(){quickSearch('คอนโด กรุงเทพ')},100)">ขายคอนโด กรุงเทพฯ</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(function(){quickSearch('ที่ดิน กรุงเทพ')},100)">ขายที่ดิน กรุงเทพฯ</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(function(){quickSearch('อาคารพาณิชย์ กรุงเทพ')},100)">ขายอาคารพาณิชย์ กทม.</a>
+    </div>
+    <div>
+      <h4>🏡 ซื้อ-ขาย นนทบุรี</h4>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(function(){quickSearch('บ้านเดี่ยว นนทบุรี')},100)">ขายบ้านเดี่ยว นนทบุรี</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(function(){quickSearch('ทาวน์โฮม นนทบุรี')},100)">ขายทาวน์โฮม นนทบุรี</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(function(){quickSearch('คอนโด นนทบุรี')},100)">ขายคอนโด นนทบุรี</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(function(){quickSearch('ที่ดิน นนทบุรี')},100)">ขายที่ดิน นนทบุรี</a>
+    </div>
+    <div>
+      <h4>🌊 ซื้อ-ขาย ชลบุรี</h4>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(function(){quickSearch('บ้านเดี่ยว ชลบุรี')},100)">ขายบ้านเดี่ยว ชลบุรี</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(function(){quickSearch('ทาวน์โฮม ชลบุรี')},100)">ขายทาวน์โฮม ชลบุรี</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(function(){quickSearch('คอนโด ชลบุรี')},100)">ขายคอนโด ชลบุรี</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(function(){quickSearch('พัทยา')},100)">อสังหาฯ พัทยา</a>
     </div>
     <div>
       <h4>🔑 เช่า กรุงเทพฯ</h4>
-      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(()=>quickSearch('เช่าคอนโด สุขุมวิท'),100)">เช่าคอนโดสุขุมวิท</a>
-      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(()=>quickSearch('เช่าคอนโด อโศก'),100)">เช่าคอนโดอโศก</a>
-      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(()=>quickSearch('เช่าบ้านเดี่ยว กรุงเทพ'),100)">เช่าบ้านเดี่ยว กรุงเทพฯ</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(function(){quickSearch('เช่าบ้านเดี่ยว กรุงเทพ')},100)">เช่าบ้านเดี่ยว กรุงเทพฯ</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(function(){quickSearch('เช่าทาวน์โฮม กรุงเทพ')},100)">เช่าทาวน์โฮม กรุงเทพฯ</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(function(){quickSearch('เช่าคอนโด กรุงเทพ')},100)">เช่าคอนโด กรุงเทพฯ</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(function(){quickSearch('เช่าคอนโด สุขุมวิท')},100)">เช่าคอนโดสุขุมวิท</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(function(){quickSearch('เช่าคอนโด อโศก')},100)">เช่าคอนโดอโศก</a>
     </div>
     <div>
       <h4>📍 ทำเลยอดนิยม</h4>
-      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(()=>quickSearch('สุขุมวิท'),100)">คอนโดย่านสุขุมวิท</a>
-      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(()=>quickSearch('พระราม 9'),100)">อสังหาฯ พระราม 9</a>
-      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(()=>quickSearch('ทองหล่อ'),100)">คอนโดทองหล่อ</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(function(){quickSearch('สุขุมวิท')},100)">คอนโดย่านสุขุมวิท</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(function(){quickSearch('สาทร')},100)">อสังหาฯ ย่านสาทร</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(function(){quickSearch('รัชดา')},100)">บ้าน-คอนโด รัชดา</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(function(){quickSearch('ลาดพร้าว')},100)">ทรัพย์ย่านลาดพร้าว</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(function(){quickSearch('อโศก')},100)">คอนโดใกล้อโศก</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(function(){quickSearch('พระราม 9')},100)">อสังหาฯ พระราม 9</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(function(){quickSearch('ทองหล่อ')},100)">คอนโดทองหล่อ</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(function(){quickSearch('พระโขนง')},100)">คอนโดพระโขนง-BTS</a>
+    </div>
+    <div>
+      <h4>🎓 ใกล้มหาวิทยาลัย</h4>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(function(){quickSearch('จุฬาลงกรณ์')},100)">คอนโดใกล้จุฬาฯ</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(function(){quickSearch('ธรรมศาสตร์')},100)">ห้องเช่าใกล้ธรรมศาสตร์</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(function(){quickSearch('เกษตรศาสตร์')},100)">ทรัพย์ใกล้เกษตรฯ</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(function(){quickSearch('มหิดล')},100)">คอนโดใกล้มหิดล</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(function(){quickSearch('รังสิต')},100)">ห้องเช่าใกล้ ม.รังสิต</a>
+      <a href="javascript:void(0)" onclick="event.preventDefault();showPage('home');setTimeout(function(){quickSearch('สยาม')},100)">คอนโดใกล้สยาม</a>
     </div>
   </div></div>
-  <!-- Footer for social page -->
+  <!-- Footer for social page — full version matching main page -->
   <footer>
     <div class="footer-inner">
       <div class="footer-brand-col">
@@ -5315,6 +5570,19 @@ footer::after{
             <div class="logo-img-wrap" style="width:52px;height:52px">
               <div class="logo-door-glow"></div>
               <img class="logo-img-base" src="LogoWeb.webp" alt="matchdoor logo" loading="lazy" style="opacity:1;visibility:visible">
+              <svg class="logo-cat-walk" viewBox="0 0 22 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="10" cy="13" rx="6" ry="4" fill="rgba(255,255,255,0.95)"/>
+                <circle cx="16" cy="9" r="5" fill="rgba(255,255,255,0.95)"/>
+                <polygon points="13,5 11,2 14.5,4.5" fill="rgba(255,255,255,0.95)"/>
+                <polygon points="18,5 20,2 18.5,4.5" fill="rgba(255,255,255,0.95)"/>
+                <ellipse cx="14.5" cy="9" rx="1.2" ry="1.4" fill="#0F1E3A"/>
+                <ellipse cx="17.5" cy="9" rx="1.2" ry="1.4" fill="#0F1E3A"/>
+                <ellipse cx="16" cy="10.5" rx="0.8" ry="0.5" fill="rgba(255,160,180,0.9)"/>
+                <path d="M4 12 Q1 8 3 4" stroke="rgba(255,255,255,0.9)" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+                <line x1="7" y1="16" x2="6" y2="18" stroke="rgba(255,255,255,0.85)" stroke-width="1.2" stroke-linecap="round"/>
+                <line x1="10" y1="17" x2="10" y2="18" stroke="rgba(255,255,255,0.85)" stroke-width="1.2" stroke-linecap="round"/>
+                <line x1="13" y1="17" x2="13" y2="18" stroke="rgba(255,255,255,0.85)" stroke-width="1.2" stroke-linecap="round"/>
+              </svg>
             </div>
           </div>
           <div>
@@ -5322,12 +5590,20 @@ footer::after{
             <div class="footer-logo-sub">REAL ESTATE APP</div>
           </div>
         </div>
+        <p class="footer-addr" id="footer-addr-social"></p>
+        <p id="footer-phone-social" style="font-size:12px;opacity:.6;margin-top:6px"></p>
         <div class="footer-social-grid">
           <a href="https://www.instagram.com/matchdoor/" target="_blank" class="ftr-icon-btn" title="Instagram">
             <span class="fb-ico" style="background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);color:#fff"><i class="fab fa-instagram"></i></span>
           </a>
           <a href="https://www.facebook.com/matchdoor" target="_blank" class="ftr-icon-btn" title="Facebook">
             <span class="fb-ico" style="background:var(--fb);color:#fff"><i class="fab fa-facebook-f"></i></span>
+          </a>
+          <a href="https://lin.ee/matchdoor" target="_blank" class="ftr-icon-btn" title="Line">
+            <span class="fb-ico" style="background:var(--ln);color:#fff"><i class="fab fa-line"></i></span>
+          </a>
+          <a href="tel:+66615897459" class="ftr-icon-btn" title="โทรศัพท์">
+            <span class="fb-ico" style="background:var(--p);color:#fff"><i class="fas fa-mobile-alt"></i></span>
           </a>
           <a href="https://www.youtube.com/@Matchdoorhome" target="_blank" rel="noopener" class="ftr-icon-btn" title="YouTube">
             <span class="fb-ico" style="background:#FF0000;color:#fff"><i class="fab fa-youtube"></i></span>
@@ -5338,25 +5614,84 @@ footer::after{
         </div>
       </div>
       <div>
-        <h4>เมนูหลัก</h4>
-        <a href="/" onclick="event.preventDefault();showPage('home')">หน้าหลัก</a>
-        <a href="/portfolio" onclick="event.preventDefault();showPage('portfolio')">ผลงาน</a>
-        <a href="/agents" onclick="event.preventDefault();showPage('agents')">ตัวแทน</a>
-        <a onclick="openDepPanel && openDepPanel()">ลงประกาศ</a>
-        <a href="/my-account" onclick="event.preventDefault();showPage('my-account')">บัญชีของฉัน</a>
+        <h4 data-i18n="ft.col.main">เมนูหลัก</h4>
+        <a href="/" onclick="event.preventDefault();showPage('home')" data-i18n="ft.col.home">หน้าหลัก</a>
+        <a href="javascript:void(0)" onclick="gotoNew && gotoNew()" data-i18n="ft.col.new">มาใหม่</a>
+        <a href="javascript:void(0)" onclick="gotoRec && gotoRec()">Hot 🔥</a>
+        <a href="/portfolio" onclick="event.preventDefault();showPage('portfolio')" data-i18n="ft.col.portfolio">ผลงาน</a>
+        <a href="javascript:void(0)" onclick="gotoBlog && gotoBlog()" data-i18n="ft.col.blog">บทความ</a>
+        <a href="/agents" onclick="event.preventDefault();showPage('agents')" data-i18n="ft.col.agents">ตัวแทน</a>
+        <a href="javascript:void(0)" onclick="window.openDepPanel()">ลงประกาศ</a>
+        <a href="javascript:void(0)" onclick="openAdminLogin && openAdminLogin()" class="ft-admin-btn"><i class="fas fa-shield-alt"></i> Admin</a>
       </div>
       <div>
-        <h4>ประเภท</h4>
-        <a href="javascript:void(0)" onclick="setCatNav('บ้านเดี่ยว')">บ้านเดี่ยว</a>
-        <a href="javascript:void(0)" onclick="setCatNav('ทาวน์โฮม')">ทาวน์โฮม</a>
-        <a href="javascript:void(0)" onclick="setCatNav('คอนโด')">คอนโด</a>
-        <a href="javascript:void(0)" onclick="setCatNav('ที่ดิน')">ที่ดิน</a>
+        <h4 data-i18n="ft.col.type">ประเภท</h4>
+        <a href="javascript:void(0)" onclick="showPage('home');setTimeout(function(){setCatNav('บ้านเดี่ยว')},100)" data-i18n="ft.type.house">บ้านเดี่ยว</a>
+        <a href="javascript:void(0)" onclick="showPage('home');setTimeout(function(){setCatNav('ทาวน์โฮม')},100)" data-i18n="ft.type.town">ทาวน์โฮม</a>
+        <a href="javascript:void(0)" onclick="showPage('home');setTimeout(function(){setCatNav('คอนโด')},100)" data-i18n="ft.type.condo">คอนโด</a>
+        <a href="javascript:void(0)" onclick="showPage('home');setTimeout(function(){setCatNav('อาคารพาณิชย์')},100)" data-i18n="ft.type.comm">อาคารพาณิชย์</a>
+        <a href="javascript:void(0)" onclick="showPage('home');setTimeout(function(){setCatNav('ที่ดิน')},100)" data-i18n="ft.type.land">ที่ดิน</a>
+        <a href="javascript:void(0)" onclick="showPage('home')" data-i18n="ft.type.buy">ซื้อ / ขาย</a>
+        <a href="javascript:void(0)" onclick="showPage('home')" data-i18n="ft.type.rent">เช่า</a>
+      </div>
+      <div>
+        <h4 data-i18n="ft.col.area">ทำเล</h4>
+        <a href="javascript:void(0)" onclick="showPage('home');setTimeout(function(){quickSearch('สุขุมวิท')},100)" data-i18n="ft.area.sukhumvit">สุขุมวิท</a>
+        <a href="javascript:void(0)" onclick="showPage('home');setTimeout(function(){quickSearch('สาทร')},100)" data-i18n="ft.area.sathorn">สาทร</a>
+        <a href="javascript:void(0)" onclick="showPage('home');setTimeout(function(){quickSearch('รัชดา')},100)" data-i18n="ft.area.rachada">รัชดาภิเษก</a>
+        <a href="javascript:void(0)" onclick="showPage('home');setTimeout(function(){quickSearch('ลาดพร้าว')},100)" data-i18n="ft.area.ladprao">ลาดพร้าว</a>
+        <a href="javascript:void(0)" onclick="showPage('home');setTimeout(function(){quickSearch('พระราม 9')},100)" data-i18n="ft.area.rama9">พระราม 9</a>
+        <a href="javascript:void(0)" onclick="showPage('home');setTimeout(function(){quickSearch('บางนา')},100)" data-i18n="ft.area.bangna">บางนา</a>
+      </div>
+      <div>
+        <h4 data-i18n="ft.col.province">จังหวัด</h4>
+        <a href="javascript:void(0)" onclick="showPage('home');setTimeout(function(){quickProvSearch('กรุงเทพฯ')},100)" data-i18n="ft.prov.bkk">กรุงเทพฯ</a>
+        <a href="javascript:void(0)" onclick="showPage('home');setTimeout(function(){quickProvSearch('นนทบุรี')},100)" data-i18n="ft.prov.nnt">นนทบุรี</a>
+        <a href="javascript:void(0)" onclick="showPage('home');setTimeout(function(){quickProvSearch('ปทุมธานี')},100)" data-i18n="ft.prov.ptm">ปทุมธานี</a>
+        <a href="javascript:void(0)" onclick="showPage('home');setTimeout(function(){quickProvSearch('สมุทรปราการ')},100)" data-i18n="ft.prov.smk">สมุทรปราการ</a>
+        <a href="javascript:void(0)" onclick="showPage('home');setTimeout(function(){quickProvSearch('ชลบุรี')},100)" data-i18n="ft.prov.cbl">ชลบุรี</a>
+        <a href="javascript:void(0)" onclick="showPage('home');setTimeout(function(){quickProvSearch('ภูเก็ต')},100)" data-i18n="ft.prov.pkt">ภูเก็ต</a>
+      </div>
+      <div>
+        <h4 data-i18n="ft.col.info">ข้อมูล</h4>
+        <a href="javascript:void(0)" onclick="openAcceptableUseModal && openAcceptableUseModal()" data-i18n="ft.legal.aup">นโยบายการใช้งานที่ยอมรับได้</a>
+        <a href="javascript:void(0)" onclick="openTermsModal && openTermsModal()" data-i18n="ft.legal.terms2">ข้อตกลงและเงื่อนไข</a>
+        <a href="javascript:void(0)" onclick="openPrivacyModal && openPrivacyModal()" data-i18n="ft.legal.privacy">นโยบายความเป็นส่วนตัว</a>
+        <a href="javascript:void(0)" onclick="openBuySellModal && openBuySellModal()" data-i18n="ft.legal.buysell">เงื่อนไขการซื้อ-ขาย</a>
+        <a href="javascript:void(0)" onclick="openCookieModal && openCookieModal()" data-i18n="ft.legal.cookie">นโยบายคุกกี้</a>
       </div>
     </div>
     <div class="footer-legal-bar">
-      <span style="opacity:.7;font-size:12px">© 2025 Matchdoor — Real Estate Platform · Community Feed</span>
+      <a href="javascript:void(0)" onclick="openAcceptableUseModal && openAcceptableUseModal()"><i class="fas fa-check-circle"></i> <span data-i18n="ft.legal.aup">นโยบายการใช้งานที่ยอมรับได้</span></a>
+      <span class="flb-sep">·</span>
+      <a href="javascript:void(0)" onclick="openTermsModal && openTermsModal()"><i class="fas fa-file-contract"></i> <span data-i18n="ft.legal.terms2">ข้อตกลงและเงื่อนไข</span></a>
+      <span class="flb-sep">·</span>
+      <a href="javascript:void(0)" onclick="openPrivacyModal && openPrivacyModal()"><i class="fas fa-shield-alt"></i> <span data-i18n="ft.legal.privacy">นโยบายความเป็นส่วนตัว</span></a>
+      <span class="flb-sep">·</span>
+      <a href="javascript:void(0)" onclick="openBuySellModal && openBuySellModal()"><i class="fas fa-handshake"></i> <span data-i18n="ft.legal.buysell">เงื่อนไขการซื้อ-ขาย</span></a>
+      <span class="flb-sep">·</span>
+      <a href="javascript:void(0)" onclick="openCookieModal && openCookieModal()"><i class="fas fa-cookie-bite"></i> <span data-i18n="ft.legal.cookie">นโยบายคุกกี้</span></a>
     </div>
+    <div style="border-top:1px solid rgba(255,255,255,.08);padding:12px 0 4px;text-align:center;font-size:11px;color:rgba(255,255,255,.4)" id="social-footer-copy"></div>
   </footer>
+  <script>
+  (function(){
+    // Sync footer copy text from main footer
+    var mainCopy = document.getElementById('footer-copy-bottom');
+    var socialCopy = document.getElementById('social-footer-copy');
+    if(socialCopy){
+      if(mainCopy && mainCopy.textContent) socialCopy.textContent = mainCopy.textContent;
+      else socialCopy.textContent = '© 2025 Matchdoor — Real Estate Platform';
+    }
+    // Sync address & phone if applyConfig has filled them
+    var mainAddr = document.getElementById('footer-addr');
+    var socialAddr = document.getElementById('footer-addr-social');
+    if(socialAddr && mainAddr) socialAddr.textContent = mainAddr.textContent;
+    var mainPhone = document.getElementById('footer-phone');
+    var socialPhone = document.getElementById('footer-phone-social');
+    if(socialPhone && mainPhone) socialPhone.textContent = mainPhone.textContent;
+  })();
+  </script>
 </div><!-- end page-social -->
 
 <!-- FAVORITES PAGE -->
