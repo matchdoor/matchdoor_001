@@ -4516,7 +4516,246 @@ footer::after{
     <div class="pg-info" id="all-pg-info"></div>
     <div class="pg-controls" id="all-pg-controls"></div>
   </div>
+
+ <div id="osrv-sec" class="osrv-sec" style="padding:32px 0 28px">
+  <div style="max-width:1320px;margin:0 auto;padding:0 20px">
+    <div class="sec-hd">
+      <div class="sec-title">บริการอื่นๆ</div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="view-all" onclick="openAllModal('services')">ดูทั้งหมด →</span>
+        <div class="gallery-nav">
+          <button class="gallery-nav-btn" onclick="hGalleryMove('osrv-track',-1)"><i class="fas fa-chevron-left"></i></button>
+          <button class="gallery-nav-btn" onclick="hGalleryMove('osrv-track',1)"><i class="fas fa-chevron-right"></i></button>
+        </div>
+      </div>
+    </div>
+    <div class="h-gallery-wrap" id="osrv-track-wrap">
+      <div class="h-gallery-track" id="osrv-track" style="gap:14px"></div>
+    </div>
+  </div>
 </div>
+
+<!-- ===== ผลงาน SECTION (HOME PAGE) ===== -->
+<section id="home-port-sec" class="blog-sec" style="padding:32px 0 28px;background:#fff">
+  <div style="max-width:1320px;margin:0 auto;padding:0 20px">
+    <div class="sec-hd">
+      <div class="sec-title"><i class="fas fa-trophy" style="color:var(--a)"></i> <span data-i18n="sec.port">ผลงาน</span></div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="view-all" onclick="showPage('portfolio')">ดูทั้งหมด →</span>
+        <div class="gallery-nav">
+          <button class="gallery-nav-btn" onclick="hGalleryMove('home-port-track',-1)"><i class="fas fa-chevron-left"></i></button>
+          <button class="gallery-nav-btn" onclick="hGalleryMove('home-port-track',1)"><i class="fas fa-chevron-right"></i></button>
+        </div>
+      </div>
+    </div>
+    <div class="h-gallery-wrap" id="home-port-track-wrap">
+      <div class="h-gallery-track" id="home-port-track"></div>
+    </div>
+  </div>
+</section>
+ <section class="blog-sec" id="blog-sec" style="padding:32px 0 28px">
+  <div style="max-width:1320px;margin:0 auto;padding:0 20px">
+    <div class="sec-hd">
+      <div class="sec-title" data-i18n="sec.blog">บทความน่ารู้</div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="view-all" onclick="openAllModal('blog')">ดูทั้งหมด →</span>
+        <div class="gallery-nav">
+          <button class="gallery-nav-btn" onclick="hGalleryMove('blog-track',-1)"><i class="fas fa-chevron-left"></i></button>
+          <button class="gallery-nav-btn" onclick="hGalleryMove('blog-track',1)"><i class="fas fa-chevron-right"></i></button>
+        </div>
+      </div>
+    </div>
+    <div class="h-gallery-wrap" id="blog-track-wrap">
+      <div class="h-gallery-track" id="blog-track"></div>
+    </div>
+  </div>
+</section>
+ <section class="srv-sec" id="contact-sec">
+  <div class="srv-inner">
+   <div>
+    <p class="srv-label">WHAT WE DO</p>
+    <div class="srv-title" id="srv-title">บริการอสังหาฯครบวงจร</div>
+    <p class="srv-sub" id="srv-sub">ซื้อ-ขาย อสังหาฯ ให้พวกเราช่วยดูแล</p>
+    <div class="srv-list"><div class="srv-item"><div class="srv-ico"><i class="fas fa-chart-line"></i></div><span>ตั้งราคา และช่วยวิเคราะห์ตลาดอย่างมืออาชีพ</span></div><div class="srv-item"><div class="srv-ico"><i class="fas fa-bullhorn"></i></div><span>การตลาดครบทุกช่องทาง ออนไลน์และออฟไลน์</span></div><div class="srv-item"><div class="srv-ico"><i class="fas fa-users"></i></div><span>ฐานข้อมูลของผู้ซื้อ และผู้เช่าจำนวนมาก</span></div><div class="srv-item"><div class="srv-ico"><i class="fas fa-hand-holding-usd"></i></div><span>ช่วยกระสานงานกับธนาคารชั้นนำเรื่องสินเชื่อ และกู้ยืม</span></div><div class="srv-item"><div class="srv-ico"><i class="fas fa-file-signature"></i></div><span>บริการอื่นๆ ที่เกี่ยวข้องกับอสังหาฯ แบบครบวงจร</span></div></div>
+    <!-- social buttons moved to footer -->
+   </div>
+   <div class="yt-wrap" id="yt-embed"></div>
+  </div>
+ </section>
+ <div class="flink-sec"><div class="flink-inner">
+  <div>
+    <h4>🏠 ซื้อ-ขาย กรุงเทพฯ</h4>
+    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('บ้านเดี่ยว กรุงเทพ')">ขายบ้านเดี่ยว กรุงเทพฯ</a>
+    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('ทาวน์โฮม กรุงเทพ')">ขายทาวน์โฮม กรุงเทพฯ</a>
+    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('คอนโด กรุงเทพ')">ขายคอนโด กรุงเทพฯ</a>
+    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('ที่ดิน กรุงเทพ')">ขายที่ดิน กรุงเทพฯ</a>
+    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('อาคารพาณิชย์ กรุงเทพ')">ขายอาคารพาณิชย์ กทม.</a>
+  </div>
+  <div>
+    <h4>🏡 ซื้อ-ขาย นนทบุรี</h4>
+    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('บ้านเดี่ยว นนทบุรี')">ขายบ้านเดี่ยว นนทบุรี</a>
+    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('ทาวน์โฮม นนทบุรี')">ขายทาวน์โฮม นนทบุรี</a>
+    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('คอนโด นนทบุรี')">ขายคอนโด นนทบุรี</a>
+    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('ที่ดิน นนทบุรี')">ขายที่ดิน นนทบุรี</a>
+  </div>
+  <div>
+    <h4>🌊 ซื้อ-ขาย ชลบุรี</h4>
+    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('บ้านเดี่ยว ชลบุรี')">ขายบ้านเดี่ยว ชลบุรี</a>
+    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('ทาวน์โฮม ชลบุรี')">ขายทาวน์โฮม ชลบุรี</a>
+    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('คอนโด ชลบุรี')">ขายคอนโด ชลบุรี</a>
+    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('พัทยา')">อสังหาฯ พัทยา</a>
+  </div>
+  <div>
+    <h4>🔑 เช่า กรุงเทพฯ</h4>
+    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('เช่าบ้านเดี่ยว กรุงเทพ')">เช่าบ้านเดี่ยว กรุงเทพฯ</a>
+    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('เช่าทาวน์โฮม กรุงเทพ')">เช่าทาวน์โฮม กรุงเทพฯ</a>
+    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('เช่าคอนโด กรุงเทพ')">เช่าคอนโด กรุงเทพฯ</a>
+    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('เช่าคอนโด สุขุมวิท')">เช่าคอนโดสุขุมวิท</a>
+    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('เช่าคอนโด อโศก')">เช่าคอนโดอโศก</a>
+  </div>
+  <div>
+    <h4>📍 ทำเลยอดนิยม</h4>
+    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('สุขุมวิท')">คอนโดย่านสุขุมวิท</a>
+    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('สาทร')">อสังหาฯ ย่านสาทร</a>
+    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('รัชดา')">บ้าน-คอนโด รัชดา</a>
+    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('ลาดพร้าว')">ทรัพย์ย่านลาดพร้าว</a>
+    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('อโศก')">คอนโดใกล้อโศก</a>
+    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('พระราม 9')">อสังหาฯ พระราม 9</a>
+    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('ทองหล่อ')">คอนโดทองหล่อ</a>
+    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('พระโขนง')">คอนโดพระโขนง-BTS</a>
+  </div>
+  <div>
+    <h4>🎓 ใกล้มหาวิทยาลัย</h4>
+    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('จุฬาลงกรณ์')">คอนโดใกล้จุฬาฯ</a>
+    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('ธรรมศาสตร์')">ห้องเช่าใกล้ธรรมศาสตร์</a>
+    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('เกษตรศาสตร์')">ทรัพย์ใกล้เกษตรฯ</a>
+    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('มหิดล')">คอนโดใกล้มหิดล</a>
+    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('รังสิต')">ห้องเช่าใกล้ ม.รังสิต</a>
+    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('ABAC')">อสังหาฯ ใกล้ ABAC</a>
+    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('ศิลปากร')">คอนโดใกล้ศิลปากร</a>
+    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('สยาม')">คอนโดใกล้สยาม</a>
+  </div>
+</div></div>
+ <footer>
+  <div class="footer-inner">
+    <div class="footer-brand-col">
+      <div class="footer-logo">
+       <div class="footer-logo-icon-wrap">
+        <div class="logo-img-wrap" style="width:52px;height:52px">
+         <div class="logo-door-glow"></div>
+         <img class="logo-img-base" src="LogoWeb.webp" alt="matchdoor logo" loading="lazy" style="opacity:1;visibility:visible">
+         <svg class="logo-cat-walk" viewBox="0 0 22 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+           <ellipse cx="10" cy="13" rx="6" ry="4" fill="rgba(255,255,255,0.95)"/>
+           <circle cx="16" cy="9" r="5" fill="rgba(255,255,255,0.95)"/>
+           <polygon points="13,5 11,2 14.5,4.5" fill="rgba(255,255,255,0.95)"/>
+           <polygon points="18,5 20,2 18.5,4.5" fill="rgba(255,255,255,0.95)"/>
+           <ellipse cx="14.5" cy="9" rx="1.2" ry="1.4" fill="#0F1E3A"/>
+           <ellipse cx="17.5" cy="9" rx="1.2" ry="1.4" fill="#0F1E3A"/>
+           <ellipse cx="16" cy="10.5" rx="0.8" ry="0.5" fill="rgba(255,160,180,0.9)"/>
+           <path d="M4 12 Q1 8 3 4" stroke="rgba(255,255,255,0.9)" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+           <line x1="7" y1="16" x2="6" y2="18" stroke="rgba(255,255,255,0.85)" stroke-width="1.2" stroke-linecap="round"/>
+           <line x1="10" y1="17" x2="10" y2="18" stroke="rgba(255,255,255,0.85)" stroke-width="1.2" stroke-linecap="round"/>
+           <line x1="13" y1="17" x2="13" y2="18" stroke="rgba(255,255,255,0.85)" stroke-width="1.2" stroke-linecap="round"/>
+         </svg>
+        </div>
+       </div>
+       <div>
+        <div class="ft">Matchdoor</div>
+        <div class="footer-logo-sub">REAL ESTATE APP</div>
+       </div>
+      </div>
+      <p class="footer-addr" id="footer-addr"></p>
+      <p id="footer-phone" style="font-size:12px;opacity:.6;margin-top:6px"></p>
+      <div class="footer-social-grid">
+        <a href="https://www.instagram.com/matchdoor/" target="_blank" class="ftr-icon-btn" title="Instagram">
+          <span class="fb-ico" style="background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);color:#fff"><i class="fab fa-instagram"></i></span>
+        </a>
+        <a id="ftr-fb" href="#" target="_blank" class="ftr-icon-btn" title="Facebook">
+          <span class="fb-ico" style="background:var(--fb);color:#fff"><i class="fab fa-facebook-f"></i></span>
+        </a>
+        <a id="ftr-ln" href="#" target="_blank" class="ftr-icon-btn" title="Line">
+          <span class="fb-ico" style="background:var(--ln);color:#fff"><i class="fab fa-line"></i></span>
+        </a>
+        <a id="ftr-tel" href="#" class="ftr-icon-btn" title="โทรศัพท์">
+          <span class="fb-ico" style="background:var(--p);color:#fff"><i class="fas fa-mobile-alt"></i></span>
+        </a>
+        <a href="https://www.youtube.com/@Matchdoorhome" target="_blank" rel="noopener" class="ftr-icon-btn" title="YouTube">
+          <span class="fb-ico" style="background:#FF0000;color:#fff"><i class="fab fa-youtube"></i></span>
+        </a>
+        <a href="https://www.tiktok.com/@matchdoor" target="_blank" rel="noopener" class="ftr-icon-btn" title="TikTok">
+          <span class="fb-ico" style="background:#010101;color:#fff"><i class="fab fa-tiktok"></i></span>
+        </a>
+      </div>
+      <!-- alias anchors for applyConfig -->
+      <a id="fb-link" href="#" style="display:none" target="_blank"></a>
+      <a id="ln-link-alias" href="#" style="display:none" target="_blank"></a>
+      <a id="tel-link" href="#" style="display:none"></a>
+    </div>
+    <div>
+      <h4 data-i18n="ft.col.main">เมนูหลัก</h4>
+      <a href="/" onclick="event.preventDefault();showPage('home')" data-i18n="ft.col.home">หน้าหลัก</a>
+      <a href="javascript:void(0)" onclick="gotoNew()" data-i18n="ft.col.new">มาใหม่</a>
+      <a href="javascript:void(0)" onclick="gotoRec()">Hot 🔥</a>
+      <a href="/portfolio" onclick="event.preventDefault();showPage('portfolio')" data-i18n="ft.col.portfolio">ผลงาน</a>
+      <a href="javascript:void(0)" onclick="gotoBlog()" data-i18n="ft.col.blog">บทความ</a>
+      <a href="/agents" onclick="event.preventDefault();showPage('agents')" data-i18n="ft.col.agents">ตัวแทน</a>
+      <a href="javascript:void(0)" onclick="gotoOtherSrv()" data-i18n="ft.col.srv">บริการอื่นๆ</a>
+      <a href="/listings" onclick="event.preventDefault();showListingsPage(ui('ft.col.listings'))" data-i18n="ft.col.listings">ประกาศทั้งหมด</a>
+      <a href="javascript:void(0)" onclick="openAdminLogin()" class="ft-admin-btn"><i class="fas fa-shield-alt"></i> Admin</a>
+    </div>
+    <div>
+      <h4 data-i18n="ft.col.type">ประเภท</h4>
+      <a href="javascript:void(0)" onclick="setCatNav('บ้านเดี่ยว')" data-i18n="ft.type.house">บ้านเดี่ยว</a>
+      <a href="javascript:void(0)" onclick="setCatNav('ทาวน์โฮม')" data-i18n="ft.type.town">ทาวน์โฮม</a>
+      <a href="javascript:void(0)" onclick="setCatNav('คอนโด')" data-i18n="ft.type.condo">คอนโด</a>
+      <a href="javascript:void(0)" onclick="setCatNav('อาคารพาณิชย์')" data-i18n="ft.type.comm">อาคารพาณิชย์</a>
+      <a href="javascript:void(0)" onclick="setCatNav('ที่ดิน')" data-i18n="ft.type.land">ที่ดิน</a>
+      <a href="javascript:void(0)" onclick="filterTypeDD('');setTx('BUY',document.querySelectorAll('.tx-tab')[0])" data-i18n="ft.type.buy">ซื้อ / ขาย</a>
+      <a href="javascript:void(0)" onclick="filterTypeDD('');setTx('RENT',document.querySelectorAll('.tx-tab')[1])" data-i18n="ft.type.rent">เช่า</a>
+    </div>
+    <div>
+      <h4 data-i18n="ft.col.area">ทำเล</h4>
+      <a href="javascript:void(0)" onclick="quickSearch('สุขุมวิท')" data-i18n="ft.area.sukhumvit">สุขุมวิท</a>
+      <a href="javascript:void(0)" onclick="quickSearch('สาทร')" data-i18n="ft.area.sathorn">สาทร</a>
+      <a href="javascript:void(0)" onclick="quickSearch('รัชดา')" data-i18n="ft.area.rachada">รัชดาภิเษก</a>
+      <a href="javascript:void(0)" onclick="quickSearch('ลาดพร้าว')" data-i18n="ft.area.ladprao">ลาดพร้าว</a>
+      <a href="javascript:void(0)" onclick="quickSearch('พระราม 9')" data-i18n="ft.area.rama9">พระราม 9</a>
+      <a href="javascript:void(0)" onclick="quickSearch('บางนา')" data-i18n="ft.area.bangna">บางนา</a>
+    </div>
+    <div>
+      <h4 data-i18n="ft.col.province">จังหวัด</h4>
+      <a href="javascript:void(0)" onclick="quickProvSearch('กรุงเทพฯ')" data-i18n="ft.prov.bkk">กรุงเทพฯ</a>
+      <a href="javascript:void(0)" onclick="quickProvSearch('นนทบุรี')" data-i18n="ft.prov.nnt">นนทบุรี</a>
+      <a href="javascript:void(0)" onclick="quickProvSearch('ปทุมธานี')" data-i18n="ft.prov.ptm">ปทุมธานี</a>
+      <a href="javascript:void(0)" onclick="quickProvSearch('สมุทรปราการ')" data-i18n="ft.prov.smk">สมุทรปราการ</a>
+      <a href="javascript:void(0)" onclick="quickProvSearch('ชลบุรี')" data-i18n="ft.prov.cbl">ชลบุรี</a>
+      <a href="javascript:void(0)" onclick="quickProvSearch('ภูเก็ต')" data-i18n="ft.prov.pkt">ภูเก็ต</a>
+    </div>
+    <div>
+      <h4 data-i18n="ft.col.info">ข้อมูล</h4>
+      <a href="javascript:void(0)" onclick="openAcceptableUseModal()" data-i18n="ft.legal.aup">นโยบายการใช้งานที่ยอมรับได้</a>
+      <a href="javascript:void(0)" onclick="openTermsModal()" data-i18n="ft.legal.terms2">ข้อตกลงและเงื่อนไข</a>
+      <a href="javascript:void(0)" onclick="openPrivacyModal()" data-i18n="ft.legal.privacy">นโยบายความเป็นส่วนตัว</a>
+      <a href="javascript:void(0)" onclick="openBuySellModal()" data-i18n="ft.legal.buysell">เงื่อนไขการซื้อ-ขาย</a>
+      <a href="javascript:void(0)" onclick="openCookieModal()" data-i18n="ft.legal.cookie">นโยบายคุกกี้</a>
+    </div>
+  </div>
+    <div class="footer-legal-bar">
+    <a href="javascript:void(0)" onclick="openAcceptableUseModal()"><i class="fas fa-check-circle"></i> <span data-i18n="ft.legal.aup">นโยบายการใช้งานที่ยอมรับได้</span></a>
+    <span class="flb-sep">·</span>
+    <a href="javascript:void(0)" onclick="openTermsModal()"><i class="fas fa-file-contract"></i> <span data-i18n="ft.legal.terms2">ข้อตกลงและเงื่อนไข</span></a>
+    <span class="flb-sep">·</span>
+    <a href="javascript:void(0)" onclick="openPrivacyModal()"><i class="fas fa-shield-alt"></i> <span data-i18n="ft.legal.privacy">นโยบายความเป็นส่วนตัว</span></a>
+    <span class="flb-sep">·</span>
+    <a href="javascript:void(0)" onclick="openBuySellModal()"><i class="fas fa-handshake"></i> <span data-i18n="ft.legal.buysell">เงื่อนไขการซื้อ-ขาย</span></a>
+    <span class="flb-sep">·</span>
+    <a href="javascript:void(0)" onclick="openCookieModal()"><i class="fas fa-cookie-bite"></i> <span data-i18n="ft.legal.cookie">นโยบายคุกกี้</span></a>
+  </div>
+  <div class="foot-copy-bottom" id="footer-copy-bottom" style="border-top:1px solid rgba(255,255,255,.08);padding:12px 0 4px;text-align:center;font-size:11px;color:rgba(255,255,255,.4)"></div>
+  <div class="foot-copy" id="footer-copy"></div>
+</footer>
+</div>
+</div><!-- end page-home -->
 <!-- ═══ SOCIAL PAGE — แยกหน้า Community Feed ═══ -->
 <div class="page" id="page-social">
   <!-- Page Hero Banner -->
@@ -5119,245 +5358,6 @@ footer::after{
     </div>
   </footer>
 </div><!-- end page-social -->
-
- <div id="osrv-sec" class="osrv-sec" style="padding:32px 0 28px">
-  <div style="max-width:1320px;margin:0 auto;padding:0 20px">
-    <div class="sec-hd">
-      <div class="sec-title">บริการอื่นๆ</div>
-      <div style="display:flex;align-items:center;gap:10px">
-        <span class="view-all" onclick="openAllModal('services')">ดูทั้งหมด →</span>
-        <div class="gallery-nav">
-          <button class="gallery-nav-btn" onclick="hGalleryMove('osrv-track',-1)"><i class="fas fa-chevron-left"></i></button>
-          <button class="gallery-nav-btn" onclick="hGalleryMove('osrv-track',1)"><i class="fas fa-chevron-right"></i></button>
-        </div>
-      </div>
-    </div>
-    <div class="h-gallery-wrap" id="osrv-track-wrap">
-      <div class="h-gallery-track" id="osrv-track" style="gap:14px"></div>
-    </div>
-  </div>
-</div>
-
-<!-- ===== ผลงาน SECTION (HOME PAGE) ===== -->
-<section id="home-port-sec" class="blog-sec" style="padding:32px 0 28px;background:#fff">
-  <div style="max-width:1320px;margin:0 auto;padding:0 20px">
-    <div class="sec-hd">
-      <div class="sec-title"><i class="fas fa-trophy" style="color:var(--a)"></i> <span data-i18n="sec.port">ผลงาน</span></div>
-      <div style="display:flex;align-items:center;gap:10px">
-        <span class="view-all" onclick="showPage('portfolio')">ดูทั้งหมด →</span>
-        <div class="gallery-nav">
-          <button class="gallery-nav-btn" onclick="hGalleryMove('home-port-track',-1)"><i class="fas fa-chevron-left"></i></button>
-          <button class="gallery-nav-btn" onclick="hGalleryMove('home-port-track',1)"><i class="fas fa-chevron-right"></i></button>
-        </div>
-      </div>
-    </div>
-    <div class="h-gallery-wrap" id="home-port-track-wrap">
-      <div class="h-gallery-track" id="home-port-track"></div>
-    </div>
-  </div>
-</section>
- <section class="blog-sec" id="blog-sec" style="padding:32px 0 28px">
-  <div style="max-width:1320px;margin:0 auto;padding:0 20px">
-    <div class="sec-hd">
-      <div class="sec-title" data-i18n="sec.blog">บทความน่ารู้</div>
-      <div style="display:flex;align-items:center;gap:10px">
-        <span class="view-all" onclick="openAllModal('blog')">ดูทั้งหมด →</span>
-        <div class="gallery-nav">
-          <button class="gallery-nav-btn" onclick="hGalleryMove('blog-track',-1)"><i class="fas fa-chevron-left"></i></button>
-          <button class="gallery-nav-btn" onclick="hGalleryMove('blog-track',1)"><i class="fas fa-chevron-right"></i></button>
-        </div>
-      </div>
-    </div>
-    <div class="h-gallery-wrap" id="blog-track-wrap">
-      <div class="h-gallery-track" id="blog-track"></div>
-    </div>
-  </div>
-</section>
- <section class="srv-sec" id="contact-sec">
-  <div class="srv-inner">
-   <div>
-    <p class="srv-label">WHAT WE DO</p>
-    <div class="srv-title" id="srv-title">บริการอสังหาฯครบวงจร</div>
-    <p class="srv-sub" id="srv-sub">ซื้อ-ขาย อสังหาฯ ให้พวกเราช่วยดูแล</p>
-    <div class="srv-list"><div class="srv-item"><div class="srv-ico"><i class="fas fa-chart-line"></i></div><span>ตั้งราคา และช่วยวิเคราะห์ตลาดอย่างมืออาชีพ</span></div><div class="srv-item"><div class="srv-ico"><i class="fas fa-bullhorn"></i></div><span>การตลาดครบทุกช่องทาง ออนไลน์และออฟไลน์</span></div><div class="srv-item"><div class="srv-ico"><i class="fas fa-users"></i></div><span>ฐานข้อมูลของผู้ซื้อ และผู้เช่าจำนวนมาก</span></div><div class="srv-item"><div class="srv-ico"><i class="fas fa-hand-holding-usd"></i></div><span>ช่วยกระสานงานกับธนาคารชั้นนำเรื่องสินเชื่อ และกู้ยืม</span></div><div class="srv-item"><div class="srv-ico"><i class="fas fa-file-signature"></i></div><span>บริการอื่นๆ ที่เกี่ยวข้องกับอสังหาฯ แบบครบวงจร</span></div></div>
-    <!-- social buttons moved to footer -->
-   </div>
-   <div class="yt-wrap" id="yt-embed"></div>
-  </div>
- </section>
- <div class="flink-sec"><div class="flink-inner">
-  <div>
-    <h4>🏠 ซื้อ-ขาย กรุงเทพฯ</h4>
-    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('บ้านเดี่ยว กรุงเทพ')">ขายบ้านเดี่ยว กรุงเทพฯ</a>
-    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('ทาวน์โฮม กรุงเทพ')">ขายทาวน์โฮม กรุงเทพฯ</a>
-    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('คอนโด กรุงเทพ')">ขายคอนโด กรุงเทพฯ</a>
-    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('ที่ดิน กรุงเทพ')">ขายที่ดิน กรุงเทพฯ</a>
-    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('อาคารพาณิชย์ กรุงเทพ')">ขายอาคารพาณิชย์ กทม.</a>
-  </div>
-  <div>
-    <h4>🏡 ซื้อ-ขาย นนทบุรี</h4>
-    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('บ้านเดี่ยว นนทบุรี')">ขายบ้านเดี่ยว นนทบุรี</a>
-    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('ทาวน์โฮม นนทบุรี')">ขายทาวน์โฮม นนทบุรี</a>
-    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('คอนโด นนทบุรี')">ขายคอนโด นนทบุรี</a>
-    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('ที่ดิน นนทบุรี')">ขายที่ดิน นนทบุรี</a>
-  </div>
-  <div>
-    <h4>🌊 ซื้อ-ขาย ชลบุรี</h4>
-    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('บ้านเดี่ยว ชลบุรี')">ขายบ้านเดี่ยว ชลบุรี</a>
-    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('ทาวน์โฮม ชลบุรี')">ขายทาวน์โฮม ชลบุรี</a>
-    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('คอนโด ชลบุรี')">ขายคอนโด ชลบุรี</a>
-    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('พัทยา')">อสังหาฯ พัทยา</a>
-  </div>
-  <div>
-    <h4>🔑 เช่า กรุงเทพฯ</h4>
-    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('เช่าบ้านเดี่ยว กรุงเทพ')">เช่าบ้านเดี่ยว กรุงเทพฯ</a>
-    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('เช่าทาวน์โฮม กรุงเทพ')">เช่าทาวน์โฮม กรุงเทพฯ</a>
-    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('เช่าคอนโด กรุงเทพ')">เช่าคอนโด กรุงเทพฯ</a>
-    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('เช่าคอนโด สุขุมวิท')">เช่าคอนโดสุขุมวิท</a>
-    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('เช่าคอนโด อโศก')">เช่าคอนโดอโศก</a>
-  </div>
-  <div>
-    <h4>📍 ทำเลยอดนิยม</h4>
-    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('สุขุมวิท')">คอนโดย่านสุขุมวิท</a>
-    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('สาทร')">อสังหาฯ ย่านสาทร</a>
-    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('รัชดา')">บ้าน-คอนโด รัชดา</a>
-    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('ลาดพร้าว')">ทรัพย์ย่านลาดพร้าว</a>
-    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('อโศก')">คอนโดใกล้อโศก</a>
-    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('พระราม 9')">อสังหาฯ พระราม 9</a>
-    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('ทองหล่อ')">คอนโดทองหล่อ</a>
-    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('พระโขนง')">คอนโดพระโขนง-BTS</a>
-  </div>
-  <div>
-    <h4>🎓 ใกล้มหาวิทยาลัย</h4>
-    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('จุฬาลงกรณ์')">คอนโดใกล้จุฬาฯ</a>
-    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('ธรรมศาสตร์')">ห้องเช่าใกล้ธรรมศาสตร์</a>
-    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('เกษตรศาสตร์')">ทรัพย์ใกล้เกษตรฯ</a>
-    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('มหิดล')">คอนโดใกล้มหิดล</a>
-    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('รังสิต')">ห้องเช่าใกล้ ม.รังสิต</a>
-    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('ABAC')">อสังหาฯ ใกล้ ABAC</a>
-    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('ศิลปากร')">คอนโดใกล้ศิลปากร</a>
-    <a href="javascript:void(0)" onclick="event.preventDefault();quickSearch('สยาม')">คอนโดใกล้สยาม</a>
-  </div>
-</div></div>
- <footer>
-  <div class="footer-inner">
-    <div class="footer-brand-col">
-      <div class="footer-logo">
-       <div class="footer-logo-icon-wrap">
-        <div class="logo-img-wrap" style="width:52px;height:52px">
-         <div class="logo-door-glow"></div>
-         <img class="logo-img-base" src="LogoWeb.webp" alt="matchdoor logo" loading="lazy" style="opacity:1;visibility:visible">
-         <svg class="logo-cat-walk" viewBox="0 0 22 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-           <ellipse cx="10" cy="13" rx="6" ry="4" fill="rgba(255,255,255,0.95)"/>
-           <circle cx="16" cy="9" r="5" fill="rgba(255,255,255,0.95)"/>
-           <polygon points="13,5 11,2 14.5,4.5" fill="rgba(255,255,255,0.95)"/>
-           <polygon points="18,5 20,2 18.5,4.5" fill="rgba(255,255,255,0.95)"/>
-           <ellipse cx="14.5" cy="9" rx="1.2" ry="1.4" fill="#0F1E3A"/>
-           <ellipse cx="17.5" cy="9" rx="1.2" ry="1.4" fill="#0F1E3A"/>
-           <ellipse cx="16" cy="10.5" rx="0.8" ry="0.5" fill="rgba(255,160,180,0.9)"/>
-           <path d="M4 12 Q1 8 3 4" stroke="rgba(255,255,255,0.9)" stroke-width="1.5" stroke-linecap="round" fill="none"/>
-           <line x1="7" y1="16" x2="6" y2="18" stroke="rgba(255,255,255,0.85)" stroke-width="1.2" stroke-linecap="round"/>
-           <line x1="10" y1="17" x2="10" y2="18" stroke="rgba(255,255,255,0.85)" stroke-width="1.2" stroke-linecap="round"/>
-           <line x1="13" y1="17" x2="13" y2="18" stroke="rgba(255,255,255,0.85)" stroke-width="1.2" stroke-linecap="round"/>
-         </svg>
-        </div>
-       </div>
-       <div>
-        <div class="ft">Matchdoor</div>
-        <div class="footer-logo-sub">REAL ESTATE APP</div>
-       </div>
-      </div>
-      <p class="footer-addr" id="footer-addr"></p>
-      <p id="footer-phone" style="font-size:12px;opacity:.6;margin-top:6px"></p>
-      <div class="footer-social-grid">
-        <a href="https://www.instagram.com/matchdoor/" target="_blank" class="ftr-icon-btn" title="Instagram">
-          <span class="fb-ico" style="background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);color:#fff"><i class="fab fa-instagram"></i></span>
-        </a>
-        <a id="ftr-fb" href="#" target="_blank" class="ftr-icon-btn" title="Facebook">
-          <span class="fb-ico" style="background:var(--fb);color:#fff"><i class="fab fa-facebook-f"></i></span>
-        </a>
-        <a id="ftr-ln" href="#" target="_blank" class="ftr-icon-btn" title="Line">
-          <span class="fb-ico" style="background:var(--ln);color:#fff"><i class="fab fa-line"></i></span>
-        </a>
-        <a id="ftr-tel" href="#" class="ftr-icon-btn" title="โทรศัพท์">
-          <span class="fb-ico" style="background:var(--p);color:#fff"><i class="fas fa-mobile-alt"></i></span>
-        </a>
-        <a href="https://www.youtube.com/@Matchdoorhome" target="_blank" rel="noopener" class="ftr-icon-btn" title="YouTube">
-          <span class="fb-ico" style="background:#FF0000;color:#fff"><i class="fab fa-youtube"></i></span>
-        </a>
-        <a href="https://www.tiktok.com/@matchdoor" target="_blank" rel="noopener" class="ftr-icon-btn" title="TikTok">
-          <span class="fb-ico" style="background:#010101;color:#fff"><i class="fab fa-tiktok"></i></span>
-        </a>
-      </div>
-      <!-- alias anchors for applyConfig -->
-      <a id="fb-link" href="#" style="display:none" target="_blank"></a>
-      <a id="ln-link-alias" href="#" style="display:none" target="_blank"></a>
-      <a id="tel-link" href="#" style="display:none"></a>
-    </div>
-    <div>
-      <h4 data-i18n="ft.col.main">เมนูหลัก</h4>
-      <a href="/" onclick="event.preventDefault();showPage('home')" data-i18n="ft.col.home">หน้าหลัก</a>
-      <a href="javascript:void(0)" onclick="gotoNew()" data-i18n="ft.col.new">มาใหม่</a>
-      <a href="javascript:void(0)" onclick="gotoRec()">Hot 🔥</a>
-      <a href="/portfolio" onclick="event.preventDefault();showPage('portfolio')" data-i18n="ft.col.portfolio">ผลงาน</a>
-      <a href="javascript:void(0)" onclick="gotoBlog()" data-i18n="ft.col.blog">บทความ</a>
-      <a href="/agents" onclick="event.preventDefault();showPage('agents')" data-i18n="ft.col.agents">ตัวแทน</a>
-      <a href="javascript:void(0)" onclick="gotoOtherSrv()" data-i18n="ft.col.srv">บริการอื่นๆ</a>
-      <a href="/listings" onclick="event.preventDefault();showListingsPage(ui('ft.col.listings'))" data-i18n="ft.col.listings">ประกาศทั้งหมด</a>
-      <a href="javascript:void(0)" onclick="openAdminLogin()" class="ft-admin-btn"><i class="fas fa-shield-alt"></i> Admin</a>
-    </div>
-    <div>
-      <h4 data-i18n="ft.col.type">ประเภท</h4>
-      <a href="javascript:void(0)" onclick="setCatNav('บ้านเดี่ยว')" data-i18n="ft.type.house">บ้านเดี่ยว</a>
-      <a href="javascript:void(0)" onclick="setCatNav('ทาวน์โฮม')" data-i18n="ft.type.town">ทาวน์โฮม</a>
-      <a href="javascript:void(0)" onclick="setCatNav('คอนโด')" data-i18n="ft.type.condo">คอนโด</a>
-      <a href="javascript:void(0)" onclick="setCatNav('อาคารพาณิชย์')" data-i18n="ft.type.comm">อาคารพาณิชย์</a>
-      <a href="javascript:void(0)" onclick="setCatNav('ที่ดิน')" data-i18n="ft.type.land">ที่ดิน</a>
-      <a href="javascript:void(0)" onclick="filterTypeDD('');setTx('BUY',document.querySelectorAll('.tx-tab')[0])" data-i18n="ft.type.buy">ซื้อ / ขาย</a>
-      <a href="javascript:void(0)" onclick="filterTypeDD('');setTx('RENT',document.querySelectorAll('.tx-tab')[1])" data-i18n="ft.type.rent">เช่า</a>
-    </div>
-    <div>
-      <h4 data-i18n="ft.col.area">ทำเล</h4>
-      <a href="javascript:void(0)" onclick="quickSearch('สุขุมวิท')" data-i18n="ft.area.sukhumvit">สุขุมวิท</a>
-      <a href="javascript:void(0)" onclick="quickSearch('สาทร')" data-i18n="ft.area.sathorn">สาทร</a>
-      <a href="javascript:void(0)" onclick="quickSearch('รัชดา')" data-i18n="ft.area.rachada">รัชดาภิเษก</a>
-      <a href="javascript:void(0)" onclick="quickSearch('ลาดพร้าว')" data-i18n="ft.area.ladprao">ลาดพร้าว</a>
-      <a href="javascript:void(0)" onclick="quickSearch('พระราม 9')" data-i18n="ft.area.rama9">พระราม 9</a>
-      <a href="javascript:void(0)" onclick="quickSearch('บางนา')" data-i18n="ft.area.bangna">บางนา</a>
-    </div>
-    <div>
-      <h4 data-i18n="ft.col.province">จังหวัด</h4>
-      <a href="javascript:void(0)" onclick="quickProvSearch('กรุงเทพฯ')" data-i18n="ft.prov.bkk">กรุงเทพฯ</a>
-      <a href="javascript:void(0)" onclick="quickProvSearch('นนทบุรี')" data-i18n="ft.prov.nnt">นนทบุรี</a>
-      <a href="javascript:void(0)" onclick="quickProvSearch('ปทุมธานี')" data-i18n="ft.prov.ptm">ปทุมธานี</a>
-      <a href="javascript:void(0)" onclick="quickProvSearch('สมุทรปราการ')" data-i18n="ft.prov.smk">สมุทรปราการ</a>
-      <a href="javascript:void(0)" onclick="quickProvSearch('ชลบุรี')" data-i18n="ft.prov.cbl">ชลบุรี</a>
-      <a href="javascript:void(0)" onclick="quickProvSearch('ภูเก็ต')" data-i18n="ft.prov.pkt">ภูเก็ต</a>
-    </div>
-    <div>
-      <h4 data-i18n="ft.col.info">ข้อมูล</h4>
-      <a href="javascript:void(0)" onclick="openAcceptableUseModal()" data-i18n="ft.legal.aup">นโยบายการใช้งานที่ยอมรับได้</a>
-      <a href="javascript:void(0)" onclick="openTermsModal()" data-i18n="ft.legal.terms2">ข้อตกลงและเงื่อนไข</a>
-      <a href="javascript:void(0)" onclick="openPrivacyModal()" data-i18n="ft.legal.privacy">นโยบายความเป็นส่วนตัว</a>
-      <a href="javascript:void(0)" onclick="openBuySellModal()" data-i18n="ft.legal.buysell">เงื่อนไขการซื้อ-ขาย</a>
-      <a href="javascript:void(0)" onclick="openCookieModal()" data-i18n="ft.legal.cookie">นโยบายคุกกี้</a>
-    </div>
-  </div>
-    <div class="footer-legal-bar">
-    <a href="javascript:void(0)" onclick="openAcceptableUseModal()"><i class="fas fa-check-circle"></i> <span data-i18n="ft.legal.aup">นโยบายการใช้งานที่ยอมรับได้</span></a>
-    <span class="flb-sep">·</span>
-    <a href="javascript:void(0)" onclick="openTermsModal()"><i class="fas fa-file-contract"></i> <span data-i18n="ft.legal.terms2">ข้อตกลงและเงื่อนไข</span></a>
-    <span class="flb-sep">·</span>
-    <a href="javascript:void(0)" onclick="openPrivacyModal()"><i class="fas fa-shield-alt"></i> <span data-i18n="ft.legal.privacy">นโยบายความเป็นส่วนตัว</span></a>
-    <span class="flb-sep">·</span>
-    <a href="javascript:void(0)" onclick="openBuySellModal()"><i class="fas fa-handshake"></i> <span data-i18n="ft.legal.buysell">เงื่อนไขการซื้อ-ขาย</span></a>
-    <span class="flb-sep">·</span>
-    <a href="javascript:void(0)" onclick="openCookieModal()"><i class="fas fa-cookie-bite"></i> <span data-i18n="ft.legal.cookie">นโยบายคุกกี้</span></a>
-  </div>
-  <div class="foot-copy-bottom" id="footer-copy-bottom" style="border-top:1px solid rgba(255,255,255,.08);padding:12px 0 4px;text-align:center;font-size:11px;color:rgba(255,255,255,.4)"></div>
-  <div class="foot-copy" id="footer-copy"></div>
-</footer>
-</div>
 
 <!-- FAVORITES PAGE -->
 <div class="page" id="page-favorites">
@@ -6039,7 +6039,6 @@ function _popupRefreshMarkersFromData(data){
       <button class="back-btn" onclick="showPage('home')"><i class="fas fa-arrow-left"></i> <span data-i18n="ph.ma.back">กลับหน้าหลัก</span></button>
       <h1 style="margin-top:10px"><i class="fas fa-user-circle"></i> <span data-i18n="ph.ma.h1">บัญชีของฉัน</span></h1>
     </div>
-    <!-- DEV bypass button — มุมขวาบน hero, แสดงตลอดเวลา -->
     <button id="ma-dev-bypass-btn" class="ma-dev-bypass-btn" onclick="_toggleMaDevBypass()">
       <i class="fas fa-flask"></i>
       <span id="ma-dev-bypass-lbl">DEV Preview</span>
@@ -18742,11 +18741,17 @@ document.addEventListener('DOMContentLoaded', function ensureHomeVisible(){
     '/agents': 'agents', '/portfolio': 'portfolio',
     '/favorites': 'favorites', '/listings': 'listings',
     '/buy': 'home', '/rent': 'home',
+    '/my-account': 'my-account',
+    '/social': 'social',
   };
   const effectivePath = location.pathname;
   const targetName = sectionMap[effectivePath] || 'home';
-  if(!document.querySelector('.page.active')) {
+  if(targetName !== 'home') {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     const pg = document.getElementById('page-' + targetName);
+    if(pg) pg.classList.add('active');
+  } else if(!document.querySelector('.page.active')) {
+    const pg = document.getElementById('page-home');
     if(pg) pg.classList.add('active');
   }
 });
