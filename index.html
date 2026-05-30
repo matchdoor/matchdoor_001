@@ -2278,7 +2278,30 @@ footer::after{
 .ma-profile-grid{display:grid;grid-template-columns:300px 1fr;gap:24px;align-items:start}
 .ma-profile-sidebar{display:flex;flex-direction:column;gap:16px}
 .ma-profile-main{display:flex;flex-direction:column;gap:16px}
-.ma-hero{background:linear-gradient(135deg,var(--p) 0%,#2a5298 60%,#1a7a4a 100%);border-radius:20px;padding:32px 28px;margin-bottom:28px;color:#fff;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+/* ── New Profile Hero (Living Insider style but better) ── */
+.ma-hero{position:relative;overflow:hidden;border-radius:24px;margin-bottom:28px;color:#fff;background:linear-gradient(135deg,#1B3A6B 0%,#2a5298 50%,#1a6a4a 100%)}
+.ma-hero-cover{height:180px;background:linear-gradient(135deg,#1B3A6B 0%,#2a5298 40%,#1a7a4a 100%);position:relative;overflow:hidden}
+.ma-hero-cover::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")}
+.ma-hero-cover-btns{position:absolute;top:12px;right:14px;display:flex;gap:8px}
+.ma-hero-cover-btn{background:rgba(255,255,255,.18);backdrop-filter:blur(8px);color:#fff;border:1.5px solid rgba(255,255,255,.3);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;transition:.2s}
+.ma-hero-cover-btn:hover{background:rgba(255,255,255,.28)}
+.ma-hero-cover-btn.primary{background:rgba(255,255,255,.92);color:var(--p)}
+.ma-hero-cover-btn.primary:hover{background:#fff}
+.ma-hero-body{padding:0 28px 24px;display:flex;align-items:flex-end;gap:20px;flex-wrap:wrap;margin-top:-56px;position:relative}
+.ma-hero-av-wrap{position:relative;flex-shrink:0}
+.ma-av-ring{width:110px;height:110px;border-radius:50%;border:4px solid #fff;box-shadow:0 4px 20px rgba(0,0,0,.25);background:var(--p);display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:700;color:#fff;overflow:hidden;cursor:pointer;position:relative}
+.ma-av-edit-overlay{position:absolute;inset:0;border-radius:50%;background:rgba(0,0,0,.45);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;opacity:0;transition:.2s;color:#fff;font-size:11px;font-weight:600}
+.ma-av-ring:hover .ma-av-edit-overlay{opacity:1}
+.ma-hero-av-badge{position:absolute;bottom:4px;right:4px;width:28px;height:28px;border-radius:50%;background:#10b981;border:2.5px solid #fff;display:flex;align-items:center;justify-content:center}
+.ma-hero-info{flex:1;min-width:0;padding-bottom:4px;color:#fff}
+.ma-hero-name{font-size:24px;font-weight:800;margin-bottom:3px;text-shadow:0 1px 4px rgba(0,0,0,.18)}
+.ma-hero-role-tag{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;margin-bottom:6px;letter-spacing:.3px}
+.ma-hero-email{font-size:13px;opacity:.78;margin-bottom:8px;word-break:break-all}
+.ma-hero-stats{display:flex;gap:20px;flex-wrap:wrap}
+.ma-hero-stat{text-align:center;background:rgba(255,255,255,.12);border-radius:10px;padding:6px 16px}
+.ma-hero-stat-num{font-size:18px;font-weight:800}
+.ma-hero-stat-lbl{font-size:10px;opacity:.75;margin-top:1px}
+.ma-hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.18);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600}
 .ma-av-ring{width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,.18);border:3px solid rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:700;flex-shrink:0;color:#fff;position:relative;overflow:hidden}
 .ma-av-ring img{width:100%;height:100%;object-fit:cover;border-radius:50%}
 .ma-av-edit-overlay{position:absolute;inset:0;background:rgba(0,0,0,.45);border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;transition:.2s;cursor:pointer;font-size:11px;font-weight:600;gap:2px}
@@ -2296,10 +2319,11 @@ footer::after{
 .ma-terms-box input[type=checkbox]{width:17px;height:17px;flex-shrink:0;accent-color:var(--p);margin-top:2px;cursor:pointer}
 .ma-terms-box label{font-size:13px;color:var(--tx);line-height:1.5;cursor:pointer}
 .ma-terms-box a{color:var(--p);text-decoration:underline}
-.ma-hero-info{flex:1;min-width:0}
-.ma-hero-name{font-size:22px;font-weight:700;margin-bottom:4px}
-.ma-hero-email{font-size:13px;opacity:.8;margin-bottom:12px;word-break:break-all}
-.ma-hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.18);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600}
+/* ma-hero sub-elements now defined above */
+.ma-hero-info-old{flex:1;min-width:0}
+.ma-hero-name-old{font-size:22px;font-weight:700;margin-bottom:4px}
+.ma-hero-email-old{font-size:13px;opacity:.8;margin-bottom:12px;word-break:break-all}
+.ma-hero-badge-old{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.18);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600}
 /* ── Dev Bypass Button (temp — remove before production) ── */
 .ma-dev-bypass-btn{position:absolute;top:14px;right:14px;display:flex;align-items:center;gap:6px;padding:7px 13px;border-radius:10px;border:1.5px dashed rgba(255,220,0,.7);background:rgba(0,0,0,.35);color:#ffd700;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.4px;backdrop-filter:blur(4px);transition:.18s;z-index:10;white-space:nowrap}
 .ma-dev-bypass-btn:hover{background:rgba(255,200,0,.18);border-color:#ffd700;transform:scale(1.04)}
@@ -2340,7 +2364,9 @@ footer::after{
 .ma-lp-btn-ghost:hover{background:var(--lt)}
 .ma-lp-skip{margin-top:8px;font-size:12px;color:var(--gr);background:none;border:none;cursor:pointer;text-decoration:underline}
 @media(max-width:600px){
-  .ma-hero{padding:22px 18px;gap:14px}
+  .ma-hero-body{padding:0 16px 20px;gap:14px;margin-top:-48px}
+  .ma-av-ring{width:90px;height:90px;font-size:28px}
+  .ma-hero-cover{height:140px}
   .ma-tab{min-width:60px;font-size:11px;padding:8px 5px}
   .ma-tab i{font-size:14px}
   .my-account-wrap{padding:20px 10px 50px}
@@ -6239,28 +6265,64 @@ function renderMyAccount(){
   const joinDate = _u.created_at ? new Date(_u.created_at).toLocaleDateString(_lang==='th'?'th-TH':_lang==='ja'?'ja-JP':_lang==='cn'?'zh-CN':'en-US',{year:'numeric',month:'long'}) : '';
   const favCount = (typeof favs!=='undefined' ? favs : []).length;
   const devBanner = isDevMode ? `<div class="ma-dev-banner"><i class="fas fa-flask"></i> DEV MODE — จำลอง <strong>${_tokenBalance} Token</strong> · ลงประกาศได้โดยไม่บันทึก DB จริง · กด "DEV: ON" เพื่อปิด</div>` : '';
+  const roleLabel = _meta.role==='agent' ? '🏡 นายหน้า / ตัวแทน' : (_meta.role==='owner' ? '🔑 เจ้าของทรัพย์' : '👤 สมาชิก');
+  const listingsCount = (typeof _myUserListings !== 'undefined' ? _myUserListings : []).length;
   wrap.innerHTML = `
   ${devBanner}
+  <!-- ═══ NEW PREMIUM PROFILE HERO ═══ -->
   <div class="ma-hero">
-    <div class="ma-av-ring" onclick="_maScrollToPhotoSection()" title="แก้ไขรูปโปรไฟล์" style="cursor:pointer">${_meta.avatar_url?`<img src="${sanitize(_meta.avatar_url)}" alt="avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:`<span>${init}</span>`}<div class="ma-av-edit-overlay"><i class="fas fa-camera"></i><span>แก้ไขรูป</span></div></div>
-    <div class="ma-hero-info">
-      <div class="ma-hero-name">${dispName}</div>
-      <div class="ma-hero-email">${email}</div>
-      <div class="ma-hero-badge"><i class="fas fa-check-circle"></i> ${isDevMode?'⚗️ Dev Preview':(_lang==='en'?'Verified Member':_lang==='cn'?'已验证会员':_lang==='ja'?'認証済み':'สมาชิกที่ยืนยันแล้ว')}</div>
-      ${joinDate?`<div style="font-size:11px;opacity:.65;margin-top:6px">${sanitize(t('ma.member.since'))} ${joinDate}</div>`:''}
+    <div class="ma-hero-cover">
+      <div class="ma-hero-cover-btns">
+        <button class="ma-hero-cover-btn" onclick="_maTab('listings',document.querySelector('[data-tab=\\'listings\\']'));renderMaListingsPanel()">
+          <i class="fas fa-plus"></i> ลงประกาศ
+        </button>
+        <button class="ma-hero-cover-btn primary" id="ma-edit-profile-btn" onclick="_maToggleProfileEdit(true)" style="display:none">
+          <i class="fas fa-pen"></i> แก้ไขข้อมูล
+        </button>
+      </div>
+    </div>
+    <div class="ma-hero-body">
+      <div class="ma-hero-av-wrap">
+        <div class="ma-av-ring" onclick="_maScrollToPhotoSection()" title="แก้ไขรูปโปรไฟล์">
+          ${_meta.avatar_url?`<img src="${sanitize(_meta.avatar_url)}" alt="avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:`<span>${init}</span>`}
+          <div class="ma-av-edit-overlay"><i class="fas fa-camera"></i><span>แก้ไขรูป</span></div>
+        </div>
+        <div class="ma-hero-av-badge"><i class="fas fa-check" style="color:#fff;font-size:11px"></i></div>
+      </div>
+      <div class="ma-hero-info">
+        <div class="ma-hero-name">${dispName}</div>
+        <div class="ma-hero-role-tag">${roleLabel}</div>
+        <div class="ma-hero-email"><i class="fas fa-envelope" style="opacity:.6;margin-right:4px"></i>${email}</div>
+        <div class="ma-hero-stats">
+          <div class="ma-hero-stat">
+            <div class="ma-hero-stat-num">${listingsCount}</div>
+            <div class="ma-hero-stat-lbl"><i class="fas fa-building"></i> ประกาศ</div>
+          </div>
+          <div class="ma-hero-stat">
+            <div class="ma-hero-stat-num">${favCount}</div>
+            <div class="ma-hero-stat-lbl"><i class="fas fa-heart"></i> รายการโปรด</div>
+          </div>
+          <div class="ma-hero-stat">
+            <div class="ma-hero-stat-num" id="ma-stat-token">${_tokenBalance}</div>
+            <div class="ma-hero-stat-lbl"><i class="fas fa-coins"></i> Token</div>
+          </div>
+        </div>
+        ${joinDate?`<div style="font-size:11px;opacity:.6;margin-top:8px"><i class="fas fa-calendar-alt" style="margin-right:4px"></i>${sanitize(t('ma.member.since'))} ${joinDate}</div>`:''}
+      </div>
     </div>
   </div>
+  <!-- ═══ TABS ═══ -->
   <div class="ma-tab-bar" id="ma-tab-bar">
     <button class="ma-tab active" data-tab="profile" onclick="_maTab('profile',this)"><i class="fas fa-user"></i> ${sanitize(t('ma.tab.profile'))}</button>
+    <button class="ma-tab" data-tab="listings" onclick="_maTab('listings',this);renderMaListingsPanel()"><i class="fas fa-building"></i> ทรัพย์&ประกาศ<span id="ma-token-badge" style="background:#f1c40f;color:#333;border-radius:20px;padding:1px 7px;font-size:10px;font-weight:800;margin-left:2px">${_tokenBalance} T</span></button>
     <button class="ma-tab" data-tab="favs" onclick="_maTab('favs',this)"><i class="fas fa-heart"></i> ${sanitize(t('ma.tab.favs'))} ${favCount?`<span style="background:var(--a);color:#fff;border-radius:20px;padding:1px 6px;font-size:10px">${favCount}</span>`:''}</button>
-    <button class="ma-tab" data-tab="listings" onclick="_maTab('listings',this);renderMaListingsPanel()"><i class="fas fa-building"></i> ประกาศของฉัน<span id="ma-token-badge" style="background:#f1c40f;color:#333;border-radius:20px;padding:1px 7px;font-size:10px;font-weight:800;margin-left:2px">${_tokenBalance} T</span></button>
     <button class="ma-tab" data-tab="requests" onclick="_maTab('requests',this)"><i class="fas fa-file-alt"></i> ${sanitize(t('ma.tab.requests'))}</button>
     <button class="ma-tab" data-tab="history" onclick="_maTab('history',this)"><i class="fas fa-history"></i> ${sanitize(t('ma.tab.history'))}</button>
   </div>
-  <!-- Profile panel -->
+  <!-- ═══ Profile panel ═══ -->
   <div class="ma-panel active" id="ma-panel-profile">
     <div class="ma-profile-grid">
-      <!-- LEFT: Sidebar — Avatar + Quick Info + PDPA + Delete -->
+      <!-- LEFT: Sidebar -->
       <div class="ma-profile-sidebar">
         <!-- Avatar Card -->
         <div class="ma-section" id="ma-avatar-section">
@@ -6289,7 +6351,7 @@ function renderMyAccount(){
               <div style="font-size:11px;color:var(--tx2);margin-top:2px"><i class="fas fa-heart" style="color:#e74c3c"></i> รายการโปรด</div>
             </div>
             <div style="background:var(--lt);border-radius:10px;padding:12px;text-align:center">
-              <div style="font-size:22px;font-weight:800;color:var(--a)" id="ma-stat-token">${_tokenBalance}</div>
+              <div style="font-size:22px;font-weight:800;color:var(--a)" id="ma-stat-token-sidebar">${_tokenBalance}</div>
               <div style="font-size:11px;color:var(--tx2);margin-top:2px"><i class="fas fa-coins" style="color:#f1c40f"></i> Token คงเหลือ</div>
             </div>
           </div>
@@ -6333,9 +6395,27 @@ function renderMyAccount(){
         <div class="ma-section">
           <div class="ma-section-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
             <span><i class="fas fa-user-edit"></i> ${sanitize(t('ma.profile.title'))}</span>
-            <button id="ma-edit-profile-btn" onclick="_maToggleProfileEdit(true)" style="display:none;background:var(--p);color:#fff;border:none;border-radius:8px;padding:7px 16px;font-size:13px;font-weight:600;cursor:pointer;gap:6px;align-items:center">
-              <i class="fas fa-pen"></i> แก้ไขข้อมูลส่วนตัว
-            </button>
+          </div>
+          <!-- Role Selector -->
+          <div style="margin-bottom:16px">
+            <label style="font-size:12px;color:var(--tx2);font-weight:600;display:block;margin-bottom:8px"><i class="fas fa-id-badge" style="color:var(--p);margin-right:4px"></i> ประเภทบัญชี</label>
+            <div style="display:flex;gap:10px">
+              <label id="role-owner-label" style="flex:1;border:2px solid ${(_meta.role==='owner'||!_meta.role)?'var(--p)':'var(--bd)'};border-radius:12px;padding:10px 14px;cursor:pointer;display:flex;align-items:center;gap:10px;transition:.2s;background:${(_meta.role==='owner'||!_meta.role)?'rgba(27,58,107,.06)':'transparent'}" onclick="_maSelectRole('owner')">
+                <input type="radio" name="ma-role" value="owner" ${(_meta.role==='owner'||!_meta.role)?'checked':''} style="accent-color:var(--p);width:16px;height:16px" disabled>
+                <div>
+                  <div style="font-size:13px;font-weight:700;color:var(--p)">🔑 เจ้าของทรัพย์</div>
+                  <div style="font-size:11px;color:var(--tx2)">ประกาศขาย/เช่าทรัพย์ของตัวเอง</div>
+                </div>
+              </label>
+              <label id="role-agent-label" style="flex:1;border:2px solid ${_meta.role==='agent'?'var(--p)':'var(--bd)'};border-radius:12px;padding:10px 14px;cursor:pointer;display:flex;align-items:center;gap:10px;transition:.2s;background:${_meta.role==='agent'?'rgba(27,58,107,.06)':'transparent'}" onclick="_maSelectRole('agent')">
+                <input type="radio" name="ma-role" value="agent" ${_meta.role==='agent'?'checked':''} style="accent-color:var(--p);width:16px;height:16px" disabled>
+                <div>
+                  <div style="font-size:13px;font-weight:700;color:var(--p)">🏡 นายหน้า / ตัวแทน</div>
+                  <div style="font-size:11px;color:var(--tx2)">บริหารทรัพย์ให้ลูกค้าหลายราย</div>
+                </div>
+              </label>
+            </div>
+            <input type="hidden" id="ma-role" value="${sanitize(_meta.role||'owner')}">
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
             <div class="ma-field">
@@ -6370,7 +6450,7 @@ function renderMyAccount(){
           </div>
         </div>
 
-        <!-- เปลี่ยนรหัสผ่าน -->
+        <!-- เปลี่ยนรหัสผ่าน (moved here, below info form) -->
         <div class="ma-section" id="ma-pw-section">
           <div class="ma-section-title"><i class="fas fa-lock"></i> เปลี่ยนรหัสผ่าน</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
@@ -7767,6 +7847,8 @@ function _maToggleProfileEdit(editing){
       const el = document.getElementById(id);
       if(el){ el.disabled=false; el.style.background=''; el.style.color=''; el.style.cursor=''; }
     });
+    // Unlock role radio buttons
+    document.querySelectorAll('input[name="ma-role"]').forEach(r=>{ r.disabled=false; });
     // Unlock avatar fields
     if(avatarUrlField){ avatarUrlField.disabled=false; avatarUrlField.style.background=''; avatarUrlField.style.color=''; avatarUrlField.style.cursor=''; }
     if(avatarFileInput){ avatarFileInput.disabled=false; }
@@ -7788,6 +7870,8 @@ function _maToggleProfileEdit(editing){
       const el = document.getElementById(id);
       if(el){ el.disabled=true; el.style.background='var(--lt)'; el.style.color='var(--gr)'; el.style.cursor='default'; }
     });
+    // Lock role radio buttons
+    document.querySelectorAll('input[name="ma-role"]').forEach(r=>{ r.disabled=true; });
     // Lock avatar fields
     if(avatarUrlField){ avatarUrlField.disabled=true; avatarUrlField.style.background='var(--lt)'; avatarUrlField.style.color='var(--gr)'; avatarUrlField.style.cursor='default'; }
     if(avatarFileInput){ avatarFileInput.disabled=true; }
@@ -7859,7 +7943,30 @@ function _maOnTermsChange(){
   }
 }
 
-/* ── Scroll to photo section (called from hero avatar click) ── */
+/* ── Select role (owner / agent) ── */
+function _maSelectRole(role){
+  const roleInput = document.getElementById('ma-role');
+  const ownerLabel = document.getElementById('role-owner-label');
+  const agentLabel = document.getElementById('role-agent-label');
+  if(roleInput) roleInput.value = role;
+  // Update visuals
+  if(ownerLabel){
+    const isOwner = role==='owner';
+    ownerLabel.style.borderColor = isOwner ? 'var(--p)' : 'var(--bd)';
+    ownerLabel.style.background = isOwner ? 'rgba(27,58,107,.06)' : 'transparent';
+    const radio = ownerLabel.querySelector('input[type=radio]');
+    if(radio) radio.checked = isOwner;
+  }
+  if(agentLabel){
+    const isAgent = role==='agent';
+    agentLabel.style.borderColor = isAgent ? 'var(--p)' : 'var(--bd)';
+    agentLabel.style.background = isAgent ? 'rgba(27,58,107,.06)' : 'transparent';
+    const radio = agentLabel.querySelector('input[type=radio]');
+    if(radio) radio.checked = isAgent;
+  }
+}
+
+
 function _maScrollToPhotoSection(){
   // Switch to profile tab first
   const profileTab = document.querySelector('.ma-tab[data-tab="profile"]');
@@ -7886,13 +7993,14 @@ async function _maSaveProfile(){
   const phone    = document.getElementById('ma-phone')?.value.trim()||'';
   const lineId   = document.getElementById('ma-line-id')?.value.trim()||'';
   const avatarUrl= document.getElementById('ma-avatar-url')?.value.trim()||'';
+  const roleVal  = document.getElementById('ma-role')?.value||'owner';
   const termsCheck = document.getElementById('ma-terms-accept');
   if(termsCheck && !termsCheck.checked){ toast('กรุณายอมรับข้อกำหนดและเงื่อนไขก่อนบันทึก',true); return; }
   const btn = document.getElementById('ma-save-profile-btn') || document.querySelector('#ma-panel-profile .ma-save-btn');
   if(btn){btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i>';}
 
   // 1) อัปเดต auth.users metadata (เดิม) — trigger DB จะ sync user_profiles อัตโนมัติ
-  const metaPayload = {display_name:name,phone,line_id:lineId};
+  const metaPayload = {display_name:name,phone,line_id:lineId,role:roleVal};
   if(avatarUrl) metaPayload.avatar_url = avatarUrl;
   const {error} = await sb.auth.updateUser({data:metaPayload});
   if(error){
