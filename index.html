@@ -2275,9 +2275,50 @@ footer::after{
 .profile-fab-btn .pfab-av{font-size:13px;font-weight:700;width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;border:2px solid rgba(255,255,255,.6)}
 /* My Account page */
 .my-account-wrap{max-width:1100px;margin:0 auto;padding:32px 20px 60px}
-.ma-profile-grid{display:grid;grid-template-columns:300px 1fr;gap:24px;align-items:start}
-.ma-profile-sidebar{display:flex;flex-direction:column;gap:16px}
-.ma-profile-main{display:flex;flex-direction:column;gap:16px}
+/* ─── New Profile Page Layout ─── */
+.ma-profile-grid{display:grid;grid-template-columns:300px 1fr;gap:20px;align-items:start}
+.ma-profile-sidebar{display:flex;flex-direction:column;gap:14px}
+.ma-profile-main{display:flex;flex-direction:column;gap:14px}
+/* Sidebar info cards */
+.ma-info-card{background:#fff;border-radius:16px;padding:18px;border:1.5px solid var(--bd);box-shadow:0 2px 10px rgba(27,58,107,.05)}
+.ma-info-card-title{font-size:13px;font-weight:700;color:var(--p);margin-bottom:12px;display:flex;align-items:center;gap:7px;padding-bottom:10px;border-bottom:1.5px solid var(--lt)}
+/* About / Bio section */
+.ma-bio-text{font-size:13px;color:var(--tx2);line-height:1.7;white-space:pre-line}
+.ma-read-more-btn{background:none;border:none;color:var(--p);font-size:12px;font-weight:600;cursor:pointer;padding:4px 0;margin-top:4px}
+/* Cert badges */
+.ma-cert-badge{display:inline-flex;align-items:center;gap:5px;background:linear-gradient(135deg,#fffbeb,#fef3c7);border:1px solid #f1c40f88;border-radius:20px;padding:5px 12px;font-size:11px;font-weight:700;color:#856404;margin:3px}
+/* Language / Area tags */
+.ma-tag{display:inline-flex;align-items:center;gap:4px;background:var(--lt);border:1px solid var(--bd);border-radius:8px;padding:4px 10px;font-size:12px;color:var(--tx);margin:3px}
+/* Review card */
+.ma-review-card{border:1.5px solid var(--bd);border-radius:12px;padding:12px;margin-bottom:10px;background:var(--lt)}
+.ma-review-stars{color:#f1c40f;font-size:12px;margin-bottom:4px}
+.ma-review-text{font-size:12px;color:var(--tx2);line-height:1.6}
+.ma-review-author{font-size:11px;color:var(--gr);margin-top:6px}
+/* Right: listings feed */
+.ma-listing-card{background:#fff;border:1.5px solid var(--bd);border-radius:16px;overflow:hidden;margin-bottom:14px;transition:.2s}
+.ma-listing-card:hover{box-shadow:0 6px 20px rgba(27,58,107,.1);border-color:var(--p)}
+.ma-listing-card-img{width:100%;height:180px;object-fit:cover;display:block;background:var(--lt)}
+.ma-listing-card-img-placeholder{height:180px;background:var(--lt);display:flex;align-items:center;justify-content:center;font-size:40px}
+.ma-listing-card-body{padding:14px 16px}
+.ma-listing-card-title{font-size:14px;font-weight:700;color:var(--tx);margin-bottom:6px;line-height:1.4}
+.ma-listing-card-price{font-size:18px;font-weight:800;color:var(--p);margin-bottom:6px}
+.ma-listing-card-meta{display:flex;flex-wrap:wrap;gap:8px;font-size:12px;color:var(--tx2)}
+.ma-listing-card-tag{display:inline-flex;align-items:center;gap:4px;background:var(--lt);border-radius:6px;padding:3px 8px;font-size:11px}
+/* Token banner on profile top */
+.ma-token-bar{background:linear-gradient(135deg,#1B3A6B,#2a5298);border-radius:14px;padding:14px 18px;margin-bottom:16px;color:#fff;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.ma-token-bar-left{display:flex;align-items:center;gap:12px}
+.ma-token-bar-num{font-size:26px;font-weight:900}
+.ma-token-bar-btn{background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3);border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;transition:.2s}
+.ma-token-bar-btn:hover{background:rgba(255,255,255,.25)}
+.ma-token-bar-btn.gold{background:rgba(241,196,15,.2);border-color:#f1c40f;color:#f1c40f}
+/* Edit modal overlay */
+.ma-edit-modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);z-index:9000;display:flex;align-items:center;justify-content:center;padding:16px}
+.ma-edit-modal{background:#fff;border-radius:20px;width:100%;max-width:680px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.ma-edit-modal-hd{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1.5px solid var(--lt);position:sticky;top:0;background:#fff;z-index:2;border-radius:20px 20px 0 0}
+.ma-edit-modal-hd h2{font-size:16px;font-weight:700;color:var(--p);display:flex;align-items:center;gap:8px}
+.ma-edit-modal-close{width:32px;height:32px;border:none;background:var(--lt);border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--tx2);transition:.2s}
+.ma-edit-modal-close:hover{background:var(--bd);color:var(--tx)}
+.ma-edit-modal-body{padding:22px}
 /* ── New Profile Hero (Living Insider style but better) ── */
 .ma-hero{position:relative;overflow:hidden;border-radius:24px;margin-bottom:28px;color:#fff;background:linear-gradient(135deg,#1B3A6B 0%,#2a5298 50%,#1a6a4a 100%)}
 .ma-hero-cover{height:180px;background:linear-gradient(135deg,#1B3A6B 0%,#2a5298 40%,#1a7a4a 100%);position:relative;overflow:hidden}
@@ -2367,6 +2408,7 @@ footer::after{
   .ma-hero-body{padding:0 16px 20px;gap:14px;margin-top:-48px}
   .ma-av-ring{width:90px;height:90px;font-size:28px}
   .ma-hero-cover{height:140px}
+  .ma-profile-grid{grid-template-columns:1fr}
   .ma-tab{min-width:60px;font-size:11px;padding:8px 5px}
   .ma-tab i{font-size:14px}
   .my-account-wrap{padding:20px 10px 50px}
@@ -6276,7 +6318,7 @@ function renderMyAccount(){
         <button class="ma-hero-cover-btn" onclick="_maTab('listings',document.querySelector('[data-tab=\\'listings\\']'));renderMaListingsPanel()">
           <i class="fas fa-plus"></i> ลงประกาศ
         </button>
-        <button class="ma-hero-cover-btn primary" id="ma-edit-profile-btn" onclick="_maToggleProfileEdit(true)" style="display:none">
+        <button class="ma-hero-cover-btn primary" id="ma-edit-profile-btn-hero" onclick="_maOpenEditModal()" style="display:none">
           <i class="fas fa-pen"></i> แก้ไขข้อมูล
         </button>
       </div>
@@ -6321,153 +6363,139 @@ function renderMyAccount(){
   </div>
   <!-- ═══ Profile panel ═══ -->
   <div class="ma-panel active" id="ma-panel-profile">
+    <!-- Token Bar (top of profile main area) -->
+    <div class="ma-token-bar">
+      <div class="ma-token-bar-left">
+        <i class="fas fa-coins" style="font-size:28px;color:#f1c40f"></i>
+        <div>
+          <div style="font-size:11px;opacity:.65">Token คงเหลือ</div>
+          <div class="ma-token-bar-num" id="ma-stat-token">${_tokenBalance} <span style="font-size:13px;font-weight:500;opacity:.7">Token</span></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="ma-token-bar-btn gold" onclick="openBuyTokenModal()">
+          <i class="fas fa-plus-circle"></i> เติม Token
+        </button>
+        <button class="ma-token-bar-btn" onclick="_maTab('listings',document.querySelector('[data-tab=\\'listings\\']'));renderMaListingsPanel()">
+          <i class="fas fa-building"></i> ดูประกาศทั้งหมด
+        </button>
+        <button class="ma-token-bar-btn" onclick="openUserListingModal()" ${_tokenBalance<1?'disabled style="opacity:.4;cursor:not-allowed"':''}>
+          <i class="fas fa-plus"></i> ลงประกาศใหม่
+        </button>
+      </div>
+    </div>
+
     <div class="ma-profile-grid">
-      <!-- LEFT: Sidebar -->
+      <!-- ══════════ LEFT SIDEBAR ══════════ -->
       <div class="ma-profile-sidebar">
-        <!-- Avatar Card -->
-        <div class="ma-section" id="ma-avatar-section">
-          <div class="ma-section-title"><i class="fas fa-camera"></i> รูปโปรไฟล์</div>
-          <div style="display:flex;flex-direction:column;align-items:center;gap:14px">
-            <div class="ma-avatar-preview" id="ma-avatar-preview" style="width:110px;height:110px;font-size:36px">${_meta.avatar_url?`<img src="${sanitize(_meta.avatar_url)}" id="ma-avatar-preview-img" alt="avatar">`:`<span id="ma-avatar-preview-initials">${init}</span>`}</div>
-            <div style="text-align:center;width:100%">
-              <label for="ma-avatar-file" style="display:inline-flex;align-items:center;justify-content:center;gap:6px;background:var(--p);color:#fff;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer;width:100%;box-sizing:border-box">
-                <i class="fas fa-upload"></i> เลือกรูปภาพ
-              </label>
-              <input type="file" id="ma-avatar-file" accept="image/*" style="display:none" onchange="_maPreviewAvatarFile(event)" disabled>
+
+        <!-- Avatar + Name Card -->
+        <div class="ma-info-card" style="text-align:center">
+          <div style="display:flex;justify-content:center;margin-bottom:12px">
+            <div class="ma-avatar-preview" id="ma-avatar-preview" style="width:100px;height:100px;font-size:32px;margin:0 auto">
+              ${_meta.avatar_url?`<img src="${sanitize(_meta.avatar_url)}" id="ma-avatar-preview-img" alt="avatar">`:`<span id="ma-avatar-preview-initials">${init}</span>`}
             </div>
           </div>
-          <div class="ma-field" style="margin-top:12px">
-            <label style="font-size:12px">หรือใส่ URL รูปภาพ</label>
-            <input type="url" id="ma-avatar-url" value="${sanitize(_meta.avatar_url||'')}" placeholder="https://example.com/photo.jpg" disabled style="background:var(--lt);color:var(--gr);cursor:default" oninput="_maPreviewAvatarUrl(this.value)">
+          <div style="font-size:16px;font-weight:800;color:var(--tx);margin-bottom:4px">${dispName}</div>
+          <div style="font-size:12px;color:var(--tx2);margin-bottom:10px">${email}</div>
+          <div style="display:inline-flex;align-items:center;gap:5px;background:${_meta.role==='agent'?'linear-gradient(135deg,#1B3A6B,#2a5298)':'linear-gradient(135deg,#c8922a,#e0a83a)'};color:#fff;border-radius:20px;padding:5px 14px;font-size:12px;font-weight:700;margin-bottom:12px">
+            ${_meta.role==='agent'?'<i class="fas fa-id-card"></i> นายหน้า / ตัวแทน':'<i class="fas fa-key"></i> เจ้าของทรัพย์'}
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px">
+            <div style="background:var(--lt);border-radius:10px;padding:10px 6px;text-align:center">
+              <div style="font-size:18px;font-weight:800;color:var(--p)">${(typeof _myUserListings!=='undefined'?_myUserListings:[]).length}</div>
+              <div style="font-size:10px;color:var(--tx2)">ประกาศ</div>
+            </div>
+            <div style="background:var(--lt);border-radius:10px;padding:10px 6px;text-align:center">
+              <div style="font-size:18px;font-weight:800;color:#e74c3c">${favCount}</div>
+              <div style="font-size:10px;color:var(--tx2)">โปรด</div>
+            </div>
+            <div style="background:var(--lt);border-radius:10px;padding:10px 6px;text-align:center">
+              <div style="font-size:18px;font-weight:800;color:#f39c12" id="ma-stat-token-sidebar">${_tokenBalance}</div>
+              <div style="font-size:10px;color:var(--tx2)">Token</div>
+            </div>
+          </div>
+          ${joinDate?`<div style="font-size:11px;color:var(--gr);margin-top:10px"><i class="fas fa-calendar-alt" style="color:var(--p);margin-right:4px"></i>${sanitize(t('ma.member.since'))} ${joinDate}</div>`:''}
+          <!-- Edit button centered under avatar -->
+          <button id="ma-edit-profile-btn" onclick="_maOpenEditModal()" style="display:none;margin-top:14px;width:100%;background:var(--p);color:#fff;border:none;border-radius:10px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;gap:7px;align-items:center;justify-content:center">
+            <i class="fas fa-pen"></i> แก้ไขโปรไฟล์
+          </button>
+          <button onclick="logout()" style="margin-top:8px;width:100%;background:transparent;color:var(--tx2);border:1.5px solid var(--bd);border-radius:10px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer">
+            <i class="fas fa-sign-out-alt"></i> ออกจากระบบ
+          </button>
+        </div>
+
+        <!-- เกี่ยวกับฉัน / Bio -->
+        <div class="ma-info-card">
+          <div class="ma-info-card-title"><i class="fas fa-user-circle"></i> เกี่ยวกับฉัน</div>
+          <div class="ma-bio-text" id="ma-bio-display">${sanitize(_meta.bio||'ยังไม่มีข้อมูลประวัติ กดแก้ไขโปรไฟล์เพื่อเพิ่มข้อมูล')}</div>
+        </div>
+
+        <!-- ใบรับรอง / Certifications -->
+        <div class="ma-info-card">
+          <div class="ma-info-card-title"><i class="fas fa-certificate" style="color:#c8922a"></i> ใบรับรอง</div>
+          <div id="ma-certs-display">
+            ${(_meta.certifications||[]).length ? (_meta.certifications||[]).map(c=>`<span class="ma-cert-badge"><i class="fas fa-award"></i>${sanitize(c)}</span>`).join('') : `<span class="ma-cert-badge"><i class="fas fa-check-circle" style="color:#10b981"></i> สมาชิก Matchdoor</span>`}
           </div>
         </div>
 
-        <!-- Quick Member Stats -->
-        <div class="ma-section">
-          <div class="ma-section-title"><i class="fas fa-chart-bar"></i> สรุปบัญชี</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-            <div style="background:var(--lt);border-radius:10px;padding:12px;text-align:center">
-              <div style="font-size:22px;font-weight:800;color:var(--p)">${favCount}</div>
-              <div style="font-size:11px;color:var(--tx2);margin-top:2px"><i class="fas fa-heart" style="color:#e74c3c"></i> รายการโปรด</div>
-            </div>
-            <div style="background:var(--lt);border-radius:10px;padding:12px;text-align:center">
-              <div style="font-size:22px;font-weight:800;color:var(--a)" id="ma-stat-token-sidebar">${_tokenBalance}</div>
-              <div style="font-size:11px;color:var(--tx2);margin-top:2px"><i class="fas fa-coins" style="color:#f1c40f"></i> Token คงเหลือ</div>
+        <!-- ภาษาที่เชี่ยวชาญ -->
+        <div class="ma-info-card">
+          <div class="ma-info-card-title"><i class="fas fa-language"></i> ภาษาที่เชี่ยวชาญ</div>
+          <div id="ma-langs-display">
+            ${(_meta.languages||['ไทย']).map(l=>`<span class="ma-tag">${sanitize(l)}</span>`).join('')}
+          </div>
+        </div>
+
+        <!-- พื้นที่ที่เชี่ยวชาญ -->
+        <div class="ma-info-card">
+          <div class="ma-info-card-title"><i class="fas fa-map-marker-alt" style="color:#e74c3c"></i> พื้นที่ที่เชี่ยวชาญ</div>
+          <div id="ma-areas-display">
+            ${(_meta.expertise_areas||['กรุงเทพฯ']).map(a=>`<span class="ma-tag"><i class="fas fa-map-pin" style="color:var(--p);font-size:10px"></i>${sanitize(a)}</span>`).join('')}
+          </div>
+        </div>
+
+        <!-- รีวิวจากลูกค้า -->
+        <div class="ma-info-card">
+          <div class="ma-info-card-title"><i class="fas fa-star" style="color:#f1c40f"></i> รีวิวจากลูกค้า</div>
+          <div id="ma-reviews-display">
+            <div style="text-align:center;padding:16px;color:var(--tx2)">
+              <i class="fas fa-comment-dots" style="font-size:28px;opacity:.3;margin-bottom:8px;display:block"></i>
+              <div style="font-size:12px">ยังไม่มีรีวิว</div>
+              <div style="font-size:11px;opacity:.6;margin-top:4px">รีวิวจะแสดงเมื่อลูกค้าให้คะแนน</div>
             </div>
           </div>
-          ${joinDate?`<div style="font-size:12px;color:var(--tx2);margin-top:12px;text-align:center"><i class="fas fa-calendar-alt" style="color:var(--p);margin-right:4px"></i> ${sanitize(t('ma.member.since'))} ${joinDate}</div>`:''}
         </div>
 
         <!-- PDPA -->
-        <div class="ma-section">
-          <div class="ma-section-title"><i class="fas fa-shield-alt" style="color:var(--p)"></i> สิทธิตาม PDPA</div>
-          <div style="margin-bottom:14px">
-            <div style="font-size:13px;font-weight:600;margin-bottom:6px;color:var(--tx)"><i class="fas fa-download" style="color:var(--p);margin-right:6px"></i> ขอสำเนาข้อมูล</div>
-            <p style="font-size:12px;color:var(--tx2);margin-bottom:10px">ดาวน์โหลดข้อมูลส่วนบุคคลในรูปแบบ JSON</p>
-            <button onclick="_maExportMyData()" style="background:var(--p);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;width:100%;justify-content:center">
-              <i class="fas fa-file-download"></i> Export ข้อมูลของฉัน
-            </button>
-          </div>
-          <hr style="border:none;border-top:1px solid var(--bd);margin:12px 0">
-          <div>
-            <div style="font-size:13px;font-weight:600;margin-bottom:6px;color:var(--tx)"><i class="fas fa-bell" style="color:var(--p);margin-right:6px"></i> รับข่าวสาร</div>
-            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px">
-              <input type="checkbox" id="ma-marketing-consent" style="width:16px;height:16px;accent-color:var(--p)" onchange="_maUpdateMarketingConsent(this.checked)">
-              ยินยอมรับโปรโมชั่น
-            </label>
-            <span id="ma-marketing-consent-ts" style="font-size:11px;color:var(--gr);display:block;margin-top:4px"></span>
-          </div>
+        <div class="ma-info-card">
+          <div class="ma-info-card-title"><i class="fas fa-shield-alt" style="color:var(--p)"></i> สิทธิตาม PDPA</div>
+          <p style="font-size:12px;color:var(--tx2);margin-bottom:10px">ดาวน์โหลดข้อมูลส่วนบุคคลในรูปแบบ JSON</p>
+          <button onclick="_maExportMyData()" style="background:var(--p);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;width:100%;justify-content:center">
+            <i class="fas fa-file-download"></i> Export ข้อมูลของฉัน
+          </button>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;margin-top:10px">
+            <input type="checkbox" id="ma-marketing-consent" style="width:15px;height:15px;accent-color:var(--p)" onchange="_maUpdateMarketingConsent(this.checked)">
+            ยินยอมรับโปรโมชั่นจาก Matchdoor
+          </label>
+          <span id="ma-marketing-consent-ts" style="font-size:11px;color:var(--gr);display:block;margin-top:4px"></span>
         </div>
 
         <!-- ลบบัญชี -->
-        <div class="ma-section" style="border-color:rgba(220,53,69,.3)">
-          <div class="ma-section-title" style="color:#dc3545"><i class="fas fa-trash-alt"></i> ลบบัญชีผู้ใช้</div>
-          <p style="font-size:12px;color:var(--tx2);margin-bottom:10px">การลบบัญชีจะลบข้อมูลโปรไฟล์และไม่สามารถกู้คืนได้</p>
-          <button onclick="_maDeleteAccount()" style="background:transparent;color:#dc3545;border:1.5px solid #dc3545;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;width:100%">
+        <div class="ma-info-card" style="border-color:rgba(220,53,69,.3)">
+          <div class="ma-info-card-title" style="color:#dc3545"><i class="fas fa-trash-alt"></i> ลบบัญชีผู้ใช้</div>
+          <p style="font-size:12px;color:var(--tx2);margin-bottom:10px">การลบบัญชีจะลบข้อมูลทั้งหมดและไม่สามารถกู้คืนได้</p>
+          <button onclick="_maDeleteAccount()" style="background:transparent;color:#dc3545;border:1.5px solid #dc3545;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;width:100%">
             <i class="fas fa-trash-alt"></i> ลบบัญชีของฉัน
           </button>
         </div>
       </div>
 
-      <!-- RIGHT: Main — Profile form + Password -->
-      <div class="ma-profile-main">
-        <!-- Profile Form -->
-        <div class="ma-section">
-          <div class="ma-section-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
-            <span><i class="fas fa-user-edit"></i> ${sanitize(t('ma.profile.title'))}</span>
-          </div>
-          <!-- Role Selector -->
-          <div style="margin-bottom:16px">
-            <label style="font-size:12px;color:var(--tx2);font-weight:600;display:block;margin-bottom:8px"><i class="fas fa-id-badge" style="color:var(--p);margin-right:4px"></i> ประเภทบัญชี</label>
-            <div style="display:flex;gap:10px">
-              <label id="role-owner-label" style="flex:1;border:2px solid ${(_meta.role==='owner'||!_meta.role)?'var(--p)':'var(--bd)'};border-radius:12px;padding:10px 14px;cursor:pointer;display:flex;align-items:center;gap:10px;transition:.2s;background:${(_meta.role==='owner'||!_meta.role)?'rgba(27,58,107,.06)':'transparent'}" onclick="_maSelectRole('owner')">
-                <input type="radio" name="ma-role" value="owner" ${(_meta.role==='owner'||!_meta.role)?'checked':''} style="accent-color:var(--p);width:16px;height:16px" disabled>
-                <div>
-                  <div style="font-size:13px;font-weight:700;color:var(--p)">🔑 เจ้าของทรัพย์</div>
-                  <div style="font-size:11px;color:var(--tx2)">ประกาศขาย/เช่าทรัพย์ของตัวเอง</div>
-                </div>
-              </label>
-              <label id="role-agent-label" style="flex:1;border:2px solid ${_meta.role==='agent'?'var(--p)':'var(--bd)'};border-radius:12px;padding:10px 14px;cursor:pointer;display:flex;align-items:center;gap:10px;transition:.2s;background:${_meta.role==='agent'?'rgba(27,58,107,.06)':'transparent'}" onclick="_maSelectRole('agent')">
-                <input type="radio" name="ma-role" value="agent" ${_meta.role==='agent'?'checked':''} style="accent-color:var(--p);width:16px;height:16px" disabled>
-                <div>
-                  <div style="font-size:13px;font-weight:700;color:var(--p)">🏡 นายหน้า / ตัวแทน</div>
-                  <div style="font-size:11px;color:var(--tx2)">บริหารทรัพย์ให้ลูกค้าหลายราย</div>
-                </div>
-              </label>
-            </div>
-            <input type="hidden" id="ma-role" value="${sanitize(_meta.role||'owner')}">
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
-            <div class="ma-field">
-              <label>${sanitize(t('ma.profile.name'))}</label>
-              <input type="text" id="ma-display-name" value="${dispName}" placeholder="${sanitize(t('ma.profile.name'))}">
-            </div>
-            <div class="ma-field">
-              <label>${sanitize(t('ma.profile.email'))}</label>
-              <input type="email" value="${email}" disabled style="background:var(--lt);color:var(--gr);cursor:default">
-            </div>
-            <div class="ma-field">
-              <label>${sanitize(t('ma.profile.phone'))}</label>
-              <input type="tel" id="ma-phone" value="${sanitize(_meta.phone||'')}" placeholder="0812345678">
-            </div>
-            <div class="ma-field">
-              <label>${sanitize(t('ma.profile.line'))}</label>
-              <input type="text" id="ma-line-id" value="${sanitize(_meta.line_id||'')}" placeholder="@yourlineid">
-            </div>
-          </div>
-          <!-- ยอมรับข้อกำหนด -->
-          <div class="ma-terms-box" id="ma-terms-box" style="display:none">
-            <input type="checkbox" id="ma-terms-accept" onchange="_maOnTermsChange()">
-            <label for="ma-terms-accept">
-              ฉันยืนยันว่าข้อมูลที่กรอกถูกต้อง และยอมรับ <a href="#" onclick="return false" style="color:var(--p)">ข้อกำหนดการใช้งาน</a> และ <a href="#" onclick="return false" style="color:var(--p)">นโยบายความเป็นส่วนตัว</a> ของ Matchdoor
-            </label>
-          </div>
-          <div id="ma-profile-action-btns" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
-            <button class="ma-save-btn" id="ma-save-profile-btn" onclick="${isDevMode?'alert(\"Dev mode: บันทึกจริงไม่ได้ ต้อง Login ก่อนครับ 🙏\")':'_maSaveProfile()'}" disabled style="opacity:.5;cursor:not-allowed">
-              <i class="fas fa-save"></i> ${sanitize(t('ma.profile.save'))}${isDevMode?' (Dev)':''}
-            </button>
-            ${!isDevMode?`<button class="ma-logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> ${sanitize(t('ma.profile.logout'))}</button>`:''}
-          </div>
-        </div>
-
-        <!-- เปลี่ยนรหัสผ่าน (moved here, below info form) -->
-        <div class="ma-section" id="ma-pw-section">
-          <div class="ma-section-title"><i class="fas fa-lock"></i> เปลี่ยนรหัสผ่าน</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
-            <div class="ma-field">
-              <label>รหัสผ่านใหม่</label>
-              <input type="password" id="ma-new-pw" placeholder="รหัสผ่านใหม่ (อย่างน้อย 6 ตัว)" disabled style="background:var(--lt);color:var(--gr);cursor:default">
-            </div>
-            <div class="ma-field">
-              <label>ยืนยันรหัสผ่านใหม่</label>
-              <input type="password" id="ma-new-pw2" placeholder="ยืนยันรหัสผ่านใหม่" disabled style="background:var(--lt);color:var(--gr);cursor:default">
-            </div>
-          </div>
-          <div id="ma-pw-action-btns" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px">
-            <button id="ma-pw-save-btn" onclick="_maChangePassword()" disabled style="background:var(--gr);color:#fff;border:none;border-radius:8px;padding:9px 20px;font-size:13px;font-weight:600;cursor:not-allowed;opacity:.6">
-              <i class="fas fa-key"></i> บันทึกรหัสผ่าน
-            </button>
-          </div>
+      <!-- ══════════ RIGHT: Listings Feed ══════════ -->
+      <div class="ma-profile-main" id="ma-profile-listings-area">
+        <div style="text-align:center;padding:40px;color:var(--tx2)">
+          <i class="fas fa-spinner fa-spin" style="font-size:24px;opacity:.4"></i>
+          <p style="margin-top:10px;font-size:13px">กำลังโหลดประกาศ...</p>
         </div>
       </div>
     </div>
@@ -7891,11 +7919,13 @@ function _maToggleProfileEdit(editing){
 
 /* ── Apply lock state after renderMyAccount (called once on render) ── */
 function _maInitProfileLockState(){
-  // Start in locked/view mode
-  _maToggleProfileEdit(false);
-  // Show the edit button
+  // Show the edit buttons
   const editBtn = document.getElementById('ma-edit-profile-btn');
-  if(editBtn) editBtn.style.display='inline-flex';
+  if(editBtn) editBtn.style.display='flex';
+  const heroBtn = document.getElementById('ma-edit-profile-btn-hero');
+  if(heroBtn){ heroBtn.style.display='flex'; heroBtn.innerHTML='<i class="fas fa-pen"></i> แก้ไขข้อมูล'; }
+  // Render listings in right panel
+  _maRenderProfileListings();
 }
 
 /* ── Preview avatar from file upload ── */
@@ -7943,7 +7973,272 @@ function _maOnTermsChange(){
   }
 }
 
-/* ── Select role (owner / agent) ── */
+/* ── Open Edit Profile Popup Modal ── */
+function _maOpenEditModal(){
+  const existing = document.getElementById('ma-edit-profile-modal');
+  if(existing) existing.remove();
+  const _profile = _cachedUserProfile;
+  const _u = user || {email:'dev@matchdoor.co',user_metadata:{display_name:'Dev Preview',phone:'',line_id:''}};
+  const _meta = {...(_u.user_metadata||{}), ...(_profile||{})};
+  const isDevMode = !!window._maDevBypass;
+  const dispName = _meta.display_name || _u.email?.split('@')[0] || 'User';
+  const init = (_u.email||'U')[0].toUpperCase();
+  const mo = document.createElement('div');
+  mo.id='ma-edit-profile-modal';
+  mo.className='ma-edit-modal-ov';
+  mo.onclick=function(e){ if(e.target===this) this.remove(); };
+  mo.innerHTML=`
+  <div class="ma-edit-modal">
+    <div class="ma-edit-modal-hd">
+      <h2><i class="fas fa-user-edit"></i> แก้ไขโปรไฟล์</h2>
+      <button class="ma-edit-modal-close" onclick="document.getElementById('ma-edit-profile-modal').remove()">×</button>
+    </div>
+    <div class="ma-edit-modal-body">
+
+      <!-- Avatar Section -->
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:22px;padding-bottom:18px;border-bottom:1.5px solid var(--lt)">
+        <div class="ma-avatar-preview" id="ma-avatar-preview-modal" style="width:80px;height:80px;font-size:26px;flex-shrink:0">${_meta.avatar_url?`<img src="${_meta.avatar_url}" alt="av" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:`<span>${init}</span>`}</div>
+        <div style="flex:1">
+          <label style="font-size:12px;color:var(--tx2);font-weight:600;display:block;margin-bottom:6px">รูปโปรไฟล์</label>
+          <label for="ma-avatar-file-modal" style="display:inline-flex;align-items:center;gap:6px;background:var(--p);color:#fff;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer">
+            <i class="fas fa-upload"></i> เลือกรูป
+          </label>
+          <input type="file" id="ma-avatar-file-modal" accept="image/*" style="display:none" onchange="_maPreviewAvatarFileModal(event)">
+          <div style="margin-top:8px">
+            <input type="url" id="ma-avatar-url-modal" value="${_meta.avatar_url||''}" placeholder="หรือวาง URL รูปภาพ" style="width:100%;padding:8px 10px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;box-sizing:border-box" oninput="_maPreviewAvatarUrlModal(this.value)">
+          </div>
+        </div>
+      </div>
+
+      <!-- Role Selector -->
+      <div style="margin-bottom:18px">
+        <label style="font-size:12px;color:var(--tx2);font-weight:600;display:block;margin-bottom:8px"><i class="fas fa-id-badge" style="color:var(--p);margin-right:4px"></i> ประเภทบัญชี</label>
+        <div style="display:flex;gap:10px">
+          <label id="modal-role-owner-label" style="flex:1;border:2px solid ${(_meta.role==='owner'||!_meta.role)?'var(--p)':'var(--bd)'};border-radius:12px;padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:.2s;background:${(_meta.role==='owner'||!_meta.role)?'rgba(27,58,107,.06)':'transparent'}" onclick="_maSelectRoleModal('owner')">
+            <input type="radio" name="ma-role-modal" value="owner" ${(_meta.role==='owner'||!_meta.role)?'checked':''} style="accent-color:var(--p);width:15px;height:15px">
+            <div><div style="font-size:12px;font-weight:700;color:var(--p)">🔑 เจ้าของทรัพย์</div><div style="font-size:10px;color:var(--tx2)">ประกาศทรัพย์ของตัวเอง</div></div>
+          </label>
+          <label id="modal-role-agent-label" style="flex:1;border:2px solid ${_meta.role==='agent'?'var(--p)':'var(--bd)'};border-radius:12px;padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:.2s;background:${_meta.role==='agent'?'rgba(27,58,107,.06)':'transparent'}" onclick="_maSelectRoleModal('agent')">
+            <input type="radio" name="ma-role-modal" value="agent" ${_meta.role==='agent'?'checked':''} style="accent-color:var(--p);width:15px;height:15px">
+            <div><div style="font-size:12px;font-weight:700;color:var(--p)">🏡 นายหน้า / ตัวแทน</div><div style="font-size:10px;color:var(--tx2)">บริหารทรัพย์ให้ลูกค้า</div></div>
+          </label>
+        </div>
+        <input type="hidden" id="ma-role-modal" value="${_meta.role||'owner'}">
+      </div>
+
+      <!-- ข้อมูลส่วนตัว -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
+        <div class="ma-field">
+          <label>ชื่อที่แสดง *</label>
+          <input type="text" id="ma-display-name-modal" value="${dispName}" placeholder="ชื่อของคุณ">
+        </div>
+        <div class="ma-field">
+          <label>อีเมล</label>
+          <input type="email" value="${_u.email||''}" disabled style="background:var(--lt);color:var(--gr);cursor:default">
+        </div>
+        <div class="ma-field">
+          <label>เบอร์โทรศัพท์</label>
+          <input type="tel" id="ma-phone-modal" value="${_meta.phone||''}" placeholder="0812345678">
+        </div>
+        <div class="ma-field">
+          <label>LINE ID</label>
+          <input type="text" id="ma-line-id-modal" value="${_meta.line_id||''}" placeholder="@yourlineid">
+        </div>
+      </div>
+
+      <!-- ประวัติย่อ / Bio -->
+      <div class="ma-field">
+        <label>ประวัติย่อ / เกี่ยวกับฉัน</label>
+        <textarea id="ma-bio-modal" style="width:100%;padding:10px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;min-height:80px;resize:vertical;box-sizing:border-box;font-family:inherit" placeholder="แนะนำตัวเอง ประสบการณ์ ความเชี่ยวชาญ...">${_meta.bio||''}</textarea>
+      </div>
+
+      <!-- ภาษาที่เชี่ยวชาญ -->
+      <div class="ma-field">
+        <label>ภาษาที่เชี่ยวชาญ <span style="font-size:11px;color:var(--tx2)">(คั่นด้วยลูกน้ำ เช่น ไทย, English)</span></label>
+        <input type="text" id="ma-langs-modal" value="${(_meta.languages||['ไทย']).join(', ')}" placeholder="ไทย, English, 中文">
+      </div>
+
+      <!-- พื้นที่ที่เชี่ยวชาญ -->
+      <div class="ma-field">
+        <label>พื้นที่ที่เชี่ยวชาญ <span style="font-size:11px;color:var(--tx2)">(คั่นด้วยลูกน้ำ)</span></label>
+        <input type="text" id="ma-areas-modal" value="${(_meta.expertise_areas||['กรุงเทพฯ']).join(', ')}" placeholder="สุขุมวิท, อโศก, พระราม 9">
+      </div>
+
+      <!-- เปลี่ยนรหัสผ่าน -->
+      <div style="background:var(--lt);border-radius:12px;padding:14px;margin-top:6px">
+        <div style="font-size:13px;font-weight:700;color:var(--p);margin-bottom:12px;display:flex;align-items:center;gap:6px"><i class="fas fa-lock"></i> เปลี่ยนรหัสผ่าน</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 14px">
+          <div class="ma-field" style="margin:0 0 10px 0">
+            <label style="font-size:12px">รหัสผ่านใหม่</label>
+            <input type="password" id="ma-new-pw" placeholder="รหัสผ่านใหม่ (อย่างน้อย 6 ตัว)" style="border:1.5px solid var(--bd);border-radius:8px;padding:9px;font-size:13px;width:100%;box-sizing:border-box">
+          </div>
+          <div class="ma-field" style="margin:0 0 10px 0">
+            <label style="font-size:12px">ยืนยันรหัสผ่านใหม่</label>
+            <input type="password" id="ma-new-pw2" placeholder="ยืนยันรหัสผ่านใหม่" style="border:1.5px solid var(--bd);border-radius:8px;padding:9px;font-size:13px;width:100%;box-sizing:border-box">
+          </div>
+        </div>
+        <button id="ma-pw-save-btn" onclick="_maChangePassword()" style="background:var(--p);color:#fff;border:none;border-radius:8px;padding:9px 20px;font-size:12px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px">
+          <i class="fas fa-key"></i> บันทึกรหัสผ่าน
+        </button>
+      </div>
+
+      <!-- ยอมรับข้อกำหนด -->
+      <div style="background:#fffbeb;border:1px solid #f1c40f44;border-radius:10px;padding:12px;margin-top:14px;display:flex;align-items:flex-start;gap:10px">
+        <input type="checkbox" id="ma-terms-accept-modal" style="width:16px;height:16px;accent-color:var(--p);flex-shrink:0;margin-top:2px" onchange="_maOnTermsChangeModal()">
+        <label for="ma-terms-accept-modal" style="font-size:12px;color:var(--tx2);cursor:pointer">
+          ฉันยืนยันว่าข้อมูลที่กรอกถูกต้อง และยอมรับ <a href="#" onclick="return false" style="color:var(--p)">ข้อกำหนดการใช้งาน</a> และ <a href="#" onclick="return false" style="color:var(--p)">นโยบายความเป็นส่วนตัว</a> ของ Matchdoor
+        </label>
+      </div>
+
+      <!-- Save Buttons -->
+      <div style="display:flex;gap:10px;margin-top:16px">
+        <button id="ma-save-profile-btn-modal" onclick="${isDevMode?'alert(\"Dev mode: ไม่ได้บันทึก\")':'_maSaveProfileModal()'}" disabled style="flex:1;background:var(--p);color:#fff;border:none;border-radius:10px;padding:11px;font-size:14px;font-weight:700;cursor:not-allowed;opacity:.5;display:flex;align-items:center;justify-content:center;gap:6px">
+          <i class="fas fa-save"></i> บันทึกข้อมูล${isDevMode?' (Dev)':''}
+        </button>
+        <button onclick="document.getElementById('ma-edit-profile-modal').remove()" style="background:var(--lt);color:var(--tx);border:1.5px solid var(--bd);border-radius:10px;padding:11px 20px;font-size:13px;font-weight:600;cursor:pointer">
+          ยกเลิก
+        </button>
+      </div>
+    </div>
+  </div>`;
+  document.body.appendChild(mo);
+}
+
+/* ── Modal: Role selector ── */
+function _maSelectRoleModal(role){
+  const ri = document.getElementById('ma-role-modal');
+  if(ri) ri.value = role;
+  ['owner','agent'].forEach(r=>{
+    const lbl = document.getElementById('modal-role-'+r+'-label');
+    const radio = lbl?.querySelector('input[type=radio]');
+    const active = r===role;
+    if(lbl){ lbl.style.borderColor=active?'var(--p)':'var(--bd)'; lbl.style.background=active?'rgba(27,58,107,.06)':'transparent'; }
+    if(radio) radio.checked = active;
+  });
+}
+
+/* ── Modal: Preview avatar from file ── */
+function _maPreviewAvatarFileModal(event){
+  const file=event.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    const url=e.target.result;
+    _maPreviewAvatarUrlModal(url);
+    const urlField=document.getElementById('ma-avatar-url-modal');
+    if(urlField) urlField.value=url;
+  };
+  reader.readAsDataURL(file);
+}
+
+/* ── Modal: Preview avatar from URL ── */
+function _maPreviewAvatarUrlModal(url){
+  if(!url) return;
+  const preview=document.getElementById('ma-avatar-preview-modal');
+  if(preview) preview.innerHTML=`<img src="${url}" alt="av" style="width:100%;height:100%;object-fit:cover;border-radius:50%" onerror="this.parentElement.innerHTML='<span>👤</span>'">`;
+}
+
+/* ── Modal: Terms checkbox enable save ── */
+function _maOnTermsChangeModal(){
+  const checked=document.getElementById('ma-terms-accept-modal')?.checked;
+  const btn=document.getElementById('ma-save-profile-btn-modal');
+  if(!btn) return;
+  btn.disabled=!checked; btn.style.opacity=checked?'1':'.5'; btn.style.cursor=checked?'pointer':'not-allowed';
+}
+
+/* ── Modal: Save Profile ── */
+async function _maSaveProfileModal(){
+  if(!user||!sb) return;
+  const name=document.getElementById('ma-display-name-modal')?.value.trim()||'';
+  const phone=document.getElementById('ma-phone-modal')?.value.trim()||'';
+  const lineId=document.getElementById('ma-line-id-modal')?.value.trim()||'';
+  const avatarUrl=document.getElementById('ma-avatar-url-modal')?.value.trim()||'';
+  const roleVal=document.getElementById('ma-role-modal')?.value||'owner';
+  const bioVal=document.getElementById('ma-bio-modal')?.value.trim()||'';
+  const langsRaw=document.getElementById('ma-langs-modal')?.value||'';
+  const areasRaw=document.getElementById('ma-areas-modal')?.value||'';
+  const languages=langsRaw.split(',').map(s=>s.trim()).filter(Boolean);
+  const expertise_areas=areasRaw.split(',').map(s=>s.trim()).filter(Boolean);
+  const terms=document.getElementById('ma-terms-accept-modal');
+  if(terms&&!terms.checked){ toast('กรุณายอมรับข้อกำหนดก่อนบันทึก',true); return; }
+  const btn=document.getElementById('ma-save-profile-btn-modal');
+  if(btn){btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> กำลังบันทึก...';}
+  const metaPayload={display_name:name,phone,line_id:lineId,role:roleVal,bio:bioVal,languages,expertise_areas};
+  if(avatarUrl) metaPayload.avatar_url=avatarUrl;
+  const {error}=await sb.auth.updateUser({data:metaPayload});
+  if(error){
+    if(btn){btn.disabled=false;btn.innerHTML='<i class="fas fa-save"></i> บันทึกข้อมูล';btn.style.opacity='1';}
+    toast('เกิดข้อผิดพลาด: '+error.message,true); return;
+  }
+  // Sync to user_profiles table
+  try{
+    await sb.from('user_profiles').upsert({user_id:user.id,...metaPayload,updated_at:new Date().toISOString()},{onConflict:'user_id'});
+  }catch(e){}
+  _cachedUserProfile={...(_cachedUserProfile||{}), ...metaPayload};
+  toast('✅ บันทึกข้อมูลเรียบร้อย');
+  document.getElementById('ma-edit-profile-modal')?.remove();
+  renderMyAccount();
+}
+
+/* ── Render listings feed in profile right panel ── */
+async function _maRenderProfileListings(){
+  const area = document.getElementById('ma-profile-listings-area');
+  if(!area) return;
+  if(!window._maDevBypass) await loadUserTokenData();
+
+  const statusBadge=s=>{
+    const map={'รอตรวจสอบ':['#f39c12','fa-clock','รอตรวจสอบ'],'อนุมัติ':['#2ecc71','fa-check-circle','อนุมัติ'],'ปฏิเสธ':['#e74c3c','fa-times-circle','ปฏิเสธ'],'ปิด':['#95a5a6','fa-ban','ปิด'],'หมดอายุ':['#7f8c8d','fa-hourglass-end','หมดอายุ']};
+    const [c,ic,lb]=map[s]||['#bbb','fa-circle',s];
+    return `<span style="background:${c}22;color:${c};border:1px solid ${c}44;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;display:inline-flex;align-items:center;gap:4px"><i class="fas ${ic}" style="font-size:9px"></i>${lb}</span>`;
+  };
+
+  if(!_myUserListings.length){
+    area.innerHTML=`<div class="ma-info-card" style="text-align:center;padding:48px 20px">
+      <i class="fas fa-building" style="font-size:48px;color:var(--bd);margin-bottom:16px;display:block"></i>
+      <div style="font-size:16px;font-weight:700;color:var(--tx);margin-bottom:8px">ยังไม่มีประกาศ</div>
+      <p style="font-size:13px;color:var(--tx2);margin-bottom:20px">เริ่มลงประกาศทรัพย์ของคุณได้เลย ใช้เพียง 1 Token ต่อ 1 ประกาศ (90 วัน)</p>
+      <button onclick="openUserListingModal()" style="background:var(--p);color:#fff;border:none;border-radius:10px;padding:11px 24px;font-size:14px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:8px">
+        <i class="fas fa-plus"></i> ลงประกาศแรกของคุณ
+      </button>
+    </div>`;
+    return;
+  }
+
+  const html = _myUserListings.map(ul=>{
+    const photo=(ul.photos||[])[0]||'';
+    const priceStr=ul.price>=1e6?(ul.price/1e6).toFixed(1)+'M':(ul.price||0).toLocaleString();
+    const txLabel=ul.transaction==='RENT'?'ให้เช่า':'ขาย';
+    const exp=ul.expires_at?new Date(ul.expires_at).toLocaleDateString('th-TH'):'';
+    return `<div class="ma-listing-card">
+      ${photo?`<img class="ma-listing-card-img" src="${photo}" alt="listing" loading="lazy">`:`<div class="ma-listing-card-img-placeholder">🏠</div>`}
+      <div class="ma-listing-card-body">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px">
+          <div class="ma-listing-card-title">${sanitize(ul.title)}</div>
+          ${statusBadge(ul.status)}
+        </div>
+        <div class="ma-listing-card-price">฿${priceStr} ${txLabel==='ให้เช่า'?'<span style="font-size:12px;font-weight:500;color:var(--tx2)">/เดือน</span>':''}</div>
+        <div class="ma-listing-card-meta">
+          <span class="ma-listing-card-tag"><i class="fas fa-tag" style="color:#c8922a"></i>${sanitize(ul.property_type)}</span>
+          <span class="ma-listing-card-tag"><i class="fas fa-map-marker-alt" style="color:#e74c3c"></i>${sanitize(ul.province||ul.location||'')}</span>
+          <span class="ma-listing-card-tag"><i class="fas fa-calendar" style="color:var(--p)"></i>${new Date(ul.created_at).toLocaleDateString('th-TH')}</span>
+          ${exp?`<span class="ma-listing-card-tag"><i class="fas fa-hourglass-end" style="color:#e74c3c"></i>หมดอายุ ${exp}</span>`:''}
+        </div>
+        ${ul.admin_note?`<div style="font-size:11px;color:#e74c3c;margin-top:8px;padding:6px 10px;background:#e74c3c11;border-radius:6px"><i class="fas fa-comment"></i> ${sanitize(ul.admin_note)}</div>`:''}
+        ${ul.status==='อนุมัติ'&&ul.property_id?`<button onclick="openModal('${ul.property_id}')" style="margin-top:10px;font-size:12px;padding:6px 14px;background:var(--p);color:#fff;border:none;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:5px"><i class="fas fa-eye"></i> ดูประกาศ</button>`:''}
+      </div>
+    </div>`;
+  }).join('');
+
+  area.innerHTML=`
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+      <div style="font-size:16px;font-weight:700;color:var(--tx)"><i class="fas fa-building" style="color:var(--p);margin-right:6px"></i>ประกาศของฉัน <span style="font-size:13px;color:var(--tx2);font-weight:500">(${_myUserListings.length} รายการ)</span></div>
+      <button onclick="openUserListingModal()" ${_tokenBalance<1?'disabled style="opacity:.5;cursor:not-allowed"':''} style="background:var(--p);color:#fff;border:none;border-radius:10px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px">
+        <i class="fas fa-plus"></i> ลงประกาศใหม่
+      </button>
+    </div>
+    ${html}`;
+}
+
+
 function _maSelectRole(role){
   const roleInput = document.getElementById('ma-role');
   const ownerLabel = document.getElementById('role-owner-label');
@@ -7968,23 +8263,9 @@ function _maSelectRole(role){
 
 
 function _maScrollToPhotoSection(){
-  // Switch to profile tab first
   const profileTab = document.querySelector('.ma-tab[data-tab="profile"]');
   if(profileTab) profileTab.click();
-  setTimeout(()=>{
-    // Enable edit mode if not already
-    const editBtn = document.getElementById('ma-edit-profile-btn');
-    const actionBtns = document.getElementById('ma-profile-action-btns');
-    const isEditing = actionBtns && actionBtns.style.display !== 'none';
-    if(!isEditing) _maToggleProfileEdit(true);
-    // Scroll to avatar section
-    const avatarSection = document.getElementById('ma-avatar-section');
-    if(avatarSection){
-      avatarSection.scrollIntoView({behavior:'smooth', block:'center'});
-      avatarSection.style.border='1.5px solid var(--p)';
-      setTimeout(()=>{ avatarSection.style.border='1px solid var(--bd)'; }, 1500);
-    }
-  }, 100);
+  setTimeout(()=>{ _maOpenEditModal(); }, 120);
 }
 
 async function _maSaveProfile(){
