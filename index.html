@@ -2276,7 +2276,23 @@ footer::after{
 /* My Account page */
 .my-account-wrap{max-width:860px;margin:0 auto;padding:32px 16px 60px}
 .ma-hero{background:linear-gradient(135deg,var(--p) 0%,#2a5298 60%,#1a7a4a 100%);border-radius:20px;padding:32px 28px;margin-bottom:28px;color:#fff;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
-.ma-av-ring{width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,.18);border:3px solid rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:700;flex-shrink:0;color:#fff}
+.ma-av-ring{width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,.18);border:3px solid rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:700;flex-shrink:0;color:#fff;position:relative;overflow:hidden}
+.ma-av-ring img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.ma-av-edit-overlay{position:absolute;inset:0;background:rgba(0,0,0,.45);border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;transition:.2s;cursor:pointer;font-size:11px;font-weight:600;gap:2px}
+.ma-av-ring:hover .ma-av-edit-overlay{opacity:1}
+.ma-av-edit-overlay i{font-size:16px}
+.ma-avatar-section{background:var(--card);border-radius:14px;padding:16px;margin-bottom:12px;border:1px solid var(--bd)}
+.ma-avatar-preview-wrap{display:flex;align-items:center;gap:16px;margin-bottom:12px}
+.ma-avatar-preview{width:72px;height:72px;border-radius:50%;border:3px solid var(--p);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;color:#fff;background:var(--p);flex-shrink:0;overflow:hidden}
+.ma-avatar-preview img{width:100%;height:100%;object-fit:cover}
+.ma-avatar-upload-area{border:2px dashed var(--bd);border-radius:10px;padding:14px;text-align:center;cursor:pointer;transition:.2s;margin-bottom:8px}
+.ma-avatar-upload-area:hover{border-color:var(--p);background:rgba(var(--p-rgb),.04)}
+.ma-avatar-upload-area i{font-size:22px;color:var(--p);margin-bottom:6px;display:block}
+.ma-avatar-upload-area p{font-size:12px;color:var(--tx2);margin:0}
+.ma-terms-box{background:rgba(var(--p-rgb),.06);border:1.5px solid var(--p);border-radius:10px;padding:12px 14px;margin:14px 0;display:flex;align-items:flex-start;gap:10px}
+.ma-terms-box input[type=checkbox]{width:17px;height:17px;flex-shrink:0;accent-color:var(--p);margin-top:2px;cursor:pointer}
+.ma-terms-box label{font-size:13px;color:var(--tx);line-height:1.5;cursor:pointer}
+.ma-terms-box a{color:var(--p);text-decoration:underline}
 .ma-hero-info{flex:1;min-width:0}
 .ma-hero-name{font-size:22px;font-weight:700;margin-bottom:4px}
 .ma-hero-email{font-size:13px;opacity:.8;margin-bottom:12px;word-break:break-all}
@@ -6054,7 +6070,7 @@ function renderMyAccount(){
   wrap.innerHTML = `
   ${devBanner}
   <div class="ma-hero">
-    <div class="ma-av-ring">${init}</div>
+    <div class="ma-av-ring" onclick="_maScrollToPhotoSection()" title="แก้ไขรูปโปรไฟล์" style="cursor:pointer">${_meta.avatar_url?`<img src="${sanitize(_meta.avatar_url)}" alt="avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:`<span>${init}</span>`}<div class="ma-av-edit-overlay"><i class="fas fa-camera"></i><span>แก้ไขรูป</span></div></div>
     <div class="ma-hero-info">
       <div class="ma-hero-name">${dispName}</div>
       <div class="ma-hero-email">${email}</div>
@@ -6078,6 +6094,25 @@ function renderMyAccount(){
           <i class="fas fa-pen"></i> แก้ไขข้อมูลส่วนตัว
         </button>
       </div>
+      <!-- รูปโปรไฟล์ -->
+      <div class="ma-avatar-section" id="ma-avatar-section">
+        <div style="font-size:13px;font-weight:600;margin-bottom:10px;color:var(--tx)"><i class="fas fa-camera" style="color:var(--p);margin-right:6px"></i> รูปโปรไฟล์</div>
+        <div class="ma-avatar-preview-wrap">
+          <div class="ma-avatar-preview" id="ma-avatar-preview">${_meta.avatar_url?`<img src="${sanitize(_meta.avatar_url)}" id="ma-avatar-preview-img" alt="avatar">`:`<span id="ma-avatar-preview-initials">${init}</span>`}</div>
+          <div style="flex:1">
+            <div style="font-size:12px;color:var(--tx2);margin-bottom:8px">อัปโหลดรูปหรือใส่ URL รูปภาพ</div>
+            <label for="ma-avatar-file" style="display:inline-flex;align-items:center;gap:6px;background:var(--p);color:#fff;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;margin-bottom:6px">
+              <i class="fas fa-upload"></i> เลือกรูปภาพ
+            </label>
+            <input type="file" id="ma-avatar-file" accept="image/*" style="display:none" onchange="_maPreviewAvatarFile(event)" disabled>
+          </div>
+        </div>
+        <div class="ma-field" style="margin-top:4px">
+          <label style="font-size:12px">หรือใส่ URL รูปภาพ</label>
+          <input type="url" id="ma-avatar-url" value="${sanitize(_meta.avatar_url||'')}" placeholder="https://example.com/photo.jpg" disabled style="background:var(--lt);color:var(--gr);cursor:default" oninput="_maPreviewAvatarUrl(this.value)">
+        </div>
+      </div>
+      <!-- ข้อมูลทั่วไป -->
       <div class="ma-field">
         <label>${sanitize(t('ma.profile.name'))}</label>
         <input type="text" id="ma-display-name" value="${dispName}" placeholder="${sanitize(t('ma.profile.name'))}">
@@ -6094,8 +6129,15 @@ function renderMyAccount(){
         <label>${sanitize(t('ma.profile.line'))}</label>
         <input type="text" id="ma-line-id" value="${sanitize(_meta.line_id||'')}" placeholder="@yourlineid">
       </div>
+      <!-- ยอมรับข้อกำหนด -->
+      <div class="ma-terms-box" id="ma-terms-box" style="display:none">
+        <input type="checkbox" id="ma-terms-accept" onchange="_maOnTermsChange()">
+        <label for="ma-terms-accept">
+          ฉันยืนยันว่าข้อมูลที่กรอกถูกต้อง และยอมรับ <a href="#" onclick="return false" style="color:var(--p)">ข้อกำหนดการใช้งาน</a> และ <a href="#" onclick="return false" style="color:var(--p)">นโยบายความเป็นส่วนตัว</a> ของ Matchdoor
+        </label>
+      </div>
       <div id="ma-profile-action-btns" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px">
-        <button class="ma-save-btn" onclick="${isDevMode?'alert(\"Dev mode: บันทึกจริงไม่ได้ ต้อง Login ก่อนครับ 🙏\")':'_maSaveProfile()'}">
+        <button class="ma-save-btn" id="ma-save-profile-btn" onclick="${isDevMode?'alert(\"Dev mode: บันทึกจริงไม่ได้ ต้อง Login ก่อนครับ 🙏\")':'_maSaveProfile()'}" disabled style="opacity:.5;cursor:not-allowed">
           <i class="fas fa-save"></i> ${sanitize(t('ma.profile.save'))}${isDevMode?' (Dev)':''}
         </button>
         ${!isDevMode?`<button class="ma-logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> ${sanitize(t('ma.profile.logout'))}</button>`:''}
@@ -7490,6 +7532,11 @@ function _maToggleProfileEdit(editing){
   const editBtn = document.getElementById('ma-edit-profile-btn');
   const pwInputs = [document.getElementById('ma-new-pw'), document.getElementById('ma-new-pw2')];
   const pwSaveBtn = document.getElementById('ma-pw-save-btn');
+  const avatarUrlField = document.getElementById('ma-avatar-url');
+  const avatarFileInput = document.getElementById('ma-avatar-file');
+  const termsBox = document.getElementById('ma-terms-box');
+  const termsCheck = document.getElementById('ma-terms-accept');
+  const saveBtn = document.getElementById('ma-save-profile-btn');
 
   if(editing){
     // Unlock profile fields
@@ -7497,6 +7544,14 @@ function _maToggleProfileEdit(editing){
       const el = document.getElementById(id);
       if(el){ el.disabled=false; el.style.background=''; el.style.color=''; el.style.cursor=''; }
     });
+    // Unlock avatar fields
+    if(avatarUrlField){ avatarUrlField.disabled=false; avatarUrlField.style.background=''; avatarUrlField.style.color=''; avatarUrlField.style.cursor=''; }
+    if(avatarFileInput){ avatarFileInput.disabled=false; }
+    // Show terms checkbox (reset)
+    if(termsBox){ termsBox.style.display='flex'; }
+    if(termsCheck){ termsCheck.checked=false; }
+    // Keep save button disabled until terms accepted
+    if(saveBtn){ saveBtn.disabled=true; saveBtn.style.opacity='.5'; saveBtn.style.cursor='not-allowed'; }
     // Show save/logout buttons
     if(actionBtns) actionBtns.style.display='flex';
     // Hide edit button
@@ -7510,6 +7565,14 @@ function _maToggleProfileEdit(editing){
       const el = document.getElementById(id);
       if(el){ el.disabled=true; el.style.background='var(--lt)'; el.style.color='var(--gr)'; el.style.cursor='default'; }
     });
+    // Lock avatar fields
+    if(avatarUrlField){ avatarUrlField.disabled=true; avatarUrlField.style.background='var(--lt)'; avatarUrlField.style.color='var(--gr)'; avatarUrlField.style.cursor='default'; }
+    if(avatarFileInput){ avatarFileInput.disabled=true; }
+    // Hide terms box
+    if(termsBox){ termsBox.style.display='none'; }
+    if(termsCheck){ termsCheck.checked=false; }
+    // Reset save btn
+    if(saveBtn){ saveBtn.disabled=true; saveBtn.style.opacity='.5'; saveBtn.style.cursor='not-allowed'; }
     // Hide save buttons, show edit button
     if(actionBtns) actionBtns.style.display='none';
     if(editBtn){ editBtn.style.display='inline-flex'; }
@@ -7528,30 +7591,100 @@ function _maInitProfileLockState(){
   if(editBtn) editBtn.style.display='inline-flex';
 }
 
+/* ── Preview avatar from file upload ── */
+function _maPreviewAvatarFile(event){
+  const file = event.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    const url = e.target.result;
+    _maUpdateAvatarPreview(url);
+    const urlField = document.getElementById('ma-avatar-url');
+    if(urlField) urlField.value = url;
+  };
+  reader.readAsDataURL(file);
+}
+
+/* ── Preview avatar from URL input ── */
+function _maPreviewAvatarUrl(url){
+  if(!url) return;
+  _maUpdateAvatarPreview(url);
+}
+
+/* ── Update avatar preview element ── */
+function _maUpdateAvatarPreview(url){
+  const preview = document.getElementById('ma-avatar-preview');
+  if(!preview) return;
+  if(url){
+    preview.innerHTML = `<img src="${url}" alt="avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%" onerror="this.parentElement.innerHTML='<span style=\\'font-size:26px\\'>👤</span>'">`;
+  }
+}
+
+/* ── Enable/disable save button based on terms checkbox ── */
+function _maOnTermsChange(){
+  const checked = document.getElementById('ma-terms-accept')?.checked;
+  const btn = document.getElementById('ma-save-profile-btn');
+  if(!btn) return;
+  if(checked){
+    btn.disabled=false;
+    btn.style.opacity='1';
+    btn.style.cursor='pointer';
+  } else {
+    btn.disabled=true;
+    btn.style.opacity='.5';
+    btn.style.cursor='not-allowed';
+  }
+}
+
+/* ── Scroll to photo section (called from hero avatar click) ── */
+function _maScrollToPhotoSection(){
+  // Switch to profile tab first
+  const profileTab = document.querySelector('.ma-tab[data-tab="profile"]');
+  if(profileTab) profileTab.click();
+  setTimeout(()=>{
+    // Enable edit mode if not already
+    const editBtn = document.getElementById('ma-edit-profile-btn');
+    const actionBtns = document.getElementById('ma-profile-action-btns');
+    const isEditing = actionBtns && actionBtns.style.display !== 'none';
+    if(!isEditing) _maToggleProfileEdit(true);
+    // Scroll to avatar section
+    const avatarSection = document.getElementById('ma-avatar-section');
+    if(avatarSection){
+      avatarSection.scrollIntoView({behavior:'smooth', block:'center'});
+      avatarSection.style.border='1.5px solid var(--p)';
+      setTimeout(()=>{ avatarSection.style.border='1px solid var(--bd)'; }, 1500);
+    }
+  }, 100);
+}
+
 async function _maSaveProfile(){
   if(!user||!sb) return;
-  const name   = document.getElementById('ma-display-name')?.value.trim()||'';
-  const phone  = document.getElementById('ma-phone')?.value.trim()||'';
-  const lineId = document.getElementById('ma-line-id')?.value.trim()||'';
-  const btn = document.querySelector('#ma-panel-profile .ma-save-btn');
+  const name     = document.getElementById('ma-display-name')?.value.trim()||'';
+  const phone    = document.getElementById('ma-phone')?.value.trim()||'';
+  const lineId   = document.getElementById('ma-line-id')?.value.trim()||'';
+  const avatarUrl= document.getElementById('ma-avatar-url')?.value.trim()||'';
+  const termsCheck = document.getElementById('ma-terms-accept');
+  if(termsCheck && !termsCheck.checked){ toast('กรุณายอมรับข้อกำหนดและเงื่อนไขก่อนบันทึก',true); return; }
+  const btn = document.getElementById('ma-save-profile-btn') || document.querySelector('#ma-panel-profile .ma-save-btn');
   if(btn){btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i>';}
 
   // 1) อัปเดต auth.users metadata (เดิม) — trigger DB จะ sync user_profiles อัตโนมัติ
-  const {error} = await sb.auth.updateUser({data:{display_name:name,phone,line_id:lineId}});
+  const metaPayload = {display_name:name,phone,line_id:lineId};
+  if(avatarUrl) metaPayload.avatar_url = avatarUrl;
+  const {error} = await sb.auth.updateUser({data:metaPayload});
   if(error){
-    if(btn){btn.disabled=false;btn.innerHTML=`<i class="fas fa-save"></i> ${ui('ma.profile.save')||'บันทึก'}`;}
+    if(btn){btn.disabled=false;btn.innerHTML=`<i class="fas fa-save"></i> ${ui('ma.profile.save')||'บันทึก'}`;btn.style.opacity='1';btn.style.cursor='pointer';}
     toast('เกิดข้อผิดพลาด: '+error.message,true); return;
   }
 
   // 2) upsert ลง user_profiles โดยตรง (รองรับกรณี trigger ยังไม่ทำงาน)
   try {
-    await sb.from('user_profiles').upsert(
-      { user_id: user.id, display_name: name, phone, line_id: lineId, updated_at: new Date().toISOString() },
-      { onConflict: 'user_id' }
-    );
+    const profilePayload = { user_id: user.id, display_name: name, phone, line_id: lineId, updated_at: new Date().toISOString() };
+    if(avatarUrl) profilePayload.avatar_url = avatarUrl;
+    await sb.from('user_profiles').upsert(profilePayload, { onConflict: 'user_id' });
   } catch(e){ /* silent — trigger จะ sync ให้เองอยู่แล้ว */ }
 
-  if(btn){btn.disabled=false;btn.innerHTML=`<i class="fas fa-save"></i> ${ui('ma.profile.save')||'บันทึก'}`;}
+  if(btn){btn.disabled=false;btn.innerHTML=`<i class="fas fa-save"></i> ${ui('ma.profile.save')||'บันทึก'}`;btn.style.opacity='1';btn.style.cursor='pointer';}
   toast('บันทึกข้อมูลสำเร็จ ✅');
   await checkAuth();
   renderMyAccount();
