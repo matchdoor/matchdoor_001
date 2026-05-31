@@ -22233,7 +22233,7 @@ function resetAdvFilter(){
     <div class="pdp-breadcrumb-inner" id="pdp-breadcrumb-inner">
       <a href="/" onclick="event.preventDefault();showPage('home')">หน้าแรก</a>
       <span class="pdp-breadcrumb-sep">›</span>
-      <a href="/listings" onclick="event.preventDefault();showPage('listings')">ประกาศทั้งหมด</a>
+      <a href="/listings" onclick="event.preventDefault();openAllModal('all')">ประกาศทั้งหมด</a>
       <span class="pdp-breadcrumb-sep">›</span>
       <span class="pdp-breadcrumb-current" id="pdp-bc-type">คอนโด</span>
       <span class="pdp-breadcrumb-sep">›</span>
@@ -22428,18 +22428,6 @@ function resetAdvFilter(){
         </a>
       </div>
     </section>
-
-    <!-- SEO Internal Link Footer -->
-    <div class="pdp-seo-links">
-      <div class="pdp-seo-links-inner">
-        <h2>ค้นหาอสังหาริมทรัพย์ตามประเภท</h2>
-        <div class="pdp-seo-link-group" id="pdp-seo-type-links"></div>
-        <h2>ค้นหาตามทำเล</h2>
-        <div class="pdp-seo-link-group" id="pdp-seo-loc-links"></div>
-        <h2>ค้นหาใกล้รถไฟฟ้า</h2>
-        <div class="pdp-seo-link-group" id="pdp-seo-transit-links"></div>
-      </div>
-    </div>
 
   </article>
 
@@ -25177,12 +25165,22 @@ async function adminDeletePortfolio(id, title){
     }
     var state = history.state;
     var prevPage = (state && state._prevPage) ? state._prevPage : null;
-    if (prevPage && prevPage !== 'property') {
+    if (prevPage === 'listings') {
+      // กลับไปหน้า home แล้วเปิด popup ประกาศทั้งหมด
+      if (typeof showPage === 'function') showPage('home');
+      setTimeout(function() {
+        if (typeof openAllModal === 'function') openAllModal('all');
+      }, 60);
+    } else if (prevPage && prevPage !== 'property') {
       if (typeof showPage === 'function') showPage(prevPage);
     } else if (history.length > 1) {
       history.back();
     } else {
-      if (typeof showPage === 'function') showPage('listings');
+      // fallback: ไปหน้า home แล้วเปิด popup
+      if (typeof showPage === 'function') showPage('home');
+      setTimeout(function() {
+        if (typeof openAllModal === 'function') openAllModal('all');
+      }, 60);
     }
   };
 
