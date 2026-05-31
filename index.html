@@ -12608,6 +12608,15 @@ function showPage(name, propId){
     // ── Render PDP — always call even if _pdpPropUrl not yet ready ──
     if (typeof pdpShowPage === 'function' && propId) pdpShowPage(propId);
     if (typeof closeAllDD === 'function') closeAllDD();
+    // ── ปิด all-modal (popup ดูทั้งหมด) เมื่อเปิด PDP ──
+    var _allMod = document.getElementById('all-modal');
+    if (_allMod && _allMod.classList.contains('open')) {
+      _allMod.classList.remove('open');
+      window._modalCurrentType = null;
+      window._allModalParentType = null;
+      document.body.classList.remove('modal-open');
+      document.body.style.removeProperty('overflow');
+    }
     // Close hamburger
     var nav = document.getElementById('nav-links'), hb = document.getElementById('hamburger');
     if(nav) nav.classList.remove('mob-open');
@@ -22427,7 +22436,7 @@ function resetAdvFilter(){
       <div class="pdp-related-grid" id="pdp-related-grid"></div>
       <div style="text-align:center;margin-top:20px">
         <a href="/listings" class="pdp-cta-btn pdp-cta-share"
-           onclick="event.preventDefault();showPage('home');setTimeout(function(){openAllModal('all');},60)"
+           onclick="event.preventDefault();window.scrollTo({top:0,behavior:'smooth'});setTimeout(function(){openAllModal('all');},400)"
            style="display:inline-flex;padding:11px 28px">
           <i class="fas fa-search"></i> ดูประกาศทั้งหมด
         </a>
