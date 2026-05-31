@@ -4779,6 +4779,378 @@ footer::after{
   font-family: inherit;
   text-decoration: none;
 }
+
+/* ═══════════════════════════════════════════════════════
+   REVIEW SYSTEM — Matchdoor
+   ═══════════════════════════════════════════════════════ */
+
+/* ── Review Section wrapper (PDP & Agent Modal) ── */
+.rv-section {
+  background: #fff;
+  border-radius: 16px;
+  border: 1.5px solid var(--bd, #D8D0C4);
+  padding: 24px;
+  margin-bottom: 20px;
+}
+.rv-section-title {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--p, #1B3A6B);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 18px;
+  padding-bottom: 12px;
+  border-bottom: 1.5px solid var(--lt, #EEE8DF);
+}
+.rv-section-title::before {
+  content: '';
+  width: 4px;
+  height: 20px;
+  background: linear-gradient(to bottom, var(--a, #C8922A), var(--p, #1B3A6B));
+  border-radius: 2px;
+  display: block;
+  flex-shrink: 0;
+}
+
+/* ── Summary Bar ── */
+.rv-summary {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: linear-gradient(135deg, #f8f5f0, #faf7f2);
+  border-radius: 14px;
+  padding: 18px 20px;
+  margin-bottom: 20px;
+  border: 1px solid var(--bd, #D8D0C4);
+}
+.rv-avg-big {
+  font-size: 46px;
+  font-weight: 900;
+  color: var(--p, #1B3A6B);
+  line-height: 1;
+  flex-shrink: 0;
+}
+.rv-summary-right { flex: 1; min-width: 0; }
+.rv-stars-big { display: flex; gap: 4px; margin-bottom: 5px; }
+.rv-stars-big i { font-size: 20px; color: #d0c8be; }
+.rv-stars-big i.lit { color: #e8a500; }
+.rv-count-lbl {
+  font-size: 12px;
+  color: var(--gr, #888);
+  font-weight: 600;
+}
+.rv-bars { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 0; }
+.rv-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  color: var(--gr, #888);
+}
+.rv-bar-track {
+  flex: 1;
+  height: 6px;
+  background: #e8e3dc;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.rv-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--a, #C8922A), #e8b84b);
+  border-radius: 3px;
+  transition: width .6s cubic-bezier(.4,0,.2,1);
+}
+.rv-bar-n { width: 20px; text-align: right; font-weight: 700; color: var(--tx, #1A1A2E); }
+
+/* ── Review Cards ── */
+.rv-list { display: flex; flex-direction: column; gap: 14px; }
+.rv-card {
+  background: var(--bg, #FAF7F2);
+  border-radius: 13px;
+  padding: 16px;
+  border: 1px solid var(--bd, #D8D0C4);
+  position: relative;
+  transition: box-shadow .2s;
+}
+.rv-card:hover { box-shadow: 0 4px 16px rgba(27,58,107,.08); }
+.rv-card-hd {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.rv-av {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--p, #1B3A6B), #2a5298);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 800;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.rv-av img { width: 100%; height: 100%; object-fit: cover; }
+.rv-meta { flex: 1; min-width: 0; }
+.rv-author {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--tx, #1A1A2E);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rv-date { font-size: 11px; color: var(--gr, #888); margin-top: 2px; }
+.rv-stars { display: flex; gap: 3px; }
+.rv-stars i { font-size: 13px; color: #d0c8be; }
+.rv-stars i.lit { color: #e8a500; }
+.rv-type-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 20px;
+  background: var(--pastel3, #E0EAF7);
+  color: var(--p, #1B3A6B);
+  flex-shrink: 0;
+}
+.rv-type-badge.rv-type-agent { background: #E8F5E9; color: #2E7D32; }
+.rv-body {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--tx2, #555);
+  margin-top: 2px;
+}
+.rv-body.collapsed {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.rv-expand-btn {
+  background: none;
+  border: none;
+  color: var(--a, #C8922A);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 2px 0;
+  font-family: inherit;
+  margin-top: 4px;
+}
+
+/* ── Write Review Form ── */
+.rv-form-wrap {
+  background: linear-gradient(135deg, #f0eae0, #f8f5f0);
+  border-radius: 14px;
+  padding: 20px;
+  margin-top: 18px;
+  border: 1.5px dashed var(--bd, #D8D0C4);
+}
+.rv-form-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--p, #1B3A6B);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.rv-star-pick {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+.rv-star-pick i {
+  font-size: 28px;
+  color: #d0c8be;
+  cursor: pointer;
+  transition: color .15s, transform .15s;
+}
+.rv-star-pick i.lit { color: #e8a500; }
+.rv-star-pick i:hover { transform: scale(1.2); }
+.rv-textarea {
+  width: 100%;
+  min-height: 90px;
+  border: 1.5px solid var(--bd, #D8D0C4);
+  border-radius: 10px;
+  padding: 11px 13px;
+  font-size: 13px;
+  font-family: inherit;
+  resize: vertical;
+  color: var(--tx, #1A1A2E);
+  background: #fff;
+  box-sizing: border-box;
+  line-height: 1.6;
+  transition: border-color .2s;
+}
+.rv-textarea:focus { outline: none; border-color: var(--p, #1B3A6B); }
+.rv-submit-btn {
+  margin-top: 12px;
+  background: linear-gradient(135deg, var(--p, #1B3A6B), #2a5298);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 11px 24px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: opacity .2s;
+}
+.rv-submit-btn:hover { opacity: .88; }
+.rv-submit-btn:disabled { opacity: .5; cursor: not-allowed; }
+.rv-login-prompt {
+  text-align: center;
+  padding: 16px;
+  color: var(--gr, #888);
+  font-size: 13px;
+}
+.rv-login-prompt button {
+  background: var(--p, #1B3A6B);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 9px 20px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  margin-top: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.rv-empty {
+  text-align: center;
+  padding: 28px 16px;
+  color: var(--gr, #888);
+  font-size: 13px;
+}
+.rv-empty i { font-size: 36px; display: block; margin-bottom: 8px; color: #d0c8be; }
+.rv-load-more {
+  width: 100%;
+  background: none;
+  border: 1.5px solid var(--bd, #D8D0C4);
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--p, #1B3A6B);
+  cursor: pointer;
+  font-family: inherit;
+  margin-top: 14px;
+  transition: background .2s;
+}
+.rv-load-more:hover { background: var(--lt, #EEE8DF); }
+
+/* ── Home Reviews Section ── */
+#reviews-sec {
+  padding: 36px 0 32px;
+  background: linear-gradient(135deg, #f8f5f0, #faf7f2);
+}
+.rv-home-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+.rv-home-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  border: 1.5px solid var(--bd, #D8D0C4);
+  box-shadow: 0 2px 12px rgba(27,58,107,.06);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: transform .2s, box-shadow .2s;
+}
+.rv-home-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 28px rgba(27,58,107,.12);
+}
+.rv-home-card-hd { display: flex; align-items: center; gap: 12px; }
+.rv-home-meta { flex: 1; min-width: 0; }
+.rv-home-author {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--tx, #1A1A2E);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rv-home-sub {
+  font-size: 11px;
+  color: var(--gr, #888);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rv-home-body {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--tx2, #555);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.rv-home-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--gr, #888);
+  border-top: 1px solid var(--lt, #EEE8DF);
+  padding-top: 10px;
+  margin-top: 2px;
+}
+.rv-home-target {
+  font-weight: 700;
+  color: var(--p, #1B3A6B);
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 55%;
+}
+.rv-home-stats {
+  display: flex;
+  gap: 16px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 14px 18px;
+  border: 1.5px solid var(--bd, #D8D0C4);
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+.rv-stat-item { text-align: center; flex: 1; min-width: 80px; }
+.rv-stat-val {
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--p, #1B3A6B);
+  line-height: 1;
+  display: block;
+}
+.rv-stat-lbl {
+  font-size: 11px;
+  color: var(--gr, #888);
+  margin-top: 4px;
+  font-weight: 600;
+}
+@media (max-width: 640px) {
+  .rv-summary { flex-direction: column; gap: 14px; }
+  .rv-avg-big { font-size: 36px; }
+  .rv-home-grid { grid-template-columns: 1fr; }
+}
 </style>
 </head>
 <body>
@@ -5389,6 +5761,43 @@ footer::after{
     </div>
   </div>
 </section>
+
+<!-- ═══ REVIEWS SECTION (หน้าหลัก) ═══ -->
+<section id="reviews-sec">
+  <div style="max-width:1320px;margin:0 auto;padding:0 20px">
+    <div class="sec-hd">
+      <div class="sec-title">
+        <i class="fas fa-star" style="color:var(--a)"></i>
+        <span>รีวิวจากลูกค้าจริง</span>
+      </div>
+      <span class="view-all" onclick="rvShowAll()">ดูทั้งหมด →</span>
+    </div>
+    <!-- Stats bar -->
+    <div class="rv-home-stats" id="rv-home-stats">
+      <div class="rv-stat-item">
+        <span class="rv-stat-val" id="rv-stat-total">—</span>
+        <span class="rv-stat-lbl">รีวิวทั้งหมด</span>
+      </div>
+      <div class="rv-stat-item">
+        <span class="rv-stat-val" id="rv-stat-avg">—</span>
+        <span class="rv-stat-lbl">คะแนนเฉลี่ย</span>
+      </div>
+      <div class="rv-stat-item">
+        <span class="rv-stat-val" id="rv-stat-prop">—</span>
+        <span class="rv-stat-lbl">รีวิวทรัพย์</span>
+      </div>
+      <div class="rv-stat-item">
+        <span class="rv-stat-val" id="rv-stat-agent">—</span>
+        <span class="rv-stat-lbl">รีวิวตัวแทน</span>
+      </div>
+    </div>
+    <!-- Review cards grid -->
+    <div class="rv-home-grid" id="rv-home-grid">
+      <div class="rv-empty"><i class="fas fa-star"></i> กำลังโหลดรีวิว...</div>
+    </div>
+  </div>
+</section>
+
  <section class="blog-sec" id="blog-sec" style="padding:32px 0 28px">
   <div style="max-width:1320px;margin:0 auto;padding:0 20px">
     <div class="sec-hd">
@@ -7787,6 +8196,32 @@ function _popupRefreshMarkersFromData(data){
 <div class="ov" id="srv-modal" onclick="if(event.target===this)_closeModal('srv-modal')"><div class="modal"><div class="mhd"><h2 id="srv-title2"></h2><span class="mclose" onclick="_closeModal('srv-modal')">×</span></div><div class="mbody" id="srv-body"></div></div></div>
 <div class="ov" id="blog-modal" onclick="if(event.target===this)_closeModal('blog-modal')"><div class="modal"><div class="mhd"><h2 id="blog-title"></h2><span class="mclose" onclick="_closeModal('blog-modal')">×</span></div><div class="mbody" id="blog-body"></div></div></div>
 <div class="ov" id="port-modal" onclick="if(event.target===this)_closeModal('port-modal')"><div class="modal"><div class="mhd"><h2 id="port-title"></h2><span class="mclose" onclick="_closeModal('port-modal')">×</span></div><div class="mbody" id="port-body"></div></div></div>
+
+<!-- Reviews All Modal -->
+<div class="ov" id="reviews-all-modal" onclick="if(event.target===this)_closeModal('reviews-all-modal')">
+  <div class="modal" style="max-width:780px;width:95vw;max-height:92vh;display:flex;flex-direction:column;padding:0;overflow:hidden">
+    <div class="mhd" style="flex-shrink:0">
+      <h2><i class="fas fa-star" style="color:var(--a);margin-right:6px"></i> รีวิวทั้งหมด</h2>
+      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+        <select id="rv-all-filter-type" onchange="rvRenderAll()" style="padding:6px 10px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;font-family:inherit;color:var(--p)">
+          <option value="">ทุกประเภท</option>
+          <option value="property">ทรัพย์</option>
+          <option value="agent">ตัวแทน</option>
+        </select>
+        <select id="rv-all-filter-stars" onchange="rvRenderAll()" style="padding:6px 10px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;font-family:inherit;color:var(--p)">
+          <option value="">ทุกดาว</option>
+          <option value="5">5 ดาว</option>
+          <option value="4">4 ดาว</option>
+          <option value="3">3 ดาว</option>
+          <option value="2">2 ดาว</option>
+          <option value="1">1 ดาว</option>
+        </select>
+        <span class="mclose" onclick="_closeModal('reviews-all-modal')">×</span>
+      </div>
+    </div>
+    <div class="mbody" id="rv-all-body" style="overflow-y:auto;flex:1;padding:20px;-webkit-overflow-scrolling:touch"></div>
+  </div>
+</div>
 <div class="ov" id="ag-modal" onclick="if(event.target===this)_closeModal('ag-modal')">
   <div class="modal" style="max-width:680px;width:95vw;max-height:92vh;overflow:hidden;display:flex;flex-direction:column;padding:0">
     <!-- Hero Banner -->
@@ -15767,6 +16202,27 @@ function showAgentDetail(a){
     </div>` : `<div style="text-align:center;padding:20px;color:var(--gr);font-size:13px"><i class="fas fa-home" style="font-size:28px;opacity:.3;display:block;margin-bottom:8px"></i>ยังไม่มีทรัพย์ที่ดูแล</div>`;
 
   $('ag-body').innerHTML = bioHtml + contactHtml + propsHtml;
+  // ── Inject Agent Review Section ──
+  const agReviewDiv = document.createElement('div');
+  agReviewDiv.id = 'ag-rv-section';
+  agReviewDiv.style.marginTop = '24px';
+  agReviewDiv.innerHTML = `
+    <div class="rv-section">
+      <div class="rv-section-title">
+        <i class="fas fa-star" style="color:var(--a)"></i>
+        รีวิวตัวแทน
+        <span id="ag-rv-count-badge" style="font-size:12px;font-weight:600;color:var(--gr);margin-left:auto"></span>
+      </div>
+      <div id="ag-rv-summary"></div>
+      <div id="ag-rv-list" class="rv-list"></div>
+      <div id="ag-rv-more-wrap" style="display:none">
+        <button class="rv-load-more" onclick="rvLoadMoreAgent()"><i class="fas fa-chevron-down"></i> ดูรีวิวเพิ่มเติม</button>
+      </div>
+      <div id="ag-rv-form"></div>
+    </div>`;
+  $('ag-body').appendChild(agReviewDiv);
+  // Load agent reviews
+  setTimeout(function(){ rvLoadSection('agent', String(a.id), 'ag-rv'); }, 60);
   _openModal('ag-modal');
 }
 
@@ -22441,6 +22897,27 @@ function resetAdvFilter(){
       </div>
     </section>
 
+    <!-- ── Property Reviews ── -->
+    <section class="pdp-related" id="pdp-reviews-section" style="margin-top:0">
+      <div class="rv-section">
+        <div class="rv-section-title">
+          <i class="fas fa-star" style="color:var(--a)"></i>
+          รีวิวทรัพย์นี้
+          <span id="pdp-rv-count-badge" style="font-size:12px;font-weight:600;color:var(--gr);margin-left:auto"></span>
+        </div>
+        <!-- Summary -->
+        <div id="pdp-rv-summary"></div>
+        <!-- Reviews list -->
+        <div id="pdp-rv-list" class="rv-list"></div>
+        <!-- Load more -->
+        <div id="pdp-rv-more-wrap" style="display:none">
+          <button class="rv-load-more" onclick="rvLoadMoreProp()"><i class="fas fa-chevron-down"></i> ดูรีวิวเพิ่มเติม</button>
+        </div>
+        <!-- Write review form -->
+        <div id="pdp-rv-form"></div>
+      </div>
+    </section>
+
   </article>
 
   <!-- Footer inject point — same pattern as other sub-pages -->
@@ -25222,6 +25699,529 @@ async function adminDeletePortfolio(id, title){
 /* duplicate _initRouteFromUrl patch removed — handled in main router */
 
 /* BLOCK 4+5: propCard & 404.html — see git history for instructions */
+
+/* ═══════════════════════════════════════════════════════════════════════
+   REVIEW SYSTEM — Matchdoor
+   ─────────────────────────────────────────────────────────────────────
+   Storage: Supabase table "reviews" (primary) + localStorage (fallback)
+   Table schema (run once in Supabase SQL editor):
+   ───────────────────────────────────────────────────────────────────────
+   create table if not exists reviews (
+     id         uuid primary key default gen_random_uuid(),
+     type       text not null check(type in ('property','agent')),
+     target_id  text not null,
+     user_id    uuid references auth.users,
+     author     text not null default 'ผู้ใช้익명',
+     avatar_url text,
+     rating     int not null check(rating between 1 and 5),
+     body       text not null,
+     created_at timestamptz default now()
+   );
+   create index if not exists reviews_target on reviews(type, target_id);
+   alter table reviews enable row level security;
+   create policy "read all" on reviews for select using (true);
+   create policy "insert own" on reviews for insert with check (auth.uid() = user_id or user_id is null);
+   ─────────────────────────────────────────────────────────────────────
+   ═══════════════════════════════════════════════════════════════════ */
+
+(function(){
+'use strict';
+
+/* ── In-memory cache ── */
+var _rvCache = {}; // key: "type:targetId" → [{...}]
+var _rvPending = {}; // page cursors
+var _rvCurrentPropId = null;
+var _rvCurrentAgentId = null;
+var _rvAllPage = 0;
+var RV_PAGE_SIZE = 5;
+var RV_HOME_MAX = 9;
+
+/* ── LocalStorage helpers ── */
+function _rvLsKey(type, targetId){ return 'rv:' + type + ':' + targetId; }
+function _rvLsAll(){ return JSON.parse(localStorage.getItem('rv:all') || '[]'); }
+function _rvLsSave(all){ try{ localStorage.setItem('rv:all', JSON.stringify(all)); }catch(e){} }
+
+function _rvLocalGet(type, targetId){
+  try {
+    var all = _rvLsAll();
+    return all.filter(function(r){ return r.type === type && String(r.target_id) === String(targetId); })
+              .sort(function(a,b){ return new Date(b.created_at) - new Date(a.created_at); });
+  } catch(e){ return []; }
+}
+function _rvLocalAdd(review){
+  try {
+    var all = _rvLsAll();
+    review.id = 'ls-' + Date.now() + '-' + Math.random().toString(36).slice(2,6);
+    review.created_at = new Date().toISOString();
+    all.unshift(review);
+    _rvLsSave(all);
+    return review;
+  } catch(e){ return review; }
+}
+
+/* ── Supabase fetch ── */
+async function _rvFetch(type, targetId){
+  var cacheKey = type + ':' + targetId;
+  if(_rvCache[cacheKey]) return _rvCache[cacheKey];
+  // Try Supabase
+  if(typeof sb !== 'undefined' && sb){
+    try {
+      var res = await sb.from('reviews').select('*')
+        .eq('type', type).eq('target_id', String(targetId))
+        .order('created_at', {ascending: false}).limit(200);
+      if(!res.error && res.data){
+        _rvCache[cacheKey] = res.data;
+        return res.data;
+      }
+    } catch(e){ /* fall through to localStorage */ }
+  }
+  // Fallback: localStorage
+  var local = _rvLocalGet(type, targetId);
+  _rvCache[cacheKey] = local;
+  return local;
+}
+
+async function _rvInsert(review){
+  var cacheKey = review.type + ':' + review.target_id;
+  if(typeof sb !== 'undefined' && sb){
+    try {
+      var payload = Object.assign({}, review);
+      var res = await sb.from('reviews').insert(payload).select().single();
+      if(!res.error && res.data){
+        _rvLocalAdd(review); // mirror locally
+        _rvCache[cacheKey] = null; // invalidate cache
+        return res.data;
+      }
+    } catch(e){}
+  }
+  // localStorage only
+  var saved = _rvLocalAdd(review);
+  _rvCache[cacheKey] = null;
+  return saved;
+}
+
+/* ── Render helpers ── */
+function _rvStars(rating, size){
+  size = size || 13;
+  var html = '';
+  for(var i=1;i<=5;i++){
+    html += '<i class="' + (i<=rating?'fas':'far') + ' fa-star' + (i<=rating?' lit':'') + '" style="font-size:'+size+'px"></i>';
+  }
+  return html;
+}
+
+function _rvInitials(name){
+  if(!name) return '?';
+  var parts = String(name).trim().split(/\s+/);
+  if(parts.length >= 2) return (parts[0][0]+(parts[1]||'')[0]||'').toUpperCase();
+  return String(name)[0].toUpperCase();
+}
+
+function _rvAvatar(review){
+  if(review.avatar_url){
+    return '<div class="rv-av"><img src="'+review.avatar_url+'" loading="lazy" onerror="this.parentNode.innerHTML=\''+_rvInitials(review.author)+'\'"></div>';
+  }
+  return '<div class="rv-av" style="background:'+_rvColor(review.author)+'">'+_rvInitials(review.author)+'</div>';
+}
+
+function _rvColor(name){
+  var colors = ['#1B3A6B','#2a5298','#C8922A','#2E7D32','#8B0000','#4A148C','#006064'];
+  var hash = 0;
+  for(var i=0;i<(name||'').length;i++) hash = name.charCodeAt(i) + ((hash<<5)-hash);
+  return colors[Math.abs(hash) % colors.length];
+}
+
+function _rvTimeAgo(dateStr){
+  var diff = (Date.now() - new Date(dateStr).getTime()) / 1000;
+  if(diff < 60) return 'เมื่อสักครู่';
+  if(diff < 3600) return Math.floor(diff/60) + ' นาทีที่แล้ว';
+  if(diff < 86400) return Math.floor(diff/3600) + ' ชั่วโมงที่แล้ว';
+  if(diff < 2592000) return Math.floor(diff/86400) + ' วันที่แล้ว';
+  if(diff < 31536000) return Math.floor(diff/2592000) + ' เดือนที่แล้ว';
+  return Math.floor(diff/31536000) + ' ปีที่แล้ว';
+}
+
+function _rvCardHtml(r, showTarget){
+  var id = 'rv-' + (r.id||'x').toString().replace(/[^a-z0-9]/gi,'');
+  var targetName = '';
+  if(showTarget){
+    if(r.type === 'property'){
+      var p = (typeof props !== 'undefined') ? props.find(function(x){ return String(x.id)===String(r.target_id); }) : null;
+      targetName = p ? p.title : 'ทรัพย์';
+    } else {
+      var ag = (typeof agents !== 'undefined') ? agents.find(function(x){ return String(x.id)===String(r.target_id); }) : null;
+      targetName = ag ? ag.name : 'ตัวแทน';
+    }
+  }
+  return '<div class="rv-card" id="'+id+'">' +
+    '<div class="rv-card-hd">' +
+      _rvAvatar(r) +
+      '<div class="rv-meta">' +
+        '<div class="rv-author">' + (r.author||'ผู้ใช้') + '</div>' +
+        '<div class="rv-date">' + _rvTimeAgo(r.created_at) + '</div>' +
+        '<div class="rv-stars" style="margin-top:4px">' + _rvStars(r.rating, 13) + '</div>' +
+      '</div>' +
+      (showTarget ? '<span class="rv-type-badge'+(r.type==='agent'?' rv-type-agent':'')+'">'+
+        (r.type==='property'?'<i class="fas fa-home"></i>':'<i class="fas fa-user-tie"></i>')+'</span>' : '') +
+    '</div>' +
+    '<div class="rv-body collapsed" id="'+id+'-body">' + (r.body||'') + '</div>' +
+    '<button class="rv-expand-btn" id="'+id+'-btn" onclick="rvToggleBody(\''+id+'\')"><i class="fas fa-chevron-down"></i> อ่านเพิ่มเติม</button>' +
+    (showTarget && targetName ? '<div class="rv-home-footer"><span class="rv-home-target" title="'+targetName+'">' +
+      (r.type==='property'?'<i class="fas fa-home"></i> ':'<i class="fas fa-user-tie"></i> ')+targetName+'</span>' +
+      '<span>'+_rvTimeAgo(r.created_at)+'</span></div>' : '') +
+  '</div>';
+}
+
+window.rvToggleBody = function(id){
+  var body = document.getElementById(id+'-body');
+  var btn = document.getElementById(id+'-btn');
+  if(!body) return;
+  var collapsed = body.classList.contains('collapsed');
+  body.classList.toggle('collapsed', !collapsed);
+  if(btn) btn.innerHTML = collapsed
+    ? '<i class="fas fa-chevron-up"></i> ย่อ'
+    : '<i class="fas fa-chevron-down"></i> อ่านเพิ่มเติม';
+};
+
+function _rvSummaryHtml(reviews){
+  if(!reviews.length) return '';
+  var avg = reviews.reduce(function(s,r){ return s+r.rating; }, 0) / reviews.length;
+  var counts = [0,0,0,0,0];
+  reviews.forEach(function(r){ if(r.rating>=1&&r.rating<=5) counts[r.rating-1]++; });
+  var starsHtml = '';
+  for(var i=1;i<=5;i++) starsHtml += '<i class="fas fa-star'+(i<=Math.round(avg)?' lit':'')+'" style="font-size:20px"></i>';
+  var barsHtml = '';
+  for(var s=5;s>=1;s--){
+    var w = reviews.length ? Math.round(counts[s-1]/reviews.length*100) : 0;
+    barsHtml += '<div class="rv-bar-row">' +
+      '<span style="width:14px;text-align:right">'+s+'</span>' +
+      '<i class="fas fa-star" style="font-size:10px;color:#e8a500"></i>' +
+      '<div class="rv-bar-track"><div class="rv-bar-fill" style="width:'+w+'%"></div></div>' +
+      '<span class="rv-bar-n">'+counts[s-1]+'</span>' +
+    '</div>';
+  }
+  return '<div class="rv-summary">' +
+    '<div>' +
+      '<div class="rv-avg-big">'+avg.toFixed(1)+'</div>' +
+      '<div class="rv-stars-big">'+starsHtml+'</div>' +
+      '<div class="rv-count-lbl">'+reviews.length+' รีวิว</div>' +
+    '</div>' +
+    '<div class="rv-bars">'+barsHtml+'</div>' +
+  '</div>';
+}
+
+/* ── Star picker ── */
+function _rvStarPickHtml(prefix){
+  var html = '<div class="rv-star-pick" id="'+prefix+'-pick">';
+  for(var i=1;i<=5;i++){
+    html += '<i class="far fa-star" data-val="'+i+'" onclick="rvSetStar(\''+prefix+'\','+i+')"></i>';
+  }
+  html += '</div>';
+  return html;
+}
+window.rvSetStar = function(prefix, val){
+  var pick = document.getElementById(prefix+'-pick');
+  if(!pick) return;
+  pick.dataset.val = val;
+  var icons = pick.querySelectorAll('i');
+  icons.forEach(function(el,idx){ el.className = (idx<val?'fas lit':'far') + ' fa-star'; });
+};
+
+/* ── Review form HTML ── */
+function _rvFormHtml(prefix, type, targetId){
+  if(typeof user === 'undefined' || !user){
+    return '<div class="rv-form-wrap"><div class="rv-login-prompt">' +
+      '<i class="fas fa-star" style="font-size:28px;color:var(--a);display:block;margin-bottom:8px"></i>' +
+      'เข้าสู่ระบบเพื่อรีวิว<br>' +
+      '<button onclick="_openModal(\'login-modal\')"><i class="fas fa-sign-in-alt"></i> เข้าสู่ระบบ</button>' +
+    '</div></div>';
+  }
+  return '<div class="rv-form-wrap">' +
+    '<div class="rv-form-title"><i class="fas fa-pen" style="color:var(--a)"></i> เขียนรีวิว</div>' +
+    '<div style="margin-bottom:8px;font-size:12px;color:var(--gr)">คะแนน:</div>' +
+    _rvStarPickHtml(prefix) +
+    '<textarea class="rv-textarea" id="'+prefix+'-text" placeholder="แชร์ประสบการณ์ของคุณ... (อย่างน้อย 10 ตัวอักษร)" maxlength="500"></textarea>' +
+    '<div style="font-size:11px;color:var(--gr);margin-top:5px;text-align:right"><span id="'+prefix+'-charcount">0</span>/500</div>' +
+    '<button class="rv-submit-btn" id="'+prefix+'-submit" onclick="rvSubmit(\''+prefix+'\',\''+type+'\',\''+targetId+'\')">' +
+      '<i class="fas fa-paper-plane"></i> ส่งรีวิว' +
+    '</button>' +
+  '</div>';
+}
+
+/* ── Load / render a review section ── */
+window.rvLoadSection = async function(type, targetId, prefix){
+  var summaryEl = document.getElementById(prefix+'-summary');
+  var listEl = document.getElementById(prefix+'-list');
+  var formEl = document.getElementById(prefix+'-form');
+  var moreEl = document.getElementById(prefix+'-more-wrap');
+  var badgeEl = document.getElementById(prefix+'-count-badge');
+  if(!listEl) return;
+
+  listEl.innerHTML = '<div class="rv-empty"><i class="fas fa-circle-notch fa-spin"></i><br>กำลังโหลด...</div>';
+  if(formEl) formEl.innerHTML = '';
+
+  var reviews = await _rvFetch(type, targetId);
+
+  if(summaryEl) summaryEl.innerHTML = _rvSummaryHtml(reviews);
+  if(badgeEl) badgeEl.textContent = reviews.length ? '(' + reviews.length + ')' : '';
+
+  var page = _rvPending[prefix] = 0;
+  var slice = reviews.slice(0, RV_PAGE_SIZE);
+  if(!slice.length){
+    listEl.innerHTML = '<div class="rv-empty"><i class="fas fa-star"></i>ยังไม่มีรีวิว เป็นคนแรกที่รีวิว!</div>';
+  } else {
+    listEl.innerHTML = slice.map(function(r){ return _rvCardHtml(r, false); }).join('');
+  }
+  _checkExpandBtns(prefix);
+
+  if(moreEl) moreEl.style.display = reviews.length > RV_PAGE_SIZE ? '' : 'none';
+  if(formEl) {
+    formEl.innerHTML = _rvFormHtml(prefix, type, targetId);
+    _rvBindCharCount(prefix);
+  }
+
+  // Save current IDs for load-more
+  if(prefix === 'pdp-rv') _rvCurrentPropId = targetId;
+  if(prefix === 'ag-rv') _rvCurrentAgentId = targetId;
+};
+
+function _checkExpandBtns(prefix){
+  // Hide "อ่านเพิ่มเติม" button if text doesn't overflow
+  setTimeout(function(){
+    var listEl = document.getElementById(prefix+'-list');
+    if(!listEl) return;
+    listEl.querySelectorAll('.rv-card').forEach(function(card){
+      var id = card.id;
+      var body = document.getElementById(id+'-body');
+      var btn = document.getElementById(id+'-btn');
+      if(!body || !btn) return;
+      if(body.scrollHeight <= body.clientHeight + 5) btn.style.display = 'none';
+    });
+  }, 100);
+}
+
+function _rvBindCharCount(prefix){
+  var ta = document.getElementById(prefix+'-text');
+  var cc = document.getElementById(prefix+'-charcount');
+  if(ta && cc){
+    ta.addEventListener('input', function(){ cc.textContent = ta.value.length; });
+  }
+}
+
+window.rvLoadMoreProp = async function(){
+  if(!_rvCurrentPropId) return;
+  var reviews = await _rvFetch('property', _rvCurrentPropId);
+  var page = ++_rvPending['pdp-rv'];
+  var slice = reviews.slice(0, (page+1)*RV_PAGE_SIZE);
+  var listEl = document.getElementById('pdp-rv-list');
+  if(listEl) listEl.innerHTML = slice.map(function(r){ return _rvCardHtml(r, false); }).join('');
+  _checkExpandBtns('pdp-rv');
+  var moreEl = document.getElementById('pdp-rv-more-wrap');
+  if(moreEl) moreEl.style.display = slice.length < reviews.length ? '' : 'none';
+};
+
+window.rvLoadMoreAgent = async function(){
+  if(!_rvCurrentAgentId) return;
+  var reviews = await _rvFetch('agent', _rvCurrentAgentId);
+  var page = ++_rvPending['ag-rv'];
+  var slice = reviews.slice(0, (page+1)*RV_PAGE_SIZE);
+  var listEl = document.getElementById('ag-rv-list');
+  if(listEl) listEl.innerHTML = slice.map(function(r){ return _rvCardHtml(r, false); }).join('');
+  _checkExpandBtns('ag-rv');
+  var moreEl = document.getElementById('ag-rv-more-wrap');
+  if(moreEl) moreEl.style.display = slice.length < reviews.length ? '' : 'none';
+};
+
+/* ── Submit review ── */
+window.rvSubmit = async function(prefix, type, targetId){
+  var pick = document.getElementById(prefix+'-pick');
+  var ta = document.getElementById(prefix+'-text');
+  var btn = document.getElementById(prefix+'-submit');
+  if(!pick || !ta) return;
+
+  var rating = parseInt(pick.dataset.val || '0');
+  var body = (ta.value || '').trim();
+
+  if(!rating){ toast('กรุณาเลือกคะแนนดาวก่อน', true); return; }
+  if(body.length < 10){ toast('กรุณาเขียนรีวิวอย่างน้อย 10 ตัวอักษร', true); return; }
+
+  if(btn){ btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> กำลังส่ง...'; }
+
+  var authorName = 'ผู้ใช้';
+  var avatarUrl = null;
+  if(typeof user !== 'undefined' && user){
+    authorName = (user.user_metadata && user.user_metadata.full_name) || user.email || 'ผู้ใช้';
+    avatarUrl = (user.user_metadata && user.user_metadata.avatar_url) || null;
+  }
+
+  var review = {
+    type: type,
+    target_id: String(targetId),
+    user_id: (typeof user !== 'undefined' && user) ? user.id : null,
+    author: authorName,
+    avatar_url: avatarUrl,
+    rating: rating,
+    body: body
+  };
+
+  try {
+    await _rvInsert(review);
+    toast('ขอบคุณสำหรับรีวิว! ✅');
+    // Re-render section
+    await rvLoadSection(type, targetId, prefix);
+    // Refresh home section stats
+    rvRenderHome();
+  } catch(e){
+    toast('เกิดข้อผิดพลาด กรุณาลองใหม่', true);
+    if(btn){ btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane"></i> ส่งรีวิว'; }
+  }
+};
+
+/* ── Home Reviews ── */
+async function _rvFetchAll(){
+  // Supabase: fetch latest 100 reviews across all types
+  if(typeof sb !== 'undefined' && sb){
+    try {
+      var res = await sb.from('reviews').select('*').order('created_at', {ascending: false}).limit(100);
+      if(!res.error && res.data) return res.data;
+    } catch(e){}
+  }
+  // localStorage fallback
+  return _rvLsAll().slice(0, 100);
+}
+
+window.rvRenderHome = async function(){
+  var gridEl = document.getElementById('rv-home-grid');
+  if(!gridEl) return;
+
+  var all = await _rvFetchAll();
+  if(!all.length){
+    gridEl.innerHTML = '<div class="rv-empty" style="grid-column:1/-1"><i class="fas fa-star"></i>ยังไม่มีรีวิว เริ่มต้นด้วยการรีวิวทรัพย์หรือตัวแทนได้เลย!</div>';
+    _rvUpdateHomeStats(all);
+    return;
+  }
+
+  // Show top 9 (mix of property + agent, sorted by rating desc then date)
+  var sorted = all.slice().sort(function(a,b){
+    if(b.rating !== a.rating) return b.rating - a.rating;
+    return new Date(b.created_at) - new Date(a.created_at);
+  }).slice(0, RV_HOME_MAX);
+
+  gridEl.innerHTML = sorted.map(function(r){
+    var targetName = '';
+    if(r.type === 'property'){
+      var p = (typeof props !== 'undefined') ? props.find(function(x){ return String(x.id)===String(r.target_id); }) : null;
+      targetName = p ? p.title : 'ทรัพย์';
+    } else {
+      var ag = (typeof agents !== 'undefined') ? agents.find(function(x){ return String(x.id)===String(r.target_id); }) : null;
+      targetName = ag ? ag.name : 'ตัวแทน';
+    }
+    var id = 'rvh-' + (r.id||'x').toString().replace(/[^a-z0-9]/gi,'');
+    return '<div class="rv-home-card">' +
+      '<div class="rv-home-card-hd">' +
+        _rvAvatar(r) +
+        '<div class="rv-home-meta">' +
+          '<div class="rv-home-author">' + (r.author||'ผู้ใช้') + '</div>' +
+          '<div style="display:flex;gap:3px;margin-top:3px">' + _rvStars(r.rating, 12) + '</div>' +
+        '</div>' +
+        '<span class="rv-type-badge'+(r.type==='agent'?' rv-type-agent':'')+'">'+
+          (r.type==='property'?'<i class="fas fa-home"></i>':'<i class="fas fa-user-tie"></i>')+
+        '</span>' +
+      '</div>' +
+      '<div class="rv-home-body" id="'+id+'-body">' + (r.body||'') + '</div>' +
+      '<div class="rv-home-footer">' +
+        '<span class="rv-home-target" title="'+targetName+'">' +
+          (r.type==='property'?'<i class="fas fa-home"></i> ':'<i class="fas fa-user-tie"></i> ')+targetName+
+        '</span>' +
+        '<span>'+_rvTimeAgo(r.created_at)+'</span>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  _rvUpdateHomeStats(all);
+};
+
+function _rvUpdateHomeStats(all){
+  var totalEl = document.getElementById('rv-stat-total');
+  var avgEl = document.getElementById('rv-stat-avg');
+  var propEl = document.getElementById('rv-stat-prop');
+  var agentEl = document.getElementById('rv-stat-agent');
+  if(totalEl) totalEl.textContent = all.length;
+  if(avgEl) avgEl.textContent = all.length
+    ? (all.reduce(function(s,r){ return s+r.rating; },0) / all.length).toFixed(1) + ' ★'
+    : '—';
+  if(propEl) propEl.textContent = all.filter(function(r){ return r.type==='property'; }).length;
+  if(agentEl) agentEl.textContent = all.filter(function(r){ return r.type==='agent'; }).length;
+}
+
+/* ── "ดูทั้งหมด" modal ── */
+window.rvShowAll = async function(){
+  _openModal('reviews-all-modal');
+  rvRenderAll();
+};
+
+window.rvRenderAll = async function(){
+  var bodyEl = document.getElementById('rv-all-body');
+  if(!bodyEl) return;
+  bodyEl.innerHTML = '<div class="rv-empty"><i class="fas fa-circle-notch fa-spin"></i><br>กำลังโหลด...</div>';
+
+  var typeFilter = (document.getElementById('rv-all-filter-type')||{}).value || '';
+  var starsFilter = (document.getElementById('rv-all-filter-stars')||{}).value || '';
+
+  var all = await _rvFetchAll();
+  var filtered = all.filter(function(r){
+    if(typeFilter && r.type !== typeFilter) return false;
+    if(starsFilter && String(r.rating) !== starsFilter) return false;
+    return true;
+  });
+
+  if(!filtered.length){
+    bodyEl.innerHTML = '<div class="rv-empty"><i class="fas fa-star"></i>ไม่พบรีวิวที่ตรงเงื่อนไข</div>';
+    return;
+  }
+
+  bodyEl.innerHTML = '<div class="rv-list">' +
+    filtered.map(function(r){ return _rvCardHtml(r, true); }).join('') +
+  '</div>';
+
+  // Check expand buttons
+  setTimeout(function(){
+    filtered.forEach(function(r){
+      var id = 'rv-' + (r.id||'x').toString().replace(/[^a-z0-9]/gi,'');
+      var body2 = document.getElementById(id+'-body');
+      var btn2 = document.getElementById(id+'-btn');
+      if(body2 && btn2 && body2.scrollHeight <= body2.clientHeight + 5) btn2.style.display='none';
+    });
+  }, 100);
+};
+
+/* ── Hook into PDP render (called after pdpShowPage loads a property) ── */
+var _origPdpShowPage = window.pdpShowPage;
+window.pdpShowPage = function(propId){
+  if(typeof _origPdpShowPage === 'function') _origPdpShowPage(propId);
+  _rvCurrentPropId = String(propId);
+  // Wait a tick for DOM to be ready
+  setTimeout(function(){
+    rvLoadSection('property', String(propId), 'pdp-rv');
+  }, 300);
+};
+
+/* ── Init on data ready ── */
+function _rvInitHome(){
+  if(typeof props !== 'undefined' && typeof agents !== 'undefined'){
+    rvRenderHome();
+  } else {
+    setTimeout(_rvInitHome, 500);
+  }
+}
+// Start when DOM is ready
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', function(){ setTimeout(_rvInitHome, 800); });
+} else {
+  setTimeout(_rvInitHome, 800);
+}
+
+})(); /* end Review System IIFE */
 </script>
 
 </body>
