@@ -3948,6 +3948,832 @@ footer::after{
   .md-fb-layout{padding:10px 0}
   .md-fb-col-center{padding:0 6px}
 }
+
+/* ════════════════════════════════
+   PROPERTY DETAIL PAGE — CSS
+   ════════════════════════════════ */
+/* ── Page container ── */
+#page-property {
+  background: var(--bg, #F5F0E8);
+  min-height: 100vh;
+  padding-top: 0;
+}
+
+/* ── Breadcrumb (Visible + SEO) ── */
+.pdp-breadcrumb {
+  background: var(--p, #1B3A6B);
+  padding: 12px 20px;
+}
+.pdp-breadcrumb-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-size: 12px;
+}
+.pdp-breadcrumb a {
+  color: rgba(255,255,255,0.75);
+  text-decoration: none;
+  transition: color .15s;
+}
+.pdp-breadcrumb a:hover { color: #fff; }
+.pdp-breadcrumb-sep {
+  color: rgba(255,255,255,0.4);
+  font-size: 10px;
+}
+.pdp-breadcrumb-current {
+  color: var(--a, #C8922A);
+  font-weight: 600;
+  max-width: 280px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Main Layout ── */
+.pdp-layout {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 20px 60px;
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 32px;
+  align-items: start;
+}
+@media (max-width: 960px) {
+  .pdp-layout { grid-template-columns: 1fr; gap: 20px; padding: 16px 16px 120px; }
+}
+
+/* ── Gallery ── */
+.pdp-gallery {
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+  background: #1a2744;
+  aspect-ratio: 16/9;
+  min-height: 200px;
+  margin-bottom: 20px;
+}
+.pdp-gallery-main {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+.pdp-gallery-main img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform .4s ease;
+}
+.pdp-gallery-main img:hover { transform: scale(1.02); }
+
+/* Gallery nav */
+.pdp-gal-prev, .pdp-gal-next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px; height: 40px;
+  background: rgba(0,0,0,0.55);
+  border: none;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.pdp-gal-prev { left: 12px; }
+.pdp-gal-next { right: 12px; }
+.pdp-gal-prev:hover, .pdp-gal-next:hover { background: rgba(0,0,0,0.8); }
+
+/* Gallery counter */
+.pdp-gal-counter {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  background: rgba(0,0,0,0.65);
+  color: #fff;
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  z-index: 5;
+}
+
+/* Gallery thumbnails */
+.pdp-gallery-thumbs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 72px);
+  gap: 6px;
+  margin-top: 8px;
+}
+.pdp-thumb {
+  width: 72px;
+  height: 54px;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border-color .2s;
+}
+.pdp-thumb.active { border-color: var(--a, #C8922A); }
+.pdp-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ── Property Header ── */
+.pdp-header { margin-bottom: 20px; }
+.pdp-type-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.pdp-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+.pdp-badge-type { background: var(--pastel3, #E0EAF7); color: var(--p, #1B3A6B); }
+.pdp-badge-buy  { background: #FFF3E0; color: #E65100; }
+.pdp-badge-rent { background: #E8F5E9; color: #2E7D32; }
+.pdp-badge-new  { background: linear-gradient(135deg, #C8922A, #E8B84B); color: #fff; }
+.pdp-badge-hot  { background: linear-gradient(135deg, #ff4757, #ff6b81); color: #fff; }
+
+.pdp-title {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--tx, #1A1A2E);
+  line-height: 1.3;
+  margin-bottom: 8px;
+  font-family: 'Kanit', 'Noto Sans Thai', sans-serif;
+}
+@media (max-width: 600px) { .pdp-title { font-size: 20px; } }
+
+.pdp-location-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--gr, #8A8070);
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+.pdp-location-row i { color: var(--p, #1B3A6B); }
+
+/* Transit tags */
+.pdp-transit-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.pdp-transit {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: opacity .2s;
+}
+.pdp-transit:hover { opacity: .8; }
+.pdp-transit-bts { background: #1B6EC2; color: #fff; }
+.pdp-transit-mrt { background: #8B0000; color: #fff; }
+.pdp-transit-arl { background: #FF6600; color: #fff; }
+
+/* ── Price Block ── */
+.pdp-price-block {
+  background: linear-gradient(135deg, #0A1628, #0F1E3A);
+  border-radius: 16px;
+  padding: 20px 24px;
+  margin-bottom: 20px;
+  border: 1px solid rgba(200, 146, 42, .2);
+}
+.pdp-price-label {
+  font-size: 11px;
+  color: rgba(255,255,255,.55);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+.pdp-price {
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--a, #C8922A);
+  font-family: 'Kanit', sans-serif;
+  line-height: 1.1;
+  margin-bottom: 4px;
+}
+.pdp-price-sub {
+  font-size: 13px;
+  color: rgba(255,255,255,.5);
+}
+.pdp-sqm-price {
+  font-size: 12px;
+  color: rgba(255,255,255,.45);
+  margin-top: 6px;
+}
+
+/* ── Specs Grid ── */
+.pdp-specs {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 20px;
+  border: 1px solid var(--bd, #D8D0C4);
+}
+.pdp-specs-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--tx, #1A1A2E);
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pdp-specs-title::before {
+  content: '';
+  width: 3px;
+  height: 14px;
+  background: var(--a, #C8922A);
+  border-radius: 2px;
+  display: block;
+}
+.pdp-specs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 12px;
+}
+.pdp-spec-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--bg, #F5F0E8);
+  border-radius: 12px;
+  padding: 14px 8px;
+  text-align: center;
+  gap: 6px;
+}
+.pdp-spec-icon {
+  width: 38px;
+  height: 38px;
+  background: linear-gradient(135deg, var(--p, #1B3A6B), #2a5298);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 15px;
+}
+.pdp-spec-val {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--tx, #1A1A2E);
+  font-family: 'Kanit', sans-serif;
+  line-height: 1;
+}
+.pdp-spec-lbl {
+  font-size: 10px;
+  color: var(--gr, #8A8070);
+  line-height: 1.3;
+}
+
+/* ── Description ── */
+.pdp-section {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 20px;
+  border: 1px solid var(--bd, #D8D0C4);
+}
+.pdp-section-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--tx, #1A1A2E);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pdp-section-title::before {
+  content: '';
+  width: 3px;
+  height: 18px;
+  background: var(--p, #1B3A6B);
+  border-radius: 2px;
+  display: block;
+}
+.pdp-desc {
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--tx2, #4A4438);
+  white-space: pre-line;
+}
+.pdp-desc.collapsed {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.pdp-read-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--p, #1B3A6B);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 8px;
+  border: none;
+  background: none;
+  padding: 0;
+}
+
+/* ── Amenities / Features ── */
+.pdp-features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 8px;
+}
+.pdp-feature-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--tx, #1A1A2E);
+  padding: 8px 12px;
+  background: var(--bg, #F5F0E8);
+  border-radius: 8px;
+}
+.pdp-feature-item i { color: var(--g, #3D7A55); font-size: 13px; }
+
+/* ── Map ── */
+.pdp-map-wrap {
+  border-radius: 12px;
+  overflow: hidden;
+  height: 260px;
+  background: #e0e0e0;
+  position: relative;
+}
+.pdp-map-wrap iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+.pdp-map-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 10px;
+  color: var(--gr, #8A8070);
+  font-size: 13px;
+  background: var(--bg, #F5F0E8);
+  cursor: pointer;
+  transition: background .2s;
+}
+.pdp-map-placeholder:hover { background: var(--lt, #EDE8DF); }
+.pdp-map-placeholder i { font-size: 32px; color: var(--p, #1B3A6B); }
+
+/* ── Right Sidebar ── */
+.pdp-sidebar { position: sticky; top: 80px; }
+@media (max-width: 960px) {
+  .pdp-sidebar { position: static; top: auto; }
+}
+
+/* Agent Card */
+.pdp-agent-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 16px;
+  border: 1px solid var(--bd, #D8D0C4);
+}
+.pdp-agent-hd {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.pdp-agent-av {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid var(--a, #C8922A);
+  flex-shrink: 0;
+}
+.pdp-agent-av img { width: 100%; height: 100%; object-fit: cover; }
+.pdp-agent-av-ph {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--p, #1B3A6B), #2a5298);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 800;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.pdp-agent-name {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--tx, #1A1A2E);
+}
+.pdp-agent-title {
+  font-size: 12px;
+  color: var(--gr, #8A8070);
+  margin-top: 2px;
+}
+.pdp-agent-rating {
+  font-size: 12px;
+  color: var(--a, #C8922A);
+  margin-top: 3px;
+}
+.pdp-agent-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.pdp-agent-stat {
+  background: var(--bg, #F5F0E8);
+  border-radius: 8px;
+  padding: 10px;
+  text-align: center;
+}
+.pdp-agent-stat-val {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--p, #1B3A6B);
+  font-family: 'Kanit', sans-serif;
+}
+.pdp-agent-stat-lbl {
+  font-size: 10px;
+  color: var(--gr, #8A8070);
+  margin-top: 2px;
+}
+
+/* CTA Buttons */
+.pdp-cta-stack { display: flex; flex-direction: column; gap: 8px; }
+.pdp-cta-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 20px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+  text-decoration: none;
+  transition: transform .15s, box-shadow .15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.pdp-cta-btn:active { transform: scale(.98); }
+.pdp-cta-phone {
+  background: linear-gradient(135deg, var(--p, #1B3A6B), #2a5298);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(27,58,107,.3);
+}
+.pdp-cta-line {
+  background: #06C755;
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(6,199,85,.3);
+}
+.pdp-cta-fav {
+  background: var(--lt, #EDE8DF);
+  color: var(--tx, #1A1A2E);
+  border: 1.5px solid var(--bd, #D8D0C4);
+}
+.pdp-cta-fav.favorited { background: #FFF0F0; color: #C0392B; border-color: #C0392B; }
+.pdp-cta-share {
+  background: transparent;
+  color: var(--p, #1B3A6B);
+  border: 1.5px solid var(--p, #1B3A6B);
+}
+
+/* ── Share Box ── */
+.pdp-share-box {
+  background: var(--bg, #F5F0E8);
+  border-radius: 12px;
+  padding: 14px;
+  margin-top: 12px;
+  display: none;
+}
+.pdp-share-box.open { display: block; }
+.pdp-share-url {
+  width: 100%;
+  border: 1.5px solid var(--bd, #D8D0C4);
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-size: 12px;
+  color: var(--gr, #8A8070);
+  background: #fff;
+  margin-bottom: 10px;
+  font-family: monospace;
+  cursor: text;
+}
+.pdp-share-icons { display: flex; gap: 8px; justify-content: center; }
+.pdp-share-ico {
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: opacity .2s;
+  border: none;
+}
+.pdp-share-ico:hover { opacity: .8; }
+.pdp-share-fb { background: #1877F2; color: #fff; }
+.pdp-share-line { background: #06C755; color: #fff; }
+.pdp-share-tw { background: #1DA1F2; color: #fff; }
+.pdp-share-copy { background: var(--p, #1B3A6B); color: #fff; }
+
+/* ── Related Properties ── */
+/* ── Mobile Sticky CTA ── */
+.pdp-cta-mobile {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-top: 1px solid var(--bd, #D8D0C4);
+  padding: 12px 16px;
+  z-index: 100;
+  box-shadow: 0 -4px 20px rgba(27,58,107,.12);
+}
+.pdp-cta-mobile .pdp-cta-stack {
+  flex-direction: row;
+}
+.pdp-cta-mobile .pdp-cta-btn {
+  flex: 1;
+  padding: 12px 8px;
+  font-size: 13px;
+}
+@media (min-width: 961px) {
+  .pdp-cta-mobile { display: none !important; }
+}
+
+.pdp-related {
+  max-width: 1200px;
+  margin: 24px auto 48px;
+  padding: 0 20px;
+}
+.pdp-related-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--tx, #1A1A2E);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.pdp-related-title::before {
+  content: '';
+  width: 4px;
+  height: 22px;
+  background: var(--a, #C8922A);
+  border-radius: 2px;
+  display: block;
+}
+.pdp-related-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+/* Related card — compact */
+.pdp-rel-card {
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--bd, #D8D0C4);
+  text-decoration: none;
+  display: block;
+  transition: transform .2s, box-shadow .2s;
+}
+.pdp-rel-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(27,58,107,.14);
+}
+.pdp-rel-img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  display: block;
+}
+.pdp-rel-img-ph {
+  width: 100%;
+  height: 150px;
+  background: linear-gradient(135deg, #1B3A6B, #0F2548);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+}
+.pdp-rel-body {
+  padding: 12px;
+}
+.pdp-rel-type {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--p, #1B3A6B);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.pdp-rel-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--tx, #1A1A2E);
+  line-height: 1.4;
+  margin-bottom: 4px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.pdp-rel-price {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--a, #C8922A);
+  font-family: 'Kanit', sans-serif;
+}
+.pdp-rel-loc {
+  font-size: 11px;
+  color: var(--gr, #8A8070);
+  margin-top: 3px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ── Back Bar ── */
+.pdp-back-bar {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px 20px 8px;
+}
+.pdp-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: 1.5px solid var(--bd, #D8D0C4);
+  color: var(--tx, #1A1A2E);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  font-family: inherit;
+  transition: border-color .2s, background .2s;
+}
+.pdp-back-btn:hover {
+  border-color: var(--p, #1B3A6B);
+  background: var(--pastel3, #E0EAF7);
+}
+
+/* ── SEO Internal Link Section ── */
+.pdp-seo-links {
+  background: var(--p, #1B3A6B);
+  padding: 32px 20px;
+  margin-top: 48px;
+}
+.pdp-seo-links-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.pdp-seo-links h2 {
+  font-size: 15px;
+  font-weight: 700;
+  color: rgba(255,255,255,.6);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 16px;
+}
+.pdp-seo-link-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.pdp-seo-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  background: rgba(255,255,255,.1);
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 20px;
+  color: rgba(255,255,255,.85);
+  font-size: 12px;
+  text-decoration: none;
+  transition: background .15s;
+}
+.pdp-seo-link:hover {
+  background: rgba(255,255,255,.2);
+  color: #fff;
+}
+
+/* ── Loading skeleton ── */
+.pdp-skeleton {
+  background: linear-gradient(90deg, #e0dbd2 25%, #ece8e0 50%, #e0dbd2 75%);
+  background-size: 200% 100%;
+  animation: pdp-shimmer 1.4s infinite;
+  border-radius: 8px;
+}
+@keyframes pdp-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.pdp-loading {
+  max-width: 1200px;
+  margin: 24px auto;
+  padding: 0 20px;
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 24px;
+}
+@media (max-width: 960px) { .pdp-loading { grid-template-columns: 1fr; } }
+.pdp-sk-gal { height: 380px; border-radius: 16px; }
+.pdp-sk-title { height: 32px; margin-bottom: 10px; border-radius: 8px; }
+.pdp-sk-sub { height: 16px; width: 60%; border-radius: 6px; margin-bottom: 20px; }
+.pdp-sk-price { height: 80px; border-radius: 16px; margin-bottom: 16px; }
+.pdp-sk-spec { height: 120px; border-radius: 16px; margin-bottom: 16px; }
+
+/* ── Error State ── */
+.pdp-error {
+  max-width: 600px;
+  margin: 60px auto;
+  text-align: center;
+  padding: 0 20px;
+}
+.pdp-error-ico { font-size: 64px; margin-bottom: 16px; }
+.pdp-error-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--tx, #1A1A2E);
+  margin-bottom: 10px;
+}
+.pdp-error-sub { font-size: 14px; color: var(--gr, #8A8070); margin-bottom: 28px; line-height: 1.7; }
+/* ── Price block responsive ── */
+@media (max-width: 960px) {
+  #pdp-price-sidebar { display: none; }
+  #pdp-price-mobile  { display: block !important; }
+}
+@media (min-width: 961px) {
+  #pdp-price-mobile  { display: none !important; }
+  #pdp-price-sidebar { display: block; }
+}
+
+/* ── CTA mobile bar ── */
+@media (max-width: 960px) {
+  #pdp-cta-mobile { display: block !important; }
+}
+
+.pdp-error-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: var(--p, #1B3A6B);
+  color: #fff;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+  text-decoration: none;
+}
 </style>
 </head>
 <body>
@@ -6334,7 +7160,7 @@ function _popupRefreshMarkers(){
         '<div class="md-popup-loc"><i class="fas fa-map-marker-alt" style="color:var(--a);font-size:10px"></i> ' + (p.location||p.province||'กรุงเทพฯ') + '</div>' +
         '<div class="md-popup-price">' + (isRent ? '฿' + p.price.toLocaleString() + '/เดือน' : (p.price>=1e6 ? '฿'+(p.price/1e6).toFixed(2).replace(/\.?0+$/,'')+'M' : '฿'+p.price.toLocaleString())) + '</div>' +
         (specsHtml ? '<div class="md-popup-specs">' + specsHtml + '</div>' : '') +
-        '<button class="md-popup-btn" onclick="if(typeof openModal===\'function\') openModal(\'' + p.id + '\')"><i class="fas fa-eye"></i> ดูรายละเอียด</button>' +
+        '<button class="md-popup-btn" onclick="if(typeof showPage===\'function\') showPage(\'property\',\'' + p.id + '\')"><i class="fas fa-eye"></i> ดูรายละเอียด</button>' +
       '</div>' +
     '</div>';
     marker.bindPopup(popupHtml, { maxWidth: 260, minWidth: 260, offset: [130, 40] });
@@ -6522,7 +7348,7 @@ function _popupRefreshMarkersFiltered(tx, typ, prov, maxPrice, kw){
         '<div class="md-popup-loc"><i class="fas fa-map-marker-alt" style="color:var(--a);font-size:10px"></i> ' + (p.location||p.province||'กรุงเทพฯ') + '</div>' +
         '<div class="md-popup-price">' + (isRent ? '฿' + p.price.toLocaleString() + '/เดือน' : (p.price>=1e6 ? '฿'+(p.price/1e6).toFixed(2).replace(/\.?0+$/,'')+'M' : '฿'+p.price.toLocaleString())) + '</div>' +
         (specsHtml ? '<div class="md-popup-specs">' + specsHtml + '</div>' : '') +
-        '<button class="md-popup-btn" onclick="if(typeof openModal===\'function\') openModal(\'' + p.id + '\')"><i class="fas fa-eye"></i> ดูรายละเอียด</button>' +
+        '<button class="md-popup-btn" onclick="if(typeof showPage===\'function\') showPage(\'property\',\'' + p.id + '\')"><i class="fas fa-eye"></i> ดูรายละเอียด</button>' +
       '</div>' +
     '</div>';
     marker.bindPopup(popupHtml, { maxWidth: 260, minWidth: 260, offset: [130, 40] });
@@ -6762,7 +7588,7 @@ function _popupRefreshMarkersFromData(data){
         '<div class="md-popup-loc"><i class="fas fa-map-marker-alt" style="color:var(--a);font-size:10px"></i> ' + (p.location||p.province||'กรุงเทพฯ') + '</div>' +
         '<div class="md-popup-price">' + (isRent ? '฿' + p.price.toLocaleString() + '/เดือน' : (p.price>=1e6 ? '฿'+(p.price/1e6).toFixed(2).replace(/\.?0+$/,'')+'M' : '฿'+p.price.toLocaleString())) + '</div>' +
         (specsHtml ? '<div class="md-popup-specs">' + specsHtml + '</div>' : '') +
-        '<button class="md-popup-btn" onclick="if(typeof openModal===\'function\') openModal(\'' + p.id + '\')"><i class="fas fa-eye"></i> ดูรายละเอียด</button>' +
+        '<button class="md-popup-btn" onclick="if(typeof showPage===\'function\') showPage(\'property\',\'' + p.id + '\')"><i class="fas fa-eye"></i> ดูรายละเอียด</button>' +
       '</div>' +
     '</div>';
     marker.bindPopup(popupHtml, { maxWidth: 260, minWidth: 260, offset: [130, 40] });
@@ -8736,7 +9562,7 @@ async function renderMaListingsPanel() {
               ลงวันที่: ${new Date(ul.created_at).toLocaleDateString('th-TH')}
               ${exp ? ` · หมดอายุ: ${exp}` : ''}
             </div>
-            ${ul.status === 'อนุมัติ' && ul.property_id ? `<button onclick="openModal('${ul.property_id}')" style="margin-top:8px;font-size:11px;padding:5px 12px;background:var(--p);color:#fff;border:none;border-radius:8px;cursor:pointer"><i class="fas fa-eye"></i> ดูประกาศ</button>` : ''}
+            ${ul.status === 'อนุมัติ' && ul.property_id ? `<button onclick="showPage('property','${ul.property_id}')" style="margin-top:8px;font-size:11px;padding:5px 12px;background:var(--p);color:#fff;border:none;border-radius:8px;cursor:pointer"><i class="fas fa-eye"></i> ดูประกาศ</button>` : ''}
           </div>
         </div>`;
       }).join('')
@@ -10795,6 +11621,36 @@ function afterLoad(){
     var targetPage = sectionMap[location.pathname];
     var ap = document.querySelector('.page.active');
 
+    // ── PDP: ถ้ามี pending property id (มาจาก URL โดยตรง) → show ทันที ──
+    if (window._pendingPropertyId) {
+      var _pid = window._pendingPropertyId;
+      delete window._pendingPropertyId;
+      if (typeof showPage === 'function') showPage('property', _pid);
+      return;
+    }
+
+    // ── PDP: ถ้าหน้า property กำลัง active อยู่ แต่ยัง loading → re-render ──
+    var pgProp = document.getElementById('page-property');
+    var elContent = document.getElementById('pdp-content');
+    var elLoading = document.getElementById('pdp-loading');
+    if (pgProp && pgProp.classList.contains('active')) {
+      var needsRender = (elContent && elContent.style.display === 'none') ||
+                        (elLoading && elLoading.style.display !== 'none');
+      if (needsRender) {
+        // ใช้ _pdpCurrentId ที่ pdpShowPage() เซฟไว้ก่อน ถ้าไม่มีค่อยอ่านจาก URL
+        var _pidFromUrl = window._pdpCurrentId || null;
+        if (!_pidFromUrl) {
+          var _urlMatch = location.pathname.match(/^\/property\/([^\/\-]+)/);
+          if (_urlMatch) _pidFromUrl = _urlMatch[1];
+        }
+        if (!_pidFromUrl && history.state && history.state.id) _pidFromUrl = history.state.id;
+        if (_pidFromUrl && typeof pdpShowPage === 'function') {
+          pdpShowPage(_pidFromUrl);
+          return;
+        }
+      }
+    }
+
     if(ap && ap.id === 'page-listings') {
       // หน้า listings active อยู่แล้ว → render ทันที
       if(typeof renderListingsPage === 'function') renderListingsPage();
@@ -11308,6 +12164,7 @@ const PAGE_ROUTES = {
   'careers':    { path: '/careers',    title: 'สมัครงานตัวแทนอสังหาฯ กรุงเทพ — Matchdoor',                desc: 'เปิดรับสมัครตัวแทนอสังหาริมทรัพย์กรุงเทพ รายได้ดี ทำงานอิสระ ร่วมทีม Matchdoor' },
   'my-account': { path: '/my-account', title: 'บัญชีของฉัน — Matchdoor',                                 desc: 'จัดการโปรไฟล์ รายการโปรด และประกาศของคุณบน Matchdoor' },
   'social':     { path: '/social',     title: 'ฟีดชุมชน Matchdoor — อสังหาฯ บ้าน คอนโด กรุงเทพ',    desc: 'ชุมชนอสังหาริมทรัพย์ Matchdoor แชร์ทรัพย์ ถามตอบ ติดตามข่าวสารอสังหาฯ กรุงเทพ' },
+  'property':   { path: '/property', title: 'ทรัพย์ — Matchdoor', desc: 'รายละเอียดทรัพย์อสังหาริมทรัพย์' },
 };
 
 // Section → filter context for "buy" / "rent" sub-pages
@@ -11486,9 +12343,22 @@ window.addEventListener('popstate', function(e) {
         _listingsRenderPending = false;
         window._listingsRenderQueued = false;
         window._listingsBatchInFlight = false;
+        // ── hide property page before restoring ──
+        var pgPropRestore = document.getElementById('page-property');
+        if (pgPropRestore) { pgPropRestore.classList.remove('active'); pgPropRestore.style.display = 'none'; }
         _silentShowPage(state.name, true);
       });
     } else {
+      // ── Handle property page popstate ──
+      if (state.type === 'property' && state.id) {
+        var pgPropPS = document.getElementById('page-property');
+        if (pgPropPS) { pgPropPS.style.display = ''; }
+        showPage('property', state.id);
+        return;
+      }
+      // ── hide property page before restoring other page ──
+      var pgPropOther = document.getElementById('page-property');
+      if (pgPropOther) { pgPropOther.classList.remove('active'); pgPropOther.style.display = 'none'; }
       _silentShowPage(state.name);
     }
   }
@@ -11537,6 +12407,11 @@ function _silentShowPage(name, skipScrollTop) {
     }
   }
   $$('.page').forEach(p => p.classList.remove('active'));
+  // ── ซ่อน page-property เสมอเมื่อ navigate ไปหน้าอื่น ──
+  const pgPropSilent = document.getElementById('page-property');
+  if (pgPropSilent && name !== 'property') pgPropSilent.style.display = 'none';
+  // ── ถ้า name = 'property' → ให้ showPage จัดการ อย่าให้ _silentShowPage ทำงาน ──
+  if (name === 'property') return;
   const pg = $('page-' + name);
   if (!pg) return;
   pg.classList.add('active');
@@ -11622,11 +12497,10 @@ function _initRouteFromUrl() {
   const match = path.match(/^\/property\/([^\/\-]+)/);
   if (match) {
     const propId = match[1];
-    // ── เปิด property modal ที่หน้าหลัก (layout ประกาศทั้งหมด) ──
-    window._pageBeforeModal = 'home';
-    _silentShowPage('home');
-    // Try to open modal — data may not be loaded yet, handled by _pendingOpenId
-    window._pendingOpenId = propId;
+    // ── แสดง Property Detail Page (ไม่ใช่ modal) ──
+    _silentShowPage('home'); // ตั้ง base page ก่อน
+    // รอให้ data โหลดก่อน แล้วค่อย render PDP
+    window._pendingPropertyId = propId;
     return;
   }
   const sectionMap = {
@@ -11637,6 +12511,7 @@ function _initRouteFromUrl() {
     '/my-account': 'my-account',
     '/social': 'social',
   };
+  // /property/* ถูกจัดการด้วย match ด้านบนแล้ว — ไม่ต้องใส่ใน sectionMap
   const targetPage = sectionMap[path];
   if (targetPage) {
     _silentShowPage(targetPage);
@@ -11705,8 +12580,42 @@ window.closeModal = function(e) {
 // Add "ดูหน้าเต็ม" share button inside property modal after it's opened
 function _addShareButtonToModal() { /* disabled */ }
 
-// Original showPage — now also pushes history
-function showPage(name){ 
+// Original showPage — now also pushes history + supports 'property' page
+function showPage(name, propId){ 
+  // ── Handle property detail page ──
+  if (name === 'property') {
+    // ── Hide all pages, show #page-property ──
+    document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+    var pgProp = document.getElementById('page-property');
+    if (pgProp) { pgProp.style.display = ''; pgProp.classList.add('active'); }
+    // ── Push URL history (only when _pdpPropUrl is available) ──
+    if (propId && typeof _pdpPropUrl !== 'undefined') {
+      var _allPr = (typeof props !== 'undefined' && props.length) ? props : [];
+      var _pr = _allPr.find(function(x){ return String(x.id) === String(propId); });
+      if (_pr) {
+        var _path = _pdpPropUrl(_pr);
+        var _prevPage = (history.state && history.state.name) ? history.state.name : 'home';
+        if (_routerReady) {
+          history.pushState({ type:'property', id:String(propId), name:'property', _prevPage:_prevPage }, '', window.location.origin + _path);
+        }
+      }
+    }
+    // ── Render PDP — always call even if _pdpPropUrl not yet ready ──
+    if (typeof pdpShowPage === 'function' && propId) pdpShowPage(propId);
+    if (typeof closeAllDD === 'function') closeAllDD();
+    // Close hamburger
+    var nav = document.getElementById('nav-links'), hb = document.getElementById('hamburger');
+    if(nav) nav.classList.remove('mob-open');
+    if(hb)  hb.classList.remove('active');
+    // SEO button
+    var _seoBtn = document.getElementById('seo-toggle-btn');
+    if(_seoBtn) _seoBtn.setAttribute('data-page', 'other');
+    window.scrollTo(0, 0);
+    return;
+  }
+  // ── Hide property page when navigating away ──
+  var pgPropEl = document.getElementById('page-property');
+  if (pgPropEl) { pgPropEl.classList.remove('active'); pgPropEl.style.display = 'none'; }
   _silentShowPage(name); // _silentShowPage renders listings already
   // seo-toggle-btn: show only on listings page
   const seoBtn = document.getElementById('seo-toggle-btn');
@@ -11726,18 +12635,12 @@ document.addEventListener('DOMContentLoaded', function initRouter() {
       if(window._forceReset) { window._forceReset = false; }
       _routerReady = true;
       clearInterval(_readyCheck);
-      // If arriving at a property URL, open the modal now
-      if (window._pendingOpenId) {
-        const pid = window._pendingOpenId;
-        delete window._pendingOpenId;
+      // If arriving at a property URL, show Property Detail Page
+      if (window._pendingPropertyId) {
+        const pid = window._pendingPropertyId;
+        delete window._pendingPropertyId;
         setTimeout(() => {
-          if (props.find(x => String(x.id) === String(pid))) {
-            const _origFlag = _routerReady;
-            _routerReady = false;
-            if(typeof scrollToEl === 'function') scrollToEl('all-sec');
-            openModal(pid);
-            _routerReady = _origFlag;
-          }
+          showPage('property', pid);
         }, 300);
       }
     }
@@ -11880,8 +12783,8 @@ function propCard(p){
   })();
   const investHtml = investTag ? `<div style="position:absolute;bottom:44px;left:10px;background:linear-gradient(135deg,#c8922a,#e8b84b);color:#fff;font-size:10px;font-weight:800;padding:3px 10px;border-radius:20px;z-index:5;white-space:nowrap;box-shadow:0 2px 8px rgba(200,146,42,.5);letter-spacing:.3px"><i class="fas fa-chart-line"></i> ${investTag}</div>` : '';
 
-  return `<div class="prop-card" onclick="openModal('${p.id}')" style="cursor:pointer">
-    <a href="/property/${p.id}" class="prop-card-seo-link" onclick="event.preventDefault()" aria-label="${_sTitle}" tabindex="-1" style="position:absolute;inset:0;z-index:0;pointer-events:none"></a>
+  return `<div class="prop-card" onclick="showPage('property','${p.id}')" style="cursor:pointer">
+    <a href="${typeof _pdpPropUrl === 'function' ? _pdpPropUrl(p) : '/property/'+p.id}" class="prop-card-seo-link" onclick="event.preventDefault()" aria-label="${_sTitle}" tabindex="-1" style="position:absolute;inset:0;z-index:0;pointer-events:none"></a>
     <div class="prop-thumb">
       ${thumbInner}
       <div class="prop-badges">
@@ -12779,7 +13682,7 @@ function mdMapRefreshMarkers() {
         '<div class="md-popup-loc"><i class="fas fa-map-marker-alt" style="color:var(--a);font-size:10px"></i> ' + (p.location||p.province||'กรุงเทพฯ') + '</div>' +
         '<div class="md-popup-price">' + (isRent ? '฿' + p.price.toLocaleString() + '/เดือน' : (p.price>=1e6 ? '฿'+(p.price/1e6).toFixed(2).replace(/\.?0+$/,'')+'M' : '฿'+p.price.toLocaleString())) + '</div>' +
         (specsHtml ? '<div class="md-popup-specs">' + specsHtml + '</div>' : '') +
-        '<button class="md-popup-btn" onclick="if(typeof openModal===\'function\') openModal(\'' + p.id + '\')"><i class="fas fa-eye"></i> ดูรายละเอียด</button>' +
+        '<button class="md-popup-btn" onclick="if(typeof showPage===\'function\') showPage(\'property\',\'' + p.id + '\')"><i class="fas fa-eye"></i> ดูรายละเอียด</button>' +
       '</div>' +
     '</div>';
     
@@ -21321,6 +22224,230 @@ function resetAdvFilter(){
 
 
 <!-- ===== LISTINGS PAGE ===== -->
+
+<!-- ════════ PROPERTY DETAIL PAGE — HTML ════════ -->
+<div id="page-property" class="page" style="display:none" role="main">
+
+  <!-- Breadcrumb — SEO visible navigation -->
+  <nav class="pdp-breadcrumb" aria-label="เส้นทางนำทาง">
+    <div class="pdp-breadcrumb-inner" id="pdp-breadcrumb-inner">
+      <a href="/" onclick="event.preventDefault();showPage('home')">หน้าแรก</a>
+      <span class="pdp-breadcrumb-sep">›</span>
+      <a href="/listings" onclick="event.preventDefault();showPage('listings')">ประกาศทั้งหมด</a>
+      <span class="pdp-breadcrumb-sep">›</span>
+      <span class="pdp-breadcrumb-current" id="pdp-bc-type">คอนโด</span>
+      <span class="pdp-breadcrumb-sep">›</span>
+      <span class="pdp-breadcrumb-current" id="pdp-bc-title">กำลังโหลด...</span>
+    </div>
+  </nav>
+
+  <!-- Back button -->
+  <div class="pdp-back-bar">
+    <button class="pdp-back-btn" onclick="pdpGoBack()" aria-label="กลับไปหน้าก่อนหน้า">
+      <i class="fas fa-arrow-left"></i>
+      <span id="pdp-back-label">กลับ</span>
+    </button>
+  </div>
+
+  <!-- Loading skeleton -->
+  <div id="pdp-loading" class="pdp-loading" aria-hidden="true">
+    <div>
+      <div class="pdp-skeleton pdp-sk-gal"></div>
+      <div class="pdp-skeleton pdp-sk-title" style="margin-top:20px"></div>
+      <div class="pdp-skeleton pdp-sk-sub"></div>
+      <div class="pdp-skeleton pdp-sk-price"></div>
+      <div class="pdp-skeleton pdp-sk-spec"></div>
+    </div>
+    <div>
+      <div class="pdp-skeleton" style="height:280px;border-radius:16px"></div>
+    </div>
+  </div>
+
+  <!-- Error state -->
+  <div id="pdp-error" class="pdp-error" style="display:none">
+    <div class="pdp-error-ico">🏚️</div>
+    <h1 class="pdp-error-title">ไม่พบทรัพย์ที่ต้องการ</h1>
+    <p class="pdp-error-sub">ทรัพย์นี้อาจถูกลบออก หรือ URL ไม่ถูกต้อง<br>ลองค้นหาทรัพย์ที่ต้องการจากรายการด้านล่าง</p>
+    <a href="/listings" class="pdp-error-btn" onclick="event.preventDefault();showPage('listings')">
+      <i class="fas fa-search"></i> ดูประกาศทั้งหมด
+    </a>
+  </div>
+
+  <!-- Main content — rendered by JS -->
+  <article id="pdp-content" style="display:none">
+
+    <div class="pdp-layout">
+
+      <!-- LEFT: Main content -->
+      <div>
+        <!-- Gallery -->
+        <figure class="pdp-gallery" id="pdp-gallery" aria-label="รูปภาพทรัพย์">
+          <div class="pdp-gallery-main" id="pdp-gal-main">
+            <!-- JS renders image here -->
+          </div>
+          <button class="pdp-gal-prev" onclick="pdpGalNav(-1)" aria-label="รูปก่อนหน้า">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <button class="pdp-gal-next" onclick="pdpGalNav(1)" aria-label="รูปถัดไป">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+          <div class="pdp-gal-counter" id="pdp-gal-counter">1 / 1</div>
+        </figure>
+        <div class="pdp-gallery-thumbs" id="pdp-thumbs"></div>
+
+        <!-- Type + Title -->
+        <header class="pdp-header" style="margin-top:20px">
+          <div class="pdp-type-row" id="pdp-badges"></div>
+          <h1 class="pdp-title" id="pdp-title"></h1>
+          <div class="pdp-location-row" id="pdp-location">
+            <i class="fas fa-map-marker-alt"></i>
+            <span id="pdp-location-text"></span>
+          </div>
+          <!-- BTS/MRT transit links — Programmatic SEO entry points -->
+          <div class="pdp-transit-tags" id="pdp-transit-tags"></div>
+        </header>
+
+        <!-- Price (mobile: shows here, desktop: in sidebar) -->
+        <div class="pdp-price-block pdp-price-mobile" id="pdp-price-mobile" style="display:none">
+          <div class="pdp-price-label">ราคา</div>
+          <div class="pdp-price" id="pdp-price-m"></div>
+          <div class="pdp-price-sub" id="pdp-price-sub-m"></div>
+          <div class="pdp-sqm-price" id="pdp-sqm-m"></div>
+        </div>
+
+        <!-- Specs -->
+        <div class="pdp-specs">
+          <div class="pdp-specs-title"><i class="fas fa-ruler-combined" style="color:var(--a)"></i> รายละเอียดทรัพย์</div>
+          <div class="pdp-specs-grid" id="pdp-specs-grid"></div>
+        </div>
+
+        <!-- Description -->
+        <div class="pdp-section" id="pdp-desc-section">
+          <h2 class="pdp-section-title"><i class="fas fa-align-left" style="color:var(--a)"></i> รายละเอียด</h2>
+          <p class="pdp-desc collapsed" id="pdp-desc-text"></p>
+          <button class="pdp-read-more" id="pdp-read-more-btn" onclick="pdpToggleDesc()" aria-expanded="false">
+            <i class="fas fa-chevron-down"></i> อ่านเพิ่มเติม
+          </button>
+        </div>
+
+        <!-- Amenities / Appliances -->
+        <div class="pdp-section" id="pdp-amenities-section" style="display:none">
+          <h2 class="pdp-section-title"><i class="fas fa-check-circle" style="color:var(--a)"></i> สิ่งอำนวยความสะดวก</h2>
+          <div class="pdp-features-grid" id="pdp-features-grid"></div>
+        </div>
+
+        <!-- Nearby Places (Future: /bts/:station, /mrt/:station) -->
+        <div class="pdp-section" id="pdp-nearby-section" style="display:none">
+          <h2 class="pdp-section-title"><i class="fas fa-map-signs" style="color:var(--a)"></i> สถานที่ใกล้เคียง</h2>
+          <div id="pdp-nearby-grid"></div>
+        </div>
+
+        <!-- Map -->
+        <div class="pdp-section" id="pdp-map-section">
+          <h2 class="pdp-section-title"><i class="fas fa-map" style="color:var(--a)"></i> ที่ตั้ง</h2>
+          <div class="pdp-map-wrap">
+            <div class="pdp-map-placeholder" id="pdp-map-placeholder" onclick="pdpLoadMap()" role="button" aria-label="แสดงแผนที่">
+              <i class="fas fa-map-marked-alt"></i>
+              <span>แตะเพื่อดูแผนที่</span>
+              <span style="font-size:11px;color:var(--gr)" id="pdp-map-location-text"></span>
+            </div>
+            <div id="pdp-map-container" style="display:none;width:100%;height:100%"></div>
+          </div>
+          <!-- Location SEO links -->
+          <div id="pdp-location-links" style="margin-top:12px;display:flex;flex-wrap:wrap;gap:6px"></div>
+        </div>
+
+        <!-- CTA mobile (shows on mobile only) -->
+        <div class="pdp-cta-mobile" id="pdp-cta-mobile" style="display:none;margin-bottom:0">
+          <div class="pdp-cta-stack" id="pdp-cta-mobile-btns"></div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT: Sidebar -->
+      <aside class="pdp-sidebar" aria-label="ข้อมูลเพิ่มเติม">
+
+        <!-- Price Block (desktop) -->
+        <div class="pdp-price-block" id="pdp-price-sidebar">
+          <div class="pdp-price-label" id="pdp-price-label-s">ราคาขาย</div>
+          <div class="pdp-price" id="pdp-price-s"></div>
+          <div class="pdp-price-sub" id="pdp-price-sub-s"></div>
+          <div class="pdp-sqm-price" id="pdp-sqm-s"></div>
+        </div>
+
+        <!-- CTA Buttons -->
+        <div class="pdp-agent-card" id="pdp-agent-card">
+          <div class="pdp-agent-hd" id="pdp-agent-hd">
+            <!-- JS renders agent here -->
+          </div>
+          <div class="pdp-agent-stats" id="pdp-agent-stats"></div>
+          <div class="pdp-cta-stack" id="pdp-cta-btns"></div>
+          <!-- Share Box -->
+          <div class="pdp-share-box" id="pdp-share-box">
+            <input type="text" class="pdp-share-url" id="pdp-share-url" readonly onclick="this.select()">
+            <div class="pdp-share-icons">
+              <a class="pdp-share-ico pdp-share-fb" id="pdp-share-fb" href="#" target="_blank" rel="noopener" aria-label="แชร์ Facebook">
+                <i class="fab fa-facebook-f"></i>
+              </a>
+              <a class="pdp-share-ico pdp-share-line" id="pdp-share-line" href="#" target="_blank" rel="noopener" aria-label="แชร์ LINE">
+                <i class="fab fa-line"></i>
+              </a>
+              <a class="pdp-share-ico pdp-share-tw" id="pdp-share-tw" href="#" target="_blank" rel="noopener" aria-label="แชร์ Twitter/X">
+                <i class="fab fa-x-twitter"></i>
+              </a>
+              <button class="pdp-share-ico pdp-share-copy" onclick="pdpCopyUrl()" aria-label="คัดลอกลิงก์">
+                <i class="fas fa-link"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Policy Note -->
+        <div style="background:var(--pastel3,#E0EAF7);border-radius:12px;padding:14px 16px;font-size:12px;color:var(--p,#1B3A6B);line-height:1.7">
+          <i class="fas fa-shield-alt" style="margin-right:5px"></i>
+          <strong>ปรึกษาฟรี ไม่มีค่านายหน้าเพิ่มเติม</strong><br>
+          ทีมงานพร้อมให้คำปรึกษา จ.-อา. 9:00–21:00 น.
+        </div>
+
+      </aside>
+
+    </div><!-- /.pdp-layout -->
+
+    <!-- Related Properties — SEO Internal Linking -->
+    <section class="pdp-related" aria-label="ทรัพย์ที่คล้ายกัน" id="pdp-related-section">
+      <h2 class="pdp-related-title">
+        <i class="fas fa-th-large" style="color:var(--a)"></i>
+        ทรัพย์ที่คล้ายกัน
+      </h2>
+      <div class="pdp-related-grid" id="pdp-related-grid"></div>
+      <div style="text-align:center;margin-top:20px">
+        <a href="/listings" class="pdp-cta-btn pdp-cta-share"
+           onclick="event.preventDefault();showPage('listings')"
+           style="display:inline-flex;padding:11px 28px">
+          <i class="fas fa-search"></i> ดูประกาศทั้งหมด
+        </a>
+      </div>
+    </section>
+
+    <!-- SEO Internal Link Footer -->
+    <div class="pdp-seo-links">
+      <div class="pdp-seo-links-inner">
+        <h2>ค้นหาอสังหาริมทรัพย์ตามประเภท</h2>
+        <div class="pdp-seo-link-group" id="pdp-seo-type-links"></div>
+        <h2>ค้นหาตามทำเล</h2>
+        <div class="pdp-seo-link-group" id="pdp-seo-loc-links"></div>
+        <h2>ค้นหาใกล้รถไฟฟ้า</h2>
+        <div class="pdp-seo-link-group" id="pdp-seo-transit-links"></div>
+      </div>
+    </div>
+
+  </article>
+
+  <!-- Footer inject point — same pattern as other sub-pages -->
+  <div class="sub-page-footer"></div>
+
+</div><!-- /#page-property -->
+
 <div class="page" id="page-listings">
   <!-- Hero Banner -->
   <div style="background:linear-gradient(135deg,#0A1628 0%,#1B3A6B 60%,#0F2548 100%);padding:24px 20px 20px;position:relative;overflow:visible">
@@ -23103,5 +24230,1004 @@ async function adminDeletePortfolio(id, title){
   _renderAdminPanel('portfolio');
 }
 </script>
+
+<!-- ════════ PROPERTY DETAIL PAGE — JS ════════ -->
+<script>
+(function(){
+
+  /* ── State ── */
+  var _pdpProp     = null;  // current property object
+  var _pdpAgent    = null;  // current agent object
+  var _pdpGalIdx   = 0;     // current gallery index
+  var _pdpPhotos   = [];    // gallery photos array
+  var _pdpMapLoaded = false;
+
+  /* ── Format helpers (mirrors index.html helpers) ── */
+  function _fmt(v){ return typeof fmtPrice === 'function' ? fmtPrice(v, _pdpProp && _pdpProp.tx) : v.toLocaleString() + ' บาท'; }
+  function _slug(s){ return (s||'').toLowerCase().replace(/[^ก-๙a-z0-9\s-]/g,'').trim().replace(/\s+/g,'-').slice(0,80); }
+  function _san(s){ return (s||'').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function _propUrl(p){
+    var slug = _slug(p.title);
+    return '/property/' + p.id + (slug ? '-' + slug : '');
+  }
+  function _typeIcon(t){
+    var m={'คอนโด':'🏙️','บ้านเดี่ยว':'🏡','ทาวน์โฮม':'🏘️','ที่ดิน':'🌿','อาคารพาณิชย์':'🏢','วิลล่า':'🏖️','รีสอร์ท':'🌴','โรงแรม':'🏨'};
+    return m[t] || '🏠';
+  }
+  function _starStr(rating){
+    var r = Math.round((rating||4.5)*2)/2;
+    var full = Math.floor(r), half = r%1>=0.5 ? 1 : 0, empty = 5-full-half;
+    return '<i class="fas fa-star"></i>'.repeat(full) +
+           (half ? '<i class="fas fa-star-half-alt"></i>' : '') +
+           '<i class="far fa-star"></i>'.repeat(empty) +
+           ' <span style="color:var(--gr)">' + rating + '</span>';
+  }
+
+  /* ── Generate SEO slug + canonical URL ── */
+  window._pdpPropUrl = _propUrl;
+
+  /* ────────────────────────────────────────────────────
+     pdpShowPage(id)
+     - Main entry point called by router/showPage('property', id)
+     - Renders full property detail page for given property id
+  ──────────────────────────────────────────────────── */
+  window.pdpShowPage = function(id) {
+    /* บันทึก id ปัจจุบันไว้เสมอ — afterLoad() ใช้เพื่อ re-render ตอนข้อมูลพร้อม */
+    window._pdpCurrentId = String(id);
+
+    /* 1. Find property in already-loaded data */
+    var p = null;
+    if (typeof props !== 'undefined' && props.length) {
+      p = props.find(function(x){ return String(x.id) === String(id); });
+    }
+    if (!p && typeof MOCK !== 'undefined') {
+      p = (MOCK.props||[]).find(function(x){ return String(x.id) === String(id); });
+    }
+
+    /* 2. Show loading skeleton, hide others */
+    var elLoading = document.getElementById('pdp-loading');
+    var elError   = document.getElementById('pdp-error');
+    var elContent = document.getElementById('pdp-content');
+    if (elLoading) elLoading.style.display = '';
+    if (elError)   elError.style.display = 'none';
+    if (elContent) elContent.style.display = 'none';
+
+    /* 3. Render immediately if found */
+    if (p) { _pdpRender(p); return; }
+
+    /* 4. Not in memory — check Supabase */
+    if (typeof sb !== 'undefined' && sb) {
+      sb.from('properties').select('*').eq('id', id).single()
+        .then(function(res){
+          if (res.data) {
+            var mapped = typeof mapProp === 'function' ? mapProp(res.data) : res.data;
+            _pdpRender(mapped);
+          } else {
+            /* ลอง fetch ไม่พบ → check MOCK อีกครั้ง (กัน id mismatch type) */
+            var fallback = (MOCK && MOCK.props ? MOCK.props : []).find(function(x){ return String(x.id) === String(id); });
+            if (fallback) { _pdpRender(fallback); } else { _pdpShowError(); }
+          }
+        }).catch(function(){ _pdpShowError(); });
+      return;
+    }
+
+    /* 5. Supabase ยังไม่พร้อม — polling รอ props หรือ sb (max 5 วิ) */
+    var _pdpWaitTry = 0;
+    var _pdpWaitMax = 25; /* 25 × 200ms = 5 sec */
+    var _pdpWaitTimer = setInterval(function() {
+      /* abort ถ้า user navigate ออกไปแล้ว */
+      if (window._pdpCurrentId !== String(id)) { clearInterval(_pdpWaitTimer); return; }
+
+      _pdpWaitTry++;
+      var found = null;
+      if (typeof props !== 'undefined' && props.length) {
+        found = props.find(function(x){ return String(x.id) === String(id); });
+      }
+
+      if (found) {
+        clearInterval(_pdpWaitTimer);
+        _pdpRender(found);
+        return;
+      }
+
+      /* Supabase กลายเป็น ready ระหว่างรอ → fetch โดยตรง */
+      if (typeof sb !== 'undefined' && sb) {
+        clearInterval(_pdpWaitTimer);
+        sb.from('properties').select('*').eq('id', id).single()
+          .then(function(res){
+            if (res.data) {
+              var mapped = typeof mapProp === 'function' ? mapProp(res.data) : res.data;
+              _pdpRender(mapped);
+            } else {
+              var fallback2 = (MOCK && MOCK.props ? MOCK.props : []).find(function(x){ return String(x.id) === String(id); });
+              if (fallback2) { _pdpRender(fallback2); } else { _pdpShowError(); }
+            }
+          }).catch(function(){ _pdpShowError(); });
+        return;
+      }
+
+      if (_pdpWaitTry >= _pdpWaitMax) {
+        clearInterval(_pdpWaitTimer);
+        /* ลอง MOCK เป็น last resort */
+        var lastResort = (MOCK && MOCK.props ? MOCK.props : []).find(function(x){ return String(x.id) === String(id); });
+        if (lastResort) { _pdpRender(lastResort); } else { _pdpShowError(); }
+      }
+    }, 200);
+  };
+
+  /* ── Show error state ── */
+  function _pdpShowError() {
+    var elLoading = document.getElementById('pdp-loading');
+    var elError   = document.getElementById('pdp-error');
+    if (elLoading) elLoading.style.display = 'none';
+    if (elError)   elError.style.display = '';
+    window._pdpCurrentId = null;
+  }
+
+  /* ── Main render ── */
+  function _pdpRender(p) {
+    _pdpProp  = p;
+    _pdpAgent = null;
+    _pdpGalIdx = 0;
+    _pdpMapLoaded = false;
+
+    /* render สำเร็จ — clear pending flag */
+    window._pdpCurrentId = null;
+
+    /* Find agent */
+    if (p.agentId && typeof agents !== 'undefined') {
+      _pdpAgent = agents.find(function(a){ return a.id === p.agentId; });
+    }
+
+    var elLoading = document.getElementById('pdp-loading');
+    var elContent = document.getElementById('pdp-content');
+    if (elLoading) elLoading.style.display = 'none';
+    if (elContent) elContent.style.display = '';
+
+    _pdpRenderBreadcrumb(p);
+    _pdpRenderGallery(p);
+    _pdpRenderHeader(p);
+    _pdpRenderPrice(p);
+    _pdpRenderSpecs(p);
+    _pdpRenderDesc(p);
+    _pdpRenderAmenities(p);
+    _pdpRenderNearby(p);
+    _pdpRenderMap(p);
+    _pdpRenderAgent(p);
+    _pdpRenderCTA(p);
+    _pdpRenderRelated(p);
+    _pdpRenderSeoLinks(p);
+    _pdpRenderMobileCTA(p);
+    _pdpUpdateMetaAndSchema(p);
+    _pdpUpdateBackLabel();
+
+    /* Scroll to top */
+    window.scrollTo(0, 0);
+
+    /* ── Keyboard nav: ← → navigate gallery, ESC goes back ── */
+    window._pdpKeyHandler && document.removeEventListener('keydown', window._pdpKeyHandler);
+    window._pdpKeyHandler = function(e) {
+      var pgProp = document.getElementById('page-property');
+      if (!pgProp || !pgProp.classList.contains('active')) return;
+      if (e.key === 'ArrowLeft')  pdpGalNav(-1);
+      if (e.key === 'ArrowRight') pdpGalNav(1);
+      if (e.key === 'Escape')     pdpGoBack();
+    };
+    document.addEventListener('keydown', window._pdpKeyHandler);
+  }
+
+  /* ── Breadcrumb ── */
+  function _pdpRenderBreadcrumb(p) {
+    var bcType  = document.getElementById('pdp-bc-type');
+    var bcTitle = document.getElementById('pdp-bc-title');
+    if (bcType)  bcType.textContent  = p.type || 'ทรัพย์';
+    if (bcTitle) bcTitle.textContent = (p.title||'').slice(0, 50) + ((p.title||'').length > 50 ? '…' : '');
+
+    /* Update visible breadcrumb hrefs for crawlability */
+    var inner = document.getElementById('pdp-breadcrumb-inner');
+    if (!inner) return;
+    var links = inner.querySelectorAll('a');
+    /* links[0]=home, links[1]=listings — already correct */
+  }
+
+  /* ── Gallery ── */
+  function _pdpRenderGallery(p) {
+    _pdpPhotos = (p.photos || []).filter(Boolean);
+    if (!_pdpPhotos.length) {
+      /* Placeholder */
+      var main = document.getElementById('pdp-gal-main');
+      if (main) main.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:80px;background:linear-gradient(135deg,#0F2548,#1B3A6B)">' + _typeIcon(p.type) + '</div>';
+      var counter = document.getElementById('pdp-gal-counter');
+      if (counter) counter.style.display = 'none';
+      var prev = document.querySelector('.pdp-gal-prev');
+      var next = document.querySelector('.pdp-gal-next');
+      if (prev) prev.style.display = 'none';
+      if (next) next.style.display = 'none';
+      var thumbs = document.getElementById('pdp-thumbs');
+      if (thumbs) thumbs.innerHTML = '';
+      return;
+    }
+    _pdpGalIdx = 0;
+    _pdpGalShow(0);
+
+    /* Thumbnails */
+    var thumbsEl = document.getElementById('pdp-thumbs');
+    if (thumbsEl) {
+      thumbsEl.innerHTML = _pdpPhotos.map(function(url, i){
+        return '<div class="pdp-thumb' + (i===0?' active':'') + '" onclick="pdpGalGoTo(' + i + ')" role="button" aria-label="รูปที่ ' + (i+1) + '">' +
+          '<img src="' + _san(url) + '" loading="lazy" decoding="async" alt="' + _san(p.title) + ' รูปที่ ' + (i+1) + '">' +
+          '</div>';
+      }).join('');
+    }
+
+    /* Show/hide nav buttons */
+    var prev = document.querySelector('.pdp-gal-prev');
+    var next = document.querySelector('.pdp-gal-next');
+    var counter = document.getElementById('pdp-gal-counter');
+    if (_pdpPhotos.length <= 1) {
+      if (prev) prev.style.display = 'none';
+      if (next) next.style.display = 'none';
+      if (counter) counter.style.display = 'none';
+    } else {
+      if (prev) prev.style.display = '';
+      if (next) next.style.display = '';
+      if (counter) counter.style.display = '';
+    }
+  }
+
+  function _pdpGalShow(idx) {
+    if (!_pdpPhotos.length) return;
+    idx = ((idx % _pdpPhotos.length) + _pdpPhotos.length) % _pdpPhotos.length;
+    _pdpGalIdx = idx;
+    var main = document.getElementById('pdp-gal-main');
+    if (main) {
+      main.innerHTML = '<img src="' + _san(_pdpPhotos[idx]) + '" ' +
+        'alt="' + _san((_pdpProp && _pdpProp.title)||'') + ' รูปที่ ' + (idx+1) + '" ' +
+        (idx === 0 ? 'loading="eager"' : 'loading="lazy"') + ' decoding="async"' +
+        ' style="width:100%;height:100%;object-fit:cover;display:block">';
+    }
+    var counter = document.getElementById('pdp-gal-counter');
+    if (counter) counter.textContent = (idx+1) + ' / ' + _pdpPhotos.length;
+    /* Update thumb active state */
+    var thumbs = document.querySelectorAll('#pdp-thumbs .pdp-thumb');
+    thumbs.forEach(function(t, i){ t.classList.toggle('active', i===idx); });
+  }
+
+  window.pdpGalNav = function(dir) { _pdpGalShow(_pdpGalIdx + dir); };
+  window.pdpGalGoTo = function(idx) { _pdpGalShow(idx); };
+
+  /* ── Touch swipe support for gallery ── */
+  (function(){
+    var _ts = 0, _tx = 0;
+    var gal = document.getElementById('pdp-gallery');
+    if (!gal) return;
+    gal.addEventListener('touchstart', function(e){
+      _ts = e.touches[0].clientX;
+    }, { passive: true });
+    gal.addEventListener('touchend', function(e){
+      _tx = e.changedTouches[0].clientX - _ts;
+      if (Math.abs(_tx) > 40) pdpGalNav(_tx < 0 ? 1 : -1);
+    }, { passive: true });
+  })();
+
+  /* ── Header (badges, title, location, transit) ── */
+  function _pdpRenderHeader(p) {
+    /* Badges */
+    var badges = document.getElementById('pdp-badges');
+    if (badges) {
+      var html = '<span class="pdp-badge pdp-badge-type">' + _san(p.type||'ทรัพย์') + '</span>';
+      html += p.tx === 'RENT'
+        ? '<span class="pdp-badge pdp-badge-rent"><i class="fas fa-key"></i> เช่า</span>'
+        : '<span class="pdp-badge pdp-badge-buy"><i class="fas fa-tag"></i> ขาย</span>';
+      if (p.isNew)  html += '<span class="pdp-badge pdp-badge-new"><i class="fas fa-star"></i> ใหม่</span>';
+      if (p.isRec)  html += '<span class="pdp-badge pdp-badge-hot"><i class="fas fa-fire"></i> Hot</span>';
+      badges.innerHTML = html;
+    }
+
+    /* Title (h1 — critical SEO) */
+    var title = document.getElementById('pdp-title');
+    if (title) title.textContent = p.title || '';
+
+    /* Location */
+    var locText = document.getElementById('pdp-location-text');
+    if (locText) {
+      var loc = [p.location, p.province].filter(Boolean).join(', ');
+      locText.textContent = loc || '';
+    }
+
+    /* Transit tags — Programmatic SEO entry points to future /bts/ /mrt/ pages */
+    var transitEl = document.getElementById('pdp-transit-tags');
+    if (transitEl) {
+      var tags = [];
+      if (p.bts) {
+        tags.push('<a class="pdp-transit pdp-transit-bts" href="/bts/' + _slug(p.bts) + '" ' +
+          'onclick="event.preventDefault();if(typeof showPage===\'function\')showPage(\'listings\')" ' +
+          'title="คอนโดใกล้ BTS ' + _san(p.bts) + '">' +
+          '<i class="fas fa-train"></i> BTS ' + _san(p.bts) + '</a>');
+      }
+      if (p.mrt) {
+        tags.push('<a class="pdp-transit pdp-transit-mrt" href="/mrt/' + _slug(p.mrt) + '" ' +
+          'onclick="event.preventDefault();if(typeof showPage===\'function\')showPage(\'listings\')" ' +
+          'title="คอนโดใกล้ MRT ' + _san(p.mrt) + '">' +
+          '<i class="fas fa-subway"></i> MRT ' + _san(p.mrt) + '</a>');
+      }
+      if (p.arl) {
+        tags.push('<a class="pdp-transit pdp-transit-arl" href="/arl/' + _slug(p.arl) + '" ' +
+          'onclick="event.preventDefault()" ' +
+          'title="ใกล้ Airport Rail Link ' + _san(p.arl) + '">' +
+          '<i class="fas fa-plane"></i> ARL ' + _san(p.arl) + '</a>');
+      }
+      transitEl.innerHTML = tags.join('');
+    }
+  }
+
+  /* ── Price ── */
+  function _pdpRenderPrice(p) {
+    var isBuy = p.tx !== 'RENT';
+    var priceStr = typeof fmtPrice === 'function' ? fmtPrice(p.price, p.tx) : (p.price||0).toLocaleString() + (isBuy ? ' บาท' : ' บาท/เดือน');
+    var subStr   = isBuy ? 'ราคาขาย' : 'ค่าเช่าต่อเดือน';
+    var sqmStr   = (p.area > 0 && p.price > 0 && isBuy) ? '฿' + Math.round(p.price / p.area).toLocaleString() + ' / ตร.ม.' : '';
+    var labelStr = isBuy ? 'ราคาขาย' : 'ราคาเช่า';
+
+    /* Sidebar */
+    var lbl = document.getElementById('pdp-price-label-s');
+    var ps  = document.getElementById('pdp-price-s');
+    var pss = document.getElementById('pdp-price-sub-s');
+    var sq  = document.getElementById('pdp-sqm-s');
+    if (lbl) lbl.textContent = labelStr;
+    if (ps)  ps.textContent  = priceStr;
+    if (pss) pss.textContent = subStr;
+    if (sq)  sq.textContent  = sqmStr;
+
+    /* Mobile price block (hidden on desktop via CSS) */
+    var pm  = document.getElementById('pdp-price-m');
+    var psm = document.getElementById('pdp-price-sub-m');
+    var sqm = document.getElementById('pdp-sqm-m');
+    if (pm)  pm.textContent  = priceStr;
+    if (psm) psm.textContent = subStr;
+    if (sqm) sqm.textContent = sqmStr;
+  }
+
+  /* ── Specs Grid ── */
+  function _pdpRenderSpecs(p) {
+    var el = document.getElementById('pdp-specs-grid');
+    if (!el) return;
+    var items = [];
+
+    if (p.bed > 0)   items.push({icon:'fa-bed',    val:p.bed,    lbl:'ห้องนอน'});
+    if (p.bath > 0)  items.push({icon:'fa-shower',  val:p.bath,   lbl:'ห้องน้ำ'});
+    if (p.area > 0)  items.push({icon:'fa-ruler-combined', val:p.area, lbl:'พื้นที่ใช้สอย (ตร.ม.)'});
+    if (p.land_area > 0) items.push({icon:'fa-map', val:p.land_area, lbl:'ที่ดิน (ตร.ว.)'});
+    if (p.floors > 0) {
+      var fv = p.floor_no > 0 ? p.floor_no + '/' + p.floors : p.floors;
+      items.push({icon:'fa-building', val:fv, lbl: p.floor_no > 0 ? 'ชั้น / ทั้งหมด' : 'จำนวนชั้น'});
+    }
+    if (p.parking > 0) items.push({icon:'fa-car', val:p.parking, lbl:'ที่จอดรถ'});
+    if (p.furniture) {
+      var furMap = {full:'เฟอร์นิเจอร์ครบ', partial:'บางส่วน', none:'ไม่มีเฟอร์'};
+      var furIcon = {full:'fa-couch', partial:'fa-couch', none:'fa-times'};
+      items.push({icon: furIcon[p.furniture]||'fa-couch', val:'', lbl: furMap[p.furniture]||p.furniture, noVal:true});
+    }
+    if (p.pets_allowed) items.push({icon:'fa-paw', val:'', lbl:'เลี้ยงสัตว์ได้', noVal:true});
+
+    el.innerHTML = items.map(function(item){
+      return '<div class="pdp-spec-item">' +
+        '<div class="pdp-spec-icon"><i class="fas ' + item.icon + '"></i></div>' +
+        (!item.noVal ? '<div class="pdp-spec-val">' + item.val + '</div>' : '<div class="pdp-spec-val">✓</div>') +
+        '<div class="pdp-spec-lbl">' + item.lbl + '</div>' +
+        '</div>';
+    }).join('');
+
+    if (!items.length) {
+      var sec = document.querySelector('.pdp-specs');
+      if (sec) sec.style.display = 'none';
+    }
+  }
+
+  /* ── Description ── */
+  function _pdpRenderDesc(p) {
+    var el   = document.getElementById('pdp-desc-text');
+    var btn  = document.getElementById('pdp-read-more-btn');
+    var desc = p.desc || p.description || '';
+    if (el) {
+      el.textContent = desc;
+      el.classList.add('collapsed');
+    }
+    if (btn) {
+      /* Hide button if text is short */
+      btn.style.display = desc.length > 200 ? '' : 'none';
+      btn.setAttribute('aria-expanded', 'false');
+    }
+  }
+
+  window.pdpToggleDesc = function() {
+    var el  = document.getElementById('pdp-desc-text');
+    var btn = document.getElementById('pdp-read-more-btn');
+    if (!el) return;
+    var collapsed = el.classList.toggle('collapsed');
+    if (btn) {
+      btn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+      btn.innerHTML = collapsed
+        ? '<i class="fas fa-chevron-down"></i> อ่านเพิ่มเติม'
+        : '<i class="fas fa-chevron-up"></i> ย่อ';
+    }
+  };
+
+  /* ── Amenities ── */
+  function _pdpRenderAmenities(p) {
+    var sec = document.getElementById('pdp-amenities-section');
+    var grid = document.getElementById('pdp-features-grid');
+    var items = [];
+    var iconMap = {
+      'แอร์':'fa-snowflake','ตู้เย็น':'fa-temperature-low','เครื่องซักผ้า':'fa-tshirt',
+      'โทรทัศน์':'fa-tv','เตาไฟฟ้า':'fa-fire-burner','เครื่องทำน้ำอุ่น':'fa-hot-tub',
+      'สระว่ายน้ำ':'fa-swimming-pool','ฟิตเนส':'fa-dumbbell','รักษาความปลอดภัย':'fa-shield-alt',
+      'ที่จอดรถ':'fa-car','ลิฟต์':'fa-elevator','ระเบียง':'fa-door-open',
+      'ไมโครเวฟ':'fa-microwave','อินเตอร์เน็ต':'fa-wifi'
+    };
+    var apps = (p.appliances||[]).concat(p.amenities||[]).filter(Boolean);
+    apps.forEach(function(a){
+      items.push({icon: iconMap[a]||'fa-check', name: a});
+    });
+    if (p.pets_allowed) items.push({icon:'fa-paw', name:'เลี้ยงสัตว์ได้'});
+    if (p.furniture==='full') items.push({icon:'fa-couch', name:'เฟอร์นิเจอร์ครบ'});
+
+    if (!items.length) {
+      if (sec) sec.style.display = 'none';
+      return;
+    }
+    if (sec) sec.style.display = '';
+    if (grid) {
+      grid.innerHTML = items.map(function(it){
+        return '<div class="pdp-feature-item">' +
+          '<i class="fas ' + it.icon + '"></i>' +
+          '<span>' + _san(it.name) + '</span>' +
+          '</div>';
+      }).join('');
+    }
+  }
+
+  /* ── Nearby Places ── */
+  function _pdpRenderNearby(p) {
+    var sec  = document.getElementById('pdp-nearby-section');
+    var grid = document.getElementById('pdp-nearby-grid');
+    var places = p.nearby_places;
+    if (!places || (Array.isArray(places) && !places.length)) {
+      if (sec) sec.style.display = 'none';
+      return;
+    }
+    if (sec) sec.style.display = '';
+    if (grid) {
+      var arr = Array.isArray(places) ? places : Object.values(places);
+      grid.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px">' +
+        arr.map(function(pl){
+          var name = typeof pl === 'string' ? pl : (pl.name||'');
+          var dist = typeof pl === 'object' ? (pl.distance||pl.dist||'') : '';
+          return '<div class="pdp-feature-item">' +
+            '<i class="fas fa-map-pin" style="color:var(--p)"></i>' +
+            '<span>' + _san(name) + (dist ? ' <small style="color:var(--gr)">(' + dist + ')</small>' : '') + '</span>' +
+            '</div>';
+        }).join('') + '</div>';
+    }
+  }
+
+  /* ── Map (lazy load Google Maps) ── */
+  function _pdpRenderMap(p) {
+    var locText = document.getElementById('pdp-map-location-text');
+    var loc = [p.location, p.province].filter(Boolean).join(', ');
+    if (locText) locText.textContent = loc;
+
+    /* Location SEO links */
+    var locLinks = document.getElementById('pdp-location-links');
+    if (locLinks) {
+      var links = [];
+      if (p.province) {
+        links.push('<a class="pdp-transit" style="background:var(--bg);color:var(--p);border:1.5px solid var(--bd)" ' +
+          'href="/listings?province=' + encodeURIComponent(p.province) + '" ' +
+          'onclick="event.preventDefault();if(typeof quickProvSearch===\'function\')quickProvSearch(\'' + p.province + '\')">' +
+          '<i class="fas fa-map-marker-alt"></i> อสังหาฯ' + _san(p.province) + '</a>');
+      }
+      if (p.location) {
+        links.push('<a class="pdp-transit" style="background:var(--bg);color:var(--p);border:1.5px solid var(--bd)" ' +
+          'href="/listings?q=' + encodeURIComponent(p.location) + '" ' +
+          'onclick="event.preventDefault();if(typeof quickSearch===\'function\')quickSearch(\'' + p.location + '\')">' +
+          '<i class="fas fa-search-location"></i> ' + _san(p.location) + '</a>');
+      }
+      if (p.type) {
+        links.push('<a class="pdp-transit" style="background:var(--bg);color:var(--p);border:1.5px solid var(--bd)" ' +
+          'href="/listings?type=' + encodeURIComponent(p.type) + '" ' +
+          'onclick="event.preventDefault();if(typeof setCatNav===\'function\')setCatNav(\'' + p.type + '\')">' +
+          '<i class="fas fa-home"></i> ' + _san(p.type) + 'ทั้งหมด</a>');
+      }
+      locLinks.innerHTML = links.join('');
+    }
+  }
+
+  window.pdpLoadMap = function() {
+    if (_pdpMapLoaded || !_pdpProp) return;
+    _pdpMapLoaded = true;
+    var p = _pdpProp;
+    var loc = encodeURIComponent([p.location, p.province, 'ประเทศไทย'].filter(Boolean).join(' '));
+    var placeholder = document.getElementById('pdp-map-placeholder');
+    var container   = document.getElementById('pdp-map-container');
+    if (placeholder) placeholder.style.display = 'none';
+    if (container) {
+      container.style.display = '';
+      /* Use Google Maps embed — lazy loaded on user interaction */
+      var iframe = document.createElement('iframe');
+      iframe.src = 'https://maps.google.com/maps?q=' + loc + '&output=embed&z=15';
+      iframe.width = '100%';
+      iframe.height = '100%';
+      iframe.loading = 'lazy';
+      iframe.referrerPolicy = 'no-referrer-when-downgrade';
+      iframe.setAttribute('title', 'แผนที่ ' + (p.location||''));
+      iframe.style.border = '0';
+      container.appendChild(iframe);
+    }
+  };
+
+  /* ── Agent ── */
+  function _pdpRenderAgent(p) {
+    var hd    = document.getElementById('pdp-agent-hd');
+    var stats = document.getElementById('pdp-agent-stats');
+    if (!hd) return;
+    var ag = _pdpAgent;
+    if (!ag) {
+      /* Generic agent display */
+      hd.innerHTML = '<div class="pdp-agent-av-ph">MD</div>' +
+        '<div><div class="pdp-agent-name">Matchdoor</div>' +
+        '<div class="pdp-agent-title">ทีมงานมืออาชีพ</div>' +
+        '<div class="pdp-agent-rating">' + _starStr(5.0) + '</div></div>';
+      if (stats) stats.style.display = 'none';
+      return;
+    }
+    /* Avatar */
+    var avHtml = ag.avatar_url
+      ? '<div class="pdp-agent-av"><img src="' + _san(ag.avatar_url) + '" alt="' + _san(ag.name) + '" loading="lazy"></div>'
+      : '<div class="pdp-agent-av-ph">' + _san(ag.initials||ag.name.slice(0,2)) + '</div>';
+    /* Agent profile link — future /agents/:id page */
+    var agLink = '/agents/' + ag.id + '-' + _slug(ag.name);
+    hd.innerHTML = avHtml +
+      '<div>' +
+        '<a href="' + agLink + '" onclick="event.preventDefault()" ' +
+          'style="text-decoration:none">' +
+          '<div class="pdp-agent-name">' + _san(ag.name) + '</div>' +
+        '</a>' +
+        '<div class="pdp-agent-title">' + _san(ag.title||'ที่ปรึกษาอสังหาริมทรัพย์') + '</div>' +
+        '<div class="pdp-agent-rating">' + _starStr(ag.rating||4.8) + '</div>' +
+      '</div>';
+    /* Agent stats */
+    if (stats) {
+      stats.innerHTML =
+        '<div class="pdp-agent-stat">' +
+          '<div class="pdp-agent-stat-val">' + (ag.deals||0) + '</div>' +
+          '<div class="pdp-agent-stat-lbl">ดีลที่ปิดแล้ว</div>' +
+        '</div>' +
+        '<div class="pdp-agent-stat">' +
+          '<div class="pdp-agent-stat-val">' + (ag.rating||4.8) + '</div>' +
+          '<div class="pdp-agent-stat-lbl">คะแนน</div>' +
+        '</div>';
+    }
+  }
+
+  /* ── CTA Buttons ── */
+  function _pdpRenderCTA(p) {
+    var el = document.getElementById('pdp-cta-btns');
+    if (!el) return;
+    var isFav   = typeof favs !== 'undefined' && favs.includes(String(p.id));
+    var phone   = (typeof C !== 'undefined' && C.PHONE) ? C.PHONE : '';
+    var lineId  = (typeof C !== 'undefined' && C.LINE)  ? C.LINE  : '';
+    var lineUrl = 'https://line.me/R/ti/p/' + lineId;
+    var shareUrl = window.location.origin + _propUrl(p);
+
+    el.innerHTML =
+      '<a class="pdp-cta-btn pdp-cta-phone" href="tel:' + phone + '" ' +
+        'onclick="if(typeof trackPhoneClick===\'function\')trackPhoneClick(\'pdp\',' + JSON.stringify(String(p.id)) + ')">' +
+        '<i class="fas fa-phone"></i> โทรนัดชม</a>' +
+      '<a class="pdp-cta-btn pdp-cta-line" href="' + lineUrl + '" target="_blank" rel="noopener" ' +
+        'onclick="if(typeof trackLineClick===\'function\')trackLineClick(\'pdp\',' + JSON.stringify(String(p.id)) + ')">' +
+        '<i class="fab fa-line"></i> ติดต่อทาง LINE</a>' +
+      '<button class="pdp-cta-btn pdp-cta-fav' + (isFav?' favorited':'') + '" id="pdp-fav-btn" ' +
+        'onclick="pdpToggleFav()">' +
+        (isFav ? '<i class="fas fa-heart"></i> บันทึกแล้ว' : '<i class="far fa-heart"></i> บันทึก') + '</button>' +
+      '<button class="pdp-cta-btn pdp-cta-share" onclick="pdpToggleShare()">' +
+        '<i class="fas fa-share-alt"></i> แชร์ทรัพย์นี้</button>';
+
+    /* Share box URLs */
+    var shareInput = document.getElementById('pdp-share-url');
+    var fbLink  = document.getElementById('pdp-share-fb');
+    var lineLink= document.getElementById('pdp-share-line');
+    var twLink  = document.getElementById('pdp-share-tw');
+    if (shareInput) shareInput.value = shareUrl;
+    if (fbLink)   fbLink.href   = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(shareUrl);
+    if (lineLink) lineLink.href = 'https://social-plugins.line.me/lineit/share?url=' + encodeURIComponent(shareUrl);
+    if (twLink)   twLink.href   = 'https://twitter.com/intent/tweet?url=' + encodeURIComponent(shareUrl) + '&text=' + encodeURIComponent(p.title||'');
+  }
+
+  window.pdpToggleFav = function() {
+    if (!_pdpProp) return;
+    if (typeof toggleFav === 'function') {
+      toggleFav(String(_pdpProp.id), {stopPropagation: function(){}});
+    }
+    /* Re-render CTA buttons to reflect new state */
+    _pdpRenderCTA(_pdpProp);
+  };
+
+  window.pdpToggleShare = function() {
+    var box = document.getElementById('pdp-share-box');
+    if (box) box.classList.toggle('open');
+  };
+
+  window.pdpCopyUrl = function() {
+    var input = document.getElementById('pdp-share-url');
+    if (!input) return;
+    try {
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(input.value);
+      } else {
+        input.select();
+        document.execCommand('copy');
+      }
+      if (typeof toast === 'function') toast('คัดลอกลิงก์แล้ว 📋');
+    } catch(e){}
+  };
+
+  /* ── Mobile CTA ── */
+  function _pdpRenderMobileCTA(p) {
+    var el = document.getElementById('pdp-cta-mobile-btns');
+    if (!el) return;
+    var phone  = (typeof C !== 'undefined' && C.PHONE) ? C.PHONE : '';
+    var lineId = (typeof C !== 'undefined' && C.LINE)  ? C.LINE  : '';
+    var lineUrl = 'https://line.me/R/ti/p/' + lineId;
+    el.innerHTML =
+      '<a class="pdp-cta-btn pdp-cta-phone" href="tel:' + phone + '">' +
+        '<i class="fas fa-phone"></i> โทร</a>' +
+      '<a class="pdp-cta-btn pdp-cta-line" href="' + lineUrl + '" target="_blank" rel="noopener">' +
+        '<i class="fab fa-line"></i> LINE</a>';
+  }
+
+  /* ── Related Properties ── */
+  function _pdpRenderRelated(p) {
+    var grid = document.getElementById('pdp-related-grid');
+    if (!grid) return;
+    var allProps = (typeof props !== 'undefined' && props.length) ? props
+                : (typeof MOCK !== 'undefined' ? (MOCK.props||[]) : []);
+    /* Filter: same type OR same province, exclude current, max 4 */
+    var related = allProps.filter(function(x){
+      return String(x.id) !== String(p.id) && (x.type === p.type || x.province === p.province);
+    }).slice(0, 4);
+    if (!related.length) {
+      related = allProps.filter(function(x){ return String(x.id) !== String(p.id); }).slice(0, 4);
+    }
+    if (!related.length) {
+      var sec = document.getElementById('pdp-related-section');
+      if (sec) sec.style.display = 'none';
+      return;
+    }
+    /* Render related cards with real <a href> links — Google can crawl these */
+    grid.innerHTML = related.map(function(r){
+      var url  = _propUrl(r);
+      var img  = (r.photos||[]).filter(Boolean)[0];
+      var price = typeof fmtPrice === 'function' ? fmtPrice(r.price, r.tx) : (r.price||0).toLocaleString() + '฿';
+      var loc   = [r.location, r.province].filter(Boolean).join(', ');
+      return '<a class="pdp-rel-card" href="' + url + '" ' +
+        'onclick="event.preventDefault();if(typeof showPage===\'function\')showPage(\'property\',\'' + r.id + '\')" ' +
+        'aria-label="' + _san(r.title) + '">' +
+        (img
+          ? '<img class="pdp-rel-img" src="' + _san(img) + '" loading="lazy" decoding="async" alt="' + _san(r.title) + '">'
+          : '<div class="pdp-rel-img-ph">' + _typeIcon(r.type) + '</div>') +
+        '<div class="pdp-rel-body">' +
+          '<div class="pdp-rel-type">' + _san(r.type) + '</div>' +
+          '<div class="pdp-rel-title">' + _san(r.title) + '</div>' +
+          '<div class="pdp-rel-price">' + price + '</div>' +
+          '<div class="pdp-rel-loc"><i class="fas fa-map-marker-alt" style="font-size:10px"></i>' + _san(loc) + '</div>' +
+        '</div>' +
+        '</a>';
+    }).join('');
+
+    /* Inject ItemList schema for related properties */
+    _pdpInjectRelatedSchema(related);
+  }
+
+  /* ── SEO Internal Links Footer ── */
+  function _pdpRenderSeoLinks(p) {
+    var types = ['คอนโด','บ้านเดี่ยว','ทาวน์โฮม','ที่ดิน','อาคารพาณิชย์','วิลล่า'];
+    var locs  = ['สุขุมวิท','อโศก','ทองหล่อ','พระราม 9','สาทร','สีลม','จตุจักร','ลาดพร้าว','รัชดา'];
+    var transit = ['BTS อโศก','BTS ทองหล่อ','BTS เอกมัย','MRT พระราม 9','MRT ลาดพร้าว','BTS พร้อมพงษ์'];
+
+    var typeEl = document.getElementById('pdp-seo-type-links');
+    var locEl  = document.getElementById('pdp-seo-loc-links');
+    var trEl   = document.getElementById('pdp-seo-transit-links');
+
+    if (typeEl) {
+      typeEl.innerHTML = types.map(function(t){
+        return '<a class="pdp-seo-link" href="/listings?type=' + encodeURIComponent(t) + '" ' +
+          'onclick="event.preventDefault();if(typeof setCatNav===\'function\')setCatNav(\'' + t + '\')">' +
+          '<i class="fas fa-home"></i> ' + t + 'กรุงเทพ</a>';
+      }).join('');
+    }
+    if (locEl) {
+      locEl.innerHTML = locs.map(function(l){
+        return '<a class="pdp-seo-link" href="/listings?q=' + encodeURIComponent(l) + '" ' +
+          'onclick="event.preventDefault();if(typeof quickSearch===\'function\')quickSearch(\'' + l + '\')">' +
+          '<i class="fas fa-map-marker-alt"></i> อสังหาฯ' + l + '</a>';
+      }).join('');
+    }
+    if (trEl) {
+      trEl.innerHTML = transit.map(function(t){
+        var slug = _slug(t);
+        return '<a class="pdp-seo-link" href="/listings?q=' + encodeURIComponent(t) + '" ' +
+          'onclick="event.preventDefault();if(typeof quickSearch===\'function\')quickSearch(\'' + t + '\')">' +
+          '<i class="fas fa-train"></i> ใกล้ ' + t + '</a>';
+      }).join('');
+    }
+  }
+
+  /* ── Meta tags + Schema.org per property ── */
+  function _pdpUpdateMetaAndSchema(p) {
+    var siteBase = 'https://matchdoor.co';
+    var path     = _propUrl(p);
+    var fullUrl  = siteBase + path;
+    var transitKw = (p.bts?' BTS '+p.bts:'') + (p.mrt?' MRT '+p.mrt:'');
+    var title = p.title + ' ' + (p.tx==='RENT'?'ให้เช่า':'ขาย') + ' ' + p.type
+              + ' ' + (p.location||'') + (p.province?' '+p.province:'')
+              + transitKw + ' — Matchdoor';
+    var desc = (p.desc||'').slice(0,140)
+             || (p.type + (p.tx==='RENT'?' ให้เช่า':' ขาย') + ' ' + (p.location||'')
+                + ' ' + (p.province||'กรุงเทพ') + transitKw
+                + ' ราคา ' + (p.price>=1e6 ? (p.price/1e6).toFixed(1)+'ล้านบาท' : (p.price||0).toLocaleString()+'บาท')
+                + ' — Matchdoor');
+
+    /* Update page meta */
+    document.title = title;
+    var mDesc = document.querySelector('meta[name="description"]');
+    if (mDesc) mDesc.content = desc;
+    var ogT = document.querySelector('meta[property="og:title"]');
+    if (ogT) ogT.content = title;
+    var ogD = document.querySelector('meta[property="og:description"]');
+    if (ogD) ogD.content = desc;
+    var ogU = document.querySelector('meta[property="og:url"]');
+    if (ogU) ogU.content = fullUrl;
+    var ogI = document.querySelector('meta[property="og:image"]');
+    if (ogI && p.photos && p.photos[0]) ogI.content = p.photos[0];
+    var ogType = document.querySelector('meta[property="og:type"]');
+    if (ogType) ogType.content = 'product';
+    var canonical = document.querySelector('link[rel="canonical"]');
+    if (canonical) canonical.href = fullUrl;
+
+    /* Push history state */
+    if (typeof history !== 'undefined' && typeof _routerReady !== 'undefined' && _routerReady) {
+      if (location.pathname !== path) {
+        history.pushState({ type: 'property', id: String(p.id), name: 'property' }, '', fullUrl);
+      }
+    }
+
+    /* Schema.org: RealEstateListing */
+    _pdpInjectPropertySchema(p, fullUrl, desc);
+
+    /* Schema.org: BreadcrumbList */
+    _pdpInjectBreadcrumbSchema(p, path, fullUrl);
+
+    /* GA4 property_view */
+    if (typeof trackEvent === 'function') {
+      trackEvent('property_view', {
+        property_id:    String(p.id),
+        property_title: p.title || '',
+        property_type:  p.type || '',
+        property_price: p.price || 0,
+        property_tx:    p.tx || '',
+        province:       p.province || '',
+        source:         'pdp'
+      });
+    }
+    if (typeof trackPageView === 'function') {
+      trackPageView('property', title);
+    }
+  }
+
+  /* Property JSON-LD */
+  function _pdpInjectPropertySchema(p, fullUrl, desc) {
+    var schemaTypeMap = {
+      'คอนโด':'Apartment','บ้านเดี่ยว':'SingleFamilyResidence',
+      'ทาวน์โฮม':'Townhouse','ที่ดิน':'LandForm',
+      'อาคารพาณิชย์':'LocalBusiness','วิลล่า':'SingleFamilyResidence',
+      'รีสอร์ท':'LodgingBusiness','โรงแรม':'Hotel','อพาร์ตเมนต์':'ApartmentComplex'
+    };
+    var ld = {
+      '@context': 'https://schema.org',
+      '@type':    'RealEstateListing',
+      '@id':      fullUrl,
+      'name':     p.title,
+      'description': desc,
+      'url':      fullUrl,
+      'datePosted': p.createdAt || new Date().toISOString().slice(0,10),
+      'offers': {
+        '@type':          'Offer',
+        'price':          p.price,
+        'priceCurrency':  'THB',
+        'availability':   'https://schema.org/InStock',
+        'businessFunction': p.tx === 'RENT'
+          ? 'https://schema.org/LeaseOut'
+          : 'https://schema.org/Sell',
+        'seller': {
+          '@type': 'RealEstateAgent',
+          'name':  'Matchdoor',
+          'url':   'https://matchdoor.co'
+        }
+      },
+      'address': {
+        '@type':           'PostalAddress',
+        'streetAddress':   p.location || '',
+        'addressLocality': p.location || '',
+        'addressRegion':   p.province || 'กรุงเทพฯ',
+        'addressCountry':  'TH'
+      },
+      'containedInPlace': {
+        '@type': 'City',
+        'name':  p.province || 'กรุงเทพมหานคร',
+        'containedInPlace': {'@type':'Country','name':'ประเทศไทย'}
+      }
+    };
+    /* Optional fields */
+    if (p.photos && p.photos[0]) {
+      ld['image'] = {'@type':'ImageObject','url':p.photos[0],'contentUrl':p.photos[0]};
+    }
+    if (p.area > 0) {
+      ld['floorSize'] = {'@type':'QuantitativeValue','value':p.area,'unitCode':'MTK'};
+    }
+    if (p.bed > 0)  ld['numberOfRooms'] = p.bed;
+    if (p.bath > 0) ld['numberOfBathroomsTotal'] = p.bath;
+    if (p.amenities && p.amenities.length) {
+      ld['amenityFeature'] = p.amenities.map(function(a){
+        return {'@type':'LocationFeatureSpecification','name':a,'value':true};
+      });
+    }
+    /* Agent */
+    if (_pdpAgent) {
+      ld['agent'] = {
+        '@type': 'RealEstateAgent',
+        'name':   _pdpAgent.name,
+        'url':    'https://matchdoor.co/agents/' + _pdpAgent.id
+      };
+    }
+    /* BTS/MRT near transit */
+    if (p.bts || p.mrt) {
+      ld['amenityFeature'] = ld['amenityFeature'] || [];
+      if (p.bts) ld['amenityFeature'].push({'@type':'LocationFeatureSpecification','name':'ใกล้ BTS '+p.bts,'value':true});
+      if (p.mrt) ld['amenityFeature'].push({'@type':'LocationFeatureSpecification','name':'ใกล้ MRT '+p.mrt,'value':true});
+    }
+
+    var script = document.getElementById('pdp-prop-jsonld');
+    if (!script) {
+      script = document.createElement('script');
+      script.type = 'application/ld+json';
+      script.id = 'pdp-prop-jsonld';
+      document.head.appendChild(script);
+    }
+    script.textContent = JSON.stringify(ld);
+  }
+
+  /* Breadcrumb JSON-LD */
+  function _pdpInjectBreadcrumbSchema(p, path, fullUrl) {
+    var ld = {
+      '@context': 'https://schema.org',
+      '@type':    'BreadcrumbList',
+      'itemListElement': [
+        {'@type':'ListItem','position':1,'name':'หน้าแรก','item':'https://matchdoor.co'},
+        {'@type':'ListItem','position':2,'name':'ประกาศทั้งหมด','item':'https://matchdoor.co/listings'},
+        {'@type':'ListItem','position':3,'name':p.type||'ทรัพย์','item':'https://matchdoor.co/listings?type='+encodeURIComponent(p.type||'')},
+        {'@type':'ListItem','position':4,'name':p.title,'item':fullUrl}
+      ]
+    };
+    var script = document.getElementById('pdp-bc-jsonld');
+    if (!script) {
+      script = document.createElement('script');
+      script.type = 'application/ld+json';
+      script.id = 'pdp-bc-jsonld';
+      document.head.appendChild(script);
+    }
+    script.textContent = JSON.stringify(ld);
+  }
+
+  /* Related ItemList schema */
+  function _pdpInjectRelatedSchema(related) {
+    var ld = {
+      '@context': 'https://schema.org',
+      '@type':    'ItemList',
+      'name':     'ทรัพย์ที่คล้ายกัน',
+      'itemListElement': related.map(function(r, i){
+        return {
+          '@type':    'ListItem',
+          'position': i + 1,
+          'url':      'https://matchdoor.co' + _propUrl(r),
+          'name':     r.title
+        };
+      })
+    };
+    var script = document.getElementById('pdp-related-jsonld');
+    if (!script) {
+      script = document.createElement('script');
+      script.type = 'application/ld+json';
+      script.id = 'pdp-related-jsonld';
+      document.head.appendChild(script);
+    }
+    script.textContent = JSON.stringify(ld);
+  }
+
+  /* ── Back button ── */
+  function _pdpUpdateBackLabel() {
+    var btn = document.getElementById('pdp-back-label');
+    if (!btn) return;
+    var state = history.state;
+    var prev = state && state._prevPage;
+    var labels = {
+      'listings': 'กลับประกาศทั้งหมด',
+      'home': 'กลับหน้าแรก',
+      'favorites': 'กลับรายการโปรด',
+      'portfolio': 'กลับผลงาน',
+    };
+    btn.textContent = labels[prev] || 'กลับ';
+  }
+
+  window.pdpGoBack = function() {
+    // ── Remove keyboard listener when leaving ──
+    if (window._pdpKeyHandler) {
+      document.removeEventListener('keydown', window._pdpKeyHandler);
+      window._pdpKeyHandler = null;
+    }
+    var state = history.state;
+    var prevPage = (state && state._prevPage) ? state._prevPage : null;
+    if (prevPage && prevPage !== 'property') {
+      if (typeof showPage === 'function') showPage(prevPage);
+    } else if (history.length > 1) {
+      history.back();
+    } else {
+      if (typeof showPage === 'function') showPage('listings');
+    }
+  };
+
+})(); /* end IIFE */
+
+
+/* ═══════════════════════════════════════════════════
+   ROUTER INTEGRATION PATCH
+   แทนที่/เพิ่มเติมจาก router section เดิมใน index.html
+   ═══════════════════════════════════════════════════ */
+
+/*
+ * วิธีรวม showPage ให้รองรับ 'property' page:
+ * ----------------------------------------------------------------
+ * หา function showPage(name) เดิม แล้วเพิ่ม case 'property':
+ *
+ * // ใน showPage / _silentShowPage — เพิ่ม:
+ * } else if (name === 'property') {
+ *   // ไม่ render อะไรเพิ่ม — pdpShowPage() จัดการเอง
+ * }
+ *
+ * // ใน PAGE_ROUTES — เพิ่ม:
+ * 'property': { path: '/property', title: 'ทรัพย์ — Matchdoor', desc: 'รายละเอียดทรัพย์อสังหาริมทรัพย์' },
+ *
+ * // แก้ไข showPage() call site ให้รับ parameter ที่ 2:
+ * function showPage(name, propId) {
+ *   _silentShowPage(name, false, propId);
+ *   ...
+ * }
+ *
+ * // ใน _silentShowPage เพิ่ม:
+ * if (name === 'property' && propId) {
+ *   pdpShowPage(propId);
+ * }
+ * ----------------------------------------------------------------
+ */
+
+/* showPage wrapper removed — now built into showPage() directly */
+
+/* duplicate popstate removed — handled in main popstate listener */
+
+/* duplicate _initRouteFromUrl patch removed — handled in main router */
+
+/* BLOCK 4+5: propCard & 404.html — see git history for instructions */
+</script>
+
 </body>
 </html>
