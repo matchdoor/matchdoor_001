@@ -409,7 +409,10 @@
 <style>
 /* ══ MOBILE PERFORMANCE PATCH v4 — iOS Freeze Fix ══════════════ */
 /* ป้องกัน text render ช้าบน iOS — ทุก device */
-html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;overflow-x:hidden;width:100%}
+/* ── Global responsive: ป้องกัน element ล้นหน้าจอทุก device ── */
+img,video,iframe,embed,object{max-width:100%;height:auto}
+table{width:100%;table-layout:fixed;word-break:break-word}
 /* ป้องกัน 300ms tap delay ทุก interactive element */
 a,button,input,select,textarea,
 .prop-card,.cat-card,.price-card,.blog-card,.gal-card,.agent-card,
@@ -539,7 +542,7 @@ body:not(:has(.ov.open)):not(:has(.apply-overlay.open)):not(:has(.seo-drawer.ope
 /* ── z-index ให้เป็นระบบ (ทุก device) ────────────────────────
    nav=1000 | dd-panel=1050 | .ov(base)=3200 | prop-modal=3600 | ag-modal=3700 | toast=9999
    Layer order (ล่าง→บน): nav → dropdown → modal(all/login) → prop-modal → ag-modal → toast */
-nav{z-index:1000!important}
+nav:not(#md-bottom-nav){z-index:1000!important}
 /* dd-panel อยู่เหนือ nav */
 .dd-panel,.qs-dd-panel{z-index:1050!important}
 /* items ภายใน dd-panel ต้องกดได้เสมอ */
@@ -606,7 +609,12 @@ nav{z-index:1000!important}
   --sh:0 4px 24px rgba(27,58,107,.10);--shl:0 8px 40px rgba(27,58,107,.18);
   /* Dark surface colors for navs/footers */
 }
-body{font-family:'Noto Sans Thai','Sarabun',sans-serif;background:var(--bg);color:var(--tx);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+*,*::before,*::after{box-sizing:border-box}
+body{font-family:'Noto Sans Thai','Sarabun',sans-serif;background:var(--bg);color:var(--tx);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden;width:100%;max-width:100vw}
+/* เพิ่ม padding-bottom เฉพาะ mobile/tablet เพื่อไม่ให้ content ถูก bottom nav บัง */
+@media(max-width:960px){
+  body{ padding-bottom:calc(60px + env(safe-area-inset-bottom,0px)); }
+}
 
 a{text-decoration:none;color:inherit}
 button,input,select,textarea{font-family:inherit;font-size:15px}
@@ -652,7 +660,7 @@ img{max-width:100%;height:auto}
 
 @keyframes spin{to{transform:rotate(360deg)}}
 
-nav{
+nav:not(#md-bottom-nav){
   background:linear-gradient(135deg,#0A1628 0%,#0F1E3A 60%,#162848 100%);
   position:sticky;top:0;z-index:1000;
   box-shadow:0 2px 20px rgba(10,22,40,.45),0 1px 0 rgba(200,146,42,.15);
@@ -1922,6 +1930,14 @@ footer{background:linear-gradient(135deg,#2d2650 0%,#3d3373 100%);color:rgba(255
 .obtn-tel{background:var(--p);color:#fff}
 .blog-sec{background:var(--bg);padding:40px 20px}
 .blog-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:18px}
+@media(max-width:600px){
+  .blog-grid{grid-template-columns:repeat(2,1fr);gap:10px}
+  .blog-thumb{height:120px!important}
+  .blog-body{padding:8px 10px 10px!important}
+  .blog-title{font-size:12px!important;line-height:1.4!important}
+  .blog-cat{font-size:9px!important;padding:2px 7px!important}
+  .blog-meta{font-size:10px!important}
+}
 .blog-card{background:#fff;border-radius:var(--rl);border:1.5px solid var(--bd);overflow:hidden;cursor:pointer;transition:.2s}
 .blog-card:hover{transform:translateY(-3px);box-shadow:var(--sh)}
 .blog-thumb{height:148px;display:flex;align-items:center;justify-content:center;font-size:44px}
@@ -2237,12 +2253,18 @@ footer::after{
 .gal-card:hover{transform:translateY(-3px);box-shadow:var(--sh)}
 .gal-img{height:175px;background:#d5e8f5;display:flex;align-items:center;justify-content:center;font-size:48px;position:relative;overflow:hidden}
 .gal-img img{width:100%;height:100%;object-fit:cover}
+@media(max-width:600px){
+  .gal-img{height:120px}
+  .gal-body{padding:8px 10px 10px}
+  .gal-price{font-size:13px!important;margin-bottom:2px}
+}
 .ribbon{position:absolute;top:14px;right:-22px;padding:4px 32px;font-size:10px;font-weight:700;transform:rotate(30deg);width:100px;text-align:center}
 .r-sold{background:#e74c3c;color:#fff}
 .r-rent{background:#8e44ad;color:#fff}
 .gal-body{padding:14px}
 .gal-price{font-size:17px;font-weight:700;color:var(--a);margin-bottom:4px}
 .agent-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:18px}
+@media(max-width:600px){.agent-grid{grid-template-columns:repeat(2,1fr);gap:10px}}
 .agent-member-tag{display:inline-flex;align-items:center;gap:4px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;border-radius:20px;padding:3px 10px;font-size:10px;font-weight:700;margin-bottom:6px;letter-spacing:.3px}
 .agent-company-tag{display:inline-flex;align-items:center;gap:4px;background:linear-gradient(135deg,#1B3A6B,#2a5298);color:#fff;border-radius:20px;padding:3px 10px;font-size:10px;font-weight:700;margin-bottom:6px;letter-spacing:.3px}
 .agent-card{background:#fff;border-radius:var(--rl);border:2px solid var(--bd);overflow:hidden;cursor:pointer;transition:.25s;text-align:center}
@@ -2251,6 +2273,18 @@ footer::after{
 .agent-photo-full{width:100%;height:100%;object-fit:cover;object-position:center top;display:block;transition:.3s}
 .agent-card:hover .agent-photo-full{transform:scale(1.04)}
 .agent-info-area{padding:16px 20px 20px}
+@media(max-width:600px){
+  .agent-photo-wrap{height:160px}
+  .agent-info-area{padding:10px 10px 12px}
+  .agent-name{font-size:13px!important;margin-bottom:1px}
+  .agent-role{font-size:10px!important;margin-bottom:8px!important}
+  .agent-stats{gap:14px!important;padding:8px 0!important;margin-bottom:10px!important}
+  .agst .n{font-size:16px!important}
+  .agst .l{font-size:9px!important}
+  .agent-btns{flex-direction:column;gap:5px!important}
+  .agent-btns a,.agent-btns button{font-size:11px!important;padding:6px 8px!important}
+  .agent-member-tag,.agent-company-tag{font-size:9px!important;padding:2px 7px!important}
+}
 .agent-av img{width:100%;height:100%;object-fit:cover}
 .agent-name{font-size:16px;font-weight:700;margin-bottom:2px;color:var(--tx)}
 .agent-role{font-size:12px;color:var(--gr);margin-bottom:12px}
@@ -2536,7 +2570,7 @@ footer::after{
   .footer-brand-col{text-align:left}
   .footer-logo{justify-content:flex-start!important}
   .flink-inner{grid-template-columns:repeat(3,1fr)}
-  .dd-panel{position:fixed;top:auto;bottom:0;left:0;right:0;width:100%;max-height:70vh;border-radius:20px 20px 0 0;transform:none;margin:0;z-index:1050;pointer-events:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;animation:ddSlideUp .25s cubic-bezier(.32,1,.56,1) both}
+  .dd-panel{position:fixed;top:auto;bottom:60px;left:0;right:0;width:100%;max-height:70vh;border-radius:20px 20px 0 0;transform:none;margin:0;z-index:1050;pointer-events:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;animation:ddSlideUp .25s cubic-bezier(.32,1,.56,1) both}
   @keyframes ddSlideUp{from{transform:translateY(30px);opacity:.6}to{transform:translateY(0);opacity:1}}
   .dd-panel::before{content:'';display:block;width:36px;height:4px;background:rgba(0,0,0,.18);border-radius:2px;margin:10px auto 0;flex-shrink:0}
   .dd-panel.right{left:0;right:0}
@@ -2573,9 +2607,8 @@ footer::after{
   .view-all{padding:4px 10px;font-size:12px}
   .prop-grid{grid-template-columns:repeat(2,1fr);gap:10px}
   .osrv-grid{grid-template-columns:1fr 1fr}
-  .blog-grid{grid-template-columns:1fr}
-  .agent-grid{grid-template-columns:1fr}
-  .gal-grid{grid-template-columns:1fr}
+  .blog-grid{grid-template-columns:repeat(2,1fr);gap:10px}
+  .gal-grid{grid-template-columns:repeat(2,1fr);gap:10px}
   .modal .mbody{padding:16px}
   .btn-cta{padding:10px;font-size:13px}
   .float-main{width:48px;height:48px;font-size:20px}
@@ -3598,13 +3631,142 @@ footer::after{
   align-items:start;
 }
 @media(max-width:1200px){
-  .md-fb-layout{grid-template-columns:260px 1fr 280px}
+  .md-fb-layout{grid-template-columns:240px 1fr 260px;gap:14px}
 }
+/* Tablet — hide right col, show left */
 @media(max-width:960px){
-  .md-fb-layout{grid-template-columns:1fr;padding:12px}
+  .md-fb-layout{grid-template-columns:220px 1fr;padding:12px 10px;gap:12px}
+  .md-fb-col-right{display:none}
+}
+/* Mobile — single column, full width */
+@media(max-width:680px){
+  .md-fb-layout{grid-template-columns:1fr;padding:8px 0}
   .md-fb-col-left{display:none}
   .md-fb-col-right{display:none}
 }
+
+/* ══ TABLET (601-960px): Full-width feed + bottom nav ══ */
+@media(min-width:601px) and (max-width:960px){
+  .md-fb-layout{
+    grid-template-columns:1fr !important;
+    padding:10px 12px 80px !important;
+    gap:12px;
+  }
+  .md-fb-col-left{ display:none !important; }
+  .md-fb-col-right{ display:none !important; }
+  .md-fb-col-center{ max-width:680px; margin:0 auto; width:100%; }
+
+  /* Show bottom nav on tablet */
+  #md-bottom-nav{ display:flex !important; }
+
+  /* Compact story cards on tablet */
+  .md-story-card{ width:86px; height:124px; }
+}
+
+/* ══ MOBILE (≤600px): full-width, bottom nav ══ */
+@media(max-width:600px){
+  .md-fb-layout{
+    grid-template-columns:1fr !important;
+    padding:6px 0 80px !important;
+  }
+  .md-fb-col-left{ display:none !important; }
+  .md-fb-col-right{ display:none !important; }
+
+  /* Show bottom nav on mobile */
+  #md-bottom-nav{ display:flex !important; }
+
+  .md-story-card{ width:80px; height:116px; }
+}
+
+/* ══ BOTTOM NAVIGATION BAR ══ */
+#md-bottom-nav{
+  display:none; /* ซ่อนบน desktop — แสดงเฉพาะ mobile/tablet ผ่าน media query */
+  position:fixed !important;
+  top:auto !important;
+  bottom:0 !important;
+  left:0; right:0;
+  height:60px;
+  background:#fff !important;
+  border-top:1px solid #E4E6EB;
+  z-index:1100 !important;
+  padding:0 4px;
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  box-shadow:0 -2px 12px rgba(0,0,0,.10);
+  align-items:stretch;
+  justify-content:space-around;
+  max-width:100vw;
+  pointer-events:auto !important;
+}
+#md-bottom-nav .md-bnav-item{
+  pointer-events:auto !important;
+  cursor:pointer !important;
+  -webkit-tap-highlight-color:rgba(0,0,0,.08);
+  touch-action:manipulation;
+  position:relative;
+  z-index:1101 !important;
+}
+.md-bnav-item{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:3px;
+  cursor:pointer;
+  color:#65676B;
+  font-size:10px;
+  font-weight:600;
+  border-radius:10px;
+  transition:.15s;
+  padding:4px 2px;
+  -webkit-tap-highlight-color:transparent;
+}
+.md-bnav-item:active{ background:#F0F2F5; }
+.md-bnav-item.active{ color:#1B3A6B; }
+.md-bnav-item i{ font-size:20px; }
+.md-bnav-item.active i{ color:#1B3A6B; }
+/* Center post button — highlighted */
+.md-bnav-item.post-btn{
+  background:#1B3A6B;
+  color:#fff;
+  border-radius:50%;
+  width:50px;height:50px;
+  flex:0 0 50px;
+  margin-top:-14px;
+  box-shadow:0 4px 14px rgba(27,58,107,.45);
+  font-size:22px;
+  padding:0;
+}
+.md-bnav-item.post-btn i{ font-size:22px; }
+.md-bnav-item.post-btn:active{ background:#C8922A; }
+
+/* Tablet/mobile: ads strip + quick search — hidden on desktop */
+#md-tablet-ads-strip,
+#md-tablet-search-links{
+  display:none;
+}
+@media(max-width:960px){
+  #md-tablet-ads-strip{ display:block !important; }
+  #md-tablet-search-links{ display:block !important; }
+}
+.md-tabs-strip-card{
+  flex-shrink:0;
+  background:#fff;
+  border:1px solid #E4E6EB;
+  border-radius:12px;
+  padding:10px 14px;
+  font-size:12px;
+  min-width:160px;
+  cursor:pointer;
+  transition:.15s;
+}
+.md-tabs-strip-card:hover{ border-color:#C8922A; }
+.md-tabs-strip-card .tsc-title{ font-weight:700;font-size:13px;color:#1C1E21;margin-bottom:2px; }
+.md-tabs-strip-card .tsc-sub{ color:#65676B;font-size:11px; }
+.md-tabs-strip-card .tsc-badge{ display:inline-block;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700;margin-top:4px; }
+.md-tabs-strip-card .tsc-badge.sponsored{ background:#FFF3CD;color:#856404; }
+.md-tabs-strip-card .tsc-badge.hot{ background:#FFE4E4;color:#c0392b; }
+.md-tabs-strip-card .tsc-badge.premium{ background:#E8F5E9;color:#1a7a3c; }
 
 /* ─── Shared card base ─── */
 .md-fb-card{
@@ -3846,6 +4008,18 @@ footer::after{
 .md-post-action.liked i{color:#f43f5e}
 .md-post-action.contact-btn{color:#1B3A6B}
 .md-post-action.contact-btn i{color:#C8922A}
+/* ─── Mobile feed optimizations ─── */
+@media(max-width:680px){
+  .md-post-hd{padding:10px 12px}
+  .md-post-av{width:38px;height:38px;font-size:14px}
+  .md-post-name{font-size:13px}
+  .md-post-text{padding:0 12px 8px;font-size:13px}
+  .md-post-action{font-size:12px;padding:7px 2px}
+  .md-post-action i{font-size:16px}
+  .md-post-action span{display:none} /* icon only on very small */
+  .md-fb-card{border-radius:0!important;border-left:none!important;border-right:none!important;margin-bottom:8px!important}
+  #md-social-feed-section{border-top:none}
+}
 
 /* Comments */
 .md-comments{padding:8px 14px 10px}
@@ -3944,8 +4118,8 @@ footer::after{
 }
 
 /* Mobile compact story */
-@media(max-width:960px){
-  .md-fb-layout{padding:10px 0}
+@media(max-width:680px){
+  .md-fb-layout{padding:8px 0}
   .md-fb-col-center{padding:0 6px}
 }
 
@@ -6080,7 +6254,7 @@ footer::after{
           <div class="md-side-nav-item" onclick="openAllModal('all')">
             <i class="fas fa-map-marker-alt"></i> ค้นหาตามทำเล
           </div>
-          <div class="md-side-nav-item" onclick="openAllModal('fav')">
+          <div class="md-side-nav-item" onclick="showPage('favorites')">
             <i class="fas fa-heart"></i> รายการโปรด
           </div>
           <div class="md-side-divider"></div>
@@ -6149,28 +6323,214 @@ footer::after{
         </div>
       </div>
 
-      <!-- Compose Box -->
-      <div class="md-fb-card">
-        <div class="md-compose">
-          <div class="md-compose-row">
-            <div class="md-compose-av" id="md-compose-av">
+      <!-- Compose Box — INLINE (no popup, no name/phone/consent required) -->
+      <div class="md-fb-card" id="md-inline-compose-card">
+        <div class="md-compose" style="padding:14px 16px">
+          <div class="md-compose-row" style="align-items:flex-start;gap:10px">
+            <div class="md-compose-av" id="md-compose-av" style="flex-shrink:0;margin-top:4px">
               <i class="fas fa-user"></i>
             </div>
-            <div class="md-compose-input" onclick="window.openComposeModal('text')">
-              คุณมีทรัพย์อยากแชร์? โพสต์ประกาศหรือถามเรื่องบ้าน...
+            <div style="flex:1;min-width:0">
+              <textarea id="md-inline-text"
+                rows="2"
+                placeholder="คุณมีทรัพย์อยากแชร์? โพสต์ประกาศหรือถามเรื่องบ้าน..."
+                style="width:100%;background:#F0F2F5;border:2px solid transparent;border-radius:14px;
+                       padding:10px 16px;font-size:14px;font-family:inherit;resize:none;
+                       outline:none;transition:.2s;min-height:44px;max-height:180px;
+                       overflow-y:hidden;color:#1C1E21;line-height:1.5;box-sizing:border-box"
+                oninput="mdInlineAutoResize(this)"
+                onfocus="this.style.background='#fff';this.style.borderColor='#1B3A6B';document.getElementById('md-inline-actions').style.display='flex'"
+                onblur="if(!this.value.trim()){this.style.background='#F0F2F5';this.style.borderColor='transparent'}"
+              ></textarea>
+              <!-- Image preview row -->
+              <div id="md-inline-preview" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px"></div>
+              <!-- Action bar — hidden until focused -->
+              <div id="md-inline-actions" style="display:none;align-items:center;justify-content:space-between;margin-top:8px;gap:6px;flex-wrap:wrap">
+                <div style="display:flex;gap:6px;flex-wrap:wrap">
+                  <!-- Photo attach -->
+                  <label for="md-inline-file" style="display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:20px;background:#E8F5E9;color:#2e7d32;font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:.15s" onmouseover="this.style.background='#c8e6c9'" onmouseout="this.style.background='#E8F5E9'">
+                    <i class="fas fa-images"></i> รูปภาพ
+                  </label>
+                  <input type="file" id="md-inline-file" accept="image/*" multiple style="display:none" onchange="mdInlineAddFiles(this.files)">
+                  <!-- Video attach -->
+                  <label for="md-inline-video-file" style="display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:20px;background:#FEE2E2;color:#c0392b;font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:.15s" onmouseover="this.style.background='#fecaca'" onmouseout="this.style.background='#FEE2E2'">
+                    <i class="fas fa-video"></i> วิดีโอ
+                  </label>
+                  <input type="file" id="md-inline-video-file" accept="video/*" style="display:none" onchange="mdInlineAddFiles(this.files,'video')">
+                  <!-- Listing -->
+                  <button type="button" onclick="window.openComposeModal('listing')" style="display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:20px;background:#FFF3CD;color:#856404;font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:.15s" onmouseover="this.style.background='#fde68a'" onmouseout="this.style.background='#FFF3CD'">
+                    <i class="fas fa-building"></i> ลงประกาศ
+                  </button>
+                </div>
+                <button type="button" id="md-inline-post-btn"
+                  onclick="mdInlineSubmit()"
+                  style="padding:7px 20px;background:#1B3A6B;color:#fff;border:none;border-radius:20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:.15s;flex-shrink:0"
+                  onmouseover="this.style.background='#C8922A'" onmouseout="this.style.background='#1B3A6B'">
+                  <i class="fas fa-paper-plane" style="margin-right:4px"></i> โพสต์
+                </button>
+              </div>
             </div>
           </div>
-          <div class="md-compose-tools">
-            <div class="md-compose-tool video" onclick="window.openComposeModal('video')">
-              <i class="fas fa-video"></i> วิดีโอ
-            </div>
-            <div class="md-compose-tool photo" onclick="window.openComposeModal('photo')">
-              <i class="fas fa-images"></i> รูปภาพ
-            </div>
-            <div class="md-compose-tool listing" onclick="window.openComposeModal('listing')">
-              <i class="fas fa-building"></i> ลงประกาศ
-            </div>
+        </div>
+      </div>
+
+      <script>
+      /* ── Inline Compose — no popup, no login required ── */
+      window._mdInlineFiles = [];
+
+      window.mdInlineAutoResize = function(ta){
+        ta.style.height = 'auto';
+        ta.style.height = Math.min(ta.scrollHeight, 180) + 'px';
+      };
+
+      window.mdInlineAddFiles = function(files, type){
+        var arr = Array.from(files||[]);
+        var maxSize = (type==='video') ? 50*1024*1024 : 5*1024*1024;
+        arr.forEach(function(f){
+          if(f.size > maxSize){ typeof toast==='function' && toast(f.name+' ขนาดไฟล์เกิน', true); return; }
+          window._mdInlineFiles.push({file:f,type:type||'image'});
+        });
+        var prev = document.getElementById('md-inline-preview');
+        if(!prev) return;
+        prev.innerHTML = window._mdInlineFiles.map(function(item,i){
+          var url = URL.createObjectURL(item.file);
+          var thumb = item.type==='video'
+            ? '<div style="width:72px;height:56px;background:#1B3A6B;border-radius:8px;display:flex;align-items:center;justify-content:center"><i class="fas fa-play-circle" style="color:#fff;font-size:22px"></i></div>'
+            : '<img src="'+url+'" style="width:72px;height:56px;object-fit:cover;border-radius:8px;display:block">';
+          return '<div style="position:relative;display:inline-block">'+thumb
+            +'<button onclick="window._mdInlineFiles.splice('+i+',1);mdInlineAddFiles([])" style="position:absolute;top:-5px;right:-5px;background:rgba(0,0,0,.65);color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:11px;cursor:pointer;line-height:1;padding:0">×</button>'
+            +'</div>';
+        }).join('');
+        document.getElementById('md-inline-actions').style.display='flex';
+      };
+
+      window.mdInlineSubmit = function(){
+        var ta = document.getElementById('md-inline-text');
+        var text = (ta ? ta.value : '').trim();
+        if(!text && !window._mdInlineFiles.length){
+          typeof toast==='function' && toast('กรุณาเขียนข้อความหรือแนบรูปก่อนโพสต์', true);
+          if(ta) ta.focus();
+          return;
+        }
+
+        // Build preview URL
+        var previewUrl = null;
+        var postType = 'text';
+        if(window._mdInlineFiles.length){
+          previewUrl = URL.createObjectURL(window._mdInlineFiles[0].file);
+          postType = window._mdInlineFiles[0].type === 'video' ? 'video' : 'photo';
+        }
+
+        // Build hashtags from text
+        var hashtags = ['#Matchdoor'];
+        var tagMatches = text.match(/#[\u0E00-\u0E7F\w]+/g);
+        if(tagMatches) hashtags = tagMatches.concat(['#Matchdoor']);
+
+        // Determine author name
+        var authorName = 'สมาชิก';
+        if(typeof user !== 'undefined' && user){
+          authorName = (user.user_metadata && user.user_metadata.full_name) || user.email || 'สมาชิก';
+        }
+
+        var post = {
+          id: 'lp' + Date.now(),
+          authorName: authorName,
+          authorPhoto: (typeof user!=='undefined'&&user&&user.user_metadata&&user.user_metadata.avatar_url)||null,
+          text: text,
+          type: postType,
+          previewUrl: previewUrl,
+          hashtags: hashtags,
+          createdAt: new Date().toISOString()
+        };
+
+        // Submit to Supabase in background (optional)
+        try {
+          if(typeof sb!=='undefined' && sb && typeof sbInsertRateLimited==='function'){
+            sbInsertRateLimited('listings', {
+              name: authorName,
+              phone: '',
+              details: '[inline-post] ' + text,
+              status: 'รอตรวจสอบ',
+              consent_given: true,
+              consent_timestamp: new Date().toISOString()
+            }, null, null);
+          }
+        } catch(e){}
+
+        // Prepend post to feed immediately
+        window.mdPrependLocalPost(post);
+
+        // Reset compose box
+        if(ta){ ta.value=''; ta.style.height='auto'; ta.style.background='#F0F2F5'; ta.style.borderColor='transparent'; }
+        window._mdInlineFiles = [];
+        var prev = document.getElementById('md-inline-preview');
+        if(prev) prev.innerHTML = '';
+        document.getElementById('md-inline-actions').style.display='none';
+
+        typeof toast==='function' && toast('โพสต์สำเร็จแล้ว 🎉');
+
+        // Scroll feed into view
+        var feedEl = document.getElementById('md-feed-posts');
+        if(feedEl) feedEl.scrollIntoView({behavior:'smooth', block:'start'});
+      };
+
+      // Enter = submit (Shift+Enter = newline)
+      document.addEventListener('DOMContentLoaded', function(){
+        var ta = document.getElementById('md-inline-text');
+        if(ta){
+          ta.addEventListener('keydown', function(e){
+            if(e.key==='Enter' && !e.shiftKey && !e.metaKey){
+              e.preventDefault();
+              window.mdInlineSubmit();
+            }
+          });
+        }
+      });
+      </script>
+
+      <!-- ═══ TABLET ADS STRIP (visible only on tablet/mobile via CSS) ═══ -->
+      <div id="md-tablet-ads-strip" class="md-fb-card" style="overflow:hidden;padding:10px 14px 12px">
+        <div style="font-size:12px;font-weight:700;color:#65676B;margin-bottom:8px;display:flex;align-items:center;gap:6px">
+          <i class="fas fa-bullhorn" style="color:#C8922A"></i> โฆษณาแนะนำ
+        </div>
+        <div style="display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;scroll-snap-type:x mandatory">
+          <div class="md-tabs-strip-card" style="scroll-snap-align:start" onclick="quickSearch&&quickSearch('คอนโด สุขุมวิท 50')">
+            <div style="font-size:20px;margin-bottom:4px">🏗️</div>
+            <div class="tsc-title">Nue Vibe สุขุมวิท 50</div>
+            <div class="tsc-sub">เริ่ม 2.9 ล้าน · ใกล้ BTS ออนนุช</div>
+            <div class="tsc-badge sponsored">Sponsored</div>
           </div>
+          <div class="md-tabs-strip-card" style="scroll-snap-align:start" onclick="quickSearch&&quickSearch('คอนโด พระราม 9')">
+            <div style="font-size:20px;margin-bottom:4px">🏢</div>
+            <div class="tsc-title">Origin Place พระราม 9</div>
+            <div class="tsc-sub">Pre-Sale ลดสูงสุด 20%</div>
+            <div class="tsc-badge hot">Hot Deal</div>
+          </div>
+          <div class="md-tabs-strip-card" style="scroll-snap-align:start" onclick="quickSearch&&quickSearch('บ้าน บางนา')">
+            <div style="font-size:20px;margin-bottom:4px">🌿</div>
+            <div class="tsc-title">The Forestias บางนา</div>
+            <div class="tsc-sub">บ้านหรูติดป่า เริ่ม 15 ล้าน</div>
+            <div class="tsc-badge premium">Premium</div>
+          </div>
+          <div class="md-tabs-strip-card" style="scroll-snap-align:start" onclick="window.openAdContact&&window.openAdContact()">
+            <div style="font-size:20px;margin-bottom:4px">📢</div>
+            <div class="tsc-title">ลงโฆษณากับเรา</div>
+            <div class="tsc-sub">เข้าถึงลูกค้าหลายพัน</div>
+            <div class="tsc-badge" style="background:#E7F3FF;color:#1877F2">ติดต่อ</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ TABLET QUICK SEARCH LINKS (visible only tablet/mobile) ═══ -->
+      <div id="md-tablet-search-links" class="md-fb-card" style="padding:12px 14px">
+        <div style="font-size:12px;font-weight:700;color:#65676B;margin-bottom:8px">🔍 ค้นหายอดนิยม</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <div onclick="quickSearch&&quickSearch('คอนโด สุขุมวิท')" style="padding:5px 12px;border-radius:20px;background:#E7F3FF;color:#1877F2;font-size:12px;font-weight:600;cursor:pointer;border:1px solid #b8d4f5">🏢 สุขุมวิท</div>
+          <div onclick="quickSearch&&quickSearch('บ้านเดี่ยว กรุงเทพ')" style="padding:5px 12px;border-radius:20px;background:#E8F5E9;color:#2e7d32;font-size:12px;font-weight:600;cursor:pointer;border:1px solid #a5d6a7">🏠 บ้านเดี่ยว</div>
+          <div onclick="quickSearch&&quickSearch('คอนโด พระราม 9')" style="padding:5px 12px;border-radius:20px;background:#FFF3E0;color:#e65100;font-size:12px;font-weight:600;cursor:pointer;border:1px solid #ffcc80">🚇 พระราม 9</div>
+          <div onclick="quickSearch&&quickSearch('ทาวน์โฮม ลาดพร้าว')" style="padding:5px 12px;border-radius:20px;background:#F3E5F5;color:#7b1fa2;font-size:12px;font-weight:600;cursor:pointer;border:1px solid #ce93d8">🏘️ ลาดพร้าว</div>
+          <div onclick="quickSearch&&quickSearch('เช่าคอนโด ทองหล่อ')" style="padding:5px 12px;border-radius:20px;background:#FCE4EC;color:#c62828;font-size:12px;font-weight:600;cursor:pointer;border:1px solid #f48fb1">🔑 ทองหล่อ</div>
+          <div onclick="quickSearch&&quickSearch('ที่ดิน กรุงเทพ')" style="padding:5px 12px;border-radius:20px;background:#E0F2F1;color:#00695c;font-size:12px;font-weight:600;cursor:pointer;border:1px solid #80cbc4">🌿 ที่ดิน</div>
         </div>
       </div>
 
@@ -6269,6 +6629,232 @@ footer::after{
 
   </div><!-- end md-fb-layout -->
 </div><!-- end md-social-feed-section -->
+
+<!-- ══ BOTTOM NAVIGATION BAR (Tablet + Mobile) ══ -->
+<nav id="md-bottom-nav" role="navigation" aria-label="เมนูหลัก">
+  <div class="md-bnav-item active" id="bnav-home" style="touch-action:manipulation;user-select:none">
+    <i class="fas fa-home"></i><span>หน้าแรก</span>
+  </div>
+  <div class="md-bnav-item" id="bnav-search" style="touch-action:manipulation;user-select:none">
+    <i class="fas fa-search"></i><span>ค้นหา</span>
+  </div>
+  <div class="md-bnav-item post-btn" id="bnav-post" title="โพสต์" style="touch-action:manipulation;user-select:none">
+    <i class="fas fa-plus"></i>
+  </div>
+  <div class="md-bnav-item" id="bnav-fav" style="touch-action:manipulation;user-select:none">
+    <i class="fas fa-heart"></i><span>โปรด</span>
+  </div>
+  <div class="md-bnav-item" id="bnav-menu" style="touch-action:manipulation;user-select:none">
+    <i class="fas fa-bars"></i><span>เมนู</span>
+  </div>
+</nav>
+
+<!-- ══ BOTTOM NAV — More Menu Sheet ══ -->
+<div id="md-bnav-sheet" style="display:none;position:fixed;inset:0;z-index:3600" onclick="if(event.target===this||event.target.id==='md-bnav-backdrop') mdBnavCloseMenu()">
+  <div id="md-bnav-backdrop" style="position:absolute;inset:0;background:rgba(0,0,0,.4);cursor:pointer"></div>
+  <div id="md-bnav-sheet-panel" style="position:absolute;bottom:60px;left:0;right:0;z-index:1;background:#fff;border-radius:20px 20px 0 0;padding:16px 12px 24px;box-shadow:0 -8px 32px rgba(0,0,0,.18);max-height:75vh;overflow-y:auto">
+    <div id="md-bnav-drag-handle" style="width:40px;height:5px;background:#CBD0D6;border-radius:99px;margin:0 auto 18px;cursor:pointer;touch-action:none" title="ลากลงเพื่อปิด"></div>
+    <div style="font-size:12px;font-weight:700;color:#65676B;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;padding:0 4px">เมนูหลัก</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div class="md-bnav-sheet-item" onclick="showPage&&showPage('community');mdBnavCloseMenu()"><i class="fas fa-users" style="color:#1877F2"></i> ชุมชน</div>
+      <div class="md-bnav-sheet-item" onclick="openAllModal&&openAllModal('blog');mdBnavCloseMenu()"><i class="fas fa-newspaper" style="color:#C8922A"></i> ข่าวอสังหาฯ</div>
+      <div class="md-bnav-sheet-item" onclick="showPage&&showPage('portfolio');mdBnavCloseMenu()"><i class="fas fa-trophy" style="color:#C8922A"></i> ผลงานเรา</div>
+      <div class="md-bnav-sheet-item" onclick="showPage&&showPage('agents');mdBnavCloseMenu()"><i class="fas fa-user-tie" style="color:#10b981"></i> ทีมตัวแทน</div>
+      <div class="md-bnav-sheet-item" onclick="openAllModal&&openAllModal('all');mdBnavCloseMenu()"><i class="fas fa-building" style="color:#7C6FCD"></i> ประกาศทั้งหมด</div>
+      <div class="md-bnav-sheet-item" onclick="mdBnavCloseMenu();if(typeof showPage==='function')showPage('home');setTimeout(function(){if(typeof scrollToEl==='function')scrollToEl('contact-sec');},200)"><i class="fas fa-calculator" style="color:#C8922A"></i> บริการครบวงจร</div>
+      <div class="md-bnav-sheet-item" onclick="openApplyModal&&openApplyModal('agent');mdBnavCloseMenu()"><i class="fas fa-briefcase" style="color:#1B3A6B"></i> สมัครตัวแทน</div>
+      <div class="md-bnav-sheet-item" onclick="window.openAdContact&&window.openAdContact();mdBnavCloseMenu()"><i class="fas fa-bullhorn" style="color:#f43f5e"></i> ลงโฆษณา</div>
+    </div>
+    <div style="margin-top:16px;border-top:1px solid #E4E6EB;padding-top:14px;display:flex;gap:8px">
+      <button onclick="typeof _openModal==='function'?_openModal('login-modal'):null;mdBnavCloseMenu()" style="flex:1;padding:11px;background:#1B3A6B;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit"><i class="fas fa-sign-in-alt"></i> เข้าสู่ระบบ</button>
+      <button onclick="typeof showPage==='function'?showPage('home'):null;setTimeout(function(){scrollToEl&&scrollToEl('contact-sec')},100);mdBnavCloseMenu()" style="flex:1;padding:11px;background:#C8922A;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit"><i class="fas fa-phone-alt"></i> ติดต่อเรา</button>
+    </div>
+  </div>
+</div>
+
+<style>
+.md-bnav-sheet-item{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 14px;border-radius:10px;
+  font-size:13px;font-weight:600;color:#1C1E21;
+  cursor:pointer;transition:.15s;
+  background:#F8F9FA;border:1px solid #E4E6EB;
+}
+.md-bnav-sheet-item:active{background:#E7F3FF;color:#1877F2;}
+.md-bnav-sheet-item i{font-size:18px;width:20px;text-align:center;}
+#md-bnav-drag-handle:hover{background:#A8B0BA;}
+#md-bnav-drag-handle:active{background:#7D8590;}
+</style>
+
+<script>
+window.mdBnavActive = function(id){
+  document.querySelectorAll('#md-bottom-nav .md-bnav-item').forEach(function(el){ el.classList.remove('active'); });
+  var el = document.getElementById(id);
+  if(el && !el.classList.contains('post-btn')) el.classList.add('active');
+};
+window.mdBnavFocusCompose = function(){
+  var card = document.getElementById('md-inline-compose-card');
+  var ta = document.getElementById('md-inline-text');
+  if(card) card.scrollIntoView({behavior:'smooth',block:'center'});
+  setTimeout(function(){
+    if(ta){
+      ta.focus();
+      var acts = document.getElementById('md-inline-actions');
+      if(acts) acts.style.display='flex';
+    }
+  },350);
+};
+window.mdBnavToggleMenu = function(){
+  var sheet = document.getElementById('md-bnav-sheet');
+  if(!sheet) return;
+  if(sheet.style.display==='block'){ mdBnavCloseMenu(); return; }
+  sheet.style.display='block';
+  var panel = document.getElementById('md-bnav-sheet-panel');
+  if(panel){
+    panel.style.transition='none'; panel.style.transform='translateY(110%)';
+    requestAnimationFrame(function(){
+      panel.style.transition='transform .32s cubic-bezier(.32,1,.56,1)';
+      panel.style.transform='translateY(0)';
+    });
+  }
+};
+window.mdBnavCloseMenu = function(){
+  var sheet = document.getElementById('md-bnav-sheet');
+  var panel = document.getElementById('md-bnav-sheet-panel');
+  if(!sheet) return;
+  if(panel){
+    panel.style.transform='translateY(110%)';
+    setTimeout(function(){ sheet.style.display='none'; panel.style.transform=''; },300);
+  } else { sheet.style.display='none'; }
+  var menuBtn = document.getElementById('bnav-menu');
+  if(menuBtn) menuBtn.classList.remove('active');
+};
+
+/* ── Swipe-down to close sheet ── */
+(function(){
+  var panel, startY, startScrollTop, isDragging, isScrollIntent;
+  var THRESHOLD = 80; // px ที่ต้องลากลงเพื่อปิด
+
+  function onTouchStart(e){
+    panel = document.getElementById('md-bnav-sheet-panel');
+    if(!panel) return;
+    var t = e.touches[0];
+    startY = t.clientY;
+    startScrollTop = panel.scrollTop;
+    isDragging = false;
+    isScrollIntent = false;
+  }
+
+  function onTouchMove(e){
+    if(!panel) return;
+    var t = e.touches[0];
+    var deltaY = t.clientY - startY;
+    var deltaX = Math.abs(t.clientX - (e.touches[0]?.clientX || t.clientX));
+
+    // ถ้า panel scroll ได้และยังไม่ scroll สุด → ให้ scroll ตามปกติ
+    if(startScrollTop > 0 && deltaY > 0){ isScrollIntent = true; }
+    if(isScrollIntent) return;
+
+    if(deltaY > 10){
+      // ลากลง — หยุด scroll แล้ว animate panel
+      isDragging = true;
+      e.preventDefault();
+      var offset = Math.max(0, deltaY);
+      panel.style.transition = 'none';
+      panel.style.transform = 'translateY(' + offset + 'px)';
+    }
+  }
+
+  function onTouchEnd(e){
+    if(!panel || !isDragging) return;
+    var t = e.changedTouches[0];
+    var deltaY = t.clientY - startY;
+    panel.style.transition = '';
+
+    if(deltaY > THRESHOLD){
+      // ลากพอ → ปิด
+      mdBnavCloseMenu();
+    } else {
+      // ลากไม่พอ → spring กลับ
+      panel.style.transition = 'transform .25s cubic-bezier(.32,1,.56,1)';
+      panel.style.transform = 'translateY(0)';
+    }
+    isDragging = false;
+    isScrollIntent = false;
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    var sheetEl = document.getElementById('md-bnav-sheet-panel');
+    var handleEl = document.getElementById('md-bnav-drag-handle');
+    if(sheetEl){
+      sheetEl.addEventListener('touchstart', onTouchStart, {passive:true});
+      sheetEl.addEventListener('touchmove',  onTouchMove,  {passive:false});
+      sheetEl.addEventListener('touchend',   onTouchEnd,   {passive:true});
+    }
+    // click drag handle ก็ปิดได้
+    if(handleEl){
+      handleEl.addEventListener('click', function(){ mdBnavCloseMenu(); });
+    }
+  });
+})();
+
+/* ── Bind bottom nav buttons via addEventListener (ป้องกัน onclick ถูก block) ── */
+(function(){
+  function _bnavBind(){
+    var nav = document.getElementById('md-bottom-nav');
+    if(!nav) return;
+
+    function _tap(el, fn){
+      var _touched = false;
+      el.addEventListener('touchstart', function(e){
+        _touched = true;
+        el.style.opacity = '.7';
+      }, {passive:true});
+      el.addEventListener('touchend', function(e){
+        el.style.opacity = '';
+        if(_touched){ _touched = false; e.preventDefault(); fn(); }
+      }, {passive:false});
+      el.addEventListener('click', function(e){
+        if(!_touched) fn();
+        _touched = false;
+      });
+    }
+
+    var btnHome = document.getElementById('bnav-home');
+    var btnSearch = document.getElementById('bnav-search');
+    var btnPost = document.getElementById('bnav-post');
+    var btnFav = document.getElementById('bnav-fav');
+    var btnMenu = document.getElementById('bnav-menu');
+
+    if(btnHome) _tap(btnHome, function(){
+      mdBnavActive('bnav-home');
+      if(typeof showPage === 'function') showPage('home');
+      window.scrollTo({top:0, behavior:'smooth'});
+    });
+    if(btnSearch) _tap(btnSearch, function(){
+      mdBnavActive('bnav-search');
+      if(typeof openAllModal === 'function') openAllModal('all');
+    });
+    if(btnPost) _tap(btnPost, function(){
+      if(typeof mdBnavFocusCompose === 'function') mdBnavFocusCompose();
+    });
+    if(btnFav) _tap(btnFav, function(){
+      mdBnavActive('bnav-fav');
+      if(typeof showPage === 'function') showPage('favorites');
+    });
+    if(btnMenu) _tap(btnMenu, function(){
+      mdBnavActive('bnav-menu');
+      if(typeof mdBnavToggleMenu === 'function') mdBnavToggleMenu();
+    });
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', _bnavBind);
+  } else {
+    _bnavBind();
+  }
+})();
+</script>
 
 <!-- ═══ SOCIAL FEED JS ═══════════════════════════════════ -->
 <script>
@@ -6666,12 +7252,13 @@ footer::after{
     var existing = document.getElementById('md-compose-modal');
     if(existing) existing.remove();
 
-    var iconMap  = {text:'fas fa-pen',photo:'fas fa-images',video:'fas fa-video'};
-    var titleMap = {text:'แชร์ทรัพย์ / ถามเรื่องบ้าน',photo:'แชร์รูปทรัพย์',video:'แชร์วิดีโอทรัพย์'};
+    var iconMap  = {text:'fas fa-pen',photo:'fas fa-images',video:'fas fa-video',question:'fas fa-question-circle'};
+    var titleMap = {text:'แชร์ทรัพย์ / ถามเรื่องบ้าน',photo:'แชร์รูปทรัพย์',video:'แชร์วิดีโอทรัพย์',question:'ถามเรื่องบ้าน / อสังหาฯ'};
     var phMap    = {
       text:'คุณมีทรัพย์อยากแชร์? ถามเรื่องบ้าน? หรือต้องการซื้อ/เช่า? เขียนได้เลยครับ...',
       photo:'บรรยายรูปที่อยากแชร์ เช่น "คอนโด Ashton Asoke วิวสวย ชั้น 22 ราคาพิเศษ"',
-      video:'บรรยายวิดีโอ เช่น "Tour บ้านเดี่ยว 3 ห้องนอน ลาดพร้าว"'
+      video:'บรรยายวิดีโอ เช่น "Tour บ้านเดี่ยว 3 ห้องนอน ลาดพร้าว"',
+      question:'เขียนคำถามของคุณ เช่น "ซื้อคอนโดตอนนี้ดีไหม?" หรือ "ย่านไหนน่าลงทุนในปี 2568?"'
     };
 
     var showUpload = (type==='photo'||type==='video');
@@ -6679,6 +7266,36 @@ footer::after{
     var icon = iconMap[type]||'fas fa-pen';
     var modalTitle = titleMap[type]||'โพสต์';
     var placeholder = phMap[type]||'';
+
+    // Tag selector HTML
+    var tagSelectorHtml = '';
+    if(type==='question'){
+      tagSelectorHtml = '<div style="margin-top:12px">'
+        +'<label style="font-size:12px;font-weight:600;color:var(--tx2);display:block;margin-bottom:8px"><i class="fas fa-tags"></i> เลือกหัวข้อ <span style="color:#e05">*</span></label>'
+        +'<div id="cm-tags" style="display:flex;flex-wrap:wrap;gap:7px">'
+          +'<button type="button" class="cm-tag-btn" data-tag="คำถามทั่วไป" onclick="window._cmToggleTag(this)" style="padding:5px 13px;border-radius:20px;border:1.5px solid var(--bd);background:#fff;cursor:pointer;font-size:12px;font-weight:600;transition:.15s;font-family:inherit">💬 คำถามทั่วไป</button>'
+          +'<button type="button" class="cm-tag-btn" data-tag="ซื้อ-ขาย" onclick="window._cmToggleTag(this)" style="padding:5px 13px;border-radius:20px;border:1.5px solid var(--bd);background:#fff;cursor:pointer;font-size:12px;font-weight:600;transition:.15s;font-family:inherit">🏠 ซื้อ-ขาย</button>'
+          +'<button type="button" class="cm-tag-btn" data-tag="เช่า" onclick="window._cmToggleTag(this)" style="padding:5px 13px;border-radius:20px;border:1.5px solid var(--bd);background:#fff;cursor:pointer;font-size:12px;font-weight:600;transition:.15s;font-family:inherit">🔑 เช่า</button>'
+          +'<button type="button" class="cm-tag-btn" data-tag="ลงทุน" onclick="window._cmToggleTag(this)" style="padding:5px 13px;border-radius:20px;border:1.5px solid var(--bd);background:#fff;cursor:pointer;font-size:12px;font-weight:600;transition:.15s;font-family:inherit">📈 ลงทุน</button>'
+          +'<button type="button" class="cm-tag-btn" data-tag="กฎหมาย-สัญญา" onclick="window._cmToggleTag(this)" style="padding:5px 13px;border-radius:20px;border:1.5px solid var(--bd);background:#fff;cursor:pointer;font-size:12px;font-weight:600;transition:.15s;font-family:inherit">⚖️ กฎหมาย/สัญญา</button>'
+          +'<button type="button" class="cm-tag-btn" data-tag="ทำเล-โซน" onclick="window._cmToggleTag(this)" style="padding:5px 13px;border-radius:20px;border:1.5px solid var(--bd);background:#fff;cursor:pointer;font-size:12px;font-weight:600;transition:.15s;font-family:inherit">📍 ทำเล/โซน</button>'
+          +'<button type="button" class="cm-tag-btn" data-tag="สินเชื่อ-ธนาคาร" onclick="window._cmToggleTag(this)" style="padding:5px 13px;border-radius:20px;border:1.5px solid var(--bd);background:#fff;cursor:pointer;font-size:12px;font-weight:600;transition:.15s;font-family:inherit">🏦 สินเชื่อ/ธนาคาร</button>'
+          +'<button type="button" class="cm-tag-btn" data-tag="ตกแต่ง-ต่อเติม" onclick="window._cmToggleTag(this)" style="padding:5px 13px;border-radius:20px;border:1.5px solid var(--bd);background:#fff;cursor:pointer;font-size:12px;font-weight:600;transition:.15s;font-family:inherit">🎨 ตกแต่ง/ต่อเติม</button>'
+        +'</div>'
+        +'</div>';
+    } else {
+      // For non-question types, show property type tag
+      tagSelectorHtml = '<div style="margin-top:10px">'
+        +'<label style="font-size:12px;font-weight:600;color:var(--tx2);display:block;margin-bottom:8px"><i class="fas fa-tag"></i> ประเภททรัพย์</label>'
+        +'<div id="cm-tags" style="display:flex;flex-wrap:wrap;gap:7px">'
+          +'<button type="button" class="cm-tag-btn" data-tag="คอนโด" onclick="window._cmToggleTag(this)" style="padding:5px 13px;border-radius:20px;border:1.5px solid var(--bd);background:#fff;cursor:pointer;font-size:12px;font-weight:600;transition:.15s;font-family:inherit">🏢 คอนโด</button>'
+          +'<button type="button" class="cm-tag-btn" data-tag="บ้านเดี่ยว" onclick="window._cmToggleTag(this)" style="padding:5px 13px;border-radius:20px;border:1.5px solid var(--bd);background:#fff;cursor:pointer;font-size:12px;font-weight:600;transition:.15s;font-family:inherit">🏠 บ้านเดี่ยว</button>'
+          +'<button type="button" class="cm-tag-btn" data-tag="ทาวน์โฮม" onclick="window._cmToggleTag(this)" style="padding:5px 13px;border-radius:20px;border:1.5px solid var(--bd);background:#fff;cursor:pointer;font-size:12px;font-weight:600;transition:.15s;font-family:inherit">🏘️ ทาวน์โฮม</button>'
+          +'<button type="button" class="cm-tag-btn" data-tag="ที่ดิน" onclick="window._cmToggleTag(this)" style="padding:5px 13px;border-radius:20px;border:1.5px solid var(--bd);background:#fff;cursor:pointer;font-size:12px;font-weight:600;transition:.15s;font-family:inherit">🌿 ที่ดิน</button>'
+          +'<button type="button" class="cm-tag-btn" data-tag="อาคารพาณิชย์" onclick="window._cmToggleTag(this)" style="padding:5px 13px;border-radius:20px;border:1.5px solid var(--bd);background:#fff;cursor:pointer;font-size:12px;font-weight:600;transition:.15s;font-family:inherit">🏬 อาคารพาณิชย์</button>'
+        +'</div>'
+        +'</div>';
+    }
 
     var mo = document.createElement('div');
     mo.className='ov'; mo.id='md-compose-modal';
@@ -6713,6 +7330,7 @@ footer::after{
             +'<div style="font-size:11px;color:var(--gr)">โพสต์ใน Matchdoor Community</div></div>'
           +'</div>'
           +'<textarea id="cm-text" rows="4" placeholder="'+placeholder+'" style="width:100%;border:1.5px solid var(--bd);border-radius:10px;padding:12px;font-size:14px;font-family:inherit;resize:vertical;box-sizing:border-box;outline:none;transition:.2s;min-height:100px"></textarea>'
+          +tagSelectorHtml
           +uploadHtml
           +'<div class="frow" style="margin-top:12px">'
             +'<div class="fg"><label style="font-size:12px">ชื่อ-นามสกุล <span style="color:#e05">*</span></label><input id="cm-name" placeholder="ชื่อของคุณ" style="width:100%"></div>'
@@ -6777,6 +7395,18 @@ footer::after{
     }
   };
 
+  // Tag toggle for compose modal
+  window._cmToggleTag = function(btn){
+    var isActive = btn.style.background === 'var(--p)' || btn.classList.contains('cm-tag-active');
+    if(isActive){
+      btn.style.background='#fff'; btn.style.color=''; btn.style.borderColor='var(--bd)';
+      btn.classList.remove('cm-tag-active');
+    } else {
+      btn.style.background='var(--p)'; btn.style.color='#fff'; btn.style.borderColor='var(--p)';
+      btn.classList.add('cm-tag-active');
+    }
+  };
+
   // Handle file uploads for compose modal
   window._cmFiles = [];
   window._cmHandleFiles = function(files, type){
@@ -6823,6 +7453,13 @@ footer::after{
     var textVal  = ((document.getElementById('cm-text')||{}).value||'').trim();
     var consent  = (document.getElementById('cm-consent')||{}).checked;
 
+    // Collect selected tags
+    var selectedTags = [];
+    document.querySelectorAll('#cm-tags .cm-tag-active').forEach(function(btn){
+      var tag = btn.getAttribute('data-tag');
+      if(tag) selectedTags.push('#'+tag.replace(/[^\u0E00-\u0E7Fa-zA-Z0-9]/g,''));
+    });
+
     if(nameRaw.length<2){ showErr('กรุณากรอกชื่อ (อย่างน้อย 2 ตัวอักษร)'); return; }
     if(!textVal){ showErr('กรุณาเขียนข้อความก่อนโพสต์'); return; }
     if(!consent){ showErr('กรุณายินยอมการเก็บข้อมูลก่อน'); return; }
@@ -6838,6 +7475,7 @@ footer::after{
     var hashtags = ['#Matchdoor'];
     var tagMatches = textVal.match(/#[\u0E00-\u0E7F\w]+/g);
     if(tagMatches) hashtags = tagMatches.concat(['#Matchdoor']);
+    if(selectedTags.length) hashtags = hashtags.concat(selectedTags);
 
     // Create local post object for immediate display
     var localPost = {
@@ -7124,13 +7762,18 @@ footer::after{
   }
 
   function bindComposeInput(){
-    var compose = document.querySelector('#md-social-feed-section .md-compose-input');
-    if(compose) compose.onclick = function(e){ e.stopPropagation(); window.openComposeModal('text'); };
-    var toolCls = {video:'video',photo:'photo',listing:'listing'};
-    Object.keys(toolCls).forEach(function(cls){
-      var t = document.querySelector('#md-social-feed-section .md-compose-tool.'+cls);
-      if(t) t.onclick = function(e){ e.stopPropagation(); window.openComposeModal(toolCls[cls]); };
-    });
+    // Inline textarea — just ensure Enter key handler is attached (already done inline, but double-bind safely)
+    var inlineTa = document.getElementById('md-inline-text');
+    if(inlineTa && !inlineTa._mdBound){
+      inlineTa._mdBound = true;
+      inlineTa.addEventListener('keydown', function(e){
+        if(e.key==='Enter' && !e.shiftKey && !e.metaKey){
+          e.preventDefault();
+          window.mdInlineSubmit && window.mdInlineSubmit();
+        }
+      });
+    }
+    // Story card bindings
     var addStory = document.querySelector('#md-social-feed-section .md-story-card.add-story');
     if(addStory) addStory.onclick = function(e){ e.stopPropagation(); window.openShareStoryModal(); };
     var storyLink = document.querySelector('#md-social-feed-section .md-story-bar-hd a');
@@ -14675,8 +15318,52 @@ function openAllModal(type){
   }
   else if(type==='blog'){
     title=ui('modal.blog.title');
-    const html=`<div class="blog-grid">${blogs.map(bg=>blogCardFull(bg)).join('')}</div>`;
-    t.textContent=title; b.innerHTML=html; var _fs=document.getElementById('all-modal-filter-sticky');if(_fs)_fs.innerHTML=''; _openModal('all-modal'); b.scrollTop=0; return;
+    // Build sort+filter bar
+    var filterBar = '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 16px 8px;border-bottom:1px solid var(--bd);background:#fff;position:sticky;top:0;z-index:10">'
+      +'<div style="display:flex;gap:6px;flex-wrap:wrap;flex:1">'
+        +'<button onclick="window._blogFilter(\'all\',this)" class="gf active" style="font-size:12px;padding:5px 13px">ทั้งหมด</button>'
+        +'<button onclick="window._blogFilter(\'การลงทุน\',this)" class="gf" style="font-size:12px;padding:5px 13px">การลงทุน</button>'
+        +'<button onclick="window._blogFilter(\'คำแนะนำ\',this)" class="gf" style="font-size:12px;padding:5px 13px">คำแนะนำ</button>'
+        +'<button onclick="window._blogFilter(\'ข่าวสาร\',this)" class="gf" style="font-size:12px;padding:5px 13px">ข่าวสาร</button>'
+      +'</div>'
+      +'<div style="display:flex;align-items:center;gap:6px">'
+        +'<i class="fas fa-sort-amount-down" style="color:var(--p);font-size:13px"></i>'
+        +'<select onchange="window._blogSort(this.value)" style="border:1.5px solid var(--bd);border-radius:8px;padding:4px 8px;font-size:12px;font-family:inherit;cursor:pointer;outline:none">'
+          +'<option value="newest">ล่าสุด</option>'
+          +'<option value="popular">ยอดนิยม</option>'
+        +'</select>'
+      +'</div>'
+    +'</div>'
+    +'<div id="blog-modal-grid" style="padding:14px 16px"></div>';
+    t.textContent=title;
+    b.innerHTML=filterBar;
+    var _fs=document.getElementById('all-modal-filter-sticky');if(_fs)_fs.innerHTML='';
+    // Store and render
+    window._blogModalAll = blogs.slice();
+    window._blogModalCat = 'all';
+    window._blogRenderModal = function(){
+      var list = window._blogModalAll;
+      if(window._blogModalCat && window._blogModalCat!=='all') list=list.filter(function(x){ return x.cat && x.cat.includes(window._blogModalCat); });
+      var grid = document.getElementById('blog-modal-grid');
+      if(grid){
+        var cols = window.innerWidth<=600?'repeat(2,1fr)':'repeat(auto-fill,minmax(240px,1fr))';
+        grid.innerHTML='<div style="display:grid;grid-template-columns:'+cols+';gap:12px">'+(list.length?list.map(function(bg){return blogCardFull(bg);}).join(''):'<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--gr)"><i class="fas fa-newspaper" style="font-size:36px;opacity:.3"></i><br><br>ไม่พบบทความในหมวดนี้</div>')+'</div>';
+        setTimeout(function(){ initAllCardSwipes(); },80);
+      }
+    };
+    window._blogFilter = function(cat,btn){
+      window._blogModalCat=cat;
+      document.querySelectorAll('#all-body .gf').forEach(function(b2){b2.classList.remove('active');});
+      if(btn) btn.classList.add('active');
+      window._blogRenderModal();
+    };
+    window._blogSort = function(val){
+      if(val==='popular') window._blogModalAll=blogs.slice().sort(function(a,b2){return(b2.views||0)-(a.views||0);});
+      else window._blogModalAll=blogs.slice();
+      window._blogRenderModal();
+    };
+    window._blogRenderModal();
+    _openModal('all-modal'); b.scrollTop=0; return;
   }
   else return;
 
