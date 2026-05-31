@@ -7048,7 +7048,7 @@ window.mdBnavCloseMenu = function(){
     var hashtags = [];
     if(p.district) hashtags.push('#'+p.district.replace(/\s/g,''));
     if(p.prop_type||p.type) hashtags.push('#'+(p.prop_type||p.type||'').replace(/\s/g,''));
-    if(p.near_bts) hashtags.push('#ใกล้BTS'+p.near_bts.replace(/\s/g,''));
+    if(p.bts||p.near_bts) hashtags.push('#ใกล้BTS'+(p.bts||p.near_bts).replace(/\s/g,''));
     hashtags.push('#Matchdoor');
     var hashtagHtml = hashtags.map(function(h){ return '<span class="md-hashtag">'+esc(h)+'</span>'; }).join(' ');
     var likes = Math.floor(Math.random()*80)+5;
@@ -9463,7 +9463,16 @@ let allFiltered = []; // เก็บ filtered ทั้งหมดเพื่
 
 const $=id=>document.getElementById(id);
 const $$=sel=>document.querySelectorAll(sel);
-function toast(msg,err=false){ const t=$('toast'); t.textContent=msg; t.style.background=err?'rgba(200,50,50,.9)':'rgba(0,0,0,.85)'; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
+function toast(msg,type=false){
+  const t=$('toast');
+  t.textContent=msg;
+  const isErr=type===true||type==='error';
+  const isWarn=type==='warn';
+  const isOk=type==='success';
+  t.style.background=isErr?'rgba(200,50,50,.9)':isWarn?'rgba(180,120,0,.9)':isOk?'rgba(39,174,96,.9)':'rgba(0,0,0,.85)';
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
 function loading(s){$('loading').classList.toggle('show',s)}
 function scrollToEl(id){$(id)?.scrollIntoView({behavior:'smooth'})}
 function fmtPrice(p,t){
@@ -9759,6 +9768,18 @@ async function checkAuth(){
   _cachedUserProfile = null;
   if(user){
     await _loadUserProfile(true);
+    // ── Sync favorites จาก Supabase → localStorage ──────────────
+    try{
+      const {data:favData}=await sb.from('favorites').select('property_id').eq('user_id',user.id);
+      if(favData && favData.length){
+        const dbFavIds=favData.map(r=>String(r.property_id));
+        const merged=[...new Set([...dbFavIds,...favs])];
+        favs=merged;
+        localStorage.setItem('md_favs',JSON.stringify(favs));
+        updateFavUI();
+        renderFavDropdown();
+      }
+    }catch(e){ console.warn('[favs sync]',e.message); }
   } else {
     // ไม่มี user — ล้าง metadata ที่อาจค้างอยู่
     if(u) u.user_metadata = {};
@@ -9958,7 +9979,7 @@ function renderMyAccount(){
   const wrap = document.getElementById('my-account-content');
   if(!wrap) return;
   const t = (key) => {
-    const e = I18N_DICT[key]; if(e) return e[_lang]||e['th']||key;
+    const e = (typeof I18N_DICT!=='undefined')&&I18N_DICT[key]; if(e) return e[(typeof _lang!=='undefined'?_lang:'th')]||e['th']||key;
     return ui(key)||key;
   };
   // ── Dev bypass state: update button appearance ──
@@ -10312,8 +10333,8 @@ async function grantWelcomeBonus(uid) {
         balance:             WELCOME_BONUS_TOKENS,
         total_purchased:     WELCOME_BONUS_TOKENS,
         total_used:          0,
-        welcome_bonus_given: true
-        // v19: user_tokens ไม่มี created_at column
+        welcome_bonus_given: true,
+        created_at:          new Date().toISOString()
       });
       if (insErr) throw insErr;
     } else {
@@ -11416,6 +11437,9 @@ async function adminApproveUserListing(ulId) {
       amenities:         ul.amenities    || [],
       description:       ul.description  || '',
       near_bts:          ul.near_bts     || '',
+      bts:               ul.bts          || ul.near_bts || '',
+      mrt:               ul.mrt          || '',
+      transit:           ul.transit      || '',
       nearby_places:     ul.nearby_places || null,
       deposit:           ul.deposit           || null,
       advance_payment:   ul.advance_payment   || null,
@@ -11436,7 +11460,7 @@ async function adminApproveUserListing(ulId) {
     // 2. อัปเดต user_listing status + หัก 1 Token
     const { error: ulErr } = await sb.from('user_listings').update({
       status:      'อนุมัติ',
-      approved_by: user.id,
+      approved_by: (_adminUser||user)?.id || null,
       approved_at: new Date().toISOString(),
       property_id: newPropId
     }).eq('id', ulId);
@@ -12420,11 +12444,11 @@ async function saveProfile(){
 const MOCK = {
   props: [
     {id:'p1',title:'บ้านเดี่ยว 2 ชั้น หมู่บ้านพฤกษา',type:'บ้านเดี่ยว',province:'กรุงเทพฯ',location:'ลาดกระบัง กรุงเทพฯ',price:4500000,tx:'BUY',bed:3,bath:2,area:180,land_area:52,floors:2,floor_no:0,parking:2,furniture:'full',pets_allowed:true,appliances:['แอร์','ตู้เย็น','เครื่องซักผ้า'],isNew:true,isRec:true,desc:'บ้านเดี่ยว 2 ชั้น ทำเลดี ใกล้ทางด่วน เฟอร์นิเจอร์ครบ เลี้ยงสัตว์ได้',agentId:'a1',createdAt:'2025-04-20',photos:['https://picsum.photos/id/101/800/600','https://picsum.photos/id/111/800/600']},
-    {id:'p2',title:'คอนโด ลุมพินี วิลล์ รัชโยธิน',type:'คอนโด',province:'กรุงเทพฯ',location:'จตุจักร กรุงเทพฯ',price:2200000,tx:'BUY',bed:1,bath:1,area:35,land_area:0,floors:25,floor_no:12,parking:1,furniture:'full',pets_allowed:false,appliances:['แอร์','ตู้เย็น','โทรทัศน์'],isNew:false,isRec:true,desc:'คอนโดใกล้รถไฟฟ้า BTS พร้อมอยู่',agentId:'a2',createdAt:'2025-03-15',photos:['https://picsum.photos/id/102/800/600']},
-    {id:'p3',title:'ทาวน์โฮม 3 ชั้น ใกล้รถไฟฟ้าสายสีม่วง',type:'ทาวน์โฮม',province:'นนทบุรี',location:'ปากเกร็ด นนทบุรี',price:3200000,tx:'BUY',bed:3,bath:2,area:140,land_area:21,floors:3,floor_no:0,parking:2,furniture:'partial',pets_allowed:true,appliances:['แอร์','เครื่องทำน้ำอุ่น'],isNew:true,isRec:false,desc:'โครงการใหม่ ใกล้ MRT สายสีม่วง',agentId:'a3',createdAt:'2025-05-01',photos:['https://picsum.photos/id/103/800/600']},
+    {id:'p2',title:'คอนโด ลุมพินี วิลล์ รัชโยธิน',type:'คอนโด',province:'กรุงเทพฯ',location:'จตุจักร กรุงเทพฯ',price:2200000,tx:'BUY',bed:1,bath:1,area:35,land_area:0,floors:25,floor_no:12,parking:1,furniture:'full',pets_allowed:false,appliances:['แอร์','ตู้เย็น','โทรทัศน์'],isNew:false,isRec:true,desc:'คอนโดใกล้รถไฟฟ้า BTS พร้อมอยู่',bts:'ลาดพร้าว',near_bts:'ลาดพร้าว',agentId:'a2',createdAt:'2025-03-15',photos:['https://picsum.photos/id/102/800/600']},
+    {id:'p3',title:'ทาวน์โฮม 3 ชั้น ใกล้รถไฟฟ้าสายสีม่วง',type:'ทาวน์โฮม',province:'นนทบุรี',location:'ปากเกร็ด นนทบุรี',price:3200000,tx:'BUY',bed:3,bath:2,area:140,land_area:21,floors:3,floor_no:0,parking:2,furniture:'partial',pets_allowed:true,appliances:['แอร์','เครื่องทำน้ำอุ่น'],isNew:true,isRec:false,desc:'โครงการใหม่ ใกล้ MRT สายสีม่วง',mrt:'บางรักน้อย-ท่าอิฐ',agentId:'a3',createdAt:'2025-05-01',photos:['https://picsum.photos/id/103/800/600']},
     {id:'p4',title:'ที่ดินเปล่า ติดถนนใหญ่ ทำเลทอง',type:'ที่ดิน',province:'ชลบุรี',location:'บางละมุง ชลบุรี',price:8900000,tx:'BUY',bed:0,bath:0,area:400,land_area:100,floors:0,floor_no:0,parking:0,furniture:'none',pets_allowed:false,appliances:[],isNew:false,isRec:true,desc:'ที่ดินเปล่า ติดถนน 4 เลน เหมาะลงทุน',agentId:'a4',createdAt:'2025-02-10',photos:['https://picsum.photos/id/104/800/600']},
-    {id:'p5',title:'คอนโดให้เช่า แอชตัน อโศก',type:'คอนโด',province:'กรุงเทพฯ',location:'อโศก กรุงเทพฯ',price:35000,tx:'RENT',bed:2,bath:2,area:65,land_area:0,floors:50,floor_no:28,parking:1,furniture:'full',pets_allowed:false,appliances:['แอร์','ตู้เย็น','เครื่องซักผ้า','โทรทัศน์'],isNew:false,isRec:true,desc:'คอนโดหรู ใจกลางเมือง ใกล้ BTS อโศก',agentId:'a5',createdAt:'2025-04-01',photos:['https://picsum.photos/id/105/800/600']},
-    {id:'p8',title:'ทาวน์โฮม ลาดพร้าว 71',type:'ทาวน์โฮม',province:'กรุงเทพฯ',location:'ลาดพร้าว กรุงเทพฯ',price:3900000,tx:'BUY',bed:3,bath:2,area:150,land_area:24,floors:3,floor_no:0,parking:2,furniture:'none',pets_allowed:false,appliances:['แอร์'],isNew:true,isRec:true,desc:'ทาวน์โฮม ใกล้ MRT ลาดพร้าว',agentId:'a1',createdAt:'2025-05-05',photos:['https://picsum.photos/id/108/800/600']},
+    {id:'p5',title:'คอนโดให้เช่า แอชตัน อโศก',type:'คอนโด',province:'กรุงเทพฯ',location:'อโศก กรุงเทพฯ',price:35000,tx:'RENT',bed:2,bath:2,area:65,land_area:0,floors:50,floor_no:28,parking:1,furniture:'full',pets_allowed:false,appliances:['แอร์','ตู้เย็น','เครื่องซักผ้า','โทรทัศน์'],isNew:false,isRec:true,desc:'คอนโดหรู ใจกลางเมือง ใกล้ BTS อโศก',bts:'อโศก',near_bts:'อโศก',agentId:'a5',createdAt:'2025-04-01',photos:['https://picsum.photos/id/105/800/600']},
+    {id:'p8',title:'ทาวน์โฮม ลาดพร้าว 71',type:'ทาวน์โฮม',province:'กรุงเทพฯ',location:'ลาดพร้าว กรุงเทพฯ',price:3900000,tx:'BUY',bed:3,bath:2,area:150,land_area:24,floors:3,floor_no:0,parking:2,furniture:'none',pets_allowed:false,appliances:['แอร์'],isNew:true,isRec:true,desc:'ทาวน์โฮม ใกล้ MRT ลาดพร้าว',mrt:'ลาดพร้าว',agentId:'a1',createdAt:'2025-05-05',photos:['https://picsum.photos/id/108/800/600']},
     {id:'p13',title:'คอนโดให้เช่า ใกล้ ม.เกษตรศาสตร์',type:'คอนโด',province:'กรุงเทพฯ',location:'ลาดยาว กรุงเทพฯ',price:12000,tx:'RENT',bed:1,bath:1,area:30,land_area:0,floors:8,floor_no:5,parking:1,furniture:'full',pets_allowed:false,appliances:['แอร์','ตู้เย็น'],isNew:false,isRec:false,desc:'คอนโดสตูดิโอ เฟอร์นิเจอร์ครบ',agentId:'a2',createdAt:'2025-04-18',photos:['https://picsum.photos/id/114/800/600']},
     {id:'p15',title:'ที่ดินเปล่า 100 ตร.วา พระราม 2',type:'ที่ดิน',province:'กรุงเทพฯ',location:'พระราม 2 ซอย 40',price:5500000,tx:'BUY',bed:0,bath:0,area:400,land_area:100,floors:0,floor_no:0,parking:0,furniture:'none',pets_allowed:false,appliances:[],isNew:false,isRec:true,desc:'ที่ดินเปล่า หน้ากว้าง 20 เมตร',agentId:'a4',createdAt:'2025-02-28',photos:['https://picsum.photos/id/116/800/600']}
   ],
@@ -12503,6 +12527,10 @@ function mapProp(r){
     rent_duration:r.rent_duration||r.rentDuration||null,
     // v19: contact + location fields จาก admin_approve_user_listing
     near_bts:r.near_bts||'',
+    // BTS/MRT/Transit fields — ใช้งานโดย filter, search, PDP, schema
+    bts: r.bts || r.near_bts || '',
+    mrt: r.mrt || '',
+    transit: r.transit || r.near_transit || '',
     contact_name:r.contact_name||'',
     contact_phone:r.contact_phone||'',
     contact_line:r.contact_line||''
@@ -14975,6 +15003,14 @@ function renderGrid(id,list,loading_sk=false){
 }
 
 function toggleFav(id,e){ if(e)e.stopPropagation(); const sid=String(id); const i=favs.indexOf(sid); const isAdding=(i===-1); if(isAdding)favs.push(sid); else favs.splice(i,1); localStorage.setItem('md_favs',JSON.stringify(favs)); updateFavUI(); renderFavDropdown(); if($('page-favorites').classList.contains('active'))renderFavPage(); $$(`[data-id="${sid}"]`).forEach(b=>{ const on=favs.includes(sid); b.innerHTML=on?'<i class="fas fa-heart"></i>':'<i class="far fa-heart"></i>'; b.classList.toggle('favorited',on); });
+  // ── Sync กับ Supabase favorites table (fire-and-forget) ──
+  if(user && sb){
+    if(isAdding){
+      sb.from('favorites').insert({user_id:user.id, property_id:sid}).then(({error})=>{ if(error) console.warn('[favorites insert]',error.message); });
+    } else {
+      sb.from('favorites').delete().eq('user_id',user.id).eq('property_id',sid).then(({error})=>{ if(error) console.warn('[favorites delete]',error.message); });
+    }
+  }
   // GA4: favorite event
   try{ if(typeof trackEvent==='function'&&isAdding){ const _p=(typeof props!=='undefined')?props.find(function(x){return String(x.id)===sid;}):null; trackEvent('favorite_add',{property_id:sid,property_title:_p?(_p.title||''):'',property_type:_p?(_p.type||''):'',price:_p?(_p.price||0):0}); } }catch(e){}
 }
@@ -15032,6 +15068,8 @@ function openModal(id){
     if(h.length>50) h=h.slice(0,50);
     localStorage.setItem('md_view_history',JSON.stringify(h));
   }catch(e){}
+  // ── Increment view count ใน Supabase (fire-and-forget) ──
+  if(sb){ sb.rpc('increment_views',{p_table:'properties',p_id:String(id)}).then(()=>{}); }
 
   // ── bump generation + abort ทันที — หยุด batch idle ที่กำลัง render listings อยู่ ──
   if(typeof window._listingsRenderGen !== 'undefined') {
@@ -16673,6 +16711,8 @@ function showBlogDetail(blog){
     window.blogGoSlide = i => { blogSlideCur=i; renderBlogSlider(); };
     renderBlogSlider();
   }
+  // ── Increment view count ใน Supabase (fire-and-forget) ──
+  if(sb && blog.id){ sb.rpc('increment_views',{p_table:'blogs',p_id:String(blog.id)}).then(()=>{}); }
   _openModal('blog-modal');
 }
 
@@ -16960,6 +17000,8 @@ function showAgentDetail(a){
   $('ag-body').appendChild(agReviewDiv);
   // Load agent reviews
   setTimeout(function(){ rvLoadSection('agent', String(a.id), 'ag-rv'); }, 60);
+  // ── Increment view count ใน Supabase (fire-and-forget) ──
+  if(sb && a.id){ sb.rpc('increment_views',{p_table:'agents',p_id:String(a.id)}).then(()=>{}); }
   _openModal('ag-modal');
 }
 
@@ -25587,6 +25629,11 @@ async function adminDeletePortfolio(id, title){
 
     /* render สำเร็จ — clear pending flag */
     window._pdpCurrentId = null;
+
+    /* ── Increment view count ใน Supabase (fire-and-forget) ── */
+    if (typeof sb !== 'undefined' && sb && p && p.id) {
+      sb.rpc('increment_views', { p_table: 'properties', p_id: String(p.id) }).then(function(){});
+    }
 
     /* Find agent */
     if (p.agentId && typeof agents !== 'undefined') {
