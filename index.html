@@ -3651,10 +3651,18 @@ footer::after{
     grid-template-columns:1fr !important;
     padding:10px 12px 80px !important;
     gap:12px;
+    width:100%;
+    box-sizing:border-box;
   }
   .md-fb-col-left{ display:none !important; }
   .md-fb-col-right{ display:none !important; }
-  .md-fb-col-center{ max-width:680px; margin:0 auto; width:100%; }
+  .md-fb-col-center{
+    max-width:680px;
+    margin:0 auto;
+    width:100%;
+    min-width:0;
+    box-sizing:border-box;
+  }
 
   /* Show bottom nav on tablet */
   #md-bottom-nav{ display:flex !important; }
@@ -3668,14 +3676,56 @@ footer::after{
   .md-fb-layout{
     grid-template-columns:1fr !important;
     padding:6px 0 80px !important;
+    width:100%;
+    box-sizing:border-box;
   }
   .md-fb-col-left{ display:none !important; }
   .md-fb-col-right{ display:none !important; }
+  .md-fb-col-center{
+    width:100%;
+    min-width:0;
+    max-width:100%;
+    padding:0;
+    box-sizing:border-box;
+    overflow:hidden;
+  }
 
   /* Show bottom nav on mobile */
   #md-bottom-nav{ display:flex !important; }
 
   .md-story-card{ width:80px; height:116px; }
+
+  /* stories scroll must not overflow page */
+  .md-stories-scroll{
+    width:100%;
+    max-width:100%;
+    box-sizing:border-box;
+  }
+
+  /* story bar padding tighter on mobile */
+  .md-story-bar{ padding:10px 10px 8px; }
+
+  /* compose textarea + actions must not overflow */
+  .md-compose-row{ flex-wrap:nowrap !important; }
+  #md-inline-text{ width:100% !important; box-sizing:border-box !important; }
+  #md-inline-actions{
+    flex-wrap:wrap !important;
+    gap:4px !important;
+  }
+
+  /* tablet ads strip — constrain cards */
+  #md-tablet-ads-strip,
+  #md-tablet-search-links{
+    box-sizing:border-box;
+    width:100%;
+    overflow:hidden;
+  }
+  .md-tabs-strip-card{ min-width:140px; }
+
+  /* quick search tags — wrap properly */
+  #md-tablet-search-links > div > div{
+    flex-wrap:wrap !important;
+  }
 }
 
 /* ══ BOTTOM NAVIGATION BAR ══ */
@@ -4017,7 +4067,7 @@ footer::after{
   .md-post-action{font-size:12px;padding:7px 2px}
   .md-post-action i{font-size:16px}
   .md-post-action span{display:none} /* icon only on very small */
-  .md-fb-card{border-radius:0!important;border-left:none!important;border-right:none!important;margin-bottom:8px!important}
+  .md-fb-card{border-radius:0!important;border-left:none!important;border-right:none!important;margin-bottom:8px!important;width:100%!important;box-sizing:border-box!important;overflow:hidden!important}
   #md-social-feed-section{border-top:none}
 }
 
@@ -4120,7 +4170,7 @@ footer::after{
 /* Mobile compact story */
 @media(max-width:680px){
   .md-fb-layout{padding:8px 0}
-  .md-fb-col-center{padding:0 6px}
+  .md-fb-col-center{padding:0;width:100%;min-width:0;max-width:100%}
 }
 
 /* ════════════════════════════════
@@ -6198,7 +6248,7 @@ footer::after{
      MATCHDOOR SOCIAL FEED — Facebook-style 3-column layout
      Left: Team/Agents | Center: Feed | Right: Ads + SEO
 ═══════════════════════════════════════════════════════════ -->
-<div id="md-social-feed-section" style="background:#F0F2F5;padding:0 0 4px;border-top:2px solid #E4E6EB">
+<div id="md-social-feed-section" style="background:#F0F2F5;padding:0 0 4px;border-top:2px solid #E4E6EB;width:100%;box-sizing:border-box;overflow-x:hidden">
   <div class="md-fb-layout">
 
     <!-- ════ LEFT COLUMN: Team + Nav ════ -->
