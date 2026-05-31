@@ -12310,7 +12310,12 @@ window.addEventListener('popstate', function(e) {
   const state = e.state;
   if (!state) { _silentShowPage('home'); return; }
   if (state.type === 'property') {
-    if (state.id) { openModal(state.id); }
+    // ── navigate ไป PDP เสมอ — ห้ามเปิด popup modal ──
+    if (state.id) {
+      var pgPropPS = document.getElementById('page-property');
+      if (pgPropPS) { pgPropPS.style.display = ''; }
+      if (typeof showPage === 'function') showPage('property', state.id);
+    }
   } else if (state.type === 'page') {
     // ── FIX: ถ้า modal เปิดอยู่ ให้ปิด modal ก่อน แทนที่จะ showPage ใหม่ ──
     const propModal = document.getElementById('prop-modal');
@@ -12354,13 +12359,6 @@ window.addEventListener('popstate', function(e) {
         _silentShowPage(state.name, true);
       });
     } else {
-      // ── Handle property page popstate ──
-      if (state.type === 'property' && state.id) {
-        var pgPropPS = document.getElementById('page-property');
-        if (pgPropPS) { pgPropPS.style.display = ''; }
-        showPage('property', state.id);
-        return;
-      }
       // ── hide property page before restoring other page ──
       var pgPropOther = document.getElementById('page-property');
       if (pgPropOther) { pgPropOther.classList.remove('active'); pgPropOther.style.display = 'none'; }
@@ -25178,14 +25176,9 @@ async function adminDeletePortfolio(id, title){
       window._pdpKeyHandler = null;
     }
     var state = history.state;
-    var prevPage = (state && state._prevPage) ? state._prevPage : null;
-    // กลับไปหน้าแรกเสมอ แล้วค่อยเปิด popup ถ้ามาจาก listings
-    if (typeof showPage === 'function') showPage('home');
-    if (prevPage === 'listings') {
-      setTimeout(function() {
-        if (typeof openAllModal === 'function') openAllModal('all');
-      }, 60);
-    }
+    var prevPage = (state && state._prevPage) ? state._prevPage : 'home';
+    // กลับไปหน้าที่มาจากโดยตรง ไม่เปิด popup ใดๆ
+    if (typeof showPage === 'function') showPage(prevPage);
   };
 
 })(); /* end IIFE */
