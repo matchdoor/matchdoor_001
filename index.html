@@ -3963,6 +3963,11 @@ footer::after{
 .pdp-breadcrumb {
   background: var(--p, #1B3A6B);
   padding: 12px 20px;
+  /* override nav{position:sticky} selector ที่ครอบคลุม <nav> ทุก element */
+  position: relative !important;
+  top: auto !important;
+  z-index: auto !important;
+  box-shadow: none !important;
 }
 .pdp-breadcrumb-inner {
   max-width: 1200px;
@@ -22422,7 +22427,7 @@ function resetAdvFilter(){
       <div class="pdp-related-grid" id="pdp-related-grid"></div>
       <div style="text-align:center;margin-top:20px">
         <a href="/listings" class="pdp-cta-btn pdp-cta-share"
-           onclick="event.preventDefault();showPage('listings')"
+           onclick="event.preventDefault();showPage('home');setTimeout(function(){openAllModal('all');},60)"
            style="display:inline-flex;padding:11px 28px">
           <i class="fas fa-search"></i> ดูประกาศทั้งหมด
         </a>
@@ -25165,19 +25170,9 @@ async function adminDeletePortfolio(id, title){
     }
     var state = history.state;
     var prevPage = (state && state._prevPage) ? state._prevPage : null;
+    // กลับไปหน้าแรกเสมอ แล้วค่อยเปิด popup ถ้ามาจาก listings
+    if (typeof showPage === 'function') showPage('home');
     if (prevPage === 'listings') {
-      // กลับไปหน้า home แล้วเปิด popup ประกาศทั้งหมด
-      if (typeof showPage === 'function') showPage('home');
-      setTimeout(function() {
-        if (typeof openAllModal === 'function') openAllModal('all');
-      }, 60);
-    } else if (prevPage && prevPage !== 'property') {
-      if (typeof showPage === 'function') showPage(prevPage);
-    } else if (history.length > 1) {
-      history.back();
-    } else {
-      // fallback: ไปหน้า home แล้วเปิด popup
-      if (typeof showPage === 'function') showPage('home');
       setTimeout(function() {
         if (typeof openAllModal === 'function') openAllModal('all');
       }, 60);
