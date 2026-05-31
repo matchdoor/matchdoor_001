@@ -2012,6 +2012,8 @@ footer::after{
 .admin-login-submit{width:100%;padding:13px;background:linear-gradient(135deg,#c8922a,#e8b84b);border:none;border-radius:10px;color:#0d1b2e;font-size:14px;font-weight:700;cursor:pointer;margin-top:4px;transition:all .2s;letter-spacing:.3px}
 .admin-login-submit:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(200,146,42,.4)}
 .admin-login-submit:active{transform:none}
+.admin-dev-bypass{width:100%;padding:10px;background:rgba(255,255,255,.04);border:1px dashed rgba(255,255,255,.15);border-radius:8px;color:rgba(255,255,255,.4);font-size:12px;cursor:pointer;margin-top:10px;transition:all .2s}
+.admin-dev-bypass:hover{background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);border-color:rgba(255,255,255,.3)}
 .admin-login-err{color:#ff6b6b;font-size:12px;margin-top:-6px;margin-bottom:8px;display:none;padding:8px 12px;background:rgba(255,107,107,.1);border-radius:6px;border-left:3px solid #ff6b6b}
 /* ── Admin Panel Page ── */
 #page-admin{background:#0a1628}
@@ -2090,6 +2092,7 @@ footer::after{
 .admin-panel.active{display:block}
 .admin-empty{text-align:center;padding:48px 20px;color:rgba(255,255,255,.25)}
 .admin-empty i{font-size:36px;margin-bottom:12px;display:block;opacity:.4}
+.admin-dev-banner{background:linear-gradient(135deg,rgba(255,170,0,.12),rgba(255,200,100,.08));border:1px solid rgba(255,170,0,.25);border-radius:10px;padding:10px 16px;margin-bottom:20px;font-size:12px;color:rgba(255,200,100,.8);display:flex;align-items:center;gap:8px}
 .admin-search-bar{padding:12px 20px;border-bottom:1px solid rgba(255,255,255,.05);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .admin-search-input{flex:1;min-width:180px;padding:8px 14px;background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.08);border-radius:8px;color:#fff;font-size:13px;outline:none}
 .admin-search-input:focus{border-color:rgba(200,146,42,.4)}
@@ -2398,6 +2401,12 @@ footer::after{
 .ma-hero-name-old{font-size:22px;font-weight:700;margin-bottom:4px}
 .ma-hero-email-old{font-size:13px;opacity:.8;margin-bottom:12px;word-break:break-all}
 .ma-hero-badge-old{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.18);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600}
+/* ── Dev Bypass Button (temp — remove before production) ── */
+.ma-dev-bypass-btn{position:absolute;top:14px;right:14px;display:flex;align-items:center;gap:6px;padding:7px 13px;border-radius:10px;border:1.5px dashed rgba(255,220,0,.7);background:rgba(0,0,0,.35);color:#ffd700;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.4px;backdrop-filter:blur(4px);transition:.18s;z-index:10;white-space:nowrap}
+.ma-dev-bypass-btn:hover{background:rgba(255,200,0,.18);border-color:#ffd700;transform:scale(1.04)}
+.ma-dev-bypass-btn.active{background:rgba(255,200,0,.22);border-color:#ffd700;box-shadow:0 0 12px rgba(255,215,0,.35)}
+.ma-dev-bypass-btn i{font-size:12px}
+.ma-dev-banner{display:flex;align-items:center;gap:8px;background:linear-gradient(90deg,rgba(255,193,7,.12),rgba(255,193,7,.06));border:1.5px dashed rgba(255,193,7,.55);border-radius:10px;padding:9px 14px;margin-bottom:16px;font-size:12px;font-weight:600;color:#92650a}
 .ma-tab-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:24px;background:#fff;border-radius:14px;padding:6px;box-shadow:0 2px 12px rgba(27,58,107,.08);border:1.5px solid var(--bd)}
 .ma-tab{flex:1;min-width:80px;padding:9px 8px;border:none;background:transparent;border-radius:10px;font-size:12px;font-weight:600;color:var(--tx2);cursor:pointer;transition:.18s;display:flex;flex-direction:column;align-items:center;gap:3px;white-space:nowrap}
 .ma-tab i{font-size:15px}
@@ -8714,7 +8723,11 @@ function _popupRefreshMarkersFromData(data){
       <button class="back-btn" onclick="showPage('home')"><i class="fas fa-arrow-left"></i> <span data-i18n="ph.ma.back">กลับหน้าหลัก</span></button>
       <h1 style="margin-top:10px"><i class="fas fa-user-circle"></i> <span data-i18n="ph.ma.h1">บัญชีของฉัน</span></h1>
     </div>
-</div>
+    <button id="ma-dev-bypass-btn" class="ma-dev-bypass-btn" onclick="_toggleMaDevBypass()">
+      <i class="fas fa-flask"></i>
+      <span id="ma-dev-bypass-lbl">DEV Preview</span>
+    </button>
+  </div>
   <div class="my-account-wrap" id="my-account-content">
     <!-- Filled by renderMyAccount() -->
     <div class="ma-empty" style="padding:80px 20px"><i class="fas fa-spinner fa-spin"></i></div>
@@ -9917,6 +9930,22 @@ function _updateProfileFab(){
   }
 }
 /* ── My Account page renderer ── */
+/* ── Dev Bypass: toggle preview mode without login (TEMP — remove before production) ── */
+window._maDevBypass = false;
+function _toggleMaDevBypass(){
+  window._maDevBypass = !window._maDevBypass;
+  // ── Dev mode: จำลอง Token 20 เหรียญให้ทดลองลงประกาศได้ ──
+  if(window._maDevBypass && !user){
+    _tokenBalance = 20;
+    _myUserListings = [];
+    _myTokenOrders  = [];
+    console.info('[DEV] Token balance set to 20 (mock)');
+  } else if(!window._maDevBypass && !user){
+    _tokenBalance = 0;
+  }
+  renderMyAccount();
+}
+
 // ── [v13] ดึงข้อมูล user_profiles จาก DB — merge กับ auth.user_metadata ──
 // เรียกครั้งแรกหลัง login และหลังบันทึกโปรไฟล์
 let _cachedUserProfile = null;
@@ -9953,7 +9982,14 @@ function renderMyAccount(){
     const e = (typeof I18N_DICT!=='undefined')&&I18N_DICT[key]; if(e) return e[(typeof _lang!=='undefined'?_lang:'th')]||e['th']||key;
     return ui(key)||key;
   };
-  if(!user){
+  // ── Dev bypass state: update button appearance ──
+  const bypassBtn = document.getElementById('ma-dev-bypass-btn');
+  const bypassLbl = document.getElementById('ma-dev-bypass-lbl');
+  const isDevMode = !!window._maDevBypass;
+  if(bypassBtn) bypassBtn.classList.toggle('active', isDevMode);
+  if(bypassLbl) bypassLbl.textContent = isDevMode ? 'DEV: ON' : 'DEV Preview';
+
+  if(!user && !isDevMode){
     // Show login prompt
     wrap.innerHTML = `
     <div class="ma-login-prompt">
@@ -9987,15 +10023,17 @@ function renderMyAccount(){
   // Expose globally for _showMyProfileOnAgentsPage
   window._currentUser = _u;
   window._currentMeta = _meta;
-  // Logged in — render full dashboard
+  // Logged in (or dev bypass) — render full dashboard
   const init = (_u.email||'U')[0].toUpperCase();
   const dispName = sanitize(_meta.display_name || _u.email?.split('@')[0] || 'User');
   const email = sanitize(_u.email||'');
   const joinDate = _u.created_at ? new Date(_u.created_at).toLocaleDateString(_lang==='th'?'th-TH':_lang==='ja'?'ja-JP':_lang==='cn'?'zh-CN':'en-US',{year:'numeric',month:'long'}) : '';
   const favCount = (typeof favs!=='undefined' ? favs : []).length;
+  const devBanner = isDevMode ? `<div class="ma-dev-banner"><i class="fas fa-flask"></i> DEV MODE — จำลอง <strong>${_tokenBalance} Token</strong> · ลงประกาศได้โดยไม่บันทึก DB จริง · กด "DEV: ON" เพื่อปิด</div>` : '';
   const roleLabel = _meta.role==='agent' ? '🏡 นายหน้า / ตัวแทน' : (_meta.role==='owner' ? '🔑 เจ้าของทรัพย์' : '👤 สมาชิก');
   const listingsCount = (typeof _myUserListings !== 'undefined' ? _myUserListings : []).length;
   wrap.innerHTML = `
+  ${devBanner}
   <!-- ═══ NEW PREMIUM PROFILE HERO ═══ -->
   <div class="ma-hero">
     <div class="ma-hero-cover">
@@ -10359,8 +10397,8 @@ async function loadTokenPackages() {
 
 // ── เปิด Modal ลงประกาศ (User Listing) ─────────────────────
 async function openUserListingModal() {
-  if (!user) { _openModal('login-modal'); return; }
-  await loadUserTokenData();
+  if (!user && !window._maDevBypass) { _openModal('login-modal'); return; }
+  if (!window._maDevBypass) await loadUserTokenData();
   if (_tokenBalance < 1) {
     openBuyTokenModal();
     return;
@@ -10505,7 +10543,8 @@ async function submitTokenOrder() {
 
 // ── Submit User Listing Form ────────────────────────────────
 async function submitUserListing() {
-  if (!user || !sb) return;
+  const isDev = window._maDevBypass && !user;
+  if (!isDev && (!user || !sb)) return;
 
   const get = id => document.getElementById(id);
   const val = id => (get(id)?.value||'').trim();
@@ -10536,6 +10575,7 @@ async function submitUserListing() {
 
     // ── อัปโหลดรูปภาพ (ถ้ามี) ──
     let photoUrls = [];
+    if (!isDev) {
       const photoInput = get('ul-photos');
       if (photoInput?.files?.length) {
         for (const file of Array.from(photoInput.files).slice(0, 10)) {
@@ -10548,10 +10588,11 @@ async function submitUserListing() {
           }
         }
       }
+    }
 
     const listingData = {
       // ── Core ──
-      user_id:           user.id,
+      user_id:           isDev ? 'dev-user' : user.id,
       title,
       property_type:     type,
       transaction:       tx,
@@ -10584,13 +10625,27 @@ async function submitUserListing() {
       water_rate:        isRent ? (num('ul-water') || null) : null,
       min_lease_months:  isRent ? (int('ul-min-lease') || null) : null,
       // ── Contact ──
-      contact_name:      val('ul-contact-name') || (user.user_metadata?.display_name || ''),
+      contact_name:      val('ul-contact-name') || (isDev ? 'Dev User' : (user.user_metadata?.display_name || '')),
       contact_phone:     phone,
       contact_line:      val('ul-contact-line'),
       photos:            photoUrls,
       status:            'รอตรวจสอบ'
     };
-    // ── Supabase insert ──
+
+    // ── DEV MODE: จำลองการส่งโดยไม่เขียน DB ──
+    if (isDev) {
+      await new Promise(r => setTimeout(r, 700));
+      _tokenBalance = Math.max(0, _tokenBalance - 1);
+      const mockListing = { id: 'dev-' + Date.now(), ...listingData, created_at: new Date().toISOString(), admin_note: '' };
+      _myUserListings.unshift(mockListing);
+      _closeModal('user-listing-modal');
+      window._ulNearbyList = [];
+      toast('✅ [DEV] จำลองลงประกาศสำเร็จ! (ไม่ได้บันทึกจริง)', 'success');
+      renderMaListingsPanel();
+      return;
+    }
+
+    // ── Real Supabase insert ──
     const { error } = await sb.from('user_listings').insert(listingData);
     if (error) {
       if (error.message.includes('insufficient_tokens')) {
@@ -10621,7 +10676,7 @@ async function renderMaListingsPanel() {
   const panel = document.getElementById('ma-panel-listings');
   if (!panel) return;
   // ── Dev mode: ใช้ mock Token ที่ set ไว้แล้ว ไม่ต้อง query DB ──
-  await loadUserTokenData();
+  if (!window._maDevBypass) await loadUserTokenData();
 
   const statusBadge = s => {
     const map = {
@@ -11122,9 +11177,9 @@ if (document.readyState === 'loading') {
 // ══════════════════════════════════════════════════════════════
 
 // ── Render Admin: Token Orders ─────────────────────────────
-async function _renderAdminTokenOrders(el) {
+async function _renderAdminTokenOrders(el, devBanner) {
   let orders = [];
-  if (sb) {
+  if (!_adminDevMode && sb) {
     try {
       const { data } = await sb
         .from('token_orders')
@@ -11147,7 +11202,7 @@ async function _renderAdminTokenOrders(el) {
     return `<span style="background:${c}22;color:${c};border:1px solid ${c}44;border-radius:20px;padding:3px 10px;font-size:10px;font-weight:700">${l}</span>`;
   };
 
-  el.innerHTML = `
+  el.innerHTML = devBanner + `
     <div class="admin-section">
       <div class="admin-section-head">
         <div class="admin-section-title"><i class="fas fa-coins" style="color:#f1c40f"></i> Token Orders — รออนุมัติ (${orders.filter(o=>o.status==='รอยืนยัน').length})</div>
@@ -11195,9 +11250,9 @@ async function _renderAdminTokenOrders(el) {
 }
 
 // ── Render Admin: User Listings ────────────────────────────
-async function _renderAdminUserListings(el) {
+async function _renderAdminUserListings(el, devBanner) {
   let userListings = [];
-  if (sb) {
+  if (!_adminDevMode && sb) {
     try {
       const { data } = await sb
         .from('v_admin_user_listings')
@@ -11224,7 +11279,7 @@ async function _renderAdminUserListings(el) {
     return `<span style="background:${c}22;color:${c};border:1px solid ${c}44;border-radius:20px;padding:3px 10px;font-size:10px;font-weight:700"><i class="fas ${ic}" style="font-size:8px"></i> ${s}</span>`;
   };
 
-  el.innerHTML = `
+  el.innerHTML = devBanner + `
     <div class="admin-section">
       <div class="admin-section-head">
         <div class="admin-section-title"><i class="fas fa-home"></i> User Listings — รออนุมัติ (${userListings.filter(u=>u.status==='รอตรวจสอบ').length})</div>
@@ -11666,8 +11721,9 @@ function _maOpenEditModal(){
   const existing = document.getElementById('ma-edit-profile-modal');
   if(existing) existing.remove();
   const _profile = _cachedUserProfile;
-  const _u = user;
+  const _u = user || {email:'dev@matchdoor.co',user_metadata:{display_name:'Dev Preview',phone:'',line_id:''}};
   const _meta = {...(_u.user_metadata||{}), ...(_profile||{})};
+  const isDevMode = !!window._maDevBypass;
   const dispName = _meta.display_name || _u.email?.split('@')[0] || 'User';
   const init = (_u.email||'U')[0].toUpperCase();
   const mo = document.createElement('div');
@@ -11779,8 +11835,8 @@ function _maOpenEditModal(){
 
       <!-- Save Buttons -->
       <div style="display:flex;gap:10px;margin-top:16px">
-        <button id="ma-save-profile-btn-modal" onclick="_maSaveProfileModal()" disabled style="flex:1;background:var(--p);color:#fff;border:none;border-radius:10px;padding:11px;font-size:14px;font-weight:700;cursor:not-allowed;opacity:.5;display:flex;align-items:center;justify-content:center;gap:6px">
-          <i class="fas fa-save"></i> บันทึกข้อมูล
+        <button id="ma-save-profile-btn-modal" onclick="${isDevMode?'alert(\"Dev mode: ไม่ได้บันทึก\")':'_maSaveProfileModal()'}" disabled style="flex:1;background:var(--p);color:#fff;border:none;border-radius:10px;padding:11px;font-size:14px;font-weight:700;cursor:not-allowed;opacity:.5;display:flex;align-items:center;justify-content:center;gap:6px">
+          <i class="fas fa-save"></i> บันทึกข้อมูล${isDevMode?' (Dev)':''}
         </button>
         <button onclick="document.getElementById('ma-edit-profile-modal').remove()" style="background:var(--lt);color:var(--tx);border:1.5px solid var(--bd);border-radius:10px;padding:11px 20px;font-size:13px;font-weight:600;cursor:pointer">
           ยกเลิก
@@ -11870,7 +11926,7 @@ async function _maSaveProfileModal(){
 async function _maRenderProfileListings(){
   const area = document.getElementById('ma-profile-listings-area');
   if(!area) return;
-  await loadUserTokenData();
+  if(!window._maDevBypass) await loadUserTokenData();
 
   const statusBadge=s=>{
     const map={'รอตรวจสอบ':['#f39c12','fa-clock','รอตรวจสอบ'],'อนุมัติ':['#2ecc71','fa-check-circle','อนุมัติ'],'ปฏิเสธ':['#e74c3c','fa-times-circle','ปฏิเสธ'],'ปิด':['#95a5a6','fa-ban','ปิด'],'หมดอายุ':['#7f8c8d','fa-hourglass-end','หมดอายุ']};
@@ -24429,6 +24485,7 @@ const ADMIN_EMAILS = [
 ];
 
 let _adminUser = null;
+let _adminDevMode = false;
 let _adminCurrentPanel = 'dashboard';
 
 function openAdminLogin(){
@@ -24466,7 +24523,7 @@ async function adminLogin(){
       _adminShowErr('บัญชีนี้ไม่มีสิทธิ์ Admin');
       return;
     }
-    _adminUser = u;
+    _adminUser = u; _adminDevMode = false;
     _closeModal('admin-login-modal');
     _openAdminPanel();
     toast('เข้าสู่ระบบ Admin สำเร็จ ✅');
@@ -24476,6 +24533,13 @@ async function adminLogin(){
     btn.innerHTML='<i class="fas fa-sign-in-alt"></i>&nbsp; เข้าสู่ระบบ Admin';
     btn.disabled=false;
   }
+}
+
+function adminDevBypass(){
+  _adminDevMode = true;
+  _adminUser = { email:'dev@matchdoor.co', user_metadata:{ display_name:'DEV Preview' } };
+  _closeModal('admin-login-modal');
+  _openAdminPanel();
 }
 
 function _adminShowErr(msg){
@@ -24496,8 +24560,8 @@ function _openAdminPanel(){
 }
 
 async function adminLogout(){
-  _adminUser = null;
-  if(sb){
+  _adminUser = null; _adminDevMode = false;
+  if(sb && !_adminDevMode){
     try{ await sb.auth.signOut(); } catch(e){}
   }
   showPage('home');
@@ -24512,7 +24576,7 @@ function adminNav(panel, el){
   const titles = {dashboard:'Dashboard',properties:'ประกาศทรัพย์ — จัดการ & อนุมัติ',requests:'Buy Requests — ติดตามลูกค้า',agents:'Agents & Portfolio',portfolio:'ผลงานปิดดีล',analytics:'Analytics Dashboard',notifications:'Broadcast Notifications','token-orders':'Token Orders — ยืนยันการซื้อ','user-listings':'User Listings — อนุมัติประกาศ'};
   document.getElementById('admin-topbar-icon').className = (icons[panel]||'fas fa-circle') + ' ';
   document.getElementById('admin-topbar-title').textContent = titles[panel]||panel;
-  document.getElementById('admin-topbar-meta').textContent = '';
+  document.getElementById('admin-topbar-meta').textContent = _adminDevMode ? '⚗️ DEV MODE' : '';
   _renderAdminPanel(panel);
 }
 
@@ -24520,13 +24584,14 @@ async function _renderAdminPanel(panel){
   const el = document.getElementById('admin-content');
   if(!el) return;
   el.innerHTML = '<div style="text-align:center;padding:60px 20px;color:rgba(255,255,255,.3)"><i class="fas fa-spinner fa-spin" style="font-size:24px"></i></div>';
+  const devBanner = _adminDevMode ? `<div class="admin-dev-banner"><i class="fas fa-flask"></i> <strong>DEV MODE</strong> — ข้อมูลที่แสดงเป็น mock / ดึงจาก local state ไม่ได้เขียนลง Supabase จริง</div>` : '';
 
   // ดึงข้อมูลจาก Supabase (ถ้าไม่ใช่ dev mode และ sb พร้อม)
   let allProps = (typeof props !== 'undefined' && props.length) ? props : (typeof MOCK!=='undefined'?MOCK.props:[]);
   let allAgents = (typeof agents!=='undefined'&&agents.length)?agents:(typeof MOCK!=='undefined'?MOCK.agents:[]);
   let allPort = (typeof port!=='undefined'&&port.length)?port:(typeof MOCK!=='undefined'?MOCK.port:[]);
 
-  if(sb){
+  if(!_adminDevMode && sb){
     try{
       // Admin ดึงทุก properties รวม pending/rejected (ไม่กรอง status)
       // ใช้ range(0,999) ป้องกัน PostgREST default limit ตัด
@@ -24543,7 +24608,7 @@ async function _renderAdminPanel(panel){
 
   // ดึง buy_requests จาก Supabase
   let buyRequests = [];
-  if(sb){
+  if(!_adminDevMode && sb){
     try{
       const {data} = await sb.from('buy_requests').select('*').order('created_at',{ascending:false}).range(0,499);
       if(data) buyRequests = data;
@@ -24557,7 +24622,7 @@ async function _renderAdminPanel(panel){
   if(panel==='dashboard'){
     // [v13] ดึง v_dashboard_summary จาก Supabase สำหรับตัวเลขที่แม่นยำ
     let dashSummary = null;
-    if(sb){
+    if(!_adminDevMode && sb){
       try {
         const { data } = await sb.from('v_dashboard_summary').select('*').single();
         if(data) dashSummary = data;
@@ -24577,7 +24642,7 @@ async function _renderAdminPanel(panel){
       : allProps.reduce((s,p)=>s+(p.price||0),0);
     const realTotalVal = allProps.length ? allProps.reduce((s,p)=>s+(p.price||0),0) : totalVal;
     const fmtVal = realTotalVal>=1e9?(realTotalVal/1e9).toFixed(1)+'B':(realTotalVal/1e6).toFixed(0)+'M';
-    el.innerHTML = `
+    el.innerHTML = devBanner + `
     <div class="admin-stats-grid">
       <div class="admin-stat-card"><div class="admin-stat-icon" style="background:rgba(200,146,42,.15);color:#c8922a"><i class="fas fa-building"></i></div><div class="admin-stat-num">${dashSummary?.total_properties??allProps.length}</div><div class="admin-stat-label">ประกาศทั้งหมด</div><div class="admin-stat-change ${pending>0?'dn':'up'}"><i class="fas fa-${pending>0?'clock':'check'}"></i> ${pending} รอการอนุมัติ</div></div>
       <div class="admin-stat-card"><div class="admin-stat-icon" style="background:rgba(74,144,226,.15);color:#4a90e2"><i class="fas fa-file-alt"></i></div><div class="admin-stat-num">${buyRequests.length}</div><div class="admin-stat-label">Buy Requests</div><div class="admin-stat-change ${newReqs>0?'dn':'up'}"><i class="fas fa-circle" style="font-size:7px"></i> ${newReqs} ใหม่</div></div>
@@ -24632,7 +24697,7 @@ async function _renderAdminPanel(panel){
 
   else if(panel==='properties'){
     document.getElementById('admin-pending-badge').textContent = allProps.filter(p=>p.status==='pending'||!p.status).length||0;
-    el.innerHTML = `
+    el.innerHTML = devBanner + `
     <div class="admin-section">
       <div class="admin-section-head"><div class="admin-section-title"><i class="fas fa-building"></i> ประกาศทรัพย์ทั้งหมด (${allProps.length})</div><div class="admin-topbar-actions"><button class="admin-btn admin-btn-primary" onclick="adminAddProp()"><i class="fas fa-plus"></i> เพิ่มทรัพย์</button></div></div>
       <div class="admin-search-bar">
@@ -24652,7 +24717,7 @@ async function _renderAdminPanel(panel){
   }
 
   else if(panel==='requests'){
-    el.innerHTML = `
+    el.innerHTML = devBanner + `
     <div class="admin-section">
       <div class="admin-section-head"><div class="admin-section-title"><i class="fas fa-file-alt"></i> Buy Requests ทั้งหมด (${buyRequests.length})</div></div>
       <div class="admin-search-bar">
@@ -24678,7 +24743,7 @@ async function _renderAdminPanel(panel){
   }
 
   else if(panel==='agents'){
-    el.innerHTML = `
+    el.innerHTML = devBanner + `
     <div class="admin-section">
       <div class="admin-section-head"><div class="admin-section-title"><i class="fas fa-users"></i> Agents (${allAgents.length})</div><button class="admin-btn admin-btn-primary" onclick="adminAddAgent()"><i class="fas fa-plus"></i> เพิ่ม Agent</button></div>
       <table class="admin-table"><thead><tr><th>ชื่อ</th><th>ตำแหน่ง</th><th>ทรัพย์ที่ดูแล</th><th>ยอดปิดดีล</th><th>Action</th></tr></thead>
@@ -24693,7 +24758,7 @@ async function _renderAdminPanel(panel){
   }
 
   else if(panel==='portfolio'){
-    el.innerHTML = `
+    el.innerHTML = devBanner + `
     <div class="admin-section">
       <div class="admin-section-head"><div class="admin-section-title"><i class="fas fa-trophy"></i> Portfolio ปิดดีล (${allPort.length})</div><button class="admin-btn admin-btn-primary" onclick="adminAddPortfolio()"><i class="fas fa-plus"></i> เพิ่มผลงาน</button></div>
       <table class="admin-table"><thead><tr><th>ชื่อทรัพย์</th><th>ราคาปิดดีล</th><th>Agent</th><th>วันที่ปิด</th><th>Action</th></tr></thead>
@@ -24711,7 +24776,7 @@ async function _renderAdminPanel(panel){
     const byType = {};
     allProps.forEach(p=>{ byType[p.type||'อื่นๆ']=(byType[p.type||'อื่นๆ']||0)+1; });
     const maxV = Math.max(...Object.values(byType),1);
-    el.innerHTML = `
+    el.innerHTML = devBanner + `
     <div class="admin-analytics-grid">
       <div class="admin-section">
         <div class="admin-section-head"><div class="admin-section-title"><i class="fas fa-chart-bar"></i> ประกาศตามประเภท</div></div>
@@ -24736,13 +24801,13 @@ async function _renderAdminPanel(panel){
   }
 
   else if(panel==='token-orders'){
-    await _renderAdminTokenOrders(el);
+    await _renderAdminTokenOrders(el, devBanner);
   }
   else if(panel==='user-listings'){
-    await _renderAdminUserListings(el);
+    await _renderAdminUserListings(el, devBanner);
   }
     else if(panel==='notifications'){
-    el.innerHTML = `
+    el.innerHTML = devBanner + `
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start">
       <!-- ฟอร์มส่ง Notification -->
       <div class="admin-section" style="max-width:100%">
@@ -24837,7 +24902,7 @@ function _adminFilterProps(){
 
 async function adminApprove(id){
   if(!confirm('อนุมัติทรัพย์ #'+id+'?')) return;
-  if(sb){
+  if(!_adminDevMode && sb){
     try{
       await sb.from('properties').update({status:'approved'}).eq('id',id);
       if(typeof props!=='undefined'){ const p=props.find(x=>String(x.id)===String(id)); if(p) p.status='approved'; }
@@ -24851,7 +24916,7 @@ async function adminApprove(id){
 }
 async function adminReject(id){
   if(!confirm('ปฏิเสธทรัพย์ #'+id+'?')) return;
-  if(sb){
+  if(!_adminDevMode && sb){
     try{ await sb.from('properties').update({status:'rejected'}).eq('id',id); toast('ปฏิเสธแล้ว'); }
     catch(e){ toast('Error: '+e.message); return; }
   } else { toast('DEV: ปฏิเสธ #'+id+' (ไม่ได้เขียนจริง)'); }
@@ -24923,7 +24988,7 @@ async function adminSaveProp(id){
   const errEl    = document.getElementById('aep-err');
   if(!title){ if(errEl){errEl.textContent='กรุณากรอกชื่อทรัพย์';errEl.style.display='block';} return; }
   const updates = {title, price, tx, province, location, description:desc, status, admin_note:note};
-  if(sb){
+  if(!_adminDevMode && sb){
     try{
       const {error} = await sb.from('properties').update(updates).eq('id',id);
       if(error){ if(errEl){errEl.textContent='Error: '+error.message;errEl.style.display='block';} return; }
@@ -24993,7 +25058,7 @@ async function adminSaveAgent(id){
   const errEl   = document.getElementById('aea-err');
   if(!name){ if(errEl){errEl.textContent='กรุณากรอกชื่อ';errEl.style.display='block';} return; }
   const updates = {name, title, phone, line_id:lineId, rating, deals, bio, is_active:active};
-  if(sb){
+  if(!_adminDevMode && sb){
     try{
       const {error} = await sb.from('agents').update(updates).eq('id',id);
       if(error){ if(errEl){errEl.textContent='Error: '+error.message;errEl.style.display='block';} return; }
@@ -25004,9 +25069,10 @@ async function adminSaveAgent(id){
   _renderAdminPanel('agents');
 }
 async function adminUpdateRequest(id, status){
-  if(sb){
+  if(!_adminDevMode && sb){
     try{ await sb.from('buy_requests').update({status}).eq('id',id); toast('อัปเดตสถานะ: '+status); }
     catch(e){ toast('Error: '+e.message); return; }
+  } else { toast('DEV: อัปเดต request #'+id+' → '+status); }
   _renderAdminPanel('requests');
 }
 function adminContactRequest(id, phone, contact){ window.open('tel:'+phone,'_self'); }
@@ -25024,7 +25090,7 @@ async function adminSendNotification(){
   const origHtml = btn?.innerHTML||'';
   if(btn){ btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> กำลังส่ง...'; }
 
-  if(sb){
+  if(!_adminDevMode && sb){
     try{
       // [v13] บันทึกลง site_notifications table จริง
       // Supabase Realtime จะ broadcast ให้ clients ที่ subscribe อยู่อัตโนมัติ
@@ -25057,7 +25123,7 @@ async function adminSendNotification(){
   if(btn){ btn.disabled=false; btn.innerHTML=origHtml; }
 
   // ── refresh รายการ notifications ──
-  _renderNotifHistory();
+  if(!_adminDevMode) _renderNotifHistory();
 }
 function adminRefreshData(){ adminNav(_adminCurrentPanel, document.querySelector('.admin-nav-item.active')); toast('🔄 Refresh แล้ว'); }
 
@@ -25065,7 +25131,8 @@ function adminRefreshData(){ adminNav(_adminCurrentPanel, document.querySelector
 async function _renderNotifHistory(){
   const container = document.getElementById('admin-notif-history');
   if(!container) return;
-  if(!sb){
+  if(_adminDevMode || !sb){
+    container.innerHTML = '<div style="padding:20px;color:rgba(255,255,255,.3);font-size:12px;text-align:center">DEV MODE — ไม่แสดงข้อมูลจริง</div>';
     return;
   }
   container.innerHTML = '<div style="text-align:center;padding:30px;color:rgba(255,255,255,.3)"><i class="fas fa-spinner fa-spin"></i></div>';
@@ -25192,7 +25259,7 @@ async function adminSaveNewProp(){
   const propId = 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2,5);
   const payload = {id:propId, title, price, tx, type, province, location, description:desc, status: status||'pending', admin_note:note, created_at:new Date().toISOString()};
   if(img) payload.photos = [img]; // v19: photos TEXT[] ไม่ใช่ image_url
-  if(sb){
+  if(!_adminDevMode && sb){
     try{
       const {data, error} = await sb.from('properties').insert([payload]).select();
       if(error){ if(errEl){errEl.textContent='Error: '+error.message;errEl.style.display='block';} return; }
@@ -25208,7 +25275,7 @@ async function adminSaveNewProp(){
 /* ─── ลบทรัพย์ ─── */
 async function adminDeleteProp(id, title){
   if(!confirm('ลบทรัพย์ "' + (title||'#'+id) + '" ?\n\nการกระทำนี้ไม่สามารถยกเลิกได้')) return;
-  if(sb){
+  if(!_adminDevMode && sb){
     try{
       const {error} = await sb.from('properties').delete().eq('id',id);
       if(error){ toast('Error: '+error.message); return; }
@@ -25286,7 +25353,7 @@ async function adminSaveNewAgent(){
   const agentId = 'a' + Date.now().toString(36) + Math.random().toString(36).slice(2,5);
   const payload = {id:agentId, name, title, phone, line_id:lineId, rating, deals, bio, is_active:active, created_at:new Date().toISOString()};
   if(photo) payload.avatar_url = photo; // v19: avatar_url ไม่ใช่ photo_url
-  if(sb){
+  if(!_adminDevMode && sb){
     try{
       const {data, error} = await sb.from('agents').insert([payload]).select();
       if(error){ if(errEl){errEl.textContent='Error: '+error.message;errEl.style.display='block';} return; }
@@ -25301,7 +25368,7 @@ async function adminSaveNewAgent(){
 /* ─── ลบ Agent ─── */
 async function adminDeleteAgent(id, name){
   if(!confirm('ลบ Agent "' + (name||'#'+id) + '" ?\n\nการกระทำนี้ไม่สามารถยกเลิกได้')) return;
-  if(sb){
+  if(!_adminDevMode && sb){
     try{
       const {error} = await sb.from('agents').delete().eq('id',id);
       if(error){ toast('Error: '+error.message); return; }
@@ -25388,7 +25455,7 @@ async function adminSavePortfolio(isEdit){
   const payload = {title, price, date:date||null, type, review: (note||agent||''), location:''};
   if(!isEdit) payload.id = portId; // id เฉพาะตอน insert ใหม่
   if(img) payload.photo = img; // v19: photo TEXT ไม่ใช่ image_url
-  if(sb){
+  if(!_adminDevMode && sb){
     try{
       if(isEdit && id){
         const {error} = await sb.from('portfolio').update(payload).eq('id',id);
@@ -25409,7 +25476,7 @@ async function adminSavePortfolio(isEdit){
 /* ─── ลบ Portfolio ─── */
 async function adminDeletePortfolio(id, title){
   if(!confirm('ลบ Portfolio "' + (title||'#'+id) + '" ?\n\nการกระทำนี้ไม่สามารถยกเลิกได้')) return;
-  if(sb){
+  if(!_adminDevMode && sb){
     try{
       const {error} = await sb.from('portfolio').delete().eq('id',id);
       if(error){ toast('Error: '+error.message); return; }
