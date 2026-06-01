@@ -539,14 +539,40 @@ body:not(:has(.ov.open)):not(:has(.apply-overlay.open)):not(:has(.seo-drawer.ope
   body.modal-open{overflow:hidden!important}
   .ov,.modal,.mbody{-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 }
-/* ── z-index ให้เป็นระบบ (ทุก device) ────────────────────────
-   nav=1000 | dd-panel=1050 | .ov(base)=3200 | prop-modal=3600 | ag-modal=3700 | toast=9999
-   Layer order (ล่าง→บน): nav → dropdown → modal(all/login) → prop-modal → ag-modal → toast */
+/* ══ Z-INDEX MASTER SYSTEM (ทุก device รวม Mobile & Tablet) ══════════════
+   ตาราง Layer order (ล่าง → บน):
+   ─────────────────────────────────────────────────────────────────────────
+   900   float buttons (LINE, chat)
+   999   nav-links mobile menu
+   1000  nav bar (fixed, no transform when visible → ไม่สร้าง stacking context)
+   1050  dd-panel desktop (position:absolute ใน nav)
+   1100  dd-panel mobile/tablet (position:fixed ลอยเหนือทุกอย่างใน layer นี้)
+   3200  overlay base (.ov)
+   3300  seo-drawer-overlay, adv-sheet-overlay
+   3400  adv-sheet, seo-drawer, adv-fp
+   3490  adv-desktop-overlay
+   3500  adv-filter-panel
+   3600  prop-modal
+   3700  ag-modal
+   9000  autocomplete list (ac-list)
+   9100  ls-ac-list
+   9999  toast (สูงสุดเสมอ)
+   ─────────────────────────────────────────────────────────────────────────
+   หลักการ: nav ต้องไม่มี will-change:transform หรือ transform ขณะที่มองเห็น
+   เพราะ transform สร้าง stacking context ใหม่ที่กักดัก z-index ของ child ไว้
+   ════════════════════════════════════════════════════════════════════════ */
 nav:not(#md-bottom-nav){z-index:1000!important}
-/* dd-panel อยู่เหนือ nav */
+/* dd-panel desktop: absolute ใน nav — อยู่เหนือ nav content */
 .dd-panel,.qs-dd-panel{z-index:1050!important}
+/* dd-panel mobile/tablet: fixed — ต้องสูงกว่า nav-links (999) และ nav (1000) */
+@media(max-width:1200px){
+  .dd-panel,.qs-dd-panel{z-index:1100!important}
+  .nav-links{z-index:1050!important}
+}
 /* items ภายใน dd-panel ต้องกดได้เสมอ */
 .dd-panel *,.qs-dd-panel *{pointer-events:auto}
+/* dd-panel.open: ไม่สร้าง stacking context เพิ่ม */
+.dd-panel.open{isolation:auto}
 .ov,.loading-overlay{z-index:3200!important}
 .seo-drawer-overlay,.adv-sheet-overlay{z-index:3300!important}
 .adv-desktop-overlay{z-index:3490!important}
@@ -581,6 +607,9 @@ nav:not(#md-bottom-nav){z-index:1000!important}
 .ls-ac-list .ac-sub{font-size:11px;color:var(--gr);margin-left:auto;white-space:nowrap}
 /* quick-search panel */
 .qs-group .qs-dd-panel{z-index:1060!important}
+@media(max-width:1200px){
+  .qs-group .qs-dd-panel{z-index:1110!important}
+}
 
 /* ════════════════════════════════════════════════════
    GLOBAL STYLES
@@ -664,13 +693,15 @@ nav:not(#md-bottom-nav){
   background:linear-gradient(135deg,#0A1628 0%,#0F1E3A 60%,#162848 100%);
   position:fixed;top:0;left:0;right:0;z-index:1000;
   box-shadow:0 2px 20px rgba(10,22,40,.45),0 1px 0 rgba(200,146,42,.15);
-  transform:translateY(0);
+  /* ไม่ใส่ transform:translateY(0) และ will-change:transform เมื่อไม่ซ่อน
+     เพราะ transform + will-change สร้าง stacking context ที่กักดัก z-index ของ dropdown */
   transition:transform 0.35s cubic-bezier(0.4,0,0.2,1), box-shadow 0.35s ease;
-  will-change:transform;
+  will-change:auto;
 }
 nav:not(#md-bottom-nav).nav-hidden{
   transform:translateY(-100%);
   box-shadow:none;
+  will-change:transform;
 }
 /* เพิ่ม padding-top ให้ body เพื่อชดเชย fixed nav */
 body{padding-top:64px}
@@ -2559,8 +2590,8 @@ footer::after{
 .loc-opt{padding:5px 12px;border-radius:20px;border:1.5px solid var(--bd);background:#fff;cursor:pointer;font-size:12px;color:var(--tx2);transition:.2s}
 .loc-opt:hover{border-color:var(--p);color:var(--p);background:var(--lt)}
 @media(max-width:950px){
-  .nav-links{display:none!important;flex-direction:column;position:absolute;top:64px;left:0;right:0;background:var(--p2);padding:12px;z-index:999}
-  .nav-links.mob-open{display:flex!important}
+  .nav-links{display:none!important;flex-direction:column;position:absolute;top:64px;left:0;right:0;background:var(--p2);padding:12px;z-index:1050;overflow:visible}
+  .nav-links.mob-open{display:flex!important;overflow:visible}
   .hamburger{display:flex}
   .sf{grid-template-columns:1fr 1fr}
   .sf .ac-wrap{grid-column:1/-1}
@@ -2574,7 +2605,7 @@ footer::after{
   .footer-brand-col{text-align:left}
   .footer-logo{justify-content:flex-start!important}
   .flink-inner{grid-template-columns:repeat(3,1fr)}
-  .dd-panel{position:fixed;top:auto;bottom:60px;left:0;right:0;width:100%;max-height:70vh;border-radius:20px 20px 0 0;transform:none;margin:0;z-index:1050;pointer-events:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;animation:ddSlideUp .25s cubic-bezier(.32,1,.56,1) both}
+  .dd-panel{position:fixed;top:auto;bottom:60px;left:0;right:0;width:100%;max-height:70vh;border-radius:20px 20px 0 0;transform:none;margin:0;z-index:1100;pointer-events:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;animation:ddSlideUp .25s cubic-bezier(.32,1,.56,1) both}
   @keyframes ddSlideUp{from{transform:translateY(30px);opacity:.6}to{transform:translateY(0);opacity:1}}
   .dd-panel::before{content:'';display:block;width:36px;height:4px;background:rgba(0,0,0,.18);border-radius:2px;margin:10px auto 0;flex-shrink:0}
   .dd-panel.right{left:0;right:0}
@@ -2648,7 +2679,7 @@ footer::after{
   .osrv-card{padding:14px 10px}
   .osrv-name{font-size:13px}
   .footer-inner,.flink-inner{gap:20px}
-  .dd-panel{left:0;right:0;max-height:65vh;z-index:1050}
+  .dd-panel{left:0;right:0;max-height:65vh;z-index:1100}
   .dp{padding:12px}
   .frow{gap:8px}
   .fg input,.fg select,.fg textarea{padding:8px 10px}
@@ -2682,8 +2713,9 @@ footer::after{
    ═══════════════════════════════════════════════════════════════ */
 @media(max-width:1200px){
   /* ซ่อน nav-links แล้วให้ hamburger เปิด */
-  .nav-links{display:none!important;flex-direction:column;position:absolute;top:64px;left:0;right:0;background:var(--p2);padding:12px;z-index:999}
-  .nav-links.mob-open{display:flex!important}
+  /* z-index:1050 — อยู่เหนือ nav (1000) แต่ต่ำกว่า dd-panel mobile (1100) */
+  .nav-links{display:none!important;flex-direction:column;position:absolute;top:64px;left:0;right:0;background:var(--p2);padding:12px;z-index:1050;overflow:visible}
+  .nav-links.mob-open{display:flex!important;overflow:visible}
   /* แสดง hamburger */
   .hamburger{display:flex}
   /* ซ่อน Add LINE ใน navbar */
@@ -2693,6 +2725,8 @@ footer::after{
   .btn-dep{gap:0}
   /* ลด gap ใน nav-right */
   .nav-right{gap:4px}
+  /* dd-panel ใน hamburger mode: fixed ลอยเหนือ nav-links */
+  .dd-panel{z-index:1100!important}
 }
 
 /* ══ DESKTOP (>1200px): full navbar ════════════════════════════ */
@@ -3650,7 +3684,7 @@ footer::after{
   box-shadow:0 20px 50px rgba(0,0,0,.22),0 2px 10px rgba(0,0,0,.1);
   border:1.5px solid rgba(200,146,42,.2);
   overflow:hidden;
-  z-index:220;
+  z-index:1200;
   max-height:calc(100vh - 80px);
   overflow-y:auto;
   animation:langPanelIn .18s ease;
@@ -10585,7 +10619,7 @@ function renderMyAccount(){
         <button class="ma-hero-cover-btn" style="background:linear-gradient(135deg,#1B3A6B,#2a5298);border:none;color:#fff;display:inline-flex;align-items:center;gap:6px;font-weight:700" onclick="showPage('social')">
           <img src="LogoWeb.webp" alt="Matchdoor" style="width:16px;height:16px;object-fit:contain;border-radius:3px;vertical-align:middle"> ฟีดชุมชน
         </button>
-        <button class="ma-hero-cover-btn" onclick="_maTab('listings',document.querySelector('[data-tab=\\'listings\\']'));renderMaListingsPanel()">
+        <button class="ma-hero-cover-btn" onclick="_maTab('listings',document.querySelector('[data-tab=\\'listings\\']'));renderMaListingsPanel();setTimeout(function(){var el=document.getElementById('ma-tab-bar');if(el){el.scrollIntoView({behavior:'smooth',block:'start'});}},100);">
           <i class="fas fa-plus"></i> ลงประกาศ
         </button>
         <button class="ma-hero-cover-btn primary" id="ma-edit-profile-btn-hero" onclick="_maOpenEditModal()" style="display:none">
