@@ -3037,8 +3037,86 @@ footer::after{
 /* Listings */
 .agp-listings-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
 .agp-listings-count{background:var(--p);color:#fff;border-radius:20px;padding:2px 10px;font-size:11px;font-weight:700;margin-left:6px}
-.agp-prop-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
-@media(max-width:480px){.agp-prop-grid{grid-template-columns:1fr 1fr;gap:10px}}
+.agp-prop-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:700px){.agp-prop-grid{grid-template-columns:repeat(2,1fr);gap:10px}}
+@media(max-width:400px){.agp-prop-grid{grid-template-columns:1fr 1fr;gap:8px}}
+
+/* Pagination */
+.agp-pagination{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:20px;flex-wrap:wrap}
+.agp-page-btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:36px;height:36px;padding:0 10px;
+  border-radius:8px;border:1.5px solid var(--bd);
+  background:#fff;color:var(--tx);font-size:13px;font-weight:600;
+  cursor:pointer;font-family:inherit;transition:.15s;user-select:none;
+}
+.agp-page-btn:hover:not(:disabled){background:var(--lt);border-color:var(--p);color:var(--p)}
+.agp-page-btn.active{background:var(--p);border-color:var(--p);color:#fff}
+.agp-page-btn:disabled{opacity:.35;cursor:default}
+.agp-page-info{font-size:12px;color:var(--gr);padding:0 6px}
+
+/* Ad Banner in sidebar */
+.agp-ad-slot{
+  background:#fff;border-radius:16px;border:1.5px solid var(--bd);
+  overflow:hidden;margin-bottom:20px;
+}
+.agp-ad-slot:last-child{margin-bottom:0}
+.agp-ad-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 14px 8px;
+  border-bottom:1px solid var(--bd);
+}
+.agp-ad-label{font-size:10px;font-weight:700;color:var(--gr);text-transform:uppercase;letter-spacing:.5px}
+.agp-ad-badge{font-size:9px;background:var(--lt);color:var(--gr);border-radius:4px;padding:2px 6px;font-weight:600}
+.agp-ad-body{padding:14px}
+.agp-ad-img{
+  width:100%;height:160px;object-fit:cover;border-radius:10px;
+  display:block;background:linear-gradient(135deg,#e8e4dc,#d4cfc5);
+}
+.agp-ad-img-placeholder{
+  width:100%;height:160px;border-radius:10px;
+  background:linear-gradient(135deg,#f0ebe0,#e8e4dc);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:8px;color:var(--gr);font-size:13px;font-weight:600;
+  border:2px dashed var(--bd);
+}
+.agp-ad-img-placeholder i{font-size:28px;opacity:.4}
+.agp-ad-title{font-size:13px;font-weight:700;color:var(--tx);margin:10px 0 3px}
+.agp-ad-desc{font-size:12px;color:var(--tx2);line-height:1.6;margin-bottom:10px}
+.agp-ad-cta{
+  display:block;width:100%;padding:9px 0;text-align:center;
+  border-radius:8px;font-size:12px;font-weight:700;
+  background:linear-gradient(135deg,var(--a),var(--a2));color:#1A1A2E;
+  text-decoration:none;cursor:pointer;border:none;font-family:inherit;
+  transition:.15s;
+}
+.agp-ad-cta:hover{opacity:.88;transform:translateY(-1px)}
+.agp-ad-leaderboard{
+  width:100%;height:90px;border-radius:10px;
+  background:linear-gradient(135deg,#f0ebe0,#e8e4dc);
+  display:flex;align-items:center;justify-content:center;
+  border:2px dashed var(--bd);color:var(--gr);font-size:12px;font-weight:600;
+  gap:8px;flex-direction:column;
+}
+.agp-ad-leaderboard i{font-size:20px;opacity:.4}
+
+/* Responsive: on small screens move sidebar above cards (community-feed style) */
+@media(max-width:900px){
+  .agp-body{grid-template-columns:1fr;gap:20px}
+  #agp-sidebar-col{order:-1}  /* sidebar moves above main col */
+  .agp-sidebar{position:static}
+  /* On mobile show ads as horizontal strip */
+  .agp-ad-slot.agp-ad-horizontal{
+    display:flex;align-items:center;gap:14px;padding:12px 14px;
+  }
+  .agp-ad-horizontal .agp-ad-body{padding:0;flex:1;display:flex;align-items:center;gap:12px}
+  .agp-ad-horizontal .agp-ad-img,.agp-ad-horizontal .agp-ad-img-placeholder{
+    width:80px;height:80px;min-width:80px;flex-shrink:0;
+  }
+  .agp-ad-horizontal .agp-ad-content{flex:1}
+  .agp-ad-horizontal .agp-ad-title{margin-top:0}
+  .agp-ad-horizontal .agp-ad-desc{display:none}
+}
 .agp-prop-card{border:1.5px solid var(--bd);border-radius:12px;overflow:hidden;cursor:pointer;transition:.2s;background:#fff}
 .agp-prop-card:hover{border-color:var(--p);transform:translateY(-3px);box-shadow:0 8px 28px rgba(27,58,107,.13)}
 .agp-prop-thumb{height:130px;background:var(--lt);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:40px}
@@ -8506,6 +8584,7 @@ window.mdBnavCloseMenu = function(){
             กำลังโหลด...
           </div>
         </div>
+        <div class="agp-pagination" id="agp-pagination" style="display:none"></div>
       </div>
 
       <!-- Reviews -->
@@ -8530,6 +8609,67 @@ window.mdBnavCloseMenu = function(){
       <div class="agp-card">
         <div class="agp-card-title"><i class="fas fa-chart-bar"></i> สถิติ</div>
         <div id="agp-stats-detail"></div>
+      </div>
+
+      <!-- Ad Slot 1 -->
+      <div class="agp-ad-slot agp-ad-horizontal">
+        <div class="agp-ad-header">
+          <span class="agp-ad-label"><i class="fas fa-bullhorn" style="margin-right:4px"></i>โฆษณา</span>
+          <span class="agp-ad-badge">สปอนเซอร์</span>
+        </div>
+        <div class="agp-ad-body">
+          <div class="agp-ad-content">
+            <div class="agp-ad-img-placeholder">
+              <i class="fas fa-image"></i>
+              <span>พื้นที่โฆษณา 300×160</span>
+            </div>
+            <div class="agp-ad-title">โปรโมทอสังหาฯ ของคุณที่นี่</div>
+            <div class="agp-ad-desc">เข้าถึงผู้ซื้อและผู้เช่าที่สนใจอสังหาริมทรัพย์โดยตรง ลงโฆษณากับ Matchdoor วันนี้</div>
+            <a class="agp-ad-cta" href="mailto:contact.matchdoor@gmail.com" target="_blank" rel="noopener">
+              <i class="fas fa-envelope" style="margin-right:5px"></i>ติดต่อลงโฆษณา
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ad Slot 2 -->
+      <div class="agp-ad-slot">
+        <div class="agp-ad-header">
+          <span class="agp-ad-label"><i class="fas fa-star" style="margin-right:4px"></i>แนะนำ</span>
+          <span class="agp-ad-badge">สปอนเซอร์</span>
+        </div>
+        <div class="agp-ad-body">
+          <div class="agp-ad-img-placeholder">
+            <i class="fas fa-ad"></i>
+            <span>พื้นที่โฆษณา 300×250</span>
+          </div>
+          <div class="agp-ad-title">พื้นที่ประชาสัมพันธ์โครงการ</div>
+          <div class="agp-ad-desc">โครงการพัฒนาอสังหาริมทรัพย์ บ้านจัดสรร คอนโดมิเนียม หรือบริการที่เกี่ยวข้อง สนใจลงโฆษณาติดต่อเราได้เลย</div>
+          <a class="agp-ad-cta" href="mailto:contact.matchdoor@gmail.com" target="_blank" rel="noopener">
+            <i class="fas fa-paper-plane" style="margin-right:5px"></i>สอบถามพื้นที่โฆษณา
+          </a>
+        </div>
+      </div>
+
+      <!-- Ad Slot 3 -->
+      <div class="agp-ad-slot agp-ad-horizontal">
+        <div class="agp-ad-header">
+          <span class="agp-ad-label"><i class="fas fa-tags" style="margin-right:4px"></i>ข่าวสาร</span>
+          <span class="agp-ad-badge">สปอนเซอร์</span>
+        </div>
+        <div class="agp-ad-body">
+          <div class="agp-ad-content">
+            <div class="agp-ad-leaderboard">
+              <i class="fas fa-rectangle-ad"></i>
+              <span>Banner 300×90</span>
+            </div>
+            <div class="agp-ad-title">ประกาศโครงการใหม่</div>
+            <div class="agp-ad-desc">สำหรับโครงการอสังหาฯ ที่ต้องการประชาสัมพันธ์ถึงกลุ่มเป้าหมายโดยตรง</div>
+            <a class="agp-ad-cta" href="mailto:contact.matchdoor@gmail.com" target="_blank" rel="noopener">
+              <i class="fas fa-info-circle" style="margin-right:5px"></i>ดูแพ็กเกจโฆษณา
+            </a>
+          </div>
+        </div>
       </div>
 
     </div>
@@ -17703,13 +17843,21 @@ function showAgentDetail(a){
       aboutCard.style.display = 'none';
     }
 
-    /* Property grid */
-    var propCountEl = document.getElementById('agp-prop-count');
-    if(propCountEl) propCountEl.textContent = myProps.length;
-    var propGrid = document.getElementById('agp-prop-grid');
-    if(propGrid){
-      if(myProps.length){
-        propGrid.innerHTML = myProps.map(function(p){
+    /* Property grid — with pagination (24/page) */
+    var _AGP_PAGE_SIZE = 24;
+    var _agpCurrentPage = 1;
+
+    function _agpRenderPage(propsArr, page){
+      var propGrid = document.getElementById('agp-prop-grid');
+      var paginationEl = document.getElementById('agp-pagination');
+      if(!propGrid) return;
+      var totalPages = Math.max(1, Math.ceil(propsArr.length / _AGP_PAGE_SIZE));
+      page = Math.max(1, Math.min(page, totalPages));
+      _agpCurrentPage = page;
+      var start = (page - 1) * _AGP_PAGE_SIZE;
+      var slice = propsArr.slice(start, start + _AGP_PAGE_SIZE);
+      if(propsArr.length){
+        propGrid.innerHTML = slice.map(function(p){
           var thumb = p.photos&&p.photos[0]
             ? '<img src="'+p.photos[0]+'" loading="lazy" alt="'+p.title+'">'
             : '<span>'+(typeof typeIcon==='function'?typeIcon(p.type):'🏠')+'</span>';
@@ -17729,7 +17877,48 @@ function showAgentDetail(a){
           +'<i class="fas fa-home" style="font-size:32px;opacity:.25;display:block;margin-bottom:8px"></i>'
           +'ยังไม่มีทรัพย์ที่ดูแล</div>';
       }
+      /* Build pagination */
+      if(paginationEl){
+        if(totalPages <= 1){
+          paginationEl.style.display = 'none';
+          paginationEl.innerHTML = '';
+        } else {
+          paginationEl.style.display = 'flex';
+          var html = '';
+          /* First */
+          html += '<button class="agp-page-btn" title="หน้าแรก" '+(page<=1?'disabled':'')+' onclick="_agpGoPage(1)"><i class="fas fa-angle-double-left"></i></button>';
+          /* Prev */
+          html += '<button class="agp-page-btn" title="หน้าก่อน" '+(page<=1?'disabled':'')+' onclick="_agpGoPage('+(_agpCurrentPage-1)+')"><i class="fas fa-angle-left"></i></button>';
+          /* Page numbers */
+          var startP = Math.max(1, page - 2);
+          var endP = Math.min(totalPages, startP + 4);
+          if(endP - startP < 4) startP = Math.max(1, endP - 4);
+          if(startP > 1) html += '<span class="agp-page-info">…</span>';
+          for(var pi = startP; pi <= endP; pi++){
+            html += '<button class="agp-page-btn'+(pi===page?' active':'')+'" onclick="_agpGoPage('+pi+')">'+pi+'</button>';
+          }
+          if(endP < totalPages) html += '<span class="agp-page-info">…</span>';
+          /* Next */
+          html += '<button class="agp-page-btn" title="หน้าถัดไป" '+(page>=totalPages?'disabled':'')+' onclick="_agpGoPage('+(_agpCurrentPage+1)+')"><i class="fas fa-angle-right"></i></button>';
+          /* Last */
+          html += '<button class="agp-page-btn" title="หน้าสุดท้าย" '+(page>=totalPages?'disabled':'')+' onclick="_agpGoPage('+totalPages+')"><i class="fas fa-angle-double-right"></i></button>';
+          html += '<span class="agp-page-info">'+page+' / '+totalPages+'</span>';
+          paginationEl.innerHTML = html;
+        }
+      }
     }
+
+    /* Expose for onclick */
+    window._agpAllProps = myProps;
+    window._agpGoPage = function(p){
+      _agpRenderPage(window._agpAllProps, p);
+      var card = document.getElementById('agp-prop-grid');
+      if(card) card.scrollIntoView({ behavior:'smooth', block:'start' });
+    };
+
+    var propCountEl = document.getElementById('agp-prop-count');
+    if(propCountEl) propCountEl.textContent = myProps.length;
+    _agpRenderPage(myProps, 1);
 
     /* Contact sidebar */
     var contactGrid = document.getElementById('agp-contact-grid');
