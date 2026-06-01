@@ -1550,8 +1550,7 @@ footer{background:linear-gradient(135deg,#2d2650 0%,#3d3373 100%);color:rgba(255
 .pdi-more{background:var(--bd);color:var(--tx2);font-weight:700}
 /* modal price */
 .modal-price{font-size:24px;font-weight:700;color:var(--a);margin:8px 0 4px}
-.modal-extras{display:flex;flex-direction:column;gap:10px;margin:14px 0;padding:14px;background:var(--bg);border-radius:14px;border:1.5px solid var(--bd)}
-.modal-extra-row{display:flex;align-items:center;gap:10px;padding:8px 10px;background:#fff;border-radius:10px;border:1px solid var(--bd)}
+.modal-extras{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0;padding:14px;background:var(--bg);border-radius:14px;border:1.5px solid var(--bd)}.modal-extra-row{display:flex;align-items:center;gap:10px;padding:8px 10px;background:#fff;border-radius:10px;border:1px solid var(--bd)}.modal-extra-apps{grid-column:1/-1}
 .modal-extra-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
 .modal-extra-info{flex:1;min-width:0}
 .modal-extra-label{font-size:10px;font-weight:700;color:var(--gr);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
@@ -15739,7 +15738,7 @@ function openModal(id){
 
   // 6) Agent — synchronous
   const ab=$('m-agent');
-  if(a){ab.style.display='flex';ab.style.cursor='pointer';ab.onclick=()=>showAgentDetail(a);ab.title='ดูข้อมูลตัวแทน';$('m-ag-av').textContent=a.initials||a.name[0];$('m-ag-av').style.background=a.color||'#0f3460';$('m-ag-name').textContent=a.name;$('m-ag-name').style.textDecoration='underline dotted';$('m-ag-name').style.color='var(--a)';$('m-ag-role').textContent=a.title;}
+  if(a){ab.style.display='flex';ab.style.cursor='pointer';ab.onclick=()=>{closeModal();setTimeout(()=>showPage('agent-profile',String(a.id)),220);};ab.title='ดูข้อมูลตัวแทน';$('m-ag-av').textContent=a.initials||a.name[0];$('m-ag-av').style.background=a.color||'#0f3460';$('m-ag-name').textContent=a.name;$('m-ag-name').style.textDecoration='underline dotted';$('m-ag-name').style.color='var(--a)';$('m-ag-role').textContent=a.title;}
   else ab.style.display='none';
 
   // 7) CTA + Fav — synchronous
