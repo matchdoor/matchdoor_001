@@ -662,9 +662,19 @@ img{max-width:100%;height:auto}
 
 nav:not(#md-bottom-nav){
   background:linear-gradient(135deg,#0A1628 0%,#0F1E3A 60%,#162848 100%);
-  position:sticky;top:0;z-index:1000;
+  position:fixed;top:0;left:0;right:0;z-index:1000;
   box-shadow:0 2px 20px rgba(10,22,40,.45),0 1px 0 rgba(200,146,42,.15);
+  transform:translateY(0);
+  transition:transform 0.35s cubic-bezier(0.4,0,0.2,1), box-shadow 0.35s ease;
+  will-change:transform;
 }
+nav:not(#md-bottom-nav).nav-hidden{
+  transform:translateY(-100%);
+  box-shadow:none;
+}
+/* เพิ่ม padding-top ให้ body เพื่อชดเชย fixed nav */
+body{padding-top:64px}
+@media(max-width:950px){body{padding-top:64px}}
 .nav-inner{max-width:1320px;margin:0 auto;padding:0 12px 0 16px;display:flex;align-items:center;height:64px;gap:6px;overflow:visible;}
 /* ── NAVBAR LOGO ── */
 .logo{
@@ -1498,7 +1508,7 @@ nav:not(#md-bottom-nav){
 /* Floating buttons pastel */
 .float-main{width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,var(--a),var(--p));color:#F0ECE3;font-size:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 16px rgba(255,107,157,.4)}
 /* Footer pastel */
-footer{background:linear-gradient(135deg,#2d2650 0%,#3d3373 100%);color:rgba(255,255,255,.7);padding:40px 20px 24px}
+footer{background:linear-gradient(135deg,#2d2650 0%,#3d3373 100%);color:rgba(255,255,255,.7);padding:40px 0 24px}
 /* iphone icon */
 .iphone-icon{font-size:16px}
 /* Btn styles */
@@ -1906,8 +1916,8 @@ footer{background:linear-gradient(135deg,#2d2650 0%,#3d3373 100%);color:rgba(255
 .prop-title{font-size:14px;font-weight:700;margin-bottom:4px;line-height:1.35}
 .prop-loc{font-size:12px;color:var(--gr);margin-bottom:8px}
 .prop-price{font-size:18px;font-weight:700;color:var(--a)}
-.srv-sec{background:linear-gradient(135deg,#0A1628 0%,#1B3A6B 50%,#0F2548 100%);color:#F0ECE3;padding:55px 20px}
-.srv-inner{max-width:1320px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:50px;align-items:center}
+.srv-sec{background:linear-gradient(135deg,#0A1628 0%,#1B3A6B 50%,#0F2548 100%);color:#F0ECE3;padding:55px 0}
+.srv-inner{max-width:1320px;margin:0 auto;padding:0 20px;display:grid;grid-template-columns:1fr 1fr;gap:50px;align-items:center}
 .srv-label{font-size:10px;opacity:.5;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}
 .srv-title{font-size:28px;font-weight:700;margin-bottom:6px}
 .srv-sub{opacity:.75;font-size:14px;margin-bottom:20px}
@@ -1945,8 +1955,8 @@ footer{background:linear-gradient(135deg,#2d2650 0%,#3d3373 100%);color:rgba(255
 .blog-cat{display:inline-block;background:#E8EFF7;color:var(--p);font-size:10px;padding:3px 10px;border-radius:20px;margin-bottom:6px;font-weight:700}
 .blog-title{font-size:14px;font-weight:700;margin-bottom:5px;line-height:1.4}
 .blog-meta{font-size:11px;color:var(--gr)}
-.flink-sec{background:linear-gradient(180deg,#f8faff 0%,#eef2fb 100%);padding:32px 20px;border-top:2px solid var(--bd)}
-.flink-inner{max-width:1320px;margin:0 auto;display:grid;grid-template-columns:repeat(6,1fr);gap:14px}
+.flink-sec{background:linear-gradient(180deg,#f8faff 0%,#eef2fb 100%);padding:32px 0;border-top:2px solid var(--bd)}
+.flink-inner{max-width:1320px;margin:0 auto;padding:0 20px;display:grid;grid-template-columns:repeat(6,1fr);gap:14px}
 .flink-inner>div{background:#fff;border-radius:12px;padding:16px 14px;border:1.5px solid #e2e8f5;box-shadow:0 2px 8px rgba(27,58,107,.06);transition:box-shadow .2s}
 .flink-inner>div:hover{box-shadow:0 4px 16px rgba(27,58,107,.13);border-color:#c5d3ee}
 .flink-inner h4{margin-bottom:10px;font-size:11.5px;font-weight:800;color:var(--p);text-transform:uppercase;letter-spacing:.4px;padding-bottom:7px;border-bottom:2px solid var(--a);display:block}
@@ -1956,7 +1966,7 @@ footer{background:linear-gradient(135deg,#2d2650 0%,#3d3373 100%);color:rgba(255
 footer{
   background:linear-gradient(170deg,#060E1E 0%,#0A1628 60%,#0D1A30 100%);
   color:rgba(255,255,255,.7);
-  padding:52px 20px 24px;
+  padding:52px 0 24px;
   position:relative;
   overflow:hidden;
 }
@@ -1974,7 +1984,7 @@ footer::after{
   background:radial-gradient(circle,rgba(255,107,157,.08) 0%,transparent 70%);
   pointer-events:none;
 }
-.footer-inner{max-width:1320px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr;gap:24px;margin-bottom:28px;position:relative;z-index:1}
+.footer-inner{max-width:1320px;margin:0 auto;padding:0 20px;display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr;gap:24px;margin-bottom:28px;position:relative;z-index:1}
 
 .footer-slogan{font-size:13px;font-style:italic;opacity:.6;margin-bottom:14px;color:rgba(255,220,120,.75)}
 .footer-addr{font-size:12px;opacity:.55;line-height:1.7}
@@ -2114,7 +2124,7 @@ footer::after{
 
 .footer-legal-bar{
   border-top:1px solid rgba(255,255,255,.07);
-  padding:14px 0 6px;
+  padding:14px 20px 6px;
   display:flex;flex-wrap:wrap;justify-content:center;align-items:center;
   gap:4px;margin-bottom:12px;font-size:11px;
   position:relative;z-index:1;
@@ -4188,10 +4198,22 @@ footer::after{
   background: var(--p, #1B3A6B);
   padding: 12px 20px;
   /* override nav{position:sticky} selector ที่ครอบคลุม <nav> ทุก element */
-  position: relative !important;
-  top: auto !important;
-  z-index: auto !important;
-  box-shadow: none !important;
+  position: fixed !important;
+  top: 64px !important;
+  left: 0;
+  right: 0;
+  z-index: 990 !important;
+  box-shadow: 0 2px 8px rgba(10,22,40,.3) !important;
+  transition: top 0.35s cubic-bezier(0.4,0,0.2,1) !important;
+  will-change: top;
+}
+/* เมื่อ navbar ซ่อน breadcrumb เลื่อนขึ้นแทน */
+.pdp-breadcrumb.sub-nav-top {
+  top: 0 !important;
+}
+/* เพิ่ม padding-top ให้ PDP page เพื่อชดเชย breadcrumb fixed */
+#page-property {
+  padding-top: 46px;
 }
 .pdp-breadcrumb-inner {
   max-width: 1200px;
@@ -4219,6 +4241,178 @@ footer::after{
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* ══ COMMUNITY SUB-HEADER — sticky under navbar ══ */
+/* ══ COMMUNITY SUB-HEADER — redesigned, professional ══ */
+#community-sub-header {
+  position: fixed !important;
+  top: 64px;
+  left: 0;
+  right: 0;
+  z-index: 990;
+  /* Layered background: deep navy + subtle mesh */
+  background: #0A1628 !important;
+  border-bottom: 1px solid rgba(200,146,42,0.25) !important;
+  box-shadow: 0 4px 24px rgba(0,0,0,.35), 0 1px 0 rgba(200,146,42,.12) !important;
+  transition: top 0.35s cubic-bezier(0.4,0,0.2,1);
+  will-change: top;
+  /* kill inline style bg via specificity — handled by !important above */
+}
+#community-sub-header.sub-nav-top {
+  top: 0;
+}
+/* Inner layout container */
+#community-sub-header .csh-inner {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 20px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+/* Back button — pill style */
+#community-sub-header .csh-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 14px;
+  height: 34px;
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 8px;
+  color: rgba(255,255,255,.8);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background .18s, border-color .18s;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+#community-sub-header .csh-back:hover {
+  background: rgba(255,255,255,.13);
+  border-color: rgba(255,255,255,.28);
+  color: #fff;
+}
+/* Divider */
+#community-sub-header .csh-div {
+  width: 1px;
+  height: 28px;
+  background: rgba(255,255,255,.1);
+  margin: 0 16px;
+  flex-shrink: 0;
+}
+/* Logo + title block */
+#community-sub-header .csh-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+#community-sub-header .csh-logo {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+#community-sub-header .csh-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1;
+  font-family: 'Kanit','Noto Sans Thai',sans-serif;
+  letter-spacing: -.2px;
+  white-space: nowrap;
+}
+#community-sub-header .csh-sub {
+  font-size: 10.5px;
+  color: rgba(255,255,255,.45);
+  margin-top: 2px;
+  white-space: nowrap;
+  font-family: 'Noto Sans Thai',sans-serif;
+}
+/* Community badge */
+#community-sub-header .csh-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  background: rgba(24,119,242,.18);
+  border: 1px solid rgba(24,119,242,.35);
+  border-radius: 20px;
+  color: #7CB9FF;
+  font-size: 11px;
+  font-weight: 600;
+  margin-left: 14px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+/* Spacer */
+#community-sub-header .csh-spacer { flex: 1 1 0; min-width: 0; }
+/* CTA Button */
+#community-sub-header .csh-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 18px;
+  height: 34px;
+  background: linear-gradient(135deg, #C8922A 0%, #E8B84B 100%);
+  border: none;
+  border-radius: 8px;
+  color: #1A1A2E;
+  font-size: 12.5px;
+  font-weight: 800;
+  cursor: pointer;
+  font-family: 'Kanit','Noto Sans Thai',sans-serif;
+  box-shadow: 0 2px 12px rgba(200,146,42,.4);
+  transition: transform .18s, box-shadow .18s, filter .18s;
+  flex-shrink: 0;
+  white-space: nowrap;
+  letter-spacing: .1px;
+}
+#community-sub-header .csh-cta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 18px rgba(200,146,42,.55);
+  filter: brightness(1.06);
+}
+#community-sub-header .csh-cta i { font-size: 11px; }
+
+/* ── MOBILE: collapse gracefully ── */
+@media (max-width: 600px) {
+  #community-sub-header .csh-inner {
+    padding: 0 14px;
+    height: 48px;
+    gap: 0;
+  }
+  #community-sub-header .csh-sub,
+  #community-sub-header .csh-badge {
+    display: none;
+  }
+  #community-sub-header .csh-back span { display: none; }
+  #community-sub-header .csh-back {
+    padding: 0 10px;
+    min-width: 34px;
+    justify-content: center;
+  }
+  #community-sub-header .csh-div { margin: 0 10px; }
+  #community-sub-header .csh-cta span { display: none; }
+  #community-sub-header .csh-cta {
+    padding: 0 12px;
+    min-width: 34px;
+    justify-content: center;
+  }
+  #community-sub-header .csh-cta i { font-size: 14px; }
+}
+@media (max-width: 768px) {
+  #community-sub-header .csh-badge { display: none; }
+}
+
+/* padding-top ให้ page-social ชดเชย fixed community header */
+#page-social {
+  padding-top: 52px;
 }
 
 /* ── Main Layout ── */
@@ -6039,6 +6233,7 @@ footer::after{
     </div>
   </div>
 </section>
+</div><!-- end wrap#all-sec -->
  <section class="srv-sec" id="contact-sec">
   <div class="srv-inner">
    <div>
@@ -6220,28 +6415,43 @@ footer::after{
     <span class="flb-sep">·</span>
     <a href="javascript:void(0)" onclick="openCookieModal()"><i class="fas fa-cookie-bite"></i> <span data-i18n="ft.legal.cookie">นโยบายคุกกี้</span></a>
   </div>
-  <div class="foot-copy-bottom" id="footer-copy-bottom" style="border-top:1px solid rgba(255,255,255,.08);padding:12px 0 4px;text-align:center;font-size:11px;color:rgba(255,255,255,.4)"></div>
+  <div class="foot-copy-bottom" id="footer-copy-bottom" style="border-top:1px solid rgba(255,255,255,.08);padding:12px 20px 4px;text-align:center;font-size:11px;color:rgba(255,255,255,.4)"></div>
   <div class="foot-copy" id="footer-copy"></div>
 </footer>
 </div>
 </div><!-- end page-home -->
 <!-- ═══ SOCIAL PAGE — แยกหน้า Community Feed ═══ -->
 <div class="page" id="page-social">
-  <!-- Page Hero Banner — Community Feed (compact) -->
-  <div style="background:linear-gradient(135deg,#1B3A6B 0%,#1877F2 60%,#0d3b2e 100%);padding:10px 20px 10px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;border-bottom:2px solid rgba(255,255,255,.1)">
-    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-      <button class="back-btn" onclick="showPage('home')" style="margin:0;padding:6px 14px;font-size:12px"><i class="fas fa-arrow-left"></i> หน้าหลัก</button>
-      <div style="display:flex;align-items:center;gap:10px">
-        <img src="LogoWeb.webp" alt="Matchdoor" style="width:32px;height:32px;object-fit:contain;border-radius:6px">
+  <!-- Page Hero Banner — Community Feed (redesigned) -->
+  <div id="community-sub-header">
+    <div class="csh-inner">
+      <!-- Back -->
+      <button class="csh-back" onclick="showPage('home')">
+        <i class="fas fa-arrow-left"></i>
+        <span>หน้าหลัก</span>
+      </button>
+
+      <!-- Divider -->
+      <div class="csh-div"></div>
+
+      <!-- Brand -->
+      <div class="csh-brand">
+        <img src="LogoWeb.webp" alt="Matchdoor" class="csh-logo">
         <div>
-          <div style="font-size:16px;font-weight:800;color:#fff;line-height:1.2;font-family:'Kanit','Noto Sans Thai',sans-serif">ฟีดชุมชน Matchdoor</div>
-          <div style="font-size:11px;color:rgba(255,255,255,.65);margin-top:1px">แชร์ทรัพย์ · ถามตอบ · ข่าวสารอสังหาฯ</div>
+          <div class="csh-title">ฟีดชุมชน Matchdoor</div>
+          <div class="csh-sub">แชร์ทรัพย์ · ถามตอบ · ข่าวสารอสังหาฯ</div>
         </div>
+        <span class="csh-badge"><i class="fas fa-users"></i> Community</span>
       </div>
-      <span style="background:rgba(255,255,255,.15);color:#fff;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600;border:1px solid rgba(255,255,255,.2)"><i class="fas fa-users" style="margin-right:4px"></i> Community</span>
-    </div>
-    <div style="display:flex;gap:8px;align-items:center">
-      <button onclick="window.openDepPanel()" style="background:rgba(200,146,42,.9);border:none;border-radius:20px;padding:7px 16px;font-size:12px;font-weight:700;color:#fff;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px"><i class="fas fa-plus"></i> ลงประกาศ</button>
+
+      <!-- Spacer -->
+      <div class="csh-spacer"></div>
+
+      <!-- CTA -->
+      <button class="csh-cta" onclick="window.openDepPanel()">
+        <i class="fas fa-plus"></i>
+        <span>ลงประกาศ</span>
+      </button>
     </div>
   </div>
 <!-- ═══════════════════════════════════════════════════════════
@@ -27008,5 +27218,158 @@ if(document.readyState === 'loading'){
 })(); /* end Review System IIFE */
 </script>
 
+<!-- ══ AUTO-HIDE NAVBAR ON SCROLL DOWN / SHOW ON SCROLL UP ══════════════ -->
+<script>
+(function(){
+  'use strict';
+  var _lastY = 0;
+  var _ticking = false;
+  var _threshold = 80;
+  var _delta = 0;
+
+  function _getNav(){
+    return document.querySelector('nav:not(#md-bottom-nav):not(.admin-sidebar nav)');
+  }
+
+  function _onScroll(){
+    var currentY = window.scrollY || window.pageYOffset;
+    var nav = _getNav();
+    if(!nav) return;
+
+    if(currentY < 10){
+      nav.classList.remove('nav-hidden');
+      _delta = 0;
+      _lastY = currentY;
+      return;
+    }
+
+    var diff = currentY - _lastY;
+    _delta += diff;
+    _lastY = currentY;
+
+    if(_delta > _threshold){
+      nav.classList.add('nav-hidden');
+      document.querySelectorAll('.dd-panel.open').forEach(function(el){ el.classList.remove('open'); });
+      document.querySelectorAll('.nav-links.mob-open').forEach(function(el){ el.classList.remove('mob-open'); });
+      document.querySelectorAll('.hamburger.active').forEach(function(el){ el.classList.remove('active'); });
+      _delta = _threshold;
+    } else if(_delta < -_threshold * 0.5){
+      nav.classList.remove('nav-hidden');
+      _delta = -_threshold * 0.5;
+    }
+  }
+
+  function _onScrollThrottle(){
+    if(!_ticking){
+      requestAnimationFrame(function(){
+        _onScroll();
+        _ticking = false;
+      });
+      _ticking = true;
+    }
+  }
+
+  window.addEventListener('scroll', _onScrollThrottle, { passive: true });
+
+  document.addEventListener('click', function(e){
+    var nav = _getNav();
+    if(!nav) return;
+    if(e.target && e.target.closest && (
+        e.target.closest('[data-modal]') ||
+        e.target.closest('.ov-close') ||
+        e.target.closest('.btn-close') ||
+        e.target.closest('.logo')
+    )){
+      nav.classList.remove('nav-hidden');
+      _delta = 0;
+    }
+  });
+
+  var _spWrap = setInterval(function(){
+    if(typeof window.showPage === 'function'){
+      clearInterval(_spWrap);
+      var _orig = window.showPage;
+      window.showPage = function(){
+        var nav = _getNav();
+        if(nav) nav.classList.remove('nav-hidden');
+        _delta = 0;
+        _lastY = 0;
+        _orig.apply(this, arguments);
+      };
+    }
+  }, 300);
+})();
+</script>
+
+
+<!-- ══ SUB-HEADER STICKY SYNC (PDP Breadcrumb + Community Banner) ══════ -->
+<script>
+(function(){
+  'use strict';
+
+  /* ── Helper: ดึง sub-header elements ตามหน้าที่ active ── */
+  function _getSubHeaders(){
+    return [
+      document.querySelector('.pdp-breadcrumb'),
+      document.getElementById('community-sub-header')
+    ].filter(Boolean);
+  }
+
+  /* ── ตรวจว่า navbar หลักซ่อนอยู่ไหม ── */
+  function _isNavHidden(){
+    var nav = document.querySelector('nav:not(#md-bottom-nav)');
+    return nav && nav.classList.contains('nav-hidden');
+  }
+
+  /* ── อัปเดต sub-header position ── */
+  function _syncSubHeaders(){
+    var hidden = _isNavHidden();
+    _getSubHeaders().forEach(function(el){
+      if(hidden){
+        el.classList.add('sub-nav-top');   /* top: 0 — navbar ซ่อน */
+      } else {
+        el.classList.remove('sub-nav-top'); /* top: 64px — navbar แสดง */
+      }
+    });
+  }
+
+  /* ── MutationObserver เฝ้า nav-hidden class change ── */
+  function _watchNav(){
+    var nav = document.querySelector('nav:not(#md-bottom-nav)');
+    if(!nav){
+      setTimeout(_watchNav, 300);
+      return;
+    }
+    var obs = new MutationObserver(function(mutations){
+      mutations.forEach(function(m){
+        if(m.attributeName === 'class') _syncSubHeaders();
+      });
+    });
+    obs.observe(nav, { attributes: true, attributeFilter: ['class'] });
+    /* sync ทันที */
+    _syncSubHeaders();
+  }
+
+  /* ── เริ่ม observer หลัง DOM พร้อม ── */
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', _watchNav);
+  } else {
+    _watchNav();
+  }
+
+  /* ── Sync ทุกครั้งที่ scroll ด้วย (fallback) ── */
+  var _ticking = false;
+  window.addEventListener('scroll', function(){
+    if(!_ticking){
+      requestAnimationFrame(function(){
+        _syncSubHeaders();
+        _ticking = false;
+      });
+      _ticking = true;
+    }
+  }, { passive: true });
+
+})();
+</script>
 </body>
 </html>
