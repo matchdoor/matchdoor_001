@@ -2411,11 +2411,6 @@ footer::after{
 .ma-hero-name-old{font-size:22px;font-weight:700;margin-bottom:4px}
 .ma-hero-email-old{font-size:13px;opacity:.8;margin-bottom:12px;word-break:break-all}
 .ma-hero-badge-old{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.18);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600}
-/* ── Dev Bypass Button (temp — remove before production) ── */
-.ma-dev-bypass-btn{position:absolute;top:14px;right:14px;display:flex;align-items:center;gap:6px;padding:7px 13px;border-radius:10px;border:1.5px dashed rgba(255,220,0,.7);background:rgba(0,0,0,.35);color:#ffd700;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.4px;backdrop-filter:blur(4px);transition:.18s;z-index:10;white-space:nowrap}
-.ma-dev-bypass-btn:hover{background:rgba(255,200,0,.18);border-color:#ffd700;transform:scale(1.04)}
-.ma-dev-bypass-btn.active{background:rgba(255,200,0,.22);border-color:#ffd700;box-shadow:0 0 12px rgba(255,215,0,.35)}
-.ma-dev-bypass-btn i{font-size:12px}
 .ma-dev-banner{display:flex;align-items:center;gap:8px;background:linear-gradient(90deg,rgba(255,193,7,.12),rgba(255,193,7,.06));border:1.5px dashed rgba(255,193,7,.55);border-radius:10px;padding:9px 14px;margin-bottom:16px;font-size:12px;font-weight:600;color:#92650a}
 .ma-tab-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:24px;background:#fff;border-radius:14px;padding:6px;box-shadow:0 2px 12px rgba(27,58,107,.08);border:1.5px solid var(--bd)}
 .ma-tab{flex:1;min-width:80px;padding:9px 8px;border:none;background:transparent;border-radius:10px;font-size:12px;font-weight:600;color:var(--tx2);cursor:pointer;transition:.18s;display:flex;flex-direction:column;align-items:center;gap:3px;white-space:nowrap}
@@ -2939,6 +2934,138 @@ footer::after{
 }
 .stars {color:#f59e0b;font-size:13px;letter-spacing:1px;}
 .rating-num {font-size:12px;color:var(--gr);font-weight:600;}
+
+/* ══════════════════════════════════════════════════════════════
+   AGENT PROFILE PAGE — /agent/{slug}
+══════════════════════════════════════════════════════════════ */
+#page-agent-profile { background:var(--bg); min-height:100vh; }
+
+/* Hero */
+.agp-hero {
+  background:linear-gradient(145deg,#0A1628 0%,#1B3A6B 55%,#0f2a1a 100%);
+  padding:48px 0 40px;
+  position:relative;
+  overflow:hidden;
+}
+.agp-hero::before {
+  content:'';
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse at 80% 50%,rgba(16,185,129,.10) 0%,transparent 60%),
+             radial-gradient(ellipse at 20% 80%,rgba(200,146,42,.08) 0%,transparent 55%);
+  pointer-events:none;
+}
+.agp-hero-inner {
+  max-width:1100px;margin:0 auto;padding:0 24px;
+  display:flex;align-items:flex-start;gap:32px;
+  position:relative;z-index:2;
+}
+@media(max-width:680px){
+  .agp-hero-inner{flex-direction:column;align-items:center;text-align:center}
+}
+.agp-av-wrap{
+  width:120px;height:120px;flex-shrink:0;
+  border-radius:50%;border:4px solid rgba(255,255,255,.85);
+  overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.35);
+  background:linear-gradient(135deg,#1B3A6B,#2a5298);
+  display:flex;align-items:center;justify-content:center;
+  font-size:42px;font-weight:800;color:#fff;
+}
+.agp-av-wrap img{width:100%;height:100%;object-fit:cover;}
+.agp-meta{flex:1;min-width:0}
+.agp-tag-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.agp-tag-row .agent-member-tag,.agp-tag-row .agent-company-tag{margin-bottom:0}
+.agp-name{font-size:28px;font-weight:800;color:#fff;line-height:1.2;font-family:'Kanit',sans-serif;margin-bottom:4px}
+.agp-role{font-size:14px;color:rgba(255,255,255,.7);margin-bottom:10px}
+.agp-rating-row{display:flex;align-items:center;gap:8px;margin-bottom:16px}
+.agp-stars{color:#f1c40f;font-size:16px;letter-spacing:1px}
+.agp-rating-num{font-size:15px;font-weight:700;color:#fff}
+.agp-rating-count{font-size:13px;color:rgba(255,255,255,.55)}
+.agp-stats{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.agp-stat{
+  background:rgba(255,255,255,.12);
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:12px;padding:10px 18px;text-align:center;min-width:72px;
+  backdrop-filter:blur(8px);
+}
+.agp-stat-val{font-size:20px;font-weight:800;color:#fff;font-family:'Kanit',sans-serif;line-height:1.1}
+.agp-stat-lbl{font-size:10px;color:rgba(255,255,255,.6);margin-top:3px;text-transform:uppercase;letter-spacing:.4px}
+.agp-cta-row{display:flex;gap:10px;flex-wrap:wrap}
+.agp-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:11px 20px;border-radius:12px;font-size:14px;font-weight:700;
+  border:none;cursor:pointer;font-family:inherit;text-decoration:none;transition:.2s;
+}
+.agp-btn-line{background:#25D366;color:#fff}
+.agp-btn-line:hover{background:#1ebe5d;transform:translateY(-1px);box-shadow:0 6px 18px rgba(37,211,102,.4)}
+.agp-btn-phone{background:linear-gradient(135deg,var(--a),var(--a2));color:#1A1A2E}
+.agp-btn-phone:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(200,146,42,.45)}
+.agp-btn-email{background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3)}
+.agp-btn-email:hover{background:rgba(255,255,255,.25)}
+
+/* Back btn */
+.agp-back{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(255,255,255,.12);color:rgba(255,255,255,.8);
+  padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;
+  cursor:pointer;margin-bottom:20px;border:1px solid rgba(255,255,255,.2);
+  font-family:inherit;text-decoration:none;transition:.15s;
+}
+.agp-back:hover{background:rgba(255,255,255,.22);color:#fff}
+
+/* Body layout */
+.agp-body{max-width:1100px;margin:0 auto;padding:32px 24px;display:grid;grid-template-columns:1fr 340px;gap:28px;align-items:start}
+@media(max-width:900px){.agp-body{grid-template-columns:1fr;gap:20px}}
+@media(max-width:600px){.agp-body{padding:20px 16px}}
+
+/* Cards */
+.agp-card{background:#fff;border-radius:16px;border:1.5px solid var(--bd);padding:22px 24px;margin-bottom:20px}
+.agp-card:last-child{margin-bottom:0}
+.agp-card-title{font-size:12px;font-weight:800;color:var(--p);text-transform:uppercase;letter-spacing:.7px;margin-bottom:14px;display:flex;align-items:center;gap:7px}
+.agp-card-title i{color:var(--a);font-size:14px}
+
+/* Bio */
+.agp-bio-text{font-size:14px;color:var(--tx2);line-height:1.8;margin:0}
+
+/* Contact */
+.agp-contact-grid{display:flex;flex-direction:column;gap:10px}
+.agp-contact-item{display:flex;align-items:center;gap:12px;padding:11px 14px;background:var(--lt);border-radius:10px;text-decoration:none;color:var(--tx);transition:.15s}
+.agp-contact-item:hover{background:#e8e4dc;color:var(--p)}
+.agp-contact-item i{width:18px;text-align:center;color:var(--a);font-size:16px;flex-shrink:0}
+.agp-contact-label{font-size:11px;color:var(--gr);font-weight:600;text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:1px}
+.agp-contact-val{font-size:13px;font-weight:700;color:var(--tx);display:block}
+
+/* Listings */
+.agp-listings-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.agp-listings-count{background:var(--p);color:#fff;border-radius:20px;padding:2px 10px;font-size:11px;font-weight:700;margin-left:6px}
+.agp-prop-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+@media(max-width:480px){.agp-prop-grid{grid-template-columns:1fr 1fr;gap:10px}}
+.agp-prop-card{border:1.5px solid var(--bd);border-radius:12px;overflow:hidden;cursor:pointer;transition:.2s;background:#fff}
+.agp-prop-card:hover{border-color:var(--p);transform:translateY(-3px);box-shadow:0 8px 28px rgba(27,58,107,.13)}
+.agp-prop-thumb{height:130px;background:var(--lt);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:40px}
+.agp-prop-thumb img{width:100%;height:100%;object-fit:cover;transition:.3s}
+.agp-prop-card:hover .agp-prop-thumb img{transform:scale(1.05)}
+.agp-prop-info{padding:10px 12px}
+.agp-prop-price{font-size:14px;font-weight:800;color:var(--p);margin-bottom:2px}
+.agp-prop-title{font-size:12px;font-weight:600;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.agp-prop-loc{font-size:11px;color:var(--gr);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.agp-prop-type-badge{display:inline-block;background:var(--lt);border-radius:4px;padding:1px 6px;font-size:10px;font-weight:600;color:var(--tx2);margin-top:4px}
+
+/* Reviews */
+.agp-review-summary{display:flex;align-items:center;gap:24px;background:linear-gradient(135deg,#f8f6f2,#f0ebe0);border-radius:14px;padding:18px 22px;margin-bottom:20px}
+.agp-rv-big-score{font-size:52px;font-weight:800;color:var(--p);font-family:'Kanit',sans-serif;line-height:1}
+.agp-rv-score-right{flex:1}
+.agp-rv-stars-big{font-size:22px;color:#f1c40f;letter-spacing:2px}
+.agp-rv-count{font-size:13px;color:var(--gr);margin-top:4px}
+.agp-rv-bars{margin-top:10px}
+.agp-rv-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.agp-rv-bar-label{font-size:11px;font-weight:600;color:var(--gr);width:28px;text-align:right}
+.agp-rv-bar-track{flex:1;height:6px;background:var(--bd);border-radius:3px;overflow:hidden}
+.agp-rv-bar-fill{height:100%;background:linear-gradient(90deg,var(--a),var(--a2));border-radius:3px;transition:width .6s ease}
+.agp-rv-bar-count{font-size:11px;color:var(--gr);width:20px}
+
+/* Sidebar sticky */
+.agp-sidebar{position:sticky;top:80px}
+@media(max-width:900px){.agp-sidebar{position:static}}
 
 /* ── GLASSMORPHISM CARDS ── */
 
@@ -8324,6 +8451,93 @@ window.mdBnavCloseMenu = function(){
 </div>
 
 <!-- AGENTS PAGE -->
+<!-- ══════════════════════════════════════════════════════════════
+     AGENT PROFILE PAGE — /agent/{slug}
+══════════════════════════════════════════════════════════════ -->
+<div class="page" id="page-agent-profile">
+  <!-- Hero -->
+  <div class="agp-hero" id="agp-hero">
+    <div class="agp-hero-inner">
+      <div>
+        <button class="agp-back" onclick="showPage('agents')">
+          <i class="fas fa-arrow-left"></i> ทีมตัวแทน
+        </button>
+        <div style="display:flex;align-items:flex-start;gap:28px;flex-wrap:wrap">
+          <div class="agp-av-wrap" id="agp-av"></div>
+          <div class="agp-meta">
+            <div class="agp-tag-row" id="agp-tag-row"></div>
+            <div class="agp-name" id="agp-name">—</div>
+            <div class="agp-role" id="agp-role"></div>
+            <div class="agp-rating-row">
+              <span class="agp-stars" id="agp-stars"></span>
+              <span class="agp-rating-num" id="agp-rating-num"></span>
+              <span class="agp-rating-count" id="agp-rating-count"></span>
+            </div>
+            <div class="agp-stats" id="agp-stats"></div>
+            <div class="agp-cta-row" id="agp-cta-row"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="agp-body" id="agp-body-grid">
+    <!-- Main column -->
+    <div id="agp-main-col">
+
+      <!-- About -->
+      <div class="agp-card" id="agp-about-card" style="display:none">
+        <div class="agp-card-title"><i class="fas fa-user-circle"></i> เกี่ยวกับตัวแทน</div>
+        <p class="agp-bio-text" id="agp-bio"></p>
+      </div>
+
+      <!-- Property Listings -->
+      <div class="agp-card">
+        <div class="agp-listings-header">
+          <div class="agp-card-title" style="margin-bottom:0">
+            <i class="fas fa-home"></i> ทรัพย์ที่ดูแล
+            <span class="agp-listings-count" id="agp-prop-count">0</span>
+          </div>
+        </div>
+        <div class="agp-prop-grid" id="agp-prop-grid">
+          <div style="grid-column:1/-1;text-align:center;padding:32px 0;color:var(--gr)">
+            <i class="fas fa-spinner fa-spin" style="font-size:22px;opacity:.4;display:block;margin-bottom:8px"></i>
+            กำลังโหลด...
+          </div>
+        </div>
+      </div>
+
+      <!-- Reviews -->
+      <div class="agp-card" id="agp-reviews-card">
+        <div class="agp-card-title"><i class="fas fa-star"></i> รีวิวจากลูกค้า</div>
+        <div id="agp-rv-summary-wrap"></div>
+        <div id="agp-rv-section"></div>
+      </div>
+
+    </div>
+
+    <!-- Sidebar -->
+    <div class="agp-sidebar" id="agp-sidebar-col">
+
+      <!-- Contact -->
+      <div class="agp-card">
+        <div class="agp-card-title"><i class="fas fa-address-card"></i> ติดต่อตัวแทน</div>
+        <div class="agp-contact-grid" id="agp-contact-grid"></div>
+      </div>
+
+      <!-- Stats -->
+      <div class="agp-card">
+        <div class="agp-card-title"><i class="fas fa-chart-bar"></i> สถิติ</div>
+        <div id="agp-stats-detail"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="sub-page-footer"></div>
+</div>
+
 <div class="page" id="page-agents">
   <div class="page-hero ag-bg">
     <canvas class="page-hero-canvas" id="ph-canvas-ag"></canvas>
@@ -8933,10 +9147,6 @@ function _popupRefreshMarkersFromData(data){
       <button class="back-btn" onclick="showPage('home')"><i class="fas fa-arrow-left"></i> <span data-i18n="ph.ma.back">กลับหน้าหลัก</span></button>
       <h1 style="margin-top:10px"><i class="fas fa-user-circle"></i> <span data-i18n="ph.ma.h1">บัญชีของฉัน</span></h1>
     </div>
-    <button id="ma-dev-bypass-btn" class="ma-dev-bypass-btn" onclick="_toggleMaDevBypass()">
-      <i class="fas fa-flask"></i>
-      <span id="ma-dev-bypass-lbl">DEV Preview</span>
-    </button>
   </div>
   <div class="my-account-wrap" id="my-account-content">
     <!-- Filled by renderMyAccount() -->
@@ -10142,20 +10352,6 @@ function _updateProfileFab(){
 /* ── My Account page renderer ── */
 /* ── Dev Bypass: toggle preview mode without login (TEMP — remove before production) ── */
 window._maDevBypass = false;
-function _toggleMaDevBypass(){
-  window._maDevBypass = !window._maDevBypass;
-  // ── Dev mode: จำลอง Token 20 เหรียญให้ทดลองลงประกาศได้ ──
-  if(window._maDevBypass && !user){
-    _tokenBalance = 20;
-    _myUserListings = [];
-    _myTokenOrders  = [];
-    console.info('[DEV] Token balance set to 20 (mock)');
-  } else if(!window._maDevBypass && !user){
-    _tokenBalance = 0;
-  }
-  renderMyAccount();
-}
-
 // ── [v13] ดึงข้อมูล user_profiles จาก DB — merge กับ auth.user_metadata ──
 // เรียกครั้งแรกหลัง login และหลังบันทึกโปรไฟล์
 let _cachedUserProfile = null;
@@ -10192,12 +10388,7 @@ function renderMyAccount(){
     const e = (typeof I18N_DICT!=='undefined')&&I18N_DICT[key]; if(e) return e[(typeof _lang!=='undefined'?_lang:'th')]||e['th']||key;
     return ui(key)||key;
   };
-  // ── Dev bypass state: update button appearance ──
-  const bypassBtn = document.getElementById('ma-dev-bypass-btn');
-  const bypassLbl = document.getElementById('ma-dev-bypass-lbl');
-  const isDevMode = !!window._maDevBypass;
-  if(bypassBtn) bypassBtn.classList.toggle('active', isDevMode);
-  if(bypassLbl) bypassLbl.textContent = isDevMode ? 'DEV: ON' : 'DEV Preview';
+  const isDevMode = false;
 
   if(!user && !isDevMode){
     // Show login prompt
@@ -12740,6 +12931,7 @@ function mapProp(r){
     // BTS/MRT/Transit fields — ใช้งานโดย filter, search, PDP, schema
     bts: r.bts || r.near_bts || '',
     mrt: r.mrt || '',
+    arl: r.arl || '',
     transit: r.transit || r.near_transit || '',
     contact_name:r.contact_name||'',
     contact_phone:r.contact_phone||'',
@@ -13527,15 +13719,16 @@ function quickSearch(kw){ _silentShowPage('home',true); const inp=document.getEl
 function quickProvSearch(prov){ showPage('home'); setTimeout(()=>{ _locProv=prov; _locDist=''; _locLevel='province'; locDrillCommit(); scrollToEl('all-sec'); },100); }
 // Map section names to URL paths and SEO metadata
 const PAGE_ROUTES = {
-  'listings':   { path: '/listings',   title: 'ประกาศอสังหาฯทั้งหมด — บ้าน คอนโด ที่ดิน ใกล้ BTS MRT กรุงเทพ | Matchdoor', desc: 'ค้นหาบ้าน คอนโด ทาวน์โฮม ที่ดิน ใกล้ BTS MRT ทุกสาย กรุงเทพ ทุกระดับราคา ปรึกษาฟรี' },
-  'home':       { path: '/',           title: 'Matchdoor — ขายบ้าน คอนโด ที่ดิน ใกล้ BTS MRT กรุงเทพ ราคาดี',            desc: 'Matchdoor ซื้อขายเช่าบ้าน คอนโด ที่ดิน ทุกประเภท กรุงเทพ ใกล้ BTS สุขุมวิท MRT รัชดา พระราม9 ปรึกษาฟรี ไม่มีค่านายหน้า' },
-  'agents':     { path: '/agents',     title: 'ทีมตัวแทนอสังหาฯมืออาชีพ กรุงเทพ — Matchdoor',           desc: 'ทีมตัวแทนอสังหาริมทรัพย์มืออาชีพ กรุงเทพ ใกล้ BTS MRT พร้อมให้คำปรึกษาด้านการซื้อขายเช่าทุกประเภท ฟรี' },
-  'portfolio':  { path: '/portfolio',  title: 'ผลงานปิดดีลอสังหาฯ กรุงเทพ — Matchdoor',                     desc: 'ผลงานอสังหาริมทรัพย์กรุงเทพที่ Matchdoor ปิดดีลสำเร็จ บ้าน คอนโด ใกล้ BTS MRT พร้อมรีวิวจากลูกค้าจริง' },
-  'favorites':  { path: '/favorites',  title: 'รายการโปรดอสังหาฯ — Matchdoor',                                       desc: 'อสังหาริมทรัพย์กรุงเทพที่คุณบันทึกไว้ใน Matchdoor บ้าน คอนโด ที่ดิน ใกล้ BTS MRT' },
-  'careers':    { path: '/careers',    title: 'สมัครงานตัวแทนอสังหาฯ กรุงเทพ — Matchdoor',                desc: 'เปิดรับสมัครตัวแทนอสังหาริมทรัพย์กรุงเทพ รายได้ดี ทำงานอิสระ ร่วมทีม Matchdoor' },
-  'my-account': { path: '/my-account', title: 'บัญชีของฉัน — Matchdoor',                                 desc: 'จัดการโปรไฟล์ รายการโปรด และประกาศของคุณบน Matchdoor' },
-  'social':     { path: '/social',     title: 'ฟีดชุมชน Matchdoor — อสังหาฯ บ้าน คอนโด กรุงเทพ',    desc: 'ชุมชนอสังหาริมทรัพย์ Matchdoor แชร์ทรัพย์ ถามตอบ ติดตามข่าวสารอสังหาฯ กรุงเทพ' },
-  'property':   { path: '/property', title: 'ทรัพย์ — Matchdoor', desc: 'รายละเอียดทรัพย์อสังหาริมทรัพย์' },
+  'listings':       { path: '/listings',   title: 'ประกาศอสังหาฯทั้งหมด — บ้าน คอนโด ที่ดิน ใกล้ BTS MRT กรุงเทพ | Matchdoor', desc: 'ค้นหาบ้าน คอนโด ทาวน์โฮม ที่ดิน ใกล้ BTS MRT ทุกสาย กรุงเทพ ทุกระดับราคา ปรึกษาฟรี' },
+  'home':           { path: '/',           title: 'Matchdoor — ขายบ้าน คอนโด ที่ดิน ใกล้ BTS MRT กรุงเทพ ราคาดี',            desc: 'Matchdoor ซื้อขายเช่าบ้าน คอนโด ที่ดิน ทุกประเภท กรุงเทพ ใกล้ BTS สุขุมวิท MRT รัชดา พระราม9 ปรึกษาฟรี ไม่มีค่านายหน้า' },
+  'agents':         { path: '/agents',     title: 'ทีมตัวแทนอสังหาฯมืออาชีพ กรุงเทพ — Matchdoor',           desc: 'ทีมตัวแทนอสังหาริมทรัพย์มืออาชีพ กรุงเทพ ใกล้ BTS MRT พร้อมให้คำปรึกษาด้านการซื้อขายเช่าทุกประเภท ฟรี' },
+  'agent-profile':  { path: '/agents',     title: 'ตัวแทนอสังหาริมทรัพย์ กรุงเทพ — Matchdoor',              desc: 'ตัวแทนอสังหาริมทรัพย์มืออาชีพ Matchdoor กรุงเทพ' },
+  'portfolio':      { path: '/portfolio',  title: 'ผลงานปิดดีลอสังหาฯ กรุงเทพ — Matchdoor',                     desc: 'ผลงานอสังหาริมทรัพย์กรุงเทพที่ Matchdoor ปิดดีลสำเร็จ บ้าน คอนโด ใกล้ BTS MRT พร้อมรีวิวจากลูกค้าจริง' },
+  'favorites':      { path: '/favorites',  title: 'รายการโปรดอสังหาฯ — Matchdoor',                                       desc: 'อสังหาริมทรัพย์กรุงเทพที่คุณบันทึกไว้ใน Matchdoor บ้าน คอนโด ที่ดิน ใกล้ BTS MRT' },
+  'careers':        { path: '/careers',    title: 'สมัครงานตัวแทนอสังหาฯ กรุงเทพ — Matchdoor',                desc: 'เปิดรับสมัครตัวแทนอสังหาริมทรัพย์กรุงเทพ รายได้ดี ทำงานอิสระ ร่วมทีม Matchdoor' },
+  'my-account':     { path: '/my-account', title: 'บัญชีของฉัน — Matchdoor',                                 desc: 'จัดการโปรไฟล์ รายการโปรด และประกาศของคุณบน Matchdoor' },
+  'social':         { path: '/social',     title: 'ฟีดชุมชน Matchdoor — อสังหาฯ บ้าน คอนโด กรุงเทพ',    desc: 'ชุมชนอสังหาริมทรัพย์ Matchdoor แชร์ทรัพย์ ถามตอบ ติดตามข่าวสารอสังหาฯ กรุงเทพ' },
+  'property':       { path: '/property', title: 'ทรัพย์ — Matchdoor', desc: 'รายละเอียดทรัพย์อสังหาริมทรัพย์ กรุงเทพ — Matchdoor' },
 };
 
 // Section → filter context for "buy" / "rent" sub-pages
@@ -13592,10 +13785,30 @@ function _openPropertyUrl(propId) {
     .slice(0, 80);
   const path = '/property/' + propId + (slug ? '-' + slug : '');
   const siteBase = 'https://matchdoor.co';
-  const transitKw = (p.bts ? ' BTS '+p.bts : '') + (p.mrt ? ' MRT '+p.mrt : '');
-  const title = p.title + ' ' + (p.tx==='RENT'?'ให้เช่า':'ขาย') + ' ' + p.type + ' ' + (p.location||'') + (p.province?' '+p.province:'') + transitKw + ' — Matchdoor';
-  const desc = (p.desc||'').slice(0,140) || `${p.type}${p.tx==='RENT'?' ให้เช่า':' ขาย'} ${p.location||''} ${p.province||'กรุงเทพ'}${transitKw} ราคา ${(p.price/1e6).toFixed(1)}ล้านบาท — Matchdoor`;
-  _updateMeta(title, desc, siteBase + path);
+  const transitKw = (p.bts ? ' BTS '+p.bts : '') + (p.mrt ? ' MRT '+p.mrt : '') + (p.arl ? ' ARL '+p.arl : '');
+  const txLabel = p.tx === 'RENT' ? 'ให้เช่า' : 'ขาย';
+  const priceLabel = p.price >= 1e6 ? (p.price/1e6).toFixed(1)+'ล้านบาท' : (p.price||0).toLocaleString()+'บาท';
+  const title = p.title + ' ' + txLabel + ' ' + p.type + ' ' + (p.location||'') + (p.province?' '+p.province:'') + transitKw + ' — Matchdoor';
+  const desc = (p.desc||p.description||'').slice(0,155)
+    || (p.type + txLabel + ' ' + (p.location||'') + ' ' + (p.province||'กรุงเทพ') + transitKw
+        + (p.bed > 0 ? ' '+p.bed+' ห้องนอน' : '') + (p.area > 0 ? ' พื้นที่ '+p.area+' ตร.ม.' : '')
+        + ' ราคา ' + priceLabel + ' — Matchdoor');
+  const fullUrl = siteBase + path;
+  _updateMeta(title, desc, fullUrl);
+  /* OG Image */
+  const ogImg = document.querySelector('meta[property="og:image"]');
+  if (ogImg && p.photos && p.photos[0]) ogImg.content = p.photos[0];
+  const ogImgAlt = document.querySelector('meta[property="og:image:alt"]');
+  if (ogImgAlt) ogImgAlt.content = p.title + ' — Matchdoor';
+  const ogType = document.querySelector('meta[property="og:type"]');
+  if (ogType) ogType.content = 'product';
+  /* Twitter */
+  const twTitle = document.querySelector('meta[name="twitter:title"]');
+  if (twTitle) twTitle.content = title;
+  const twDesc = document.querySelector('meta[name="twitter:description"]');
+  if (twDesc) twDesc.content = desc;
+  const twImg = document.querySelector('meta[name="twitter:image"]');
+  if (twImg && p.photos && p.photos[0]) twImg.content = p.photos[0];
   _pushRoute(path, { type: 'property', id: String(propId) });
   // Inject Property JSON-LD for this listing
   let ldScript = document.getElementById('prop-jsonld');
@@ -13614,7 +13827,8 @@ function _openPropertyUrl(propId) {
     "name": p.title,
     "description": desc,
     "url": siteBase + path,
-    "image": p.photos?.[0] ? {
+    "datePosted": p.createdAt || new Date().toISOString().slice(0,10),
+    "image": p.photos && p.photos[0] ? {
       "@type": "ImageObject",
       "url": p.photos[0],
       "contentUrl": p.photos[0]
@@ -13641,11 +13855,29 @@ function _openPropertyUrl(propId) {
     "floorSize": p.area > 0 ? {"@type": "QuantitativeValue", "value": p.area, "unitCode": "MTK"} : undefined,
     "numberOfRooms": p.bed > 0 ? p.bed : undefined,
     "numberOfBathroomsTotal": p.bath > 0 ? p.bath : undefined,
-    "amenityFeature": p.amenities ? p.amenities.map(a => ({"@type": "LocationFeatureSpecification", "name": a, "value": true})) : undefined,
+    "amenityFeature": (function(){
+      var feats = [];
+      if (p.amenities && p.amenities.length) {
+        p.amenities.forEach(function(a){ feats.push({"@type":"LocationFeatureSpecification","name":a,"value":true}); });
+      }
+      if (p.bts) feats.push({"@type":"LocationFeatureSpecification","name":"ใกล้ BTS "+p.bts,"value":true});
+      if (p.mrt) feats.push({"@type":"LocationFeatureSpecification","name":"ใกล้ MRT "+p.mrt,"value":true});
+      if (p.arl) feats.push({"@type":"LocationFeatureSpecification","name":"ใกล้ ARL "+p.arl,"value":true});
+      return feats.length ? feats : undefined;
+    })(),
     "containedInPlace": {
       "@type": "City",
-      "name": p.province || 'กรุงเทพฯ',
+      "name": p.province || 'กรุงเทพมหานคร',
       "containedInPlace": {"@type": "Country", "name": "ประเทศไทย"}
+    },
+    "breadcrumb": {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {"@type":"ListItem","position":1,"name":"หน้าแรก","item":"https://matchdoor.co"},
+        {"@type":"ListItem","position":2,"name":"ประกาศทั้งหมด","item":"https://matchdoor.co/listings"},
+        {"@type":"ListItem","position":3,"name":p.type||"ทรัพย์","item":"https://matchdoor.co/listings?type="+encodeURIComponent(p.type||'')},
+        {"@type":"ListItem","position":4,"name":p.title,"item":siteBase+path}
+      ]
     }
   };
   // Clean undefined fields
@@ -13880,7 +14112,7 @@ function _initRouteFromUrl() {
     '/my-account': 'my-account',
     '/social': 'social',
   };
-  // /property/* ถูกจัดการด้วย match ด้านบนแล้ว — ไม่ต้องใส่ใน sectionMap
+  // /property/* and /agent/* are handled by match blocks above — not in sectionMap
   const targetPage = sectionMap[path];
   if (targetPage) {
     _silentShowPage(targetPage);
@@ -13994,6 +14226,15 @@ function showPage(name, propId){
   // ── Hide property page when navigating away ──
   var pgPropEl = document.getElementById('page-property');
   if (pgPropEl) { pgPropEl.classList.remove('active'); pgPropEl.style.display = 'none'; }
+  /* ── Restore meta og:type and og:image to site defaults when leaving PDP ── */
+  var _ogTypeEl = document.querySelector('meta[property="og:type"]');
+  if (_ogTypeEl) _ogTypeEl.content = 'website';
+  var _ogImgEl = document.querySelector('meta[property="og:image"]');
+  if (_ogImgEl && _ogImgEl.content && !_ogImgEl.content.includes('matchdoor.co/og-image')) {
+    _ogImgEl.content = 'https://matchdoor.co/og-image.jpg';
+  }
+  var _ogImgAltEl = document.querySelector('meta[property="og:image:alt"]');
+  if (_ogImgAltEl) _ogImgAltEl.content = 'Matchdoor อสังหาริมทรัพย์กรุงเทพ';
   _silentShowPage(name); // _silentShowPage renders listings already
   // seo-toggle-btn: show only on listings page
   const seoBtn = document.getElementById('seo-toggle-btn');
@@ -17072,6 +17313,11 @@ function renderAgents(){
         <div class="agent-rating"><span class="stars">${'★'.repeat(Math.min(5,Math.round(a.rating||4.5)))}</span><span class="rating-num">${(a.rating||4.5).toFixed(1)}</span></div>
         <div class="agent-stats"><div class="agst"><div class="n">${myProps.length}</div><div class="l">${ui('ag.props')}</div></div><div class="agst"><div class="n">${port.length}</div><div class="l">${ui('ag.deals')}</div></div></div>
         <div class="agent-btns" onclick="event.stopPropagation()"><a class="ab ab-ln" href="${lineUrl(a.lineId)}" target="_blank"><i class="fab fa-line"></i> Line</a><a class="ab ab-tel" href="tel:${a.phone}"><i class="fas fa-mobile-alt"></i> โทร</a></div>
+        <a class="agp-profile-link" href="/agent/${a.id}-${(a.name||'').toLowerCase().replace(/[^ก-๙a-z0-9\s-]/g,'').trim().replace(/\s+/g,'-').slice(0,80)}"
+           onclick="event.stopPropagation();event.preventDefault();showPage('agent-profile','${a.id}')"
+           style="display:block;margin-top:10px;text-align:center;font-size:12px;color:var(--p);font-weight:600;padding:7px;border:1.5px solid var(--bd);border-radius:8px;text-decoration:none;transition:.15s">
+          <i class="fas fa-id-card"></i> ดูโปรไฟล์
+        </a>
       </div>
     </div>`;
   }).join(''):'<div class="empty">ไม่พบข้อมูลตัวแทน</div>';
@@ -17214,6 +17460,553 @@ function showAgentDetail(a){
   if(sb && a.id){ sb.rpc('increment_views',{p_table:'agents',p_id:String(a.id)}).then(()=>{}); }
   _openModal('ag-modal');
 }
+
+// ══════════════════════════════════════════════════════════════
+// AGENT PROFILE PAGE SYSTEM — /agent/{slug}
+// ══════════════════════════════════════════════════════════════
+(function(){
+  'use strict';
+
+  /* ── Slug helpers ── */
+  function _agSlug(name){
+    return (name||'').toLowerCase()
+      .replace(/[^ก-๙a-z0-9\s-]/g,'')
+      .trim().replace(/\s+/g,'-').slice(0,80);
+  }
+  function agentUrl(a){ return '/agent/' + a.id + '-' + _agSlug(a.name); }
+  window.agentUrl = agentUrl;
+
+  /* ── Find agent by slug id prefix ── */
+  function _findAgentBySlug(slug){
+    if(!slug) return null;
+    var idStr = slug.split('-')[0];
+    var agArr = (typeof agents !== 'undefined' && Array.isArray(agents)) ? agents : [];
+    return agArr.find(function(a){ return String(a.id) === idStr; }) || null;
+  }
+  window._findAgentBySlug = _findAgentBySlug;
+
+  /* ── SEO Meta update for agent page ── */
+  function _agUpdateMeta(a, myProps, reviewCount, avgRating){
+    var siteBase = 'https://matchdoor.co';
+    var url = siteBase + agentUrl(a);
+    var title = (a.name||'ตัวแทน') + ' — ตัวแทนอสังหาริมทรัพย์กรุงเทพ | Matchdoor';
+    var desc = (a.bio||'').slice(0,155)
+      || ((a.name||'') + ' ตัวแทนอสังหาริมทรัพย์กรุงเทพ Matchdoor '
+          + 'ดูแลทรัพย์ ' + myProps.length + ' รายการ '
+          + (avgRating > 0 ? 'คะแนน ' + avgRating.toFixed(1) + '/5 ' : '')
+          + 'ปรึกษาฟรี ติดต่อได้เลย');
+    // title + description + canonical
+    document.title = title;
+    var _set = function(sel, attr, val){ var el=document.querySelector(sel); if(el) el[attr]=val; };
+    _set('meta[name="description"]','content',desc);
+    _set('meta[property="og:title"]','content',title);
+    _set('meta[property="og:description"]','content',desc);
+    _set('meta[property="og:type"]','content','profile');
+    _set('meta[property="og:url"]','content',url);
+    _set('link[rel="canonical"]','href',url);
+    if(a.avatar_url){
+      _set('meta[property="og:image"]','content',a.avatar_url);
+      _set('meta[name="twitter:image"]','content',a.avatar_url);
+    }
+    _set('meta[name="twitter:title"]','content',title);
+    _set('meta[name="twitter:description"]','content',desc);
+    // robots: let Google index agent pages
+    var robotsMeta = document.querySelector('meta[name="robots"]');
+    if(robotsMeta) robotsMeta.content = 'index, follow';
+  }
+
+  /* ── Inject Person + Review + AggregateRating schemas ── */
+  function _agInjectSchemas(a, myProps, reviews, avgRating){
+    var siteBase = 'https://matchdoor.co';
+    var url = siteBase + agentUrl(a);
+
+    // AggregateRating
+    var aggRating = reviews.length > 0 ? {
+      '@type': 'AggregateRating',
+      'ratingValue': avgRating.toFixed(1),
+      'reviewCount': reviews.length,
+      'bestRating': '5',
+      'worstRating': '1'
+    } : undefined;
+
+    // Review array (max 10 for schema)
+    var reviewItems = reviews.slice(0,10).map(function(r){
+      return {
+        '@type': 'Review',
+        'author': { '@type': 'Person', 'name': r.author_name || r.reviewer_name || 'ลูกค้า Matchdoor' },
+        'reviewRating': { '@type': 'Rating', 'ratingValue': String(r.rating||5), 'bestRating': '5', 'worstRating': '1' },
+        'reviewBody': (r.body || r.comment || r.text || '').slice(0,500),
+        'datePublished': (r.created_at||r.createdAt||'').slice(0,10) || new Date().toISOString().slice(0,10)
+      };
+    });
+
+    // Person schema
+    var personSchema = {
+      '@context': 'https://schema.org',
+      '@type': 'Person',
+      '@id': url + '#agent',
+      'name': a.name || '',
+      'jobTitle': a.title || 'ตัวแทนอสังหาริมทรัพย์',
+      'description': a.bio || '',
+      'url': url,
+      'worksFor': {
+        '@type': 'RealEstateAgent',
+        '@id': 'https://matchdoor.co/#organization',
+        'name': 'Matchdoor',
+        'url': 'https://matchdoor.co'
+      },
+      'telephone': a.phone ? (a.phone.startsWith('+') ? a.phone : '+66' + a.phone.slice(1)) : undefined,
+      'email': a.email || undefined,
+      'image': a.avatar_url ? { '@type': 'ImageObject', 'url': a.avatar_url } : undefined,
+      'sameAs': a.lineId ? ['https://line.me/ti/p/~' + a.lineId] : undefined,
+      'knowsAbout': ['อสังหาริมทรัพย์กรุงเทพ','ซื้อขายบ้าน','คอนโดกรุงเทพ','ให้เช่าอสังหาริมทรัพย์'],
+      'hasOccupation': {
+        '@type': 'Occupation',
+        'name': 'ตัวแทนอสังหาริมทรัพย์',
+        'occupationLocation': { '@type': 'City', 'name': 'กรุงเทพมหานคร' }
+      }
+    };
+    if(aggRating) personSchema.aggregateRating = aggRating;
+    if(reviewItems.length) personSchema.review = reviewItems;
+    // Clean undefined
+    (function clean(obj){ Object.keys(obj).forEach(function(k){ if(obj[k]===undefined) delete obj[k]; else if(obj[k]&&typeof obj[k]==='object'&&!Array.isArray(obj[k])) clean(obj[k]); }); })(personSchema);
+
+    // Breadcrumb schema
+    var bcSchema = {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      'itemListElement': [
+        {'@type':'ListItem','position':1,'name':'หน้าแรก','item':'https://matchdoor.co'},
+        {'@type':'ListItem','position':2,'name':'ทีมตัวแทน','item':'https://matchdoor.co/agents'},
+        {'@type':'ListItem','position':3,'name':a.name||'ตัวแทน','item':url}
+      ]
+    };
+
+    // WebPage schema
+    var webPageSchema = {
+      '@context': 'https://schema.org',
+      '@type': 'ProfilePage',
+      'url': url,
+      'name': (a.name||'') + ' — ตัวแทนอสังหาริมทรัพย์ | Matchdoor',
+      'breadcrumb': bcSchema,
+      'mainEntity': { '@id': url + '#agent' },
+      'inLanguage': 'th-TH',
+      'isPartOf': { '@id': 'https://matchdoor.co/#website' }
+    };
+
+    var inject = function(id, data){
+      var s = document.getElementById(id);
+      if(!s){ s=document.createElement('script'); s.type='application/ld+json'; s.id=id; document.head.appendChild(s); }
+      s.textContent = JSON.stringify(data);
+    };
+    inject('agp-person-jsonld', personSchema);
+    inject('agp-webpage-jsonld', webPageSchema);
+    inject('breadcrumb-jsonld', bcSchema);
+  }
+
+  /* ── Remove agent schemas when leaving page ── */
+  function _agRemoveSchemas(){
+    ['agp-person-jsonld','agp-webpage-jsonld'].forEach(function(id){
+      var s = document.getElementById(id); if(s) s.remove();
+    });
+    // Reset og:type
+    var ogType = document.querySelector('meta[property="og:type"]');
+    if(ogType) ogType.content = 'website';
+  }
+
+  /* ── Render star bars ── */
+  function _renderStarBars(reviews){
+    var counts = {5:0,4:0,3:0,2:0,1:0};
+    reviews.forEach(function(r){ var s=Math.round(r.rating||5); if(counts[s]!==undefined) counts[s]++; });
+    var total = reviews.length || 1;
+    var avg = reviews.length ? (reviews.reduce(function(s,r){return s+(r.rating||5);},0)/reviews.length) : 0;
+    return {avg:avg, html:
+      '<div class="agp-review-summary">'
+      +'<div class="agp-rv-big-score">'+(avg>0?avg.toFixed(1):'—')+'</div>'
+      +'<div class="agp-rv-score-right">'
+        +'<div class="agp-rv-stars-big">'+(avg>0?'★'.repeat(Math.round(avg))+'☆'.repeat(5-Math.round(avg)):'☆☆☆☆☆')+'</div>'
+        +'<div class="agp-rv-count">จาก '+reviews.length+' รีวิว</div>'
+        +'<div class="agp-rv-bars">'
+        +[5,4,3,2,1].map(function(s){
+          return '<div class="agp-rv-bar-row">'
+            +'<span class="agp-rv-bar-label">'+s+'★</span>'
+            +'<div class="agp-rv-bar-track"><div class="agp-rv-bar-fill" style="width:'+(counts[s]/total*100).toFixed(1)+'%"></div></div>'
+            +'<span class="agp-rv-bar-count">'+counts[s]+'</span>'
+            +'</div>';
+        }).join('')
+        +'</div>'
+      +'</div>'
+      +'</div>'
+    };
+  }
+
+  /* ── Main render function ── */
+  window.renderAgentProfilePage = function(a){
+    if(!a) return;
+    var myProps = [];
+    if(typeof props !== 'undefined' && Array.isArray(props)){
+      myProps = props.filter(function(p){ return (a.propIds && a.propIds.includes(p.id)) || p.agentId === a.id; });
+    }
+    var isMember = !!a._isMember;
+    var rating = Number(a.rating) || 4.5;
+    var stars = Math.min(5, Math.round(rating));
+
+    /* Avatar */
+    var avEl = document.getElementById('agp-av');
+    if(avEl){
+      if(a.avatar_url){
+        avEl.innerHTML = '<img src="'+a.avatar_url+'" alt="'+a.name+' ตัวแทน Matchdoor" loading="eager">';
+      } else {
+        avEl.innerHTML = '<span>'+(a.initials||(a.name||'?')[0])+'</span>';
+        avEl.style.background = a.color || 'linear-gradient(135deg,#1B3A6B,#2a5298)';
+      }
+    }
+
+    /* Tag */
+    var tagRow = document.getElementById('agp-tag-row');
+    if(tagRow) tagRow.innerHTML = isMember
+      ? '<span class="agent-member-tag"><i class="fas fa-user-check"></i> สมาชิก Matchdoor</span>'
+      : '<span class="agent-company-tag"><i class="fas fa-building"></i> ทีม Matchdoor</span>';
+
+    /* Name / role */
+    var nameEl = document.getElementById('agp-name'); if(nameEl) nameEl.textContent = a.name || '';
+    var roleEl = document.getElementById('agp-role'); if(roleEl) roleEl.textContent = a.title || 'ตัวแทนอสังหาริมทรัพย์';
+
+    /* Rating row */
+    var starsEl = document.getElementById('agp-stars'); if(starsEl) starsEl.textContent = '★'.repeat(stars)+'☆'.repeat(5-stars);
+    var ratingNumEl = document.getElementById('agp-rating-num'); if(ratingNumEl) ratingNumEl.textContent = rating.toFixed(1);
+
+    /* Stats */
+    var statsEl = document.getElementById('agp-stats');
+    if(statsEl) statsEl.innerHTML =
+      '<div class="agp-stat"><div class="agp-stat-val">'+myProps.length+'</div><div class="agp-stat-lbl">ทรัพย์</div></div>'
+      +'<div class="agp-stat"><div class="agp-stat-val">'+(a.deals||0)+'</div><div class="agp-stat-lbl">ปิดดีล</div></div>'
+      +(rating>0?'<div class="agp-stat"><div class="agp-stat-val">'+rating.toFixed(1)+'</div><div class="agp-stat-lbl">คะแนน</div></div>':'');
+
+    /* CTA Row */
+    var ctaRow = document.getElementById('agp-cta-row');
+    if(ctaRow){
+      var ctaHtml = '';
+      if(a.lineId) ctaHtml += '<a class="agp-btn agp-btn-line" href="https://line.me/ti/p/~'+encodeURIComponent(a.lineId)+'" target="_blank" rel="noopener"><i class="fab fa-line"></i> Line</a>';
+      if(a.phone) ctaHtml += '<a class="agp-btn agp-btn-phone" href="tel:'+a.phone+'"><i class="fas fa-mobile-alt"></i> โทร '+a.phone+'</a>';
+      if(a.email) ctaHtml += '<a class="agp-btn agp-btn-email" href="mailto:'+a.email+'"><i class="fas fa-envelope"></i> อีเมล</a>';
+      ctaRow.innerHTML = ctaHtml;
+    }
+
+    /* Bio */
+    var aboutCard = document.getElementById('agp-about-card');
+    var bioEl = document.getElementById('agp-bio');
+    if(a.bio && aboutCard && bioEl){
+      bioEl.textContent = a.bio;
+      aboutCard.style.display = '';
+    } else if(aboutCard){
+      aboutCard.style.display = 'none';
+    }
+
+    /* Property grid */
+    var propCountEl = document.getElementById('agp-prop-count');
+    if(propCountEl) propCountEl.textContent = myProps.length;
+    var propGrid = document.getElementById('agp-prop-grid');
+    if(propGrid){
+      if(myProps.length){
+        propGrid.innerHTML = myProps.map(function(p){
+          var thumb = p.photos&&p.photos[0]
+            ? '<img src="'+p.photos[0]+'" loading="lazy" alt="'+p.title+'">'
+            : '<span>'+(typeof typeIcon==='function'?typeIcon(p.type):'🏠')+'</span>';
+          var price = typeof fmtPrice==='function' ? fmtPrice(p.price,p.tx) : (p.price||'').toLocaleString()+'฿';
+          return '<div class="agp-prop-card" onclick="typeof openModal===\'function\'&&openModal(\''+p.id+'\')">'
+            +'<div class="agp-prop-thumb">'+thumb+'</div>'
+            +'<div class="agp-prop-info">'
+              +'<div class="agp-prop-price">'+price+'</div>'
+              +'<div class="agp-prop-title">'+p.title+'</div>'
+              +'<div class="agp-prop-loc"><i class="fas fa-map-marker-alt" style="color:var(--a);font-size:9px"></i> '+(p.location||'')+'</div>'
+              +'<span class="agp-prop-type-badge">'+(p.type||'')+'</span>'
+            +'</div>'
+            +'</div>';
+        }).join('');
+      } else {
+        propGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:32px 0;color:var(--gr)">'
+          +'<i class="fas fa-home" style="font-size:32px;opacity:.25;display:block;margin-bottom:8px"></i>'
+          +'ยังไม่มีทรัพย์ที่ดูแล</div>';
+      }
+    }
+
+    /* Contact sidebar */
+    var contactGrid = document.getElementById('agp-contact-grid');
+    if(contactGrid){
+      var contactHtml = '';
+      if(a.phone) contactHtml +=
+        '<a class="agp-contact-item" href="tel:'+a.phone+'">'
+          +'<i class="fas fa-phone"></i>'
+          +'<div><span class="agp-contact-label">เบอร์โทร</span><span class="agp-contact-val">'+a.phone+'</span></div>'
+        +'</a>';
+      if(a.lineId) contactHtml +=
+        '<a class="agp-contact-item" href="https://line.me/ti/p/~'+encodeURIComponent(a.lineId)+'" target="_blank" rel="noopener">'
+          +'<i class="fab fa-line" style="color:#25D366"></i>'
+          +'<div><span class="agp-contact-label">Line ID</span><span class="agp-contact-val">'+a.lineId+'</span></div>'
+        +'</a>';
+      if(a.email) contactHtml +=
+        '<a class="agp-contact-item" href="mailto:'+a.email+'">'
+          +'<i class="fas fa-envelope"></i>'
+          +'<div><span class="agp-contact-label">อีเมล</span><span class="agp-contact-val">'+a.email+'</span></div>'
+        +'</a>';
+      if(!contactHtml) contactHtml = '<div style="color:var(--gr);font-size:13px;text-align:center;padding:8px 0">ไม่มีข้อมูลติดต่อ</div>';
+      contactGrid.innerHTML = contactHtml;
+    }
+
+    /* Stats detail sidebar */
+    var statsDetail = document.getElementById('agp-stats-detail');
+    if(statsDetail){
+      statsDetail.innerHTML =
+        '<div style="display:flex;flex-direction:column;gap:10px">'
+          +'<div style="display:flex;justify-content:space-between;padding:10px;background:var(--lt);border-radius:10px">'
+            +'<span style="font-size:13px;color:var(--tx2)"><i class="fas fa-home" style="color:var(--a);margin-right:6px"></i>ทรัพย์ทั้งหมด</span>'
+            +'<strong style="color:var(--p)">'+myProps.length+'</strong>'
+          +'</div>'
+          +'<div style="display:flex;justify-content:space-between;padding:10px;background:var(--lt);border-radius:10px">'
+            +'<span style="font-size:13px;color:var(--tx2)"><i class="fas fa-handshake" style="color:var(--a);margin-right:6px"></i>ปิดดีลแล้ว</span>'
+            +'<strong style="color:var(--p)">'+(a.deals||0)+'</strong>'
+          +'</div>'
+          +(rating>0?'<div style="display:flex;justify-content:space-between;padding:10px;background:var(--lt);border-radius:10px">'
+            +'<span style="font-size:13px;color:var(--tx2)"><i class="fas fa-star" style="color:#f1c40f;margin-right:6px"></i>คะแนนเฉลี่ย</span>'
+            +'<strong style="color:var(--p)">'+rating.toFixed(1)+'/5</strong>'
+          +'</div>':'')
+        +'</div>';
+    }
+
+    /* Rating count placeholder — will be updated after reviews load */
+    var ratingCountEl = document.getElementById('agp-rating-count');
+    if(ratingCountEl) ratingCountEl.textContent = '';
+
+    /* Reviews section — inject and load */
+    var rvSection = document.getElementById('agp-rv-section');
+    if(rvSection) rvSection.innerHTML = '';
+    var rvSummaryWrap = document.getElementById('agp-rv-summary-wrap');
+    if(rvSummaryWrap) rvSummaryWrap.innerHTML = '<div style="text-align:center;padding:16px;color:var(--gr);font-size:13px"><i class="fas fa-spinner fa-spin"></i> กำลังโหลดรีวิว...</div>';
+
+    /* Load reviews then inject schemas */
+    if(typeof rvLoadSection === 'function'){
+      setTimeout(function(){
+        // Create a custom handler after rvLoadSection finishes
+        rvLoadSection('agent', String(a.id), 'agp-rv-section');
+        // After reviews load, fetch them for schema
+        setTimeout(function(){
+          if(typeof _rvFetchAll === 'function'){
+            _rvFetchAll().then(function(allRvs){
+              var agRvs = allRvs.filter(function(r){ return r.type==='agent' && String(r.subject_id||r.property_id||r.agent_id)===String(a.id); });
+              var barData = _renderStarBars(agRvs);
+              if(rvSummaryWrap) rvSummaryWrap.innerHTML = agRvs.length ? barData.html : '';
+              if(ratingCountEl && agRvs.length) ratingCountEl.textContent = '('+agRvs.length+' รีวิว)';
+              _agUpdateMeta(a, myProps, agRvs.length, barData.avg);
+              _agInjectSchemas(a, myProps, agRvs, barData.avg);
+            }).catch(function(){
+              _agUpdateMeta(a, myProps, 0, rating);
+              _agInjectSchemas(a, myProps, [], rating);
+            });
+          } else {
+            if(rvSummaryWrap) rvSummaryWrap.innerHTML = '';
+            _agUpdateMeta(a, myProps, 0, rating);
+            _agInjectSchemas(a, myProps, [], rating);
+          }
+        }, 1200);
+      }, 80);
+    } else {
+      if(rvSummaryWrap) rvSummaryWrap.innerHTML = '';
+      _agUpdateMeta(a, myProps, 0, rating);
+      _agInjectSchemas(a, myProps, [], rating);
+    }
+
+    /* Increment view */
+    if(typeof sb !== 'undefined' && sb && a.id){
+      sb.rpc('increment_views',{p_table:'agents',p_id:String(a.id)}).then(function(){}).catch(function(){});
+    }
+  };
+
+  /* ── showPage('agent-profile', agentId) support ── */
+  var _origShowPage = window.showPage;
+  window.showPage = function(name, id){
+    if(name === 'agent-profile'){
+      // Hide all pages
+      document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+      var pgProp = document.getElementById('page-property');
+      if(pgProp){ pgProp.classList.remove('active'); pgProp.style.display='none'; }
+      var pgAP = document.getElementById('page-agent-profile');
+      if(pgAP){ pgAP.style.display=''; pgAP.classList.add('active'); }
+      // Find agent
+      var agArr = (typeof agents !== 'undefined' && Array.isArray(agents)) ? agents : [];
+      var a = agArr.find(function(ag){ return String(ag.id)===String(id); });
+      if(!a && id){ a = _findAgentBySlug(String(id)); }
+      if(!a){ _origShowPage('agents'); return; }
+      window._currentAgentProfileId = String(a.id);
+      // Push URL
+      if(typeof _routerReady !== 'undefined' && _routerReady){
+        var agPath = agentUrl(a);
+        history.pushState({ type:'agent-profile', id:String(a.id), name:'agent-profile' }, '', location.origin + agPath);
+      }
+      window.scrollTo(0,0);
+      if(typeof closeAllDD==='function') closeAllDD();
+      // Render
+      if(typeof props !== 'undefined' && props.length >= 0){
+        window.renderAgentProfilePage(a);
+      } else {
+        var _wait = setInterval(function(){
+          if(typeof props !== 'undefined'){
+            clearInterval(_wait);
+            window.renderAgentProfilePage(a);
+          }
+        },200);
+      }
+      return;
+    }
+    // When leaving agent-profile
+    if(typeof window._currentAgentProfileId !== 'undefined' && window._currentAgentProfileId){
+      window._currentAgentProfileId = null;
+      _agRemoveSchemas();
+    }
+    _origShowPage(name, id);
+  };
+
+  /* ── Update renderAgents cards to link to agent profile page ── */
+  var _origRenderAgents = window.renderAgents;
+  window.renderAgents = function(){
+    if(typeof _origRenderAgents === 'function') _origRenderAgents();
+    // Patch cards to also have a profile link
+    var grid = document.getElementById('agent-grid');
+    if(!grid) return;
+    var agArr = (typeof agents !== 'undefined' && Array.isArray(agents)) ? agents : [];
+    grid.querySelectorAll('.agent-card').forEach(function(card, idx){
+      var a = agArr[idx];
+      if(!a) return;
+      // Add profile link if not already there
+      if(card.querySelector('.agp-profile-link')) return;
+      var infoArea = card.querySelector('.agent-info-area');
+      if(!infoArea) return;
+      var link = document.createElement('a');
+      link.className = 'agp-profile-link';
+      link.href = agentUrl(a);
+      link.title = 'ดูโปรไฟล์ ' + a.name;
+      link.style.cssText = 'display:block;margin-top:10px;text-align:center;font-size:12px;color:var(--p);font-weight:600;padding:7px;border:1.5px solid var(--bd);border-radius:8px;text-decoration:none;transition:.15s';
+      link.innerHTML = '<i class="fas fa-id-card"></i> ดูโปรไฟล์';
+      link.addEventListener('click', function(e){
+        e.stopPropagation();
+        e.preventDefault();
+        window.showPage('agent-profile', String(a.id));
+      });
+      infoArea.appendChild(link);
+    });
+  };
+
+  /* ── Router: handle /agent/{slug} URLs ── */
+  document.addEventListener('DOMContentLoaded', function(){
+    // Patch _initRouteFromUrl (via popstate + initial load)
+    var origInit = window._initRouteFromUrl;
+    // Extend popstate for agent-profile
+    window.addEventListener('popstate', function(e){
+      var state = e.state;
+      if(state && state.type === 'agent-profile' && state.id){
+        window.showPage('agent-profile', state.id);
+      }
+      // Check URL
+      var m = location.pathname.match(/^\/agent\/([^\/]+)/);
+      if(m && (!state || state.type !== 'agent-profile')){
+        var agArr2 = (typeof agents !== 'undefined' && Array.isArray(agents)) ? agents : [];
+        var slug2 = m[1];
+        var foundAg = _findAgentBySlug(slug2);
+        if(foundAg) window.showPage('agent-profile', String(foundAg.id));
+      }
+    });
+  });
+
+  /* ── Extend _initRouteFromUrl to handle /agent/ paths ── */
+  var _agRouteChecked = false;
+  function _checkAgentRoute(){
+    if(_agRouteChecked) return;
+    var m = location.pathname.match(/^\/agent\/([^\/]+)/);
+    if(!m) return;
+    _agRouteChecked = true;
+    var slug = m[1];
+    var agArr = (typeof agents !== 'undefined' && Array.isArray(agents)) ? agents : [];
+    if(!agArr.length){
+      var _w = setInterval(function(){
+        var agArr2 = (typeof agents !== 'undefined' && Array.isArray(agents)) ? agents : [];
+        if(agArr2.length){
+          clearInterval(_w);
+          var found = _findAgentBySlug(slug);
+          if(found) window.showPage('agent-profile', String(found.id));
+          else { _silentShowPage && _silentShowPage('agents'); }
+        }
+      },200);
+    } else {
+      var found = _findAgentBySlug(slug);
+      if(found){
+        // Wait for data then show
+        var _wd = setInterval(function(){
+          if(typeof props !== 'undefined'){
+            clearInterval(_wd);
+            window.showPage('agent-profile', String(found.id));
+          }
+        },200);
+      } else {
+        if(typeof _silentShowPage==='function') _silentShowPage('agents');
+      }
+    }
+  }
+
+  // Run check after DOM + possible data
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', function(){ setTimeout(_checkAgentRoute, 100); });
+  } else {
+    setTimeout(_checkAgentRoute, 100);
+  }
+
+  // Also hook into afterLoad / data ready
+  var _agDataReadyInterval = setInterval(function(){
+    if(typeof props !== 'undefined' && typeof agents !== 'undefined'){
+      clearInterval(_agDataReadyInterval);
+      _checkAgentRoute();
+    }
+  }, 300);
+
+  /* ── openAgentModal also updates URL for sharing ── */
+  var _origOpenAgentModal = window.openAgentModal;
+  window.openAgentModal = function(agObj){
+    if(typeof _origOpenAgentModal === 'function') _origOpenAgentModal(agObj);
+    // Also update URL to agent profile URL for SEO / sharing
+    if(agObj && agObj.id && typeof _routerReady !== 'undefined' && _routerReady){
+      // Only update URL, don't navigate (modal stays)
+      // Skipped: modal doesn't warrant URL change per existing pattern
+    }
+  };
+
+  /* ── Add agent profile route to PAGE_ROUTES sectionMap (via _initRouteFromUrl patch) ── */
+  var _origInitRouteFromUrl = window._initRouteFromUrl;
+  window._initRouteFromUrl = function(){
+    // Check /agent/ first
+    var m = location.pathname.match(/^\/agent\/([^\/]+)/);
+    if(m){
+      // Show home silently as base, then let _checkAgentRoute take over
+      if(typeof _silentShowPage === 'function') _silentShowPage('agents');
+      window._pendingAgentSlug = m[1];
+      history.replaceState({ type:'agent-profile', slug:m[1], name:'agent-profile' }, '', location.href);
+      return;
+    }
+    if(typeof _origInitRouteFromUrl === 'function') _origInitRouteFromUrl();
+  };
+
+  // Handle _pendingAgentSlug after data loads
+  var _agPendingInterval = setInterval(function(){
+    if(window._pendingAgentSlug && typeof agents !== 'undefined' && Array.isArray(agents) && agents.length && typeof props !== 'undefined'){
+      var slug = window._pendingAgentSlug;
+      delete window._pendingAgentSlug;
+      clearInterval(_agPendingInterval);
+      var found = _findAgentBySlug(slug);
+      if(found) window.showPage('agent-profile', String(found.id));
+      else if(typeof _silentShowPage === 'function') _silentShowPage('agents');
+    }
+  }, 250);
+
+})();
+/* ── END AGENT PROFILE PAGE SYSTEM ── */
 
 // Sanitize: strip HTML tags to prevent XSS injection
 function sanitize(str) {
@@ -23686,15 +24479,40 @@ function resetAdvFilter(){
 <div id="page-property" class="page" style="display:none" role="main">
 
   <!-- Breadcrumb — SEO visible navigation -->
-  <nav class="pdp-breadcrumb" aria-label="เส้นทางนำทาง">
+  <nav class="pdp-breadcrumb" aria-label="เส้นทางนำทาง" itemscope itemtype="https://schema.org/BreadcrumbList">
     <div class="pdp-breadcrumb-inner" id="pdp-breadcrumb-inner">
-      <a href="/" onclick="event.preventDefault();showPage('home')">หน้าแรก</a>
+      <span itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a href="/" itemprop="item" onclick="event.preventDefault();showPage('home')">
+          <span itemprop="name">หน้าแรก</span>
+        </a>
+        <meta itemprop="position" content="1">
+      </span>
       <span class="pdp-breadcrumb-sep">›</span>
-      <a href="/listings" onclick="event.preventDefault();openAllModal('all')">ประกาศทั้งหมด</a>
+      <span itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a href="/listings" itemprop="item" id="pdp-bc-listings-link" onclick="event.preventDefault();showPage('listings')">
+          <span itemprop="name">ประกาศทั้งหมด</span>
+        </a>
+        <meta itemprop="position" content="2">
+      </span>
       <span class="pdp-breadcrumb-sep">›</span>
-      <span class="pdp-breadcrumb-current" id="pdp-bc-type">คอนโด</span>
+      <span itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a href="/listings" itemprop="item" id="pdp-bc-type-link" onclick="event.preventDefault();showPage('listings')">
+          <span itemprop="name" id="pdp-bc-type">คอนโด</span>
+        </a>
+        <meta itemprop="position" content="3">
+      </span>
+      <span class="pdp-breadcrumb-sep" id="pdp-bc-sep-province" style="display:none">›</span>
+      <span itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem" id="pdp-bc-province-item" style="display:none">
+        <a href="/listings" itemprop="item" id="pdp-bc-province-link" onclick="event.preventDefault();showPage('listings')">
+          <span itemprop="name" id="pdp-bc-province"></span>
+        </a>
+        <meta itemprop="position" content="4">
+      </span>
       <span class="pdp-breadcrumb-sep">›</span>
-      <span class="pdp-breadcrumb-current" id="pdp-bc-title">กำลังโหลด...</span>
+      <span class="pdp-breadcrumb-current" id="pdp-bc-title" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <span itemprop="name">กำลังโหลด...</span>
+        <meta itemprop="position" content="5">
+      </span>
     </div>
   </nav>
 
@@ -23753,12 +24571,12 @@ function resetAdvFilter(){
         <div class="pdp-gallery-thumbs" id="pdp-thumbs"></div>
 
         <!-- Type + Title -->
-        <header class="pdp-header" style="margin-top:20px">
+        <header class="pdp-header" style="margin-top:20px" itemscope itemtype="https://schema.org/RealEstateListing">
           <div class="pdp-type-row" id="pdp-badges"></div>
-          <h1 class="pdp-title" id="pdp-title"></h1>
-          <div class="pdp-location-row" id="pdp-location">
+          <h1 class="pdp-title" id="pdp-title" itemprop="name"></h1>
+          <div class="pdp-location-row" id="pdp-location" itemprop="address" itemscope itemtype="https://schema.org/PostalAddress">
             <i class="fas fa-map-marker-alt"></i>
-            <span id="pdp-location-text"></span>
+            <span id="pdp-location-text" itemprop="addressLocality"></span>
           </div>
           <!-- BTS/MRT transit links — Programmatic SEO entry points -->
           <div class="pdp-transit-tags" id="pdp-transit-tags"></div>
@@ -23906,6 +24724,24 @@ function resetAdvFilter(){
         <div id="pdp-rv-form"></div>
       </div>
     </section>
+
+    <!-- SEO Internal Links Footer — Programmatic SEO -->
+    <aside class="pdp-seo-links" aria-label="ค้นหาเพิ่มเติม">
+      <div class="pdp-seo-links-inner">
+        <div class="pdp-seo-link-group">
+          <h2>ประเภทอสังหาฯ</h2>
+          <div id="pdp-seo-type-links"></div>
+        </div>
+        <div class="pdp-seo-link-group">
+          <h2>ทำเลยอดนิยม</h2>
+          <div id="pdp-seo-loc-links"></div>
+        </div>
+        <div class="pdp-seo-link-group">
+          <h2>ใกล้รถไฟฟ้า</h2>
+          <div id="pdp-seo-transit-links"></div>
+        </div>
+      </div>
+    </aside>
 
   </article>
 
@@ -25889,16 +26725,49 @@ async function adminDeletePortfolio(id, title){
 
   /* ── Breadcrumb ── */
   function _pdpRenderBreadcrumb(p) {
-    var bcType  = document.getElementById('pdp-bc-type');
-    var bcTitle = document.getElementById('pdp-bc-title');
-    if (bcType)  bcType.textContent  = p.type || 'ทรัพย์';
-    if (bcTitle) bcTitle.textContent = (p.title||'').slice(0, 50) + ((p.title||'').length > 50 ? '…' : '');
+    /* Type level */
+    var bcType = document.getElementById('pdp-bc-type');
+    if (bcType) bcType.textContent = p.type || 'ทรัพย์';
+    var bcTypeLink = document.getElementById('pdp-bc-type-link');
+    if (bcTypeLink && p.type) {
+      bcTypeLink.href = '/listings?type=' + encodeURIComponent(p.type);
+      bcTypeLink.setAttribute('onclick',
+        "event.preventDefault();if(typeof setCatNav==='function')setCatNav('" + p.type + "');else showPage('listings')");
+    }
 
-    /* Update visible breadcrumb hrefs for crawlability */
-    var inner = document.getElementById('pdp-breadcrumb-inner');
-    if (!inner) return;
-    var links = inner.querySelectorAll('a');
-    /* links[0]=home, links[1]=listings — already correct */
+    /* Province level (optional) */
+    var bcSepProv  = document.getElementById('pdp-bc-sep-province');
+    var bcProvItem = document.getElementById('pdp-bc-province-item');
+    var bcProvLbl  = document.getElementById('pdp-bc-province');
+    var bcProvLink = document.getElementById('pdp-bc-province-link');
+    if (p.province) {
+      if (bcSepProv)  bcSepProv.style.display  = '';
+      if (bcProvItem) bcProvItem.style.display  = '';
+      if (bcProvLbl)  bcProvLbl.textContent     = p.province;
+      if (bcProvLink) {
+        bcProvLink.href = '/listings?province=' + encodeURIComponent(p.province);
+        bcProvLink.setAttribute('onclick',
+          "event.preventDefault();if(typeof quickProvSearch==='function')quickProvSearch('" + p.province + "');else showPage('listings')");
+      }
+      /* Fix position meta on title item */
+      var titlePos = document.querySelector('#pdp-bc-title meta[itemprop="position"]');
+      if (titlePos) titlePos.content = '5';
+    } else {
+      if (bcSepProv)  bcSepProv.style.display  = 'none';
+      if (bcProvItem) bcProvItem.style.display  = 'none';
+      /* Fix position meta on title item */
+      var titlePos2 = document.querySelector('#pdp-bc-title meta[itemprop="position"]');
+      if (titlePos2) titlePos2.content = '4';
+    }
+
+    /* Title (current page) */
+    var bcTitle = document.getElementById('pdp-bc-title');
+    if (bcTitle) {
+      var titleText = (p.title||'').slice(0, 50) + ((p.title||'').length > 50 ? '…' : '');
+      var titleSpan = bcTitle.querySelector('span[itemprop="name"]');
+      if (titleSpan) titleSpan.textContent = titleText;
+      else           bcTitle.textContent   = titleText;
+    }
   }
 
   /* ── Gallery ── */
@@ -25997,7 +26866,10 @@ async function adminDeletePortfolio(id, title){
 
     /* Title (h1 — critical SEO) */
     var title = document.getElementById('pdp-title');
-    if (title) title.textContent = p.title || '';
+    if (title) {
+      title.textContent = p.title || '';
+      title.setAttribute('title', p.title || '');
+    }
 
     /* Location */
     var locText = document.getElementById('pdp-location-text');
@@ -26024,7 +26896,7 @@ async function adminDeletePortfolio(id, title){
       }
       if (p.arl) {
         tags.push('<a class="pdp-transit pdp-transit-arl" href="/arl/' + _slug(p.arl) + '" ' +
-          'onclick="event.preventDefault()" ' +
+          'onclick="event.preventDefault();if(typeof showPage===\'function\')showPage(\'listings\')" ' +
           'title="ใกล้ Airport Rail Link ' + _san(p.arl) + '">' +
           '<i class="fas fa-plane"></i> ARL ' + _san(p.arl) + '</a>');
       }
@@ -26256,11 +27128,11 @@ async function adminDeletePortfolio(id, title){
     var avHtml = ag.avatar_url
       ? '<div class="pdp-agent-av"><img src="' + _san(ag.avatar_url) + '" alt="' + _san(ag.name) + '" loading="lazy"></div>'
       : '<div class="pdp-agent-av-ph">' + _san(ag.initials||ag.name.slice(0,2)) + '</div>';
-    /* Agent profile link — future /agents/:id page */
-    var agLink = '/agents/' + ag.id + '-' + _slug(ag.name);
+    /* Agent profile link — /agent/{id}-{slug} */
+    var agLink = '/agent/' + ag.id + '-' + _slug(ag.name);
     hd.innerHTML = avHtml +
       '<div>' +
-        '<a href="' + agLink + '" onclick="event.preventDefault()" ' +
+        '<a href="' + agLink + '" onclick="event.preventDefault();if(typeof showPage===\'function\')showPage(\'agent-profile\',\'' + ag.id + '\')" ' +
           'style="text-decoration:none">' +
           '<div class="pdp-agent-name">' + _san(ag.name) + '</div>' +
         '</a>' +
@@ -26403,8 +27275,15 @@ async function adminDeletePortfolio(id, title){
   /* ── SEO Internal Links Footer ── */
   function _pdpRenderSeoLinks(p) {
     var types = ['คอนโด','บ้านเดี่ยว','ทาวน์โฮม','ที่ดิน','อาคารพาณิชย์','วิลล่า'];
+    /* Include current property's province + common Bangkok districts */
     var locs  = ['สุขุมวิท','อโศก','ทองหล่อ','พระราม 9','สาทร','สีลม','จตุจักร','ลาดพร้าว','รัชดา'];
+    if (p.province && locs.indexOf(p.province) === -1) locs.unshift(p.province);
+    if (p.location && locs.indexOf(p.location) === -1) locs.splice(1, 0, p.location);
+    locs = locs.slice(0, 9);
     var transit = ['BTS อโศก','BTS ทองหล่อ','BTS เอกมัย','MRT พระราม 9','MRT ลาดพร้าว','BTS พร้อมพงษ์'];
+    if (p.bts && transit.indexOf('BTS '+p.bts) === -1) transit.unshift('BTS '+p.bts);
+    if (p.mrt && transit.indexOf('MRT '+p.mrt) === -1) transit.unshift('MRT '+p.mrt);
+    transit = transit.slice(0, 7);
 
     var typeEl = document.getElementById('pdp-seo-type-links');
     var locEl  = document.getElementById('pdp-seo-loc-links');
@@ -26426,7 +27305,6 @@ async function adminDeletePortfolio(id, title){
     }
     if (trEl) {
       trEl.innerHTML = transit.map(function(t){
-        var slug = _slug(t);
         return '<a class="pdp-seo-link" href="/listings?q=' + encodeURIComponent(t) + '" ' +
           'onclick="event.preventDefault();if(typeof quickSearch===\'function\')quickSearch(\'' + t + '\')">' +
           '<i class="fas fa-train"></i> ใกล้ ' + t + '</a>';
@@ -26436,23 +27314,58 @@ async function adminDeletePortfolio(id, title){
 
   /* ── Meta tags + Schema.org per property ── */
   function _pdpUpdateMetaAndSchema(p) {
-    var siteBase = 'https://matchdoor.co';
-    var path     = _propUrl(p);
-    var fullUrl  = siteBase + path;
-    var transitKw = (p.bts?' BTS '+p.bts:'') + (p.mrt?' MRT '+p.mrt:'');
-    var title = p.title + ' ' + (p.tx==='RENT'?'ให้เช่า':'ขาย') + ' ' + p.type
-              + ' ' + (p.location||'') + (p.province?' '+p.province:'')
-              + transitKw + ' — Matchdoor';
-    var desc = (p.desc||'').slice(0,140)
-             || (p.type + (p.tx==='RENT'?' ให้เช่า':' ขาย') + ' ' + (p.location||'')
-                + ' ' + (p.province||'กรุงเทพ') + transitKw
-                + ' ราคา ' + (p.price>=1e6 ? (p.price/1e6).toFixed(1)+'ล้านบาท' : (p.price||0).toLocaleString()+'บาท')
-                + ' — Matchdoor');
+    var siteBase  = 'https://matchdoor.co';
+    var path      = _propUrl(p);
+    var fullUrl   = siteBase + path;
+    var txLabel   = p.tx === 'RENT' ? 'ให้เช่า' : 'ขาย';
+    var transitKw = (p.bts ? ' BTS '+p.bts : '') + (p.mrt ? ' MRT '+p.mrt : '') + (p.arl ? ' ARL '+p.arl : '');
+    var priceLabel = (p.price >= 1e6)
+      ? (p.price/1e6).toFixed(1) + 'ล้านบาท'
+      : (p.price||0).toLocaleString() + 'บาท';
+    var specsKw = (p.bed  > 0 ? ' '+p.bed+'ห้องนอน'  : '')
+                + (p.bath > 0 ? ' '+p.bath+'ห้องน้ำ' : '')
+                + (p.area > 0 ? ' '+p.area+'ตร.ม.'   : '');
 
-    /* Update page meta */
+    /* ── Dynamic Title (≤ 60 chars ideal) ── */
+    var title = p.title
+      + ' ' + txLabel
+      + (p.tx !== 'RENT' ? '' : '')
+      + ' ' + p.type
+      + (p.location   ? ' ' + p.location   : '')
+      + (p.province   ? ' ' + p.province   : '')
+      + transitKw
+      + ' — Matchdoor';
+
+    /* ── Dynamic Meta Description (≤ 155 chars) ── */
+    var rawDesc = (p.desc || p.description || '').trim();
+    var autoDesc = p.type + ' ' + txLabel
+      + (p.location  ? ' ' + p.location  : '')
+      + (p.province  ? ' ' + p.province  : '')
+      + transitKw + specsKw
+      + ' ราคา ' + priceLabel
+      + ' ปรึกษาฟรี ไม่มีค่านายหน้า — Matchdoor';
+    var desc = rawDesc.length > 30 ? rawDesc.slice(0, 155) : autoDesc.slice(0, 155);
+
+    /* ── OG Image ── */
+    var ogImgUrl = (p.photos && p.photos[0]) ? p.photos[0] : 'https://matchdoor.co/og-image.jpg';
+
+    /* ── Update <title> ── */
     document.title = title;
+
+    /* ── Meta description ── */
     var mDesc = document.querySelector('meta[name="description"]');
     if (mDesc) mDesc.content = desc;
+
+    /* ── Meta keywords (dynamic) ── */
+    var mKw = document.querySelector('meta[name="keywords"]');
+    if (mKw) {
+      var kwParts = [p.type, txLabel, p.location, p.province,
+        p.bts ? 'ใกล้ BTS '+p.bts : '', p.mrt ? 'ใกล้ MRT '+p.mrt : '',
+        p.arl ? 'ใกล้ ARL '+p.arl : '', 'Matchdoor','อสังหาริมทรัพย์กรุงเทพ'];
+      mKw.content = kwParts.filter(Boolean).join(',');
+    }
+
+    /* ── Open Graph ── */
     var ogT = document.querySelector('meta[property="og:title"]');
     if (ogT) ogT.content = title;
     var ogD = document.querySelector('meta[property="og:description"]');
@@ -26460,33 +27373,55 @@ async function adminDeletePortfolio(id, title){
     var ogU = document.querySelector('meta[property="og:url"]');
     if (ogU) ogU.content = fullUrl;
     var ogI = document.querySelector('meta[property="og:image"]');
-    if (ogI && p.photos && p.photos[0]) ogI.content = p.photos[0];
+    if (ogI) ogI.content = ogImgUrl;
+    var ogIA = document.querySelector('meta[property="og:image:alt"]');
+    if (ogIA) ogIA.content = p.title + ' — Matchdoor';
     var ogType = document.querySelector('meta[property="og:type"]');
     if (ogType) ogType.content = 'product';
+
+    /* ── Twitter Card ── */
+    var twT = document.querySelector('meta[name="twitter:title"]');
+    if (twT) twT.content = title;
+    var twD = document.querySelector('meta[name="twitter:description"]');
+    if (twD) twD.content = desc;
+    var twI = document.querySelector('meta[name="twitter:image"]');
+    if (twI) twI.content = ogImgUrl;
+
+    /* ── Canonical ── */
     var canonical = document.querySelector('link[rel="canonical"]');
     if (canonical) canonical.href = fullUrl;
 
-    /* Push history state */
+    /* ── hreflang (update alternate) ── */
+    var hrefTh = document.querySelector('link[hreflang="th"]');
+    if (hrefTh) hrefTh.href = fullUrl;
+    var hrefDef = document.querySelector('link[hreflang="x-default"]');
+    if (hrefDef) hrefDef.href = fullUrl;
+
+    /* ── Dynamic H1 (already set by _pdpRenderHeader, but ensure sync) ── */
+    var h1El = document.getElementById('pdp-title');
+    if (h1El && !h1El.textContent) h1El.textContent = p.title || '';
+
+    /* ── Push history state ── */
     if (typeof history !== 'undefined' && typeof _routerReady !== 'undefined' && _routerReady) {
       if (location.pathname !== path) {
         history.pushState({ type: 'property', id: String(p.id), name: 'property' }, '', fullUrl);
       }
     }
 
-    /* Schema.org: RealEstateListing */
+    /* ── Schema.org: RealEstateListing ── */
     _pdpInjectPropertySchema(p, fullUrl, desc);
 
-    /* Schema.org: BreadcrumbList */
+    /* ── Schema.org: BreadcrumbList ── */
     _pdpInjectBreadcrumbSchema(p, path, fullUrl);
 
-    /* GA4 property_view */
+    /* ── GA4 property_view ── */
     if (typeof trackEvent === 'function') {
       trackEvent('property_view', {
         property_id:    String(p.id),
         property_title: p.title || '',
-        property_type:  p.type || '',
+        property_type:  p.type  || '',
         property_price: p.price || 0,
-        property_tx:    p.tx || '',
+        property_tx:    p.tx    || '',
         province:       p.province || '',
         source:         'pdp'
       });
@@ -26498,12 +27433,6 @@ async function adminDeletePortfolio(id, title){
 
   /* Property JSON-LD */
   function _pdpInjectPropertySchema(p, fullUrl, desc) {
-    var schemaTypeMap = {
-      'คอนโด':'Apartment','บ้านเดี่ยว':'SingleFamilyResidence',
-      'ทาวน์โฮม':'Townhouse','ที่ดิน':'LandForm',
-      'อาคารพาณิชย์':'LocalBusiness','วิลล่า':'SingleFamilyResidence',
-      'รีสอร์ท':'LodgingBusiness','โรงแรม':'Hotel','อพาร์ตเมนต์':'ApartmentComplex'
-    };
     var ld = {
       '@context': 'https://schema.org',
       '@type':    'RealEstateListing',
@@ -26511,7 +27440,7 @@ async function adminDeletePortfolio(id, title){
       'name':     p.title,
       'description': desc,
       'url':      fullUrl,
-      'datePosted': p.createdAt || new Date().toISOString().slice(0,10),
+      'datePosted': p.createdAt ? p.createdAt.slice(0,10) : new Date().toISOString().slice(0,10),
       'offers': {
         '@type':          'Offer',
         'price':          p.price,
@@ -26536,36 +27465,66 @@ async function adminDeletePortfolio(id, title){
       'containedInPlace': {
         '@type': 'City',
         'name':  p.province || 'กรุงเทพมหานคร',
-        'containedInPlace': {'@type':'Country','name':'ประเทศไทย'}
+        'containedInPlace': {'@type':'Country','name':'ประเทศไทย','sameAs':'https://www.wikidata.org/wiki/Q869'}
       }
     };
-    /* Optional fields */
-    if (p.photos && p.photos[0]) {
-      ld['image'] = {'@type':'ImageObject','url':p.photos[0],'contentUrl':p.photos[0]};
+
+    /* ── Images — single + array ── */
+    var photos = (p.photos || []).filter(Boolean);
+    if (photos.length === 1) {
+      ld['image'] = {'@type':'ImageObject','url':photos[0],'contentUrl':photos[0]};
+    } else if (photos.length > 1) {
+      ld['image'] = photos.map(function(u){ return {'@type':'ImageObject','url':u,'contentUrl':u}; });
     }
+
+    /* ── Property size ── */
     if (p.area > 0) {
-      ld['floorSize'] = {'@type':'QuantitativeValue','value':p.area,'unitCode':'MTK'};
+      ld['floorSize'] = {'@type':'QuantitativeValue','value':p.area,'unitCode':'MTK','unitText':'ตร.ม.'};
     }
-    if (p.bed > 0)  ld['numberOfRooms'] = p.bed;
-    if (p.bath > 0) ld['numberOfBathroomsTotal'] = p.bath;
+    if (p.land_area > 0) {
+      ld['lotSize'] = {'@type':'QuantitativeValue','value':p.land_area,'unitText':'ตร.ว.'};
+    }
+
+    /* ── Rooms ── */
+    if (p.bed  > 0) ld['numberOfRooms']          = p.bed;
+    if (p.bath > 0) ld['numberOfBathroomsTotal']  = p.bath;
+    if (p.floors > 0) ld['numberOfFloors']        = p.floors;
+    if (p.parking > 0) ld['numberOfParkingSpaces'] = p.parking;
+
+    /* ── Amenity Features (amenities + transit) ── */
+    var feats = [];
     if (p.amenities && p.amenities.length) {
-      ld['amenityFeature'] = p.amenities.map(function(a){
-        return {'@type':'LocationFeatureSpecification','name':a,'value':true};
+      p.amenities.forEach(function(a){
+        feats.push({'@type':'LocationFeatureSpecification','name':a,'value':true});
       });
     }
-    /* Agent */
+    if (p.appliances && p.appliances.length) {
+      p.appliances.forEach(function(a){
+        feats.push({'@type':'LocationFeatureSpecification','name':a,'value':true});
+      });
+    }
+    if (p.bts) feats.push({'@type':'LocationFeatureSpecification','name':'ใกล้ BTS '+p.bts,'value':true});
+    if (p.mrt) feats.push({'@type':'LocationFeatureSpecification','name':'ใกล้ MRT '+p.mrt,'value':true});
+    if (p.arl) feats.push({'@type':'LocationFeatureSpecification','name':'ใกล้ ARL '+p.arl,'value':true});
+    if (p.furniture === 'full')    feats.push({'@type':'LocationFeatureSpecification','name':'เฟอร์นิเจอร์ครบ','value':true});
+    if (p.furniture === 'partial') feats.push({'@type':'LocationFeatureSpecification','name':'เฟอร์นิเจอร์บางส่วน','value':true});
+    if (p.pets_allowed)            feats.push({'@type':'LocationFeatureSpecification','name':'เลี้ยงสัตว์ได้','value':true});
+    if (feats.length) ld['amenityFeature'] = feats;
+
+    /* ── Agent ── */
     if (_pdpAgent) {
+      var _agSlugPdp = (_pdpAgent.name||'').toLowerCase().replace(/[^ก-๙a-z0-9\s-]/g,'').trim().replace(/\s+/g,'-').slice(0,80);
       ld['agent'] = {
         '@type': 'RealEstateAgent',
         'name':   _pdpAgent.name,
-        'url':    'https://matchdoor.co/agents/' + _pdpAgent.id
+        'url':    'https://matchdoor.co/agent/' + _pdpAgent.id + (_agSlugPdp ? '-' + _agSlugPdp : ''),
+        'telephone': _pdpAgent.phone || undefined
       };
     }
-    /* BTS/MRT near transit */
-    if (p.bts || p.mrt) {
-      ld['amenityFeature'] = ld['amenityFeature'] || [];
-      if (p.bts) ld['amenityFeature'].push({'@type':'LocationFeatureSpecification','name':'ใกล้ BTS '+p.bts,'value':true});
-      if (p.mrt) ld['amenityFeature'].push({'@type':'LocationFeatureSpecification','name':'ใกล้ MRT '+p.mrt,'value':true});
+
+    /* ── Lease-specific fields ── */
+    if (p.tx === 'RENT') {
+      if (p.deposit) ld['offers']['eligibleDuration'] = p.deposit;
     }
 
     var script = document.getElementById('pdp-prop-jsonld');
@@ -26575,20 +27534,29 @@ async function adminDeletePortfolio(id, title){
       script.id = 'pdp-prop-jsonld';
       document.head.appendChild(script);
     }
-    script.textContent = JSON.stringify(ld);
+    /* Remove undefined values */
+    script.textContent = JSON.stringify(ld, function(k, v){ return v === undefined ? undefined : v; });
   }
 
   /* Breadcrumb JSON-LD */
   function _pdpInjectBreadcrumbSchema(p, path, fullUrl) {
+    var items = [
+      {'@type':'ListItem','position':1,'name':'หน้าแรก','item':'https://matchdoor.co'},
+      {'@type':'ListItem','position':2,'name':'ประกาศทั้งหมด','item':'https://matchdoor.co/listings'}
+    ];
+    var pos = 3;
+    if (p.type) {
+      items.push({'@type':'ListItem','position':pos++,'name':p.type,'item':'https://matchdoor.co/listings?type='+encodeURIComponent(p.type)});
+    }
+    if (p.province) {
+      items.push({'@type':'ListItem','position':pos++,'name':p.type ? p.type+''+p.province : p.province,'item':'https://matchdoor.co/listings?province='+encodeURIComponent(p.province)});
+    }
+    items.push({'@type':'ListItem','position':pos,'name':p.title,'item':fullUrl});
+
     var ld = {
       '@context': 'https://schema.org',
       '@type':    'BreadcrumbList',
-      'itemListElement': [
-        {'@type':'ListItem','position':1,'name':'หน้าแรก','item':'https://matchdoor.co'},
-        {'@type':'ListItem','position':2,'name':'ประกาศทั้งหมด','item':'https://matchdoor.co/listings'},
-        {'@type':'ListItem','position':3,'name':p.type||'ทรัพย์','item':'https://matchdoor.co/listings?type='+encodeURIComponent(p.type||'')},
-        {'@type':'ListItem','position':4,'name':p.title,'item':fullUrl}
-      ]
+      'itemListElement': items
     };
     var script = document.getElementById('pdp-bc-jsonld');
     if (!script) {
@@ -26602,16 +27570,36 @@ async function adminDeletePortfolio(id, title){
 
   /* Related ItemList schema */
   function _pdpInjectRelatedSchema(related) {
+    var siteBase = 'https://matchdoor.co';
     var ld = {
       '@context': 'https://schema.org',
       '@type':    'ItemList',
       'name':     'ทรัพย์ที่คล้ายกัน',
       'itemListElement': related.map(function(r, i){
+        var rUrl = siteBase + _propUrl(r);
         return {
           '@type':    'ListItem',
           'position': i + 1,
-          'url':      'https://matchdoor.co' + _propUrl(r),
-          'name':     r.title
+          'name':     r.title,
+          'url':      rUrl,
+          'item': {
+            '@type':       'RealEstateListing',
+            '@id':         rUrl,
+            'name':        r.title,
+            'url':         rUrl,
+            'offers': {
+              '@type':         'Offer',
+              'price':         r.price,
+              'priceCurrency': 'THB',
+              'availability':  'https://schema.org/InStock'
+            },
+            'address': {
+              '@type':          'PostalAddress',
+              'addressLocality': r.location || '',
+              'addressRegion':   r.province || 'กรุงเทพฯ',
+              'addressCountry':  'TH'
+            }
+          }
         };
       })
     };
@@ -26646,6 +27634,11 @@ async function adminDeletePortfolio(id, title){
       document.removeEventListener('keydown', window._pdpKeyHandler);
       window._pdpKeyHandler = null;
     }
+    /* ── Restore hreflang to site root ── */
+    var hrefTh = document.querySelector('link[hreflang="th"]');
+    if (hrefTh) hrefTh.href = 'https://matchdoor.co';
+    var hrefDef = document.querySelector('link[hreflang="x-default"]');
+    if (hrefDef) hrefDef.href = 'https://matchdoor.co';
     var state = history.state;
     var prevPage = (state && state._prevPage) ? state._prevPage : 'home';
     // กลับไปหน้าที่มาจากโดยตรง ไม่เปิด popup ใดๆ
