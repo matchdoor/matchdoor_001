@@ -5521,6 +5521,7 @@ footer::after{
 
 /* ── Review Cards ── */
 .rv-list { display: flex; flex-direction: column; gap: 14px; }
+.rv-more-btn:hover { background: #F0F2F5 !important; }
 .rv-card {
   background: var(--bg, #FAF7F2);
   border-radius: 13px;
@@ -7646,12 +7647,64 @@ window.mdBnavCloseMenu = function(){
     if(existing){ existing.remove(); return; }
     var menu = document.createElement('div');
     menu.id = 'md-post-menu-'+pid;
-    menu.style.cssText = 'position:absolute;right:8px;top:40px;background:#fff;border:1px solid #E4E6EB;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.15);z-index:100;min-width:160px;overflow:hidden';
+    menu.style.cssText = 'position:absolute;right:8px;top:40px;background:#fff;border:1px solid #E4E6EB;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.15);z-index:100;min-width:180px;overflow:hidden';
+    /* ── Check if this is the current user's own post (lp- = local/own post) ── */
+    var isOwnPost = pid && pid.toString().startsWith('lp-');
+    var deleteItem = '';
+    if(isOwnPost){
+      deleteItem = '<div style="padding:10px 14px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px;color:#e74c3c;border-top:1px solid #F0F2F5" '
+        +'onclick="mdConfirmDeletePost(\''+pid+'\');this.closest(\'[id^=md-post-menu]\').remove()">'
+        +'<i class="fas fa-trash-alt" style="width:16px"></i> ลบโพสต์</div>';
+    }
     menu.innerHTML = '<div style="padding:10px 14px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px" onclick="mdSharePost(\''+pid+'\');this.closest(\'[id^=md-post-menu]\').remove()"><i class="fas fa-share" style="color:#1B3A6B;width:16px"></i> แชร์โพสต์นี้</div>'
-      +'<div style="padding:10px 14px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px;color:#e74c3c" onclick="this.closest(\'[id^=md-post-menu]\').remove()"><i class="fas fa-flag" style="width:16px"></i> รายงานโพสต์</div>';
+      +'<div style="padding:10px 14px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px;color:#555" onclick="this.closest(\'[id^=md-post-menu]\').remove()"><i class="fas fa-bookmark" style="color:#C8922A;width:16px"></i> บันทึกโพสต์</div>'
+      +(isOwnPost ? '' : '<div style="padding:10px 14px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px;color:#e74c3c" onclick="this.closest(\'[id^=md-post-menu]\').remove()"><i class="fas fa-flag" style="width:16px"></i> รายงานโพสต์</div>')
+      +deleteItem;
     var card = btn.closest('.md-post-card');
     if(card){ card.style.position='relative'; card.appendChild(menu); }
     setTimeout(function(){ document.addEventListener('click', function rm(e){ if(!menu.contains(e.target)&&e.target!==btn){ menu.remove(); document.removeEventListener('click',rm); } }); },10);
+  };
+
+  /* ── Confirm & delete own post ── */
+  window.mdConfirmDeletePost = function(pid){
+    /* Facebook-style confirm dialog */
+    var existing = document.getElementById('md-delete-confirm-modal');
+    if(existing) existing.remove();
+    var mo = document.createElement('div');
+    mo.id = 'md-delete-confirm-modal';
+    mo.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:9999;padding:16px';
+    mo.innerHTML = '<div style="background:#fff;border-radius:12px;max-width:360px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,.22);overflow:hidden">'
+      +'<div style="padding:20px 20px 0;border-bottom:1px solid #E4E6EB;padding-bottom:16px">'
+        +'<div style="font-size:17px;font-weight:700;color:#1C1E21">ลบโพสต์?</div>'
+        +'<div style="font-size:14px;color:#65676B;margin-top:6px">คุณต้องการลบโพสต์นี้ใช่ไหม? เมื่อลบแล้วจะไม่สามารถกู้คืนได้</div>'
+      +'</div>'
+      +'<div style="display:flex;gap:0">'
+        +'<button onclick="document.getElementById(\'md-delete-confirm-modal\').remove()" style="flex:1;padding:14px;font-size:15px;font-weight:600;background:none;border:none;border-right:1px solid #E4E6EB;cursor:pointer;color:#1C1E21">ยกเลิก</button>'
+        +'<button onclick="mdDoDeletePost(\''+pid+'\');document.getElementById(\'md-delete-confirm-modal\').remove()" style="flex:1;padding:14px;font-size:15px;font-weight:700;background:none;border:none;cursor:pointer;color:#e74c3c">ลบ</button>'
+      +'</div>'
+    +'</div>';
+    mo.onclick = function(e){ if(e.target===mo) mo.remove(); };
+    document.body.appendChild(mo);
+  };
+
+  /* ── Actually remove the post card from DOM & local array ── */
+  window.mdDoDeletePost = function(pid){
+    /* Remove from DOM */
+    var card = document.querySelector('.md-post-card[data-pid="'+pid+'"]');
+    if(card){
+      card.style.transition = 'opacity .3s,transform .3s,max-height .4s';
+      card.style.opacity = '0';
+      card.style.transform = 'scale(.97)';
+      setTimeout(function(){ card.remove(); }, 320);
+    }
+    /* Remove from local feed array */
+    if(window._localFeedPosts){
+      var localId = pid.startsWith('lp-') ? pid.slice(3) : pid;
+      window._localFeedPosts = window._localFeedPosts.filter(function(p){
+        return String(p.id) !== String(localId);
+      });
+    }
+    typeof toast === 'function' && toast('ลบโพสต์แล้ว 🗑️');
   };
 
   window.mdToggleLike = function(btn){
@@ -8812,7 +8865,9 @@ function _initPopupLeafletMap(){
     maxZoom: 19,
     subdomains: 'abcd'
   }).addTo(_popupLeafletMap);
-  _popupRefreshMarkers();
+  /* defer marker loop until after tile paint — avoids jank on modal open */
+  var _rIC = window.requestIdleCallback || function(cb){ setTimeout(cb, 80); };
+  _rIC(function(){ _popupRefreshMarkers(); });
   setTimeout(function(){
     var hint = document.getElementById('popup-map-hint');
     if(hint) hint.style.opacity = '0';
@@ -26930,23 +26985,28 @@ async function adminDeletePortfolio(id, title){
     /* 3. Render immediately if found */
     if (p) { _pdpRender(p); return; }
 
-    /* 4. Not in memory — check Supabase */
-    if (typeof sb !== 'undefined' && sb) {
-      sb.from('properties').select('*').eq('id', id).single()
+    /* ── helper: fetch from Supabase then fallback to MOCK ── */
+    function _pdpFetchSb(idStr) {
+      sb.from('properties').select('*').eq('id', idStr).single()
         .then(function(res){
+          if (window._pdpCurrentId !== idStr) return; /* navigated away */
           if (res.data) {
             var mapped = typeof mapProp === 'function' ? mapProp(res.data) : res.data;
             _pdpRender(mapped);
           } else {
-            /* ลอง fetch ไม่พบ → check MOCK อีกครั้ง (กัน id mismatch type) */
-            var fallback = (MOCK && MOCK.props ? MOCK.props : []).find(function(x){ return String(x.id) === String(id); });
+            var fallback = (MOCK && MOCK.props ? MOCK.props : []).find(function(x){ return String(x.id) === idStr; });
             if (fallback) { _pdpRender(fallback); } else { _pdpShowError(); }
           }
         }).catch(function(){ _pdpShowError(); });
+    }
+
+    /* 4. Not in memory — check Supabase */
+    if (typeof sb !== 'undefined' && sb) {
+      _pdpFetchSb(String(id));
       return;
     }
 
-    /* 5. Supabase ยังไม่พร้อม — polling รอ props หรือ sb (max 5 วิ) */
+    /* 5. Supabase ยังไม่พร้อม — polling รอ sb เท่านั้น (max 5 วิ) ไม่รอ props อีกต่อไป */
     var _pdpWaitTry = 0;
     var _pdpWaitMax = 25; /* 25 × 200ms = 5 sec */
     var _pdpWaitTimer = setInterval(function() {
@@ -26954,30 +27014,11 @@ async function adminDeletePortfolio(id, title){
       if (window._pdpCurrentId !== String(id)) { clearInterval(_pdpWaitTimer); return; }
 
       _pdpWaitTry++;
-      var found = null;
-      if (typeof props !== 'undefined' && props.length) {
-        found = props.find(function(x){ return String(x.id) === String(id); });
-      }
 
-      if (found) {
-        clearInterval(_pdpWaitTimer);
-        _pdpRender(found);
-        return;
-      }
-
-      /* Supabase กลายเป็น ready ระหว่างรอ → fetch โดยตรง */
+      /* Supabase กลายเป็น ready ระหว่างรอ → fetch โดยตรงแล้วหยุด poll */
       if (typeof sb !== 'undefined' && sb) {
         clearInterval(_pdpWaitTimer);
-        sb.from('properties').select('*').eq('id', id).single()
-          .then(function(res){
-            if (res.data) {
-              var mapped = typeof mapProp === 'function' ? mapProp(res.data) : res.data;
-              _pdpRender(mapped);
-            } else {
-              var fallback2 = (MOCK && MOCK.props ? MOCK.props : []).find(function(x){ return String(x.id) === String(id); });
-              if (fallback2) { _pdpRender(fallback2); } else { _pdpShowError(); }
-            }
-          }).catch(function(){ _pdpShowError(); });
+        _pdpFetchSb(String(id));
         return;
       }
 
@@ -27009,9 +27050,12 @@ async function adminDeletePortfolio(id, title){
     /* render สำเร็จ — clear pending flag */
     window._pdpCurrentId = null;
 
-    /* ── Increment view count ใน Supabase (fire-and-forget) ── */
+    /* ── Increment view count ใน Supabase (fire after paint — ไม่ block render) ── */
     if (typeof sb !== 'undefined' && sb && p && p.id) {
-      sb.rpc('increment_views', { p_table: 'properties', p_id: String(p.id) }).then(function(){});
+      var _rIC = window.requestIdleCallback || function(cb){ setTimeout(cb, 0); };
+      _rIC(function(){
+        sb.rpc('increment_views', { p_table: 'properties', p_id: String(p.id) }).then(function(){});
+      });
     }
 
     /* Find agent */
@@ -27035,8 +27079,10 @@ async function adminDeletePortfolio(id, title){
     _pdpRenderMap(p);
     _pdpRenderAgent(p);
     _pdpRenderCTA(p);
-    _pdpRenderRelated(p);
-    _pdpRenderSeoLinks(p);
+    /* below-fold sections — defer until browser is idle */
+    var _rIC = window.requestIdleCallback || function(cb){ setTimeout(cb, 100); };
+    _rIC(function(){ _pdpRenderRelated(p); });
+    _rIC(function(){ _pdpRenderSeoLinks(p); });
     _pdpRenderMobileCTA(p);
     _pdpUpdateMetaAndSchema(p);
     _pdpUpdateBackLabel();
@@ -28173,16 +28219,27 @@ function _rvCardHtml(r, showTarget){
       targetName = ag ? ag.name : 'ตัวแทน';
     }
   }
-  return '<div class="rv-card" id="'+id+'">' +
+  /* ── Check if this review belongs to the current logged-in user ── */
+  var currentUid = (typeof window._currentUser !== 'undefined' && window._currentUser && window._currentUser.id)
+    ? window._currentUser.id
+    : (typeof user !== 'undefined' && user && user.id ? user.id : null);
+  var isOwnReview = currentUid && r.user_id && String(r.user_id) === String(currentUid);
+
+  var moreBtn = '<button class="rv-more-btn" id="'+id+'-more" onclick="event.stopPropagation();rvPostMore(this,\''+id+'\','+isOwnReview+')" '
+    +'style="position:absolute;top:8px;right:8px;background:none;border:none;cursor:pointer;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#65676B;line-height:1" '
+    +'title="ตัวเลือก">···</button>';
+
+  return '<div class="rv-card" id="'+id+'" style="position:relative">' +
     '<div class="rv-card-hd">' +
       _rvAvatar(r) +
       '<div class="rv-meta">' +
-        '<div class="rv-author">' + (r.author||'ผู้ใช้') + '</div>' +
+        '<div class="rv-author">' + (r.author||'ผู้ใช้') + (isOwnReview ? ' <span style="font-size:10px;background:#e8f4e8;color:#2e7d32;border-radius:8px;padding:1px 6px;font-weight:600;margin-left:4px">โพสต์ของคุณ</span>' : '') + '</div>' +
         '<div class="rv-date">' + _rvTimeAgo(r.created_at) + '</div>' +
         '<div class="rv-stars" style="margin-top:4px">' + _rvStars(r.rating, 13) + '</div>' +
       '</div>' +
       (showTarget ? '<span class="rv-type-badge'+(r.type==='agent'?' rv-type-agent':'')+'">'+
         (r.type==='property'?'<i class="fas fa-home"></i>':'<i class="fas fa-user-tie"></i>')+'</span>' : '') +
+      moreBtn +
     '</div>' +
     '<div class="rv-body collapsed" id="'+id+'-body">' + (r.body||'') + '</div>' +
     '<button class="rv-expand-btn" id="'+id+'-btn" onclick="rvToggleBody(\''+id+'\')"><i class="fas fa-chevron-down"></i> อ่านเพิ่มเติม</button>' +
@@ -28191,6 +28248,62 @@ function _rvCardHtml(r, showTarget){
       '<span>'+_rvTimeAgo(r.created_at)+'</span></div>' : '') +
   '</div>';
 }
+
+/* ── Review more (···) menu ── */
+window.rvPostMore = function(btn, cardId, isOwn){
+  var existing = document.getElementById('rv-menu-'+cardId);
+  if(existing){ existing.remove(); return; }
+  var menu = document.createElement('div');
+  menu.id = 'rv-menu-'+cardId;
+  menu.style.cssText = 'position:absolute;right:8px;top:40px;background:#fff;border:1px solid #E4E6EB;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.15);z-index:200;min-width:180px;overflow:hidden';
+  var deleteItem = isOwn
+    ? '<div style="padding:10px 14px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px;color:#e74c3c;border-top:1px solid #F0F2F5" '
+        +'onclick="rvConfirmDelete(\''+cardId+'\');document.getElementById(\'rv-menu-'+cardId+'\')&&document.getElementById(\'rv-menu-'+cardId+'\').remove()">'
+        +'<i class="fas fa-trash-alt" style="width:16px"></i> ลบรีวิว</div>'
+    : '<div style="padding:10px 14px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px;color:#e74c3c" '
+        +'onclick="document.getElementById(\'rv-menu-'+cardId+'\')&&document.getElementById(\'rv-menu-'+cardId+'\').remove()">'
+        +'<i class="fas fa-flag" style="width:16px"></i> รายงานรีวิว</div>';
+  menu.innerHTML = '<div style="padding:10px 14px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px;color:#555" '
+      +'onclick="document.getElementById(\'rv-menu-'+cardId+'\')&&document.getElementById(\'rv-menu-'+cardId+'\').remove()">'
+      +'<i class="fas fa-share" style="color:#1B3A6B;width:16px"></i> แชร์รีวิวนี้</div>'
+    + deleteItem;
+  var card = document.getElementById(cardId);
+  if(card){ card.appendChild(menu); }
+  setTimeout(function(){ document.addEventListener('click', function rm(e){ if(!menu.contains(e.target)&&e.target!==btn){ menu.remove(); document.removeEventListener('click',rm); } }); },10);
+};
+
+/* ── Confirm delete review ── */
+window.rvConfirmDelete = function(cardId){
+  var existing = document.getElementById('rv-delete-confirm-modal');
+  if(existing) existing.remove();
+  var mo = document.createElement('div');
+  mo.id = 'rv-delete-confirm-modal';
+  mo.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:9999;padding:16px';
+  mo.innerHTML = '<div style="background:#fff;border-radius:12px;max-width:360px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,.22);overflow:hidden">'
+    +'<div style="padding:20px 20px 16px;border-bottom:1px solid #E4E6EB">'
+      +'<div style="font-size:17px;font-weight:700;color:#1C1E21">ลบรีวิว?</div>'
+      +'<div style="font-size:14px;color:#65676B;margin-top:6px">คุณต้องการลบรีวิวนี้ใช่ไหม? เมื่อลบแล้วจะไม่สามารถกู้คืนได้</div>'
+    +'</div>'
+    +'<div style="display:flex">'
+      +'<button onclick="document.getElementById(\'rv-delete-confirm-modal\').remove()" style="flex:1;padding:14px;font-size:15px;font-weight:600;background:none;border:none;border-right:1px solid #E4E6EB;cursor:pointer;color:#1C1E21">ยกเลิก</button>'
+      +'<button onclick="rvDoDelete(\''+cardId+'\');document.getElementById(\'rv-delete-confirm-modal\').remove()" style="flex:1;padding:14px;font-size:15px;font-weight:700;background:none;border:none;cursor:pointer;color:#e74c3c">ลบ</button>'
+    +'</div>'
+  +'</div>';
+  mo.onclick = function(e){ if(e.target===mo) mo.remove(); };
+  document.body.appendChild(mo);
+};
+
+/* ── Actually remove review card ── */
+window.rvDoDelete = function(cardId){
+  var card = document.getElementById(cardId);
+  if(card){
+    card.style.transition = 'opacity .3s,transform .3s';
+    card.style.opacity = '0';
+    card.style.transform = 'scale(.97)';
+    setTimeout(function(){ card.remove(); }, 320);
+  }
+  typeof toast === 'function' && toast('ลบรีวิวแล้ว 🗑️');
+};
 
 window.rvToggleBody = function(id){
   var body = document.getElementById(id+'-body');
