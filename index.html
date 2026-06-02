@@ -13206,6 +13206,52 @@ async function loadData(){
   const hasSB = initSB();
   let useMock = false;
 
+  // ── PDP FAST PATH: ถ้าเปิด URL /property/xxx โดยตรง ──────────────
+  // fast path fetch เฉพาะรายการนั้นแล้ว แสดง UI ทันที
+  // ส่วน loadData จะทำงานแบบ background (ไม่บล็อก PDP)
+  const _isPdpUrl = !!location.pathname.match(/^\/property\/([^\/\-]+)/);
+  if (_isPdpUrl && window._pdpFastFetchDone === false) {
+    // PDP กำลังโหลดอยู่จาก fast path แล้ว — โหลด background data ต่อโดยไม่ block
+    loading(false);
+    if(hasSB){
+      try{
+        const p = await sb.from('properties')
+          .select('*')
+          .eq('status','approved')
+          .order('created_at',{ascending:false})
+          .range(0, 999);
+        if(p.data){ props = p.data.map(mapProp); }
+        agents = MOCK.agents; port = MOCK.port; services = MOCK.services; blogs = MOCK.blogs;
+        agents.forEach(a=>{a.propIds=props.filter(p=>p.agentId===a.id).map(p=>p.id);});
+        afterLoad();
+        // Background load secondary data
+        setTimeout(async ()=>{
+          try{
+            const [a, po, s, b] = await Promise.all([
+              sb.from('agents').select('*').eq('is_active',true),
+              sb.from('portfolio').select('*').order('created_at',{ascending:false}),
+              sb.from('services').select('*').eq('is_active',true).order('sort_order',{ascending:true}),
+              sb.from('blogs').select('*').eq('is_published',true).order('sort_order',{ascending:true})
+            ]);
+            if(a.data && a.data.length){ agents = a.data.map(mapAgent); agents.forEach(ag=>{ag.propIds=props.filter(p=>p.agentId===ag.id).map(p=>p.id);}); }
+            if(po.data && po.data.length){ port = po.data.map(mapPort); }
+            if(s.data && s.data.length){ services = s.data; }
+            if(b.data && b.data.length){
+              blogs = b.data.map(blog => {
+                const rawPhotos = Array.isArray(blog.photos) ? blog.photos : (blog.photos ? [blog.photos] : []);
+                const coverPath = blog.cover_image || blog.cover || '';
+                const allPhotos = coverPath ? [coverPath, ...rawPhotos] : rawPhotos;
+                return { ...blog, photos: [...new Set(allPhotos)].filter(Boolean).map(p => sbImg(p)) };
+              });
+            }
+            loadLegalPages().catch(e=>console.warn('[loadLegalPages]',e));
+          } catch(e){ console.warn('[background load]',e); }
+        }, 400);
+      } catch(e){ console.warn('[PDP background loadData]',e); }
+    }
+    return;
+  }
+
   if(hasSB){
     try{
       // ── PHASE 1: โหลด properties ทั้งหมดก่อน — SELECT * เพื่อไม่ให้ข้อมูลหาย ──────────
@@ -13416,6 +13462,13 @@ function afterLoad(){
       delete window._pendingPropertyId;
       if (typeof showPage === 'function') showPage('property', _pid);
       return;
+    }
+
+    // ── PDP: ถ้า fast path fetch เสร็จแล้ว และหน้า property active อยู่ → ไม่ต้อง re-render ──
+    var pgPropFast = document.getElementById('page-property');
+    if (pgPropFast && pgPropFast.classList.contains('active') && window._pdpFastFetchDone) {
+      window._pdpFastFetchDone = false;
+      return; // fast path render เสร็จแล้ว ไม่ต้อง re-render ซ้ำ
     }
 
     // ── PDP: ถ้าหน้า property กำลัง active อยู่ แต่ยัง loading → re-render ──
@@ -14326,8 +14379,69 @@ function _initRouteFromUrl() {
     const propId = match[1];
     // ── แสดง Property Detail Page (ไม่ใช่ modal) ──
     _silentShowPage('home'); // ตั้ง base page ก่อน
-    // รอให้ data โหลดก่อน แล้วค่อย render PDP
+    // ── PDP FAST PATH: fetch เฉพาะรายการนี้ทันที ไม่รอ loadData() ──
     window._pendingPropertyId = propId;
+    window._pdpFastFetchDone = false;
+    // รอให้ Supabase JS โหลด (defer script) แล้ว fetch ทันที
+    (function _pdpFastInit() {
+      // ถ้า Supabase JS ยังไม่โหลด → รอแบบ poll (max 4 วิ)
+      var _tries = 0, _maxTries = 40;
+      var _t = setInterval(function() {
+        _tries++;
+        var sbReady = typeof window.supabase !== 'undefined';
+        if (sbReady || _tries >= _maxTries) {
+          clearInterval(_t);
+          if (!sbReady) return; // timeout — ปล่อยให้ loadData จัดการ
+          // init Supabase client ถ้ายังไม่ได้ init
+          if (!sb) {
+            try {
+              var url = (typeof C !== 'undefined' && C.SUPABASE_URL) ? C.SUPABASE_URL.trim() : '';
+              var key = (typeof C !== 'undefined' && C.SUPABASE_KEY) ? C.SUPABASE_KEY.trim() : '';
+              if (url && key && url.startsWith('https://')) {
+                sb = window.supabase.createClient(url, key);
+              }
+            } catch(e) { return; }
+          }
+          if (!sb) return;
+          // show loading skeleton ก่อน
+          var pgProp = document.getElementById('page-property');
+          if (pgProp) { pgProp.style.display = ''; pgProp.classList.add('active'); }
+          document.querySelectorAll('.page').forEach(function(p){ if(p.id!=='page-property') p.classList.remove('active'); });
+          var elLoading = document.getElementById('pdp-loading');
+          var elContent = document.getElementById('pdp-content');
+          var elError   = document.getElementById('pdp-error');
+          if (elLoading) elLoading.style.display = '';
+          if (elContent) elContent.style.display = 'none';
+          if (elError)   elError.style.display = 'none';
+          // ── Fetch เฉพาะรายการนี้ทันที ──
+          sb.from('properties').select('*').eq('id', propId).eq('status', 'approved').single()
+            .then(function(res) {
+              window._pdpFastFetchDone = true;
+              if (!res.data) return; // loadData จะจัดการต่อ
+              // mapProp อาจยังไม่ ready — รอแบบ poll สั้นๆ
+              var _mapTries = 0;
+              var _mapT = setInterval(function() {
+                _mapTries++;
+                if (typeof mapProp === 'function' || _mapTries > 20) {
+                  clearInterval(_mapT);
+                  var mapped = (typeof mapProp === 'function') ? mapProp(res.data) : res.data;
+                  // เก็บ property นี้ไว้ใน props array ก่อน (ให้ pdpShowPage ทำงานได้)
+                  if (typeof props !== 'undefined') {
+                    var exists = props.some(function(x){ return String(x.id) === String(propId); });
+                    if (!exists) props.push(mapped);
+                  }
+                  // ถ้า pdpShowPage พร้อมแล้ว ให้ render ทันที
+                  if (typeof pdpShowPage === 'function') {
+                    window._pendingPropertyId = null;
+                    pdpShowPage(propId);
+                  }
+                }
+              }, 50);
+            })
+            .catch(function() { /* ปล่อยให้ loadData จัดการ */ });
+        }
+      }, 100);
+    })();
     return;
   }
   const sectionMap = {
@@ -14481,7 +14595,8 @@ document.addEventListener('DOMContentLoaded', function initRouter() {
       _routerReady = true;
       clearInterval(_readyCheck);
       // If arriving at a property URL, show Property Detail Page
-      if (window._pendingPropertyId) {
+      // (ถ้า fast path ทำงานเสร็จแล้ว ข้ามได้เลย)
+      if (window._pendingPropertyId && !window._pdpFastFetchDone) {
         const pid = window._pendingPropertyId;
         delete window._pendingPropertyId;
         setTimeout(() => {
