@@ -431,11 +431,30 @@ iframe#gmap-inline-iframe{
   touch-action:pan-x pan-y!important;
 }
 
-/* ══ MATCHDOOR INTERACTIVE MAP — Airbnb-style Leaflet Map ══ */
-#md-map-panel{display:none;background:#0A1628;border-bottom:2px solid rgba(200,146,42,.3)}
-#md-map-panel.open{display:block}
-#md-map-wrap{position:relative;border-radius:14px;overflow:hidden;border:2px solid rgba(200,146,42,.25);height:500px}
-@media(max-width:768px){#md-map-wrap{height:360px}}
+/* ══ MATCHDOOR INTERACTIVE MAP — Right Side Panel ══ */
+#listings-map-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1200;
+  backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);
+  transition:opacity .32s ease;opacity:0;
+}
+#listings-map-overlay.open{display:block;opacity:1}
+#md-map-panel{
+  display:block;position:fixed;right:0;top:0;bottom:0;
+  width:420px;
+  background:#0A1628;z-index:1201;
+  transform:translateX(100%);transition:transform .38s cubic-bezier(.32,.72,.48,1);
+  overflow-y:auto;overflow-x:hidden;
+  border-left:2px solid rgba(200,146,42,.35);
+  box-shadow:-8px 0 40px rgba(0,0,0,.55);
+}
+#md-map-panel.open{transform:translateX(0)}
+#md-map-wrap{position:relative;border-radius:10px;overflow:hidden;border:2px solid rgba(200,146,42,.25);height:calc(100vh - 210px);min-height:300px}
+@media(max-width:1100px){#md-map-panel{width:360px}}
+@media(max-width:768px){
+  #md-map-panel{width:100vw;right:0;top:auto;bottom:0;height:72vh;border-left:none;border-top:2px solid rgba(200,146,42,.35);border-radius:20px 20px 0 0;box-shadow:0 -8px 40px rgba(0,0,0,.55);transform:translateY(100%)}
+  #md-map-panel.open{transform:translateY(0)}
+  #md-map-wrap{height:calc(72vh - 155px);min-height:220px}
+}
 #md-leaflet-map{width:100%;height:100%}
 .md-map-price-pin{background:var(--p);color:#fff;padding:5px 9px;border-radius:20px;font-size:12px;font-weight:700;white-space:nowrap;box-shadow:0 2px 8px rgba(27,58,107,.45);border:2px solid rgba(255,255,255,.25);cursor:pointer;transition:.15s;line-height:1}
 .md-map-price-pin:hover,.md-map-price-pin.active{background:var(--a);color:#1a1a2e;transform:scale(1.1);z-index:1000!important;border-color:#fff}
@@ -2191,10 +2210,10 @@ footer::after{
 /* listings-grid ใช้ prop-grid (auto-fill) — เหมือน modal popup */
 #listings-grid{grid-template-columns:repeat(auto-fill,minmax(260px,1fr))!important}
 
-/* Search bar: desktop 8-col */
+/* Search bar: desktop 9-col (added popular loc) */
 .listings-search-sf{
   display:grid;
-  grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr 1fr auto;
+  grid-template-columns:1.6fr 0.8fr 0.8fr 0.9fr 1fr 0.9fr 0.9fr auto;
   gap:8px;
   align-items:end;
 }
@@ -5835,7 +5854,7 @@ footer::after{
      <div class="dd-sec">
       <div class="dd-sec-title">ประเภทอสังหาริมทรัพย์</div>
       <div class="dd-grid">
-       <div class="dd-item" onclick="closeAllDD();_silentShowPage('home',true);setTimeout(()=>scrollToEl('all-sec'),60)"><i class="fas fa-home"></i> ทั้งหมด</div>
+       <div class="dd-item" onclick="closeAllDD();showListingsPage('ประกาศทั้งหมด');"><i class="fas fa-home"></i> ทั้งหมด</div>
        <div class="dd-item" onclick="filterTypeDD('บ้านเดี่ยว')"><i class="fas fa-house-user"></i> บ้านเดี่ยว</div>
        <div class="dd-item" onclick="filterTypeDD('ทาวน์โฮม')"><i class="fas fa-building"></i> ทาวน์โฮม</div>
        <div class="dd-item" onclick="filterTypeDD('คอนโด')"><i class="fas fa-city"></i> คอนโด</div>
@@ -5860,7 +5879,7 @@ footer::after{
      <div class="dd-sec">
       <div class="dd-sec-title">ประเภทอสังหาแบบเช่า</div>
       <div class="dd-grid">
-       <div class="dd-item" onclick="closeAllDD();_silentShowPage('home',true);setTimeout(()=>scrollToEl('all-sec'),60)"><i class="fas fa-home"></i> ทั้งหมด</div>
+       <div class="dd-item" onclick="closeAllDD();var lp=document.getElementById('ls-tx');if(lp){lp.value='RENT';}showListingsPage('ประกาศเช่าทั้งหมด');"><i class="fas fa-home"></i> ทั้งหมด</div>
        <div class="dd-item" onclick="filterRentDD('บ้านเดี่ยว','')"><i class="fas fa-house-user"></i> บ้านเดี่ยว</div>
        <div class="dd-item" onclick="filterRentDD('ทาวน์โฮม','')"><i class="fas fa-building"></i> ทาวน์โฮม</div>
        <div class="dd-item" onclick="filterRentDD('คอนโด','')"><i class="fas fa-city"></i> คอนโด</div>
@@ -8780,7 +8799,7 @@ window.mdBnavCloseMenu = function(){
   <div class="sub-page-footer"></div>
 </div>
 
-<div class="ov" id="prop-modal" onclick="closeModal(event)"><div class="modal"><div class="mhd" style="justify-content:space-between"><h2 id="m-title" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-right:8px"></h2><div style="display:flex;align-items:center;gap:8px;flex-shrink:0"><button onclick="event.stopPropagation();(function(){const url=location.href;if(navigator.share)navigator.share({title:document.title,url});else navigator.clipboard?.writeText(url).then(()=>toast('คัดลอก URL แล้ว ✅'));})()" style="width:34px;height:34px;border-radius:50%;background:var(--lt);border:1.5px solid var(--bd);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--p);font-size:14px" title="แชร์"><i class="fas fa-share-nodes"></i></button><button id="m-fav-btn" onclick="event.stopPropagation();toggleModalFav()" class="modal-fav-btn" title="เพิ่มรายการโปรด"><i class="far fa-heart"></i></button><span class="mclose" onclick="event.stopPropagation();closeModal()">×</span></div></div><div class="mbody"><div class="mslider-wrap"><div class="mslider"><div class="slides" id="slides"></div></div><button class="sarr prev" onclick="slide(-1)"><i class="fas fa-chevron-left"></i></button><button class="sarr next" onclick="slide(1)"><i class="fas fa-chevron-right"></i></button><div class="sdots" id="sdots"></div></div><div id="m-tags" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px"></div><div class="modal-price" id="m-price"></div><div class="modal-loc" id="m-loc"></div><div class="specs" id="m-specs"></div><div id="m-extras"></div><div class="agent-box" id="m-agent"><div class="ag-av" id="m-ag-av"></div><div><div id="m-ag-name" style="font-weight:700"></div><div id="m-ag-role" style="font-size:12px;color:var(--gr)"></div></div></div><div class="modal-desc" id="m-desc"></div><div id="m-chips" style="margin-bottom:10px"></div><div id="m-map" style="margin-bottom:16px"></div><div id="m-360-wrap" style="margin-bottom:16px"><button id="m-360-toggle-btn" onclick="toggle360()" style="display:flex;align-items:center;gap:8px;width:100%;background:linear-gradient(135deg,#0f1e3a,#1b3a6b);color:#fff;border:none;border-radius:12px;padding:13px 18px;cursor:pointer;font-size:14px;font-weight:700;font-family:inherit;transition:.2s" onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'"><i class="fas fa-street-view" style="font-size:18px;opacity:.9"></i><span id="m-360-label">มุมมอง 360°</span><span class="tour360-badge">Virtual Tour</span><i id="m-360-chevron" class="fas fa-chevron-down" style="margin-left:auto;font-size:12px;opacity:.7;transition:transform .3s"></i></button><div id="m-360-viewer-wrap" style="display:none;margin-top:8px"><div id="m-360-viewer" class="tour360-viewer"><canvas id="tour360-canvas"></canvas><div class="tour360-hint"><i class="fas fa-hand-pointer"></i> <span id="m-drag-hint">ลากเพื่อหมุน</span></div><button class="tour360-close" onclick="toggle360()"><i class="fas fa-times"></i></button></div></div></div><div id="m-nearby" style="margin-bottom:14px"></div><div class="cta-row"><a class="btn-cta cta-ln" id="m-ln" href="#" target="_blank"><i class="fab fa-line"></i> <span id="m-ln-label">แชท Line</span></a><a class="btn-cta cta-tel" id="m-tel" href="#"><i class="fas fa-mobile-alt"></i> <span id="m-tel-label">โทรสอบถาม</span></a></div></div></div></div>
+<div class="ov" id="prop-modal" onclick="closeModal(event)"><div class="modal"><div class="mhd" style="justify-content:space-between"><h2 id="m-title" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-right:8px"></h2><div style="display:flex;align-items:center;gap:8px;flex-shrink:0"><button onclick="event.stopPropagation();(function(){const url=location.href;if(navigator.share)navigator.share({title:document.title,url});else navigator.clipboard?.writeText(url).then(()=>toast('คัดลอก URL แล้ว ✅'));})()" style="width:34px;height:34px;border-radius:50%;background:var(--lt);border:1.5px solid var(--bd);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--p);font-size:14px" title="แชร์"><i class="fas fa-share-nodes"></i></button><button id="m-fav-btn" onclick="event.stopPropagation();toggleModalFav()" class="modal-fav-btn" title="เพิ่มรายการโปรด"><i class="far fa-heart"></i></button><span class="mclose" onclick="event.stopPropagation();closeModal()">×</span></div></div><div class="mbody"><div class="mslider-wrap"><div class="mslider"><div class="slides" id="slides"></div></div><button class="sarr prev" onclick="slide(-1)"><i class="fas fa-chevron-left"></i></button><button class="sarr next" onclick="slide(1)"><i class="fas fa-chevron-right"></i></button><div class="sdots" id="sdots"></div></div><div id="m-tags" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px"></div><div class="modal-price" id="m-price"></div><div class="modal-loc" id="m-loc"></div><div class="specs" id="m-specs"></div><div id="m-extras"></div><div class="agent-box" id="m-agent"><div class="ag-av" id="m-ag-av"></div><div><div id="m-ag-name" style="font-weight:700"></div><div id="m-ag-role" style="font-size:12px;color:var(--gr)"></div></div></div><div class="modal-desc" id="m-desc"></div><div id="m-chips" style="margin-bottom:10px"></div><div id="m-map" style="margin-bottom:16px"></div><div id="m-360-wrap" style="margin-bottom:16px"><button id="m-360-toggle-btn" onclick="toggle360()" style="display:flex;align-items:center;gap:8px;width:100%;background:linear-gradient(135deg,#0f1e3a,#1b3a6b);color:#fff;border:none;border-radius:12px;padding:13px 18px;cursor:pointer;font-size:14px;font-weight:700;font-family:inherit;transition:.2s" onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'"><i class="fas fa-street-view" style="font-size:18px;opacity:.9"></i><span id="m-360-label">มุมมอง 360°</span><span class="tour360-badge">Virtual Tour</span><i id="m-360-chevron" class="fas fa-chevron-down" style="margin-left:auto;font-size:12px;opacity:.7;transition:transform .3s"></i></button><div id="m-360-viewer-wrap" style="display:none;margin-top:8px"><div id="m-360-viewer" class="tour360-viewer"><canvas id="tour360-canvas"></canvas><div class="tour360-hint"><i class="fas fa-hand-pointer"></i> <span id="m-drag-hint">ลากเพื่อหมุน</span></div><button class="tour360-close" onclick="toggle360()"><i class="fas fa-times"></i></button></div></div></div><div id="m-nearby" style="margin-bottom:14px"></div><div class="cta-row"><a class="btn-cta cta-ln" id="m-ln" href="#" target="_blank"><i class="fab fa-line"></i> <span id="m-ln-label">แชท Line</span></a><a class="btn-cta cta-tel" id="m-tel" href="#"><i class="fas fa-mobile-alt"></i> <span id="m-tel-label">โทรสอบถาม</span></a></div><div style="margin-top:10px"><button id="m-pdp-btn" onclick="event.stopPropagation();(function(){var id=window._currentModalId;if(id){closeModal();setTimeout(function(){showPage('property',id);},200);}})();" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--lt);border:1.5px solid var(--bd);border-radius:12px;padding:11px 16px;font-size:13px;font-weight:600;color:var(--p);cursor:pointer;font-family:inherit;transition:.15s" onmouseover="this.style.borderColor='var(--p)';this.style.background='rgba(27,58,107,.07)'" onmouseout="this.style.borderColor='var(--bd)';this.style.background='var(--lt)'"><i class="fas fa-expand-alt"></i> ดูรายละเอียดเต็มหน้า</button></div></div></div></div>
 <div class="ov" id="all-modal" onclick="if(event.target===this){if(window._allModalParentType){var _pt=window._allModalParentType;window._allModalParentType=null;openAllModal(_pt);}else{_closeModal('all-modal');window._modalCurrentType=null;}}"><div class="modal wide"><div class="mhd"><h2 id="all-title2"></h2><div id="all-modal-hdr-actions" style="display:flex;align-items:center;gap:7px;flex-shrink:0"></div><span class="mclose" onclick="if(window._allModalParentType){var _pt=window._allModalParentType;window._allModalParentType=null;openAllModal(_pt);}else{_closeModal('all-modal');window._modalCurrentType=null;}">×</span></div><div id="all-modal-filter-sticky"></div><div class="mbody" id="all-body" style="overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain"></div></div></div>
 <!-- ===== GOOGLE MY MAPS POPUP (เปิดทับ all-modal) ===== -->
 <!-- ===== GOOGLE MY MAPS INLINE PANEL — injected dynamically into all-modal ===== -->
@@ -14906,7 +14925,7 @@ function propCard(p){
   })();
   const investHtml = investTag ? `<div style="position:absolute;bottom:44px;left:10px;background:linear-gradient(135deg,#c8922a,#e8b84b);color:#fff;font-size:10px;font-weight:800;padding:3px 10px;border-radius:20px;z-index:5;white-space:nowrap;box-shadow:0 2px 8px rgba(200,146,42,.5);letter-spacing:.3px"><i class="fas fa-chart-line"></i> ${investTag}</div>` : '';
 
-  return `<div class="prop-card" onclick="showPage('property','${p.id}')" style="cursor:pointer">
+  return `<div class="prop-card" onclick="openModal('${p.id}')" style="cursor:pointer">
     <a href="${typeof _pdpPropUrl === 'function' ? _pdpPropUrl(p) : '/property/'+p.id}" class="prop-card-seo-link" onclick="event.preventDefault()" aria-label="${_sTitle}" tabindex="-1" style="position:absolute;inset:0;z-index:0;pointer-events:none"></a>
     <div class="prop-thumb">
       ${thumbInner}
@@ -15398,6 +15417,7 @@ function listingsResetSearch() {
   const lsTx = document.getElementById('ls-tx'); if(lsTx) lsTx.selectedIndex = 0;
   const lsType = document.getElementById('ls-type'); if(lsType) lsType.selectedIndex = 0;
   const lsProv = document.getElementById('ls-prov'); if(lsProv) lsProv.selectedIndex = 0;
+  const lsPopular = document.getElementById('ls-popular'); if(lsPopular) lsPopular.selectedIndex = 0;
   const lsMin = document.getElementById('ls-min'); if(lsMin) lsMin.selectedIndex = 0;
   const lsMax = document.getElementById('ls-max'); if(lsMax) lsMax.selectedIndex = 0;
   const lsTransit = document.getElementById('ls-transit'); if(lsTransit) lsTransit.selectedIndex = 0;
@@ -15588,28 +15608,27 @@ function openListingsAdvFilter() {
 }
 
 function toggleListingsMapPanel() {
-  const panel = document.getElementById('listings-map-panel');
-  if(!panel) return;
   const mdPanel = document.getElementById('md-map-panel');
-  const isShown = mdPanel ? mdPanel.style.display !== 'none' && mdPanel.style.display !== '' : panel.style.display !== 'none';
-  
-  if(mdPanel) {
-    mdPanel.style.display = isShown ? 'none' : 'block';
+  const overlay = document.getElementById('listings-map-overlay');
+  if(!mdPanel) return;
+  const isOpen = mdPanel.classList.contains('open');
+
+  if(isOpen) {
+    mdPanel.classList.remove('open');
+    if(overlay){ overlay.style.opacity='0'; setTimeout(()=>{ overlay.style.display='none'; overlay.classList.remove('open'); },350); }
   } else {
-    panel.style.display = isShown ? 'none' : 'block';
+    if(overlay){ overlay.style.display='block'; requestAnimationFrame(()=>overlay.classList.add('open')); }
+    setTimeout(()=>{ mdPanel.classList.add('open'); },10);
   }
-  
+
   const btn = document.getElementById('listings-map-toggle-btn');
-  if(btn) {
-    btn.innerHTML = isShown
+  if(btn){
+    btn.innerHTML = isOpen
       ? '<i class="fas fa-map-marked-alt"></i> <span class="ls-map-btn-label">ค้นหาด้วยแผนที่</span>'
       : '<i class="fas fa-times"></i> <span class="ls-map-btn-label">ปิดแผนที่</span>';
   }
-  
-  // Init Leaflet map first time it opens
-  if(!isShown) {
-    setTimeout(function(){ mdMapInit(); }, 80);
-  }
+
+  if(!isOpen){ setTimeout(function(){ mdMapInit(); }, 80); }
 }
 
 /* ════════════════════════════════════════════════════════════════
@@ -25425,6 +25444,48 @@ function resetAdvFilter(){
             </select>
           </div>
           <div>
+            <label style="display:block;font-size:11px;font-weight:700;color:rgba(255,220,150,.9);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px"><i class="fas fa-fire" style="color:#ff6b6b"></i> ทำเลยอดนิยม</label>
+            <select id="ls-popular" style="width:100%;padding:9px 12px;border:1.5px solid rgba(255,255,255,.25);border-radius:9px;font-size:13px;color:#fff;background:rgba(20,40,80,.85);font-family:inherit" onchange="(function(){var v=document.getElementById('ls-popular').value;if(v){document.getElementById('ls-kw').value=v;listingsInlineSearch();}})()">
+              <option value="">🔥 ทำเลยอดนิยม</option>
+              <optgroup label="📍 โซนกลางเมือง — CBD">
+                <option value="สุขุมวิท">📍 สุขุมวิท</option>
+                <option value="สาทร">📍 สาทร</option>
+                <option value="สีลม">📍 สีลม</option>
+                <option value="อโศก">📍 อโศก</option>
+                <option value="ทองหล่อ">📍 ทองหล่อ</option>
+                <option value="เพลินจิต">📍 เพลินจิต</option>
+                <option value="ชิดลม">📍 ชิดลม</option>
+                <option value="ราชประสงค์">📍 ราชประสงค์</option>
+                <option value="ลุมพินี">📍 ลุมพินี</option>
+                <option value="วิทยุ">📍 ถ.วิทยุ</option>
+              </optgroup>
+              <optgroup label="📍 โซนตะวันออก">
+                <option value="พระโขนง">📍 พระโขนง</option>
+                <option value="เอกมัย">📍 เอกมัย</option>
+                <option value="อ่อนนุช">📍 อ่อนนุช</option>
+                <option value="บางนา">📍 บางนา</option>
+                <option value="ลาดกระบัง">📍 ลาดกระบัง</option>
+                <option value="มีนบุรี">📍 มีนบุรี</option>
+                <option value="รามคำแหง">📍 รามคำแหง</option>
+              </optgroup>
+              <optgroup label="📍 โซนเหนือ">
+                <option value="รัชดา">📍 รัชดาภิเษก</option>
+                <option value="ลาดพร้าว">📍 ลาดพร้าว</option>
+                <option value="จตุจักร">📍 จตุจักร</option>
+                <option value="หมอชิต">📍 หมอชิต</option>
+                <option value="อารีย์">📍 อารีย์</option>
+                <option value="พระราม 9">📍 พระราม 9</option>
+                <option value="ห้วยขวาง">📍 ห้วยขวาง</option>
+              </optgroup>
+              <optgroup label="📍 โซนตะวันตก &amp; ใต้">
+                <option value="ปิ่นเกล้า">📍 ปิ่นเกล้า</option>
+                <option value="พระราม 3">📍 พระราม 3</option>
+                <option value="วงเวียนใหญ่">📍 วงเวียนใหญ่</option>
+                <option value="ธนบุรี">📍 ธนบุรี</option>
+              </optgroup>
+            </select>
+          </div>
+          <div>
             <label id="ls-label-min" style="display:block;font-size:11px;font-weight:700;color:rgba(255,220,150,.9);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px"><i class="fas fa-tag"></i> ราคาต่ำสุด</label>
             <select id="ls-min" style="width:100%;padding:9px 12px;border:1.5px solid rgba(255,255,255,.25);border-radius:9px;font-size:12px;color:#fff;background:rgba(20,40,80,.85);font-family:inherit" onchange="listingsInlineSearch()">
               <option value="0">ราคาต่ำสุด</option>
@@ -25530,30 +25591,36 @@ function resetAdvFilter(){
     </div>
   </div>
 
-  <!-- ══ MATCHDOOR INTERACTIVE MAP PANEL — Airbnb-style Leaflet ══ -->
-  <div id="listings-map-panel" class="md-map-panel-outer">
-    <div id="md-map-panel" style="background:#0A1628;border-bottom:2px solid rgba(200,146,42,.3)">
-      <div style="max-width:1320px;margin:0 auto;padding:0 20px 16px">
+  <!-- Map overlay backdrop -->
+  <div id="listings-map-overlay" onclick="toggleListingsMapPanel()"></div>
+
+  <!-- ══ MATCHDOOR INTERACTIVE MAP PANEL — Right Side / Mobile Bottom Sheet ══ -->
+  <div id="listings-map-panel">
+    <div id="md-map-panel">
+      <!-- Mobile drag handle -->
+      <div data-drag-handle style="display:none;width:40px;height:4px;background:rgba(255,255,255,.25);border-radius:2px;margin:10px auto 0;cursor:grab" id="md-map-drag-handle"></div>
+      <style>@media(max-width:768px){#md-map-drag-handle{display:block!important}}</style>
+      <div style="padding:14px 14px 0">
         <!-- Header -->
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0 8px;flex-wrap:wrap;gap:8px">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:12px;border-bottom:1px solid rgba(200,146,42,.2)">
           <div style="color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px">
-            <i class="fas fa-map-marked-alt" style="color:var(--a)"></i> แผนที่ประกาศอสังหาริมทรัพย์
+            <i class="fas fa-map-marked-alt" style="color:var(--a)"></i> แผนที่ประกาศอสังหาฯ
             <span id="md-map-pin-count" style="font-size:11px;opacity:.6;font-weight:400"></span>
           </div>
           <div style="display:flex;align-items:center;gap:8px">
-            <button onclick="mdMapFitAll()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:6px;padding:5px 12px;font-size:11px;cursor:pointer;display:flex;align-items:center;gap:5px"><i class="fas fa-compress-arrows-alt"></i> รวมทั้งหมด</button>
-            <button onclick="toggleListingsMapPanel()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer"><i class="fas fa-times"></i> ปิด</button>
+            <button onclick="mdMapFitAll()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer;display:flex;align-items:center;gap:5px"><i class="fas fa-compress-arrows-alt"></i></button>
+            <button onclick="toggleListingsMapPanel()" style="background:rgba(255,80,80,.15);border:1px solid rgba(255,80,80,.3);color:#fff;border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px"><i class="fas fa-times"></i> ปิด</button>
           </div>
         </div>
         <!-- Filter chips -->
-        <div class="md-map-filter-bar" id="md-map-filter-bar">
+        <div class="md-map-filter-bar" id="md-map-filter-bar" style="margin-top:12px">
           <button class="md-map-fchip active" data-tx="ALL" onclick="mdMapFilterTx('ALL',this)">ทั้งหมด</button>
           <button class="md-map-fchip" data-tx="BUY" onclick="mdMapFilterTx('BUY',this)">ซื้อ</button>
           <button class="md-map-fchip" data-tx="RENT" onclick="mdMapFilterTx('RENT',this)">เช่า</button>
           <span class="md-map-count" id="md-map-showing-count"></span>
         </div>
         <!-- Map container -->
-        <div id="md-map-wrap" style="margin-top:10px">
+        <div id="md-map-wrap" style="margin-top:12px">
           <div id="md-leaflet-map"></div>
           <!-- Tooltip hint -->
           <div id="md-map-hint" style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);background:rgba(10,22,40,.88);color:#fff;font-size:11px;padding:6px 14px;border-radius:20px;pointer-events:none;white-space:nowrap;z-index:500;transition:opacity .4s">
@@ -25561,7 +25628,7 @@ function resetAdvFilter(){
           </div>
         </div>
         <!-- Active location chips from map click -->
-        <div style="display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap" id="map-filter-chips"></div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap;padding-bottom:16px" id="map-filter-chips"></div>
       </div>
     </div>
   </div>
@@ -25592,20 +25659,57 @@ function resetAdvFilter(){
       <div class="pagination" id="listings-pagination"></div>
     </div>
 
-    <!-- SEO Sidebar -->
+    <!-- Sidebar: Ad Zone + SEO -->
     <aside class="listings-seo-sidebar">
+      <!-- ══ AD ZONE 1: Banner Ad ══ -->
+      <div class="ls-ad-banner" id="ls-ad-banner-1" style="background:linear-gradient(135deg,#0A1628 0%,#1B3A6B 100%);border-radius:14px;border:1.5px dashed rgba(200,146,42,.5);overflow:hidden;margin-bottom:16px;position:relative;min-height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px">
+        <div style="position:absolute;inset:0;opacity:.07;background:repeating-linear-gradient(45deg,rgba(200,146,42,.3) 0,rgba(200,146,42,.3) 1px,transparent 0,transparent 50%);background-size:12px 12px"></div>
+        <div style="position:relative;z-index:1">
+          <div style="width:48px;height:48px;background:rgba(200,146,42,.15);border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px"><i class="fas fa-ad" style="font-size:22px;color:var(--a)"></i></div>
+          <div style="color:rgba(255,255,255,.9);font-size:13px;font-weight:700;margin-bottom:4px">พื้นที่โฆษณา</div>
+          <div style="color:rgba(255,255,255,.5);font-size:11px;margin-bottom:14px">280 × 200 px · Banner</div>
+          <a href="mailto:contact@matchdoor.co" style="display:inline-flex;align-items:center;gap:6px;background:var(--a);color:#1A1A2E;padding:7px 16px;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none"><i class="fas fa-envelope"></i> ติดต่อลงโฆษณา</a>
+        </div>
+      </div>
+
+      <!-- ══ Property Types SEO ══ -->
       <div style="background:#fff;border-radius:14px;border:1.5px solid var(--bd);padding:18px;margin-bottom:16px">
         <div style="font-size:12px;font-weight:800;color:var(--p);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--lt)"><i class="fas fa-building" style="color:var(--a)"></i> ประเภทอสังหาฯ</div>
         <div style="display:flex;flex-direction:column;gap:6px" id="seo-prop-types"></div>
       </div>
-      <div style="background:linear-gradient(135deg,#0A1628,#1B3A6B);border-radius:14px;padding:18px;color:#fff">
+
+      <!-- ══ AD ZONE 2: Square Ad ══ -->
+      <div style="background:linear-gradient(135deg,#f8f6f0 0%,#fff8ec 100%);border-radius:14px;border:1.5px dashed rgba(200,146,42,.4);overflow:hidden;margin-bottom:16px;position:relative;min-height:250px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px">
+        <div style="position:absolute;inset:0;opacity:.05;background:repeating-linear-gradient(-45deg,#c8922a 0,#c8922a 1px,transparent 0,transparent 50%);background-size:12px 12px"></div>
+        <div style="position:relative;z-index:1">
+          <div style="width:48px;height:48px;background:rgba(200,146,42,.12);border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px"><i class="fas fa-bullhorn" style="font-size:20px;color:#c8922a"></i></div>
+          <div style="color:var(--p);font-size:13px;font-weight:700;margin-bottom:4px">พื้นที่โฆษณา</div>
+          <div style="color:var(--tx2);font-size:11px;margin-bottom:14px">280 × 250 px · Square</div>
+          <a href="mailto:contact@matchdoor.co" style="display:inline-flex;align-items:center;gap:6px;background:var(--p);color:#fff;padding:7px 16px;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none"><i class="fas fa-envelope"></i> ติดต่อลงโฆษณา</a>
+        </div>
+      </div>
+
+      <!-- ══ Consult CTA ══ -->
+      <div style="background:linear-gradient(135deg,#0A1628,#1B3A6B);border-radius:14px;padding:18px;color:#fff;margin-bottom:16px">
         <div style="font-size:13px;font-weight:700;margin-bottom:8px"><i class="fas fa-phone" style="color:var(--a)"></i> ปรึกษาฟรี ไม่มีค่าใช้จ่าย</div>
         <p style="font-size:12px;opacity:.8;margin-bottom:12px">ทีมตัวแทน Matchdoor พร้อมช่วยคุณหาบ้านที่ใช่</p>
         <a href="https://line.me/ti/p/@matchdoor" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:6px;background:var(--ln);color:#fff;padding:9px;border-radius:8px;font-weight:700;font-size:13px;text-decoration:none;margin-bottom:7px"><i class="fab fa-line"></i> Line</a>
         <a id="seo-tel-link" href="#" style="display:flex;align-items:center;justify-content:center;gap:6px;background:rgba(255,255,255,.15);color:#fff;padding:9px;border-radius:8px;font-weight:700;font-size:13px;text-decoration:none;border:1px solid rgba(255,255,255,.3)"><i class="fas fa-phone"></i> โทรเลย</a>
       </div>
+
+      <!-- ══ AD ZONE 3: Tall Ad ══ -->
+      <div style="background:linear-gradient(180deg,#0A1628 0%,#0d2040 100%);border-radius:14px;border:1.5px dashed rgba(200,146,42,.4);overflow:hidden;margin-bottom:16px;position:relative;min-height:300px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px">
+        <div style="position:relative;z-index:1">
+          <div style="width:48px;height:48px;background:rgba(200,146,42,.15);border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px"><i class="fas fa-image" style="font-size:20px;color:var(--a)"></i></div>
+          <div style="color:rgba(255,255,255,.9);font-size:13px;font-weight:700;margin-bottom:4px">พื้นที่โฆษณา</div>
+          <div style="color:rgba(255,255,255,.5);font-size:11px;margin-bottom:6px">280 × 300 px · Tall</div>
+          <div style="color:rgba(200,146,42,.7);font-size:10px;margin-bottom:14px">เข้าถึงกลุ่มเป้าหมายอสังหาฯ</div>
+          <a href="mailto:contact@matchdoor.co" style="display:inline-flex;align-items:center;gap:6px;background:var(--a);color:#1A1A2E;padding:7px 16px;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none"><i class="fas fa-envelope"></i> ติดต่อลงโฆษณา</a>
+        </div>
+      </div>
+
       <!-- Near BTS/MRT quick filter -->
-      <div style="background:#fff;border-radius:14px;border:1.5px solid var(--bd);padding:18px;margin-top:16px" id="seo-transit-box">
+      <div style="background:#fff;border-radius:14px;border:1.5px solid var(--bd);padding:18px;margin-top:0" id="seo-transit-box">
         <div style="font-size:12px;font-weight:800;color:var(--p);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--lt)"><i class="fas fa-train" style="color:#009900"></i> ใกล้รถไฟฟ้า</div>
         <div style="display:flex;flex-direction:column;gap:5px" id="seo-transit-btns"></div>
       </div>
