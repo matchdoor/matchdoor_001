@@ -13252,6 +13252,65 @@ async function loadData(){
     return;
   }
 
+  // ── LISTINGS FAST PATH: ถ้าเปิด URL /listings โดยตรง ────────────
+  // fast path fetch props แล้วตั้งค่า data ทันที
+  // loadData ยังทำงาน background ต่อ (agents/portfolio/services/blogs)
+  const _isListingsUrl = location.pathname === '/listings';
+  if (_isListingsUrl && window._listingsFastFetchDone === false) {
+    loading(false);
+    if(hasSB){
+      try{
+        const p = await sb.from('properties')
+          .select('*')
+          .eq('status','approved')
+          .order('created_at',{ascending:false})
+          .range(0, 999);
+        if(p.data && p.data.length){
+          props = p.data.map(mapProp);
+          // ถ้า fast path ยังทำงานอยู่ (ยังไม่ render) → ช่วยเซ็ต data ให้
+          if(!window._listingsFastFetchDone){
+            _listingsBaseData = [...props];
+            _listingsData = typeof sortListings==='function' ? sortListings([...props],'default') : [...props];
+            _listingsCurPage = 1;
+            window._listingsDataReady = true;
+            window._pendingListingsInit = false;
+            if(typeof renderListingsPage==='function'){
+              var lp = document.getElementById('page-listings');
+              if(lp && lp.classList.contains('active')) renderListingsPage();
+            }
+          }
+        }
+        agents = MOCK.agents; port = MOCK.port; services = MOCK.services; blogs = MOCK.blogs;
+        agents.forEach(a=>{a.propIds=props.filter(p=>p.agentId===a.id).map(p=>p.id);});
+        afterLoad();
+        // Background: secondary data
+        setTimeout(async ()=>{
+          try{
+            const [a, po, s, b] = await Promise.all([
+              sb.from('agents').select('*').eq('is_active',true),
+              sb.from('portfolio').select('*').order('created_at',{ascending:false}),
+              sb.from('services').select('*').eq('is_active',true).order('sort_order',{ascending:true}),
+              sb.from('blogs').select('*').eq('is_published',true).order('sort_order',{ascending:true})
+            ]);
+            if(a.data && a.data.length){ agents = a.data.map(mapAgent); agents.forEach(ag=>{ag.propIds=props.filter(p=>p.agentId===ag.id).map(p=>p.id);}); }
+            if(po.data && po.data.length){ port = po.data.map(mapPort); }
+            if(s.data && s.data.length){ services = s.data; }
+            if(b.data && b.data.length){
+              blogs = b.data.map(blog => {
+                const rawPhotos = Array.isArray(blog.photos) ? blog.photos : (blog.photos ? [blog.photos] : []);
+                const coverPath = blog.cover_image || blog.cover || '';
+                const allPhotos = coverPath ? [coverPath, ...rawPhotos] : rawPhotos;
+                return { ...blog, photos: [...new Set(allPhotos)].filter(Boolean).map(p => sbImg(p)) };
+              });
+            }
+            loadLegalPages().catch(e=>console.warn('[loadLegalPages]',e));
+          } catch(e){ console.warn('[listings background load]',e); }
+        }, 400);
+      } catch(e){ console.warn('[listings fast loadData]',e); }
+    }
+    return;
+  }
+
   if(hasSB){
     try{
       // ── PHASE 1: โหลด properties ทั้งหมดก่อน — SELECT * เพื่อไม่ให้ข้อมูลหาย ──────────
@@ -13494,8 +13553,12 @@ function afterLoad(){
     }
 
     if(ap && ap.id === 'page-listings') {
-      // หน้า listings active อยู่แล้ว → render ทันที
-      if(typeof renderListingsPage === 'function') renderListingsPage();
+      // ถ้า listings fast path render เสร็จแล้ว → ไม่ต้อง re-render ซ้ำ
+      if (window._listingsFastFetchDone) {
+        window._listingsFastFetchDone = false;
+      } else if(typeof renderListingsPage === 'function') {
+        renderListingsPage();
+      }
     } else if(window._pendingListingsRender) {
       // showPage('listings') ถูกเรียกก่อนข้อมูลพร้อม → render ตอนนี้
       window._pendingListingsRender = false;
@@ -13506,6 +13569,20 @@ function afterLoad(){
       if(typeof renderPortfolio === 'function') {
         renderPortfolio('all');
         setTimeout(()=>{ if(typeof applyLang==='function') applyLang(); }, 30);
+      }
+    } else if(window._pendingAgentsRender) {
+      // showPage('agents') ถูกเรียกก่อนข้อมูลพร้อม → render ตอนนี้
+      window._pendingAgentsRender = false;
+      if(typeof renderAgents === 'function') {
+        renderAgents();
+        setTimeout(function(){
+          var _tc = port.filter(function(p){return p.status==='SOLD'||p.status==='RENTED';}).length;
+          if(typeof animateCounter==='function'){
+            animateCounter(document.getElementById('ag-listing-cnt'), props.length);
+            animateCounter(document.getElementById('ag-sale-cnt'), _tc);
+            animateCounter(document.getElementById('ag-agent-cnt'), agents.length);
+          }
+        }, 200);
       }
     } else if(targetPage) {
       if(typeof _silentShowPage === 'function') {
@@ -14324,14 +14401,19 @@ function _silentShowPage(name, skipScrollTop) {
     }
   }
   else if (name === 'agents') {
-    renderAgents();
-    setTimeout(() => {
-      // ใช้ข้อมูลเดียวกับ syncAllStats เพื่อให้ตัวเลขสอดคล้องกันทุกหน้า
-      const _totalClosed = port.filter(p=>p.status==='SOLD'||p.status==='RENTED').length;
-      animateCounter($('ag-listing-cnt'), props.length);
-      animateCounter($('ag-sale-cnt'),    _totalClosed);  // SOLD+RENTED เท่านั้น (สอดคล้องกับหน้าหลัก/ผลงาน)
-      animateCounter($('ag-agent-cnt'),   agents.length);
-    }, 200);
+    if(window._dataReady) {
+      renderAgents();
+      setTimeout(() => {
+        // ใช้ข้อมูลเดียวกับ syncAllStats เพื่อให้ตัวเลขสอดคล้องกันทุกหน้า
+        const _totalClosed = port.filter(p=>p.status==='SOLD'||p.status==='RENTED').length;
+        animateCounter($('ag-listing-cnt'), props.length);
+        animateCounter($('ag-sale-cnt'),    _totalClosed);  // SOLD+RENTED เท่านั้น (สอดคล้องกับหน้าหลัก/ผลงาน)
+        animateCounter($('ag-agent-cnt'),   agents.length);
+      }, 200);
+    } else {
+      // ข้อมูลยังไม่พร้อม — ตั้ง flag ให้ afterLoad() render แทน
+      window._pendingAgentsRender = true;
+    }
   }
   else if (name === 'my-account') {
     renderMyAccount();
@@ -14464,6 +14546,87 @@ function _initRouteFromUrl() {
       // ถ้ามี query string (เช่น /listings?q=สุขุมวิท) ให้เก็บไว้ apply หลังข้อมูลโหลด
       var qs = location.search;
       if (qs) { window._pendingListingsSearch = qs; }
+
+      // ── LISTINGS FAST PATH: fetch properties ทันที ไม่รอ loadData() ──
+      // แสดง skeleton + เริ่ม fetch พร้อมกัน
+      window._listingsFastFetchDone = false;
+      (function _listingsFastInit() {
+        var _tries = 0, _maxTries = 40;
+        var _t = setInterval(function() {
+          _tries++;
+          var sbReady = typeof window.supabase !== 'undefined';
+          if (sbReady || _tries >= _maxTries) {
+            clearInterval(_t);
+            if (!sbReady) return; // timeout — ปล่อยให้ loadData จัดการ
+            // init Supabase client ถ้ายังไม่ได้ init
+            if (!sb) {
+              try {
+                var url = (typeof C !== 'undefined' && C.SUPABASE_URL) ? C.SUPABASE_URL.trim() : '';
+                var key = (typeof C !== 'undefined' && C.SUPABASE_KEY) ? C.SUPABASE_KEY.trim() : '';
+                if (url && key && url.startsWith('https://')) {
+                  sb = window.supabase.createClient(url, key);
+                }
+              } catch(e) { return; }
+            }
+            if (!sb) return;
+            // แสดง skeleton ทันที
+            var grid = document.getElementById('listings-grid');
+            if (grid && !grid.innerHTML.includes('prop-card')) {
+              grid.innerHTML = Array(12).fill(0).map(function(){
+                return '<div class="prop-card loading-sk"><div class="prop-thumb"><div class="sk-img skeleton"></div></div><div class="prop-body"><div class="sk-title skeleton"></div><div class="sk-loc skeleton"></div><div class="sk-price skeleton"></div></div></div>';
+              }).join('');
+            }
+            // Fetch properties ทันที
+            sb.from('properties').select('*')
+              .eq('status', 'approved')
+              .order('created_at', {ascending: false})
+              .range(0, 999)
+              .then(function(res) {
+                window._listingsFastFetchDone = true;
+                if (!res.data || !res.data.length) return; // loadData จะจัดการ
+                // รอให้ mapProp พร้อม
+                var _mapTries = 0;
+                var _mapT = setInterval(function() {
+                  _mapTries++;
+                  if (typeof mapProp === 'function' || _mapTries > 20) {
+                    clearInterval(_mapT);
+                    var mapped = (typeof mapProp === 'function') ? res.data.map(mapProp) : res.data;
+                    // อัปเดต props global ทันที
+                    if (typeof props !== 'undefined') { props = mapped; }
+                    // set listings data
+                    if (typeof _listingsBaseData !== 'undefined') {
+                      _listingsBaseData = mapped;
+                      if (typeof sortListings === 'function') {
+                        _listingsData = sortListings([...mapped], 'default');
+                      } else {
+                        _listingsData = [...mapped];
+                      }
+                      _listingsCurPage = 1;
+                    }
+                    window._listingsDataReady = true;
+                    window._pendingListingsInit = false;
+                    // render listings page ถ้า active อยู่
+                    if (typeof renderListingsPage === 'function') {
+                      var lp = document.getElementById('page-listings');
+                      if (lp && lp.classList.contains('active')) {
+                        renderListingsPage();
+                      }
+                    }
+                  }
+                }, 50);
+              })
+              .catch(function() { /* ปล่อยให้ loadData จัดการ */ });
+          }
+        }, 100);
+      })();
+    }
+    // agents page: ตั้ง flag ถ้าข้อมูลยังไม่พร้อม (afterLoad จะ render เอง)
+    if (path === '/agents' && !window._dataReady) {
+      window._pendingAgentsRender = true;
+    }
+    // portfolio page: ตั้ง flag ถ้าข้อมูลยังไม่พร้อม
+    if (path === '/portfolio' && !window._dataReady) {
+      window._pendingPortfolioRender = true;
     }
   } else {
     _silentShowPage('home');
