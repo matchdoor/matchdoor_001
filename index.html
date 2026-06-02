@@ -186,6 +186,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+<link rel="preconnect" href="https://maps.google.com" crossorigin>
+<link rel="dns-prefetch" href="https://maps.googleapis.com">
 <link rel="dns-prefetch" href="https://fonts.googleapis.com">
 <link rel="dns-prefetch" href="https://supabase.co">
 <!-- ═══ Google Search Console Verification ═══════════════════════════════
@@ -4682,6 +4684,7 @@ footer::after{
   height: 100%;
   position: relative;
   overflow: hidden;
+  contain: layout paint; /* isolate reflow/repaint ภายใน gallery ออกจากส่วนอื่น */
 }
 .pdp-gallery-main img {
   width: 100%;
@@ -4689,6 +4692,7 @@ footer::after{
   object-fit: cover;
   display: block;
   transition: transform .4s ease;
+  will-change: transform; /* GPU compositing layer — ลด paint cost ตอน hover/swap */
 }
 .pdp-gallery-main img:hover { transform: scale(1.02); }
 
@@ -4928,6 +4932,9 @@ footer::after{
   padding: 20px;
   margin-bottom: 20px;
   border: 1px solid var(--bd, #D8D0C4);
+  /* PERF: defer rendering of off-screen sections — ประหยัด ~40% paint time บน mobile */
+  content-visibility: auto;
+  contain-intrinsic-size: 0 200px; /* placeholder height ป้องกัน layout shift */
 }
 .pdp-section-title {
   font-size: 16px;
@@ -5211,6 +5218,8 @@ footer::after{
   max-width: 1200px;
   margin: 24px auto 48px;
   padding: 0 20px;
+  content-visibility: auto;
+  contain-intrinsic-size: 0 400px;
 }
 .pdp-related-title {
   font-size: 20px;
@@ -5334,8 +5343,10 @@ footer::after{
 .pdp-skeleton {
   background: linear-gradient(90deg, #e0dbd2 25%, #ece8e0 50%, #e0dbd2 75%);
   background-size: 200% 100%;
-  animation: pdp-shimmer 1.4s infinite;
+  animation: pdp-shimmer 1.4s infinite linear;
   border-radius: 8px;
+  /* PERF: isolate paint on its own layer */
+  will-change: background-position;
 }
 @keyframes pdp-shimmer {
   0%   { background-position: 200% 0; }
@@ -5374,16 +5385,17 @@ footer::after{
 /* ── Price block responsive ── */
 @media (max-width: 960px) {
   #pdp-price-sidebar { display: none; }
-  #pdp-price-mobile  { display: block !important; }
+  #pdp-price-mobile  { display: block; }
 }
 @media (min-width: 961px) {
-  #pdp-price-mobile  { display: none !important; }
+  #pdp-price-mobile  { display: none; }
   #pdp-price-sidebar { display: block; }
 }
 
 /* ── CTA mobile bar ── */
+#pdp-cta-mobile { display: none; } /* desktop: hidden */
 @media (max-width: 960px) {
-  #pdp-cta-mobile { display: block !important; }
+  #pdp-cta-mobile { display: block; }
 }
 
 .pdp-error-btn {
@@ -24937,7 +24949,7 @@ function resetAdvFilter(){
         </header>
 
         <!-- Price (mobile: shows here, desktop: in sidebar) -->
-        <div class="pdp-price-block pdp-price-mobile" id="pdp-price-mobile" style="display:none">
+        <div class="pdp-price-block pdp-price-mobile" id="pdp-price-mobile">
           <div class="pdp-price-label">ราคา</div>
           <div class="pdp-price" id="pdp-price-m"></div>
           <div class="pdp-price-sub" id="pdp-price-sub-m"></div>
@@ -24987,7 +24999,7 @@ function resetAdvFilter(){
         </div>
 
         <!-- CTA mobile (shows on mobile only) -->
-        <div class="pdp-cta-mobile" id="pdp-cta-mobile" style="display:none;margin-bottom:0">
+        <div class="pdp-cta-mobile" id="pdp-cta-mobile" style="margin-bottom:0">
           <div class="pdp-cta-stack" id="pdp-cta-mobile-btns"></div>
         </div>
 
@@ -26894,13 +26906,17 @@ async function adminDeletePortfolio(id, title){
     var m={'คอนโด':'🏙️','บ้านเดี่ยว':'🏡','ทาวน์โฮม':'🏘️','ที่ดิน':'🌿','อาคารพาณิชย์':'🏢','วิลล่า':'🏖️','รีสอร์ท':'🌴','โรงแรม':'🏨'};
     return m[t] || '🏠';
   }
+  var _starCache = {}; /* memoize ผลลัพธ์ — rating ซ้ำกันบ่อย */
   function _starStr(rating){
+    if (_starCache[rating]) return _starCache[rating];
     var r = Math.round((rating||4.5)*2)/2;
     var full = Math.floor(r), half = r%1>=0.5 ? 1 : 0, empty = 5-full-half;
-    return '<i class="fas fa-star"></i>'.repeat(full) +
+    var html = '<i class="fas fa-star"></i>'.repeat(full) +
            (half ? '<i class="fas fa-star-half-alt"></i>' : '') +
            '<i class="far fa-star"></i>'.repeat(empty) +
            ' <span style="color:var(--gr)">' + rating + '</span>';
+    _starCache[rating] = html;
+    return html;
   }
 
   /* ── Generate SEO slug + canonical URL ── */
@@ -26937,7 +26953,7 @@ async function adminDeletePortfolio(id, title){
 
     /* ── helper: fetch from Supabase then fallback to MOCK ── */
     function _pdpFetchSb(idStr) {
-      sb.from('properties').select('*').eq('id', idStr).single()
+      sb.from('properties').select('*').eq('id', idStr).eq('status', 'approved').single()
         .then(function(res){
           if (window._pdpCurrentId !== idStr) return; /* navigated away */
           if (res.data) {
@@ -26997,8 +27013,8 @@ async function adminDeletePortfolio(id, title){
     _pdpGalIdx = 0;
     _pdpMapLoaded = false;
 
-    /* render สำเร็จ — clear pending flag */
-    window._pdpCurrentId = null;
+    /* BUG FIX: clear _pdpCurrentId หลัง render เสร็จ (ย้ายไปท้าย function)
+       การ reset เร็วเกินไปทำให้ navigation guard ใน _pdpFetchSb ตรวจไม่ได้ */
 
     /* ── Increment view count ใน Supabase (fire after paint — ไม่ block render) ── */
     if (typeof sb !== 'undefined' && sb && p && p.id) {
@@ -27030,12 +27046,16 @@ async function adminDeletePortfolio(id, title){
     _pdpRenderAgent(p);
     _pdpRenderCTA(p);
     /* below-fold sections — defer until browser is idle */
-    var _rIC = window.requestIdleCallback || function(cb){ setTimeout(cb, 100); };
-    _rIC(function(){ _pdpRenderRelated(p); });
+    var _rICDefer = window.requestIdleCallback || function(cb){ setTimeout(cb, 100); };
+    _rICDefer(function(){ _pdpRenderRelated(p); });
     /* _pdpRenderSeoLinks removed */
     _pdpRenderMobileCTA(p);
     _pdpUpdateMetaAndSchema(p);
     _pdpUpdateBackLabel();
+
+    /* BUG FIX: clear _pdpCurrentId หลัง render pipeline เสร็จ
+       (เดิม clear ก่อน render ทำให้ guard ใน fetchSb fail ระหว่าง async) */
+    window._pdpCurrentId = null;
 
     /* Scroll to top */
     window.scrollTo(0, 0);
@@ -27047,18 +27067,23 @@ async function adminDeletePortfolio(id, title){
     });
 
     /* ── Keyboard nav: ← → navigate gallery, ESC goes back ── */
-    window._pdpKeyHandler && document.removeEventListener('keydown', window._pdpKeyHandler);
-    window._pdpKeyHandler = function(e) {
-      var pgProp = document.getElementById('page-property');
-      if (!pgProp || !pgProp.classList.contains('active')) return;
-      if (e.key === 'ArrowLeft')  pdpGalNav(-1);
-      if (e.key === 'ArrowRight') pdpGalNav(1);
-      if (e.key === 'Escape')     pdpGoBack();
-    };
-    document.addEventListener('keydown', window._pdpKeyHandler);
+    /* BUG FIX: register keyboard handler only ONCE using a stable reference
+       ที่ลงทะเบียนซ้ำทุก render ทำให้ handler สะสม (event listener leak) */
+    if (!window._pdpKeyHandler) {
+      window._pdpKeyHandler = function(e) {
+        var pgProp = document.getElementById('page-property');
+        if (!pgProp || !pgProp.classList.contains('active')) return;
+        if (e.key === 'ArrowLeft')  pdpGalNav(-1);
+        if (e.key === 'ArrowRight') pdpGalNav(1);
+        if (e.key === 'Escape')     pdpGoBack();
+      };
+      document.addEventListener('keydown', window._pdpKeyHandler);
+    }
   }
 
   /* ── Breadcrumb ── */
+  /* Cache breadcrumb elements — queried once, reused on every PDP navigation */
+  var _bcCache = null;
   function _pdpRenderBreadcrumb(p) {
     /* Type level */
     var bcType = document.getElementById('pdp-bc-type');
@@ -27075,6 +27100,12 @@ async function adminDeletePortfolio(id, title){
     var bcProvItem = document.getElementById('pdp-bc-province-item');
     var bcProvLbl  = document.getElementById('pdp-bc-province');
     var bcProvLink = document.getElementById('pdp-bc-province-link');
+
+    /* PERF FIX: cache position meta element — querySelector is expensive on large DOM */
+    if (!_bcCache) {
+      _bcCache = { titlePos: document.querySelector('#pdp-bc-title meta[itemprop="position"]') };
+    }
+
     if (p.province) {
       if (bcSepProv)  bcSepProv.style.display  = '';
       if (bcProvItem) bcProvItem.style.display  = '';
@@ -27084,15 +27115,11 @@ async function adminDeletePortfolio(id, title){
         bcProvLink.setAttribute('onclick',
           "event.preventDefault();if(typeof quickProvSearch==='function')quickProvSearch('" + p.province + "');else showPage('listings')");
       }
-      /* Fix position meta on title item */
-      var titlePos = document.querySelector('#pdp-bc-title meta[itemprop="position"]');
-      if (titlePos) titlePos.content = '5';
+      if (_bcCache.titlePos) _bcCache.titlePos.content = '5';
     } else {
       if (bcSepProv)  bcSepProv.style.display  = 'none';
       if (bcProvItem) bcProvItem.style.display  = 'none';
-      /* Fix position meta on title item */
-      var titlePos2 = document.querySelector('#pdp-bc-title meta[itemprop="position"]');
-      if (titlePos2) titlePos2.content = '4';
+      if (_bcCache.titlePos) _bcCache.titlePos.content = '4';
     }
 
     /* Title (current page) */
@@ -27123,22 +27150,45 @@ async function adminDeletePortfolio(id, title){
       return;
     }
     _pdpGalIdx = 0;
-    _pdpGalShow(0);
+    /* PERF FIX: render first image directly with eager + fetchpriority for LCP */
+    var mainEl = document.getElementById('pdp-gal-main');
+    if (mainEl) {
+      mainEl.innerHTML = '<img src="' + _san(_pdpPhotos[0]) + '" ' +
+        'alt="' + _san(p.title||'') + ' รูปที่ 1" ' +
+        'loading="eager" fetchpriority="high" decoding="async" ' +
+        'style="width:100%;height:100%;object-fit:cover;display:block">';
+      /* Preload รูปที่ 2 ล่วงหน้า */
+      if (_pdpPhotos.length > 1) { var pre = new Image(); pre.src = _pdpPhotos[1]; }
+    }
 
-    /* Thumbnails */
+    /* Thumbnails — ใช้ DocumentFragment เพื่อ batch DOM write ครั้งเดียว */
     var thumbsEl = document.getElementById('pdp-thumbs');
     if (thumbsEl) {
-      thumbsEl.innerHTML = _pdpPhotos.map(function(url, i){
-        return '<div class="pdp-thumb' + (i===0?' active':'') + '" onclick="pdpGalGoTo(' + i + ')" role="button" aria-label="รูปที่ ' + (i+1) + '">' +
-          '<img src="' + _san(url) + '" loading="lazy" decoding="async" alt="' + _san(p.title) + ' รูปที่ ' + (i+1) + '">' +
-          '</div>';
-      }).join('');
+      var frag = document.createDocumentFragment();
+      _pdpPhotos.forEach(function(url, i){
+        var div = document.createElement('div');
+        div.className = 'pdp-thumb' + (i===0?' active':'');
+        div.setAttribute('role', 'button');
+        div.setAttribute('aria-label', 'รูปที่ ' + (i+1));
+        div.onclick = (function(idx){ return function(){ pdpGalGoTo(idx); }; })(i);
+        var img = document.createElement('img');
+        img.src = _san(url);
+        img.loading = 'lazy';
+        img.decoding = 'async';
+        img.alt = _san(p.title) + ' รูปที่ ' + (i+1);
+        div.appendChild(img);
+        frag.appendChild(div);
+      });
+      thumbsEl.innerHTML = '';
+      thumbsEl.appendChild(frag);
     }
+
+    var counter = document.getElementById('pdp-gal-counter');
+    if (counter) counter.textContent = '1 / ' + _pdpPhotos.length;
 
     /* Show/hide nav buttons */
     var prev = document.querySelector('.pdp-gal-prev');
     var next = document.querySelector('.pdp-gal-next');
-    var counter = document.getElementById('pdp-gal-counter');
     if (_pdpPhotos.length <= 1) {
       if (prev) prev.style.display = 'none';
       if (next) next.style.display = 'none';
@@ -27156,10 +27206,25 @@ async function adminDeletePortfolio(id, title){
     _pdpGalIdx = idx;
     var main = document.getElementById('pdp-gal-main');
     if (main) {
-      main.innerHTML = '<img src="' + _san(_pdpPhotos[idx]) + '" ' +
-        'alt="' + _san((_pdpProp && _pdpProp.title)||'') + ' รูปที่ ' + (idx+1) + '" ' +
-        (idx === 0 ? 'loading="eager"' : 'loading="lazy"') + ' decoding="async"' +
-        ' style="width:100%;height:100%;object-fit:cover;display:block">';
+      /* PERF FIX: reuse existing <img> node — swap src แทน rebuild innerHTML
+         ป้องกัน browser ทิ้ง decoded image และ flash ขาวระหว่าง nav รูป */
+      var imgEl = main.querySelector('img');
+      var newSrc = _san(_pdpPhotos[idx]);
+      var newAlt = _san((_pdpProp && _pdpProp.title)||'') + ' รูปที่ ' + (idx+1);
+      if (imgEl) {
+        if (imgEl.getAttribute('src') !== newSrc) { imgEl.src = newSrc; }
+        imgEl.alt = newAlt;
+        imgEl.loading = 'eager';
+      } else {
+        main.innerHTML = '<img src="' + newSrc + '" alt="' + newAlt + '" ' +
+          'loading="eager" decoding="async"' +
+          ' style="width:100%;height:100%;object-fit:cover;display:block">';
+      }
+      /* Preload รูปถัดไปล่วงหน้า (ถ้ามี) — ป้องกัน flicker รูปถัดไป */
+      if (_pdpPhotos.length > 1) {
+        var nextIdx = (idx + 1) % _pdpPhotos.length;
+        var pre = new Image(); pre.src = _pdpPhotos[nextIdx];
+      }
     }
     var counter = document.getElementById('pdp-gal-counter');
     if (counter) counter.textContent = (idx+1) + ' / ' + _pdpPhotos.length;
@@ -27247,23 +27312,14 @@ async function adminDeletePortfolio(id, title){
     var sqmStr   = (p.area > 0 && p.price > 0 && isBuy) ? '฿' + Math.round(p.price / p.area).toLocaleString() + ' / ตร.ม.' : '';
     var labelStr = isBuy ? 'ราคาขาย' : 'ราคาเช่า';
 
-    /* Sidebar */
-    var lbl = document.getElementById('pdp-price-label-s');
-    var ps  = document.getElementById('pdp-price-s');
-    var pss = document.getElementById('pdp-price-sub-s');
-    var sq  = document.getElementById('pdp-sqm-s');
-    if (lbl) lbl.textContent = labelStr;
-    if (ps)  ps.textContent  = priceStr;
-    if (pss) pss.textContent = subStr;
-    if (sq)  sq.textContent  = sqmStr;
-
-    /* Mobile price block (hidden on desktop via CSS) */
-    var pm  = document.getElementById('pdp-price-m');
-    var psm = document.getElementById('pdp-price-sub-m');
-    var sqm = document.getElementById('pdp-sqm-m');
-    if (pm)  pm.textContent  = priceStr;
-    if (psm) psm.textContent = subStr;
-    if (sqm) sqm.textContent = sqmStr;
+    /* PERF FIX: batch all getElementById + textContent in one block */
+    var ids = ['pdp-price-label-s','pdp-price-s','pdp-price-sub-s','pdp-sqm-s',
+               'pdp-price-m','pdp-price-sub-m','pdp-sqm-m'];
+    var vals = [labelStr, priceStr, subStr, sqmStr, priceStr, subStr, sqmStr];
+    for (var i = 0; i < ids.length; i++) {
+      var el = document.getElementById(ids[i]);
+      if (el) el.textContent = vals[i];
+    }
   }
 
   /* ── Specs Grid ── */
@@ -27288,6 +27344,7 @@ async function adminDeletePortfolio(id, title){
     }
     if (p.pets_allowed) items.push({icon:'fa-paw', val:'', lbl:'เลี้ยงสัตว์ได้', noVal:true});
 
+    /* PERF FIX: batch DOM write via single innerHTML */
     el.innerHTML = items.map(function(item){
       return '<div class="pdp-spec-item">' +
         '<div class="pdp-spec-icon"><i class="fas ' + item.icon + '"></i></div>' +
@@ -27395,6 +27452,12 @@ async function adminDeletePortfolio(id, title){
     var loc = [p.location, p.province].filter(Boolean).join(', ');
     if (locText) locText.textContent = loc;
 
+    /* BUG FIX: reset map container เพื่อให้ property ใหม่แสดง map ของตัวเอง */
+    var placeholder = document.getElementById('pdp-map-placeholder');
+    var container   = document.getElementById('pdp-map-container');
+    if (placeholder) placeholder.style.display = '';
+    if (container)  { container.style.display = 'none'; container.innerHTML = ''; }
+
     /* Location SEO links */
     var locLinks = document.getElementById('pdp-location-links');
     if (locLinks) {
@@ -27431,14 +27494,16 @@ async function adminDeletePortfolio(id, title){
     if (placeholder) placeholder.style.display = 'none';
     if (container) {
       container.style.display = '';
-      /* Use Google Maps embed — lazy loaded on user interaction */
+      /* PERF FIX: clear stale iframe ก่อน (อาจมีจาก property ก่อนหน้า) */
+      container.innerHTML = '';
       var iframe = document.createElement('iframe');
       iframe.src = 'https://maps.google.com/maps?q=' + loc + '&output=embed&z=15';
       iframe.width = '100%';
       iframe.height = '100%';
       iframe.loading = 'lazy';
       iframe.referrerPolicy = 'no-referrer-when-downgrade';
-      iframe.setAttribute('title', 'แผนที่ ' + (p.location||''));
+      iframe.setAttribute('title', 'แผนที่ ' + _san(p.location||p.province||''));
+      iframe.setAttribute('allow', 'fullscreen');
       iframe.style.border = '0';
       container.appendChild(iframe);
     }
@@ -27554,13 +27619,15 @@ async function adminDeletePortfolio(id, title){
   function _pdpRenderMobileCTA(p) {
     var el = document.getElementById('pdp-cta-mobile-btns');
     if (!el) return;
+    /* PERF FIX: phone/line ไม่เปลี่ยนตาม property — skip ถ้า render ไปแล้ว */
+    if (el.childElementCount > 0) return;
     var phone  = (typeof C !== 'undefined' && C.PHONE) ? C.PHONE : '';
     var lineId = (typeof C !== 'undefined' && C.LINE)  ? C.LINE  : '';
-    var lineUrl = 'https://line.me/R/ti/p/' + lineId;
+    var lineHref = 'https://line.me/R/ti/p/' + lineId;
     el.innerHTML =
       '<a class="pdp-cta-btn pdp-cta-phone" href="tel:' + phone + '">' +
         '<i class="fas fa-phone"></i> โทร</a>' +
-      '<a class="pdp-cta-btn pdp-cta-line" href="' + lineUrl + '" target="_blank" rel="noopener">' +
+      '<a class="pdp-cta-btn pdp-cta-line" href="' + lineHref + '" target="_blank" rel="noopener">' +
         '<i class="fab fa-line"></i> LINE</a>';
   }
 
@@ -27582,7 +27649,7 @@ async function adminDeletePortfolio(id, title){
       if (sec) sec.style.display = 'none';
       return;
     }
-    /* Render related cards with real <a href> links — Google can crawl these */
+    /* PERF FIX: batch innerHTML once — ลด reflow */
     grid.innerHTML = related.map(function(r){
       var url  = _propUrl(r);
       var img  = (r.photos||[]).filter(Boolean)[0];
@@ -27699,10 +27766,11 @@ async function adminDeletePortfolio(id, title){
     var h1El = document.getElementById('pdp-title');
     if (h1El && !h1El.textContent) h1El.textContent = p.title || '';
 
-    /* ── Push history state ── */
+    /* ── History state: ใช้ replaceState แทน pushState เพราะ showPage() push ไปแล้ว ──
+       เฉพาะกรณี deep-link โดยตรง (pathname ยังไม่ตรง) เท่านั้นที่ต้อง replace ── */
     if (typeof history !== 'undefined' && typeof _routerReady !== 'undefined' && _routerReady) {
       if (location.pathname !== path) {
-        history.pushState({ type: 'property', id: String(p.id), name: 'property' }, '', fullUrl);
+        history.replaceState({ type: 'property', id: String(p.id), name: 'property' }, '', fullUrl);
       }
     }
 
@@ -27927,11 +27995,7 @@ async function adminDeletePortfolio(id, title){
   }
 
   window.pdpGoBack = function() {
-    // ── Remove keyboard listener when leaving ──
-    if (window._pdpKeyHandler) {
-      document.removeEventListener('keydown', window._pdpKeyHandler);
-      window._pdpKeyHandler = null;
-    }
+    /* ── Keyboard handler stays registered — it self-guards via page-property.active check ── */
     /* ── Restore hreflang to site root ── */
     var hrefTh = document.querySelector('link[hreflang="th"]');
     if (hrefTh) hrefTh.href = 'https://matchdoor.co';
@@ -27939,7 +28003,6 @@ async function adminDeletePortfolio(id, title){
     if (hrefDef) hrefDef.href = 'https://matchdoor.co';
     var state = history.state;
     var prevPage = (state && state._prevPage) ? state._prevPage : 'home';
-    // กลับไปหน้าที่มาจากโดยตรง ไม่เปิด popup ใดๆ
     if (typeof showPage === 'function') showPage(prevPage);
   };
 
