@@ -29197,3 +29197,122 @@ if(document.readyState === 'loading'){
       document.querySelectorAll('.hamburger.active').forEach(function(el){ el.classList.remove('active'); });
       _delta = _threshold;
     } else if(_delta < -_threshold * 0.5){
+      nav.classList.remove('nav-hidden');
+      _delta = -_threshold * 0.5;
+    }
+  }
+
+  function _onScrollThrottle(){
+    if(!_ticking){
+      requestAnimationFrame(function(){
+        _onScroll();
+        _ticking = false;
+      });
+      _ticking = true;
+    }
+  }
+
+  window.addEventListener('scroll', _onScrollThrottle, { passive: true });
+
+  document.addEventListener('click', function(e){
+    var nav = _getNav();
+    if(!nav) return;
+    if(e.target && e.target.closest && (
+        e.target.closest('[data-modal]') ||
+        e.target.closest('.ov-close') ||
+        e.target.closest('.btn-close') ||
+        e.target.closest('.logo')
+    )){
+      nav.classList.remove('nav-hidden');
+      _delta = 0;
+    }
+  });
+
+  var _spWrap = setInterval(function(){
+    if(typeof window.showPage === 'function'){
+      clearInterval(_spWrap);
+      var _orig = window.showPage;
+      window.showPage = function(){
+        var nav = _getNav();
+        if(nav) nav.classList.remove('nav-hidden');
+        _delta = 0;
+        _lastY = 0;
+        _orig.apply(this, arguments);
+      };
+    }
+  }, 300);
+})();
+</script>
+
+
+<!-- ══ SUB-HEADER STICKY SYNC (PDP Breadcrumb + Community Banner) ══════ -->
+<script>
+(function(){
+  'use strict';
+
+  /* ── Helper: ดึง sub-header elements ตามหน้าที่ active ── */
+  function _getSubHeaders(){
+    return [
+      document.querySelector('.pdp-breadcrumb'),
+      document.getElementById('community-sub-header')
+    ].filter(Boolean);
+  }
+
+  /* ── ตรวจว่า navbar หลักซ่อนอยู่ไหม ── */
+  function _isNavHidden(){
+    var nav = document.querySelector('nav:not(#md-bottom-nav)');
+    return nav && nav.classList.contains('nav-hidden');
+  }
+
+  /* ── อัปเดต sub-header position ── */
+  function _syncSubHeaders(){
+    var hidden = _isNavHidden();
+    _getSubHeaders().forEach(function(el){
+      if(hidden){
+        el.classList.add('sub-nav-top');   /* top: 0 — navbar ซ่อน */
+      } else {
+        el.classList.remove('sub-nav-top'); /* top: 64px — navbar แสดง */
+      }
+    });
+  }
+
+  /* ── MutationObserver เฝ้า nav-hidden class change ── */
+  function _watchNav(){
+    var nav = document.querySelector('nav:not(#md-bottom-nav)');
+    if(!nav){
+      setTimeout(_watchNav, 300);
+      return;
+    }
+    var obs = new MutationObserver(function(mutations){
+      mutations.forEach(function(m){
+        if(m.attributeName === 'class') _syncSubHeaders();
+      });
+    });
+    obs.observe(nav, { attributes: true, attributeFilter: ['class'] });
+    /* sync ทันที */
+    _syncSubHeaders();
+  }
+
+  /* ── เริ่ม observer หลัง DOM พร้อม ── */
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', _watchNav);
+  } else {
+    _watchNav();
+  }
+
+  /* ── Sync ทุกครั้งที่ scroll ด้วย (fallback) ── */
+  var _ticking = false;
+  window.addEventListener('scroll', function(){
+    if(!_ticking){
+      requestAnimationFrame(function(){
+        _syncSubHeaders();
+        _ticking = false;
+      });
+      _ticking = true;
+    }
+  }, { passive: true });
+
+})();
+</script>
+</body>
+</html>
