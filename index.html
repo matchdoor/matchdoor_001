@@ -27291,22 +27291,13 @@ async function adminDeletePortfolio(id, title){
     _pdpGalIdx = 0;
     _pdpMapLoaded = false;
 
-    /* BUG FIX: clear _pdpCurrentId หลัง render เสร็จ (ย้ายไปท้าย function)
-       การ reset เร็วเกินไปทำให้ navigation guard ใน _pdpFetchSb ตรวจไม่ได้ */
-
-    /* ── Increment view count ใน Supabase (fire after paint — ไม่ block render) ── */
-    if (typeof sb !== 'undefined' && sb && p && p.id) {
-      var _rIC = window.requestIdleCallback || function(cb){ setTimeout(cb, 0); };
-      _rIC(function(){
-        sb.rpc('increment_views', { p_table: 'properties', p_id: String(p.id) }).then(function(){});
-      });
-    }
-
-    /* Find agent */
+    /* Find agent — ทำก่อน render เพราะ critical sections ใช้ */
     if (p.agentId && typeof agents !== 'undefined') {
       _pdpAgent = agents.find(function(a){ return a.id === p.agentId; });
     }
 
+    /* ── PHASE 1 CRITICAL PATH: render above-the-fold ทันที ──────────────
+       gallery, title, price, specs, desc, CTA — ผู้ใช้เห็นทันทีโดยไม่รอ */
     var elLoading = document.getElementById('pdp-loading');
     var elContent = document.getElementById('pdp-content');
     if (elLoading) elLoading.style.display = 'none';
@@ -27318,30 +27309,47 @@ async function adminDeletePortfolio(id, title){
     _pdpRenderPrice(p);
     _pdpRenderSpecs(p);
     _pdpRenderDesc(p);
-    _pdpRenderAmenities(p);
-    _pdpRenderNearby(p);
-    _pdpRenderMap(p);
-    _pdpRenderAgent(p);
     _pdpRenderCTA(p);
-    /* below-fold sections — defer until browser is idle */
-    var _rICDefer = window.requestIdleCallback || function(cb){ setTimeout(cb, 100); };
-    _rICDefer(function(){ _pdpRenderRelated(p); });
-    /* _pdpRenderSeoLinks removed */
     _pdpRenderMobileCTA(p);
-    _pdpUpdateMetaAndSchema(p);
-    _pdpUpdateBackLabel();
 
-    /* BUG FIX: clear _pdpCurrentId หลัง render pipeline เสร็จ
-       (เดิม clear ก่อน render ทำให้ guard ใน fetchSb fail ระหว่าง async) */
+    /* clear _pdpCurrentId หลัง critical render เสร็จ */
     window._pdpCurrentId = null;
 
-    /* Scroll to top */
+    /* Scroll to top ทันทีหลัง above-fold paint */
     window.scrollTo(0, 0);
 
-    /* ── Dispatch event เพื่อแจ้ง subsystems (reviews, etc.) ว่า render เสร็จแล้ว ── */
-    /* ใช้ rAF เพื่อให้ DOM paint ก่อน แล้วค่อย fire event */
-    requestAnimationFrame(function(){
-      document.dispatchEvent(new CustomEvent('pdp:rendered', { detail: { propId: p.id } }));
+    /* ── PHASE 2 BELOW-FOLD: defer หลัง paint frame แรก ─────────────────
+       amenities, nearby, map, agent, related, meta/schema
+       แยกออกเป็นหลาย idle slots เพื่อไม่ block scroll และ interaction ── */
+    var _rICDefer = window.requestIdleCallback || function(cb){ setTimeout(cb, 80); };
+    var _propSnapshot = p; /* snapshot เพื่อ closure safety */
+
+    requestAnimationFrame(function() {
+      /* slot 1: amenities + nearby — เห็นหลัง scroll เล็กน้อย */
+      _rICDefer(function() {
+        _pdpRenderAmenities(_propSnapshot);
+        _pdpRenderNearby(_propSnapshot);
+      });
+      /* slot 2: map placeholder + agent card */
+      _rICDefer(function() {
+        _pdpRenderMap(_propSnapshot);
+        _pdpRenderAgent(_propSnapshot);
+      });
+      /* slot 3: related properties */
+      _rICDefer(function() {
+        _pdpRenderRelated(_propSnapshot);
+      });
+      /* slot 4: meta/schema + back label + view count — ไม่กระทบ visual */
+      _rICDefer(function() {
+        _pdpUpdateMetaAndSchema(_propSnapshot);
+        _pdpUpdateBackLabel();
+        /* view count fire-and-forget */
+        if (typeof sb !== 'undefined' && sb && _propSnapshot && _propSnapshot.id) {
+          sb.rpc('increment_views', { p_table: 'properties', p_id: String(_propSnapshot.id) }).then(function(){});
+        }
+        /* แจ้ง subsystems (reviews ฯลฯ) ว่า render เสร็จแล้ว */
+        document.dispatchEvent(new CustomEvent('pdp:rendered', { detail: { propId: _propSnapshot.id } }));
+      });
     });
 
     /* ── Keyboard nav: ← → navigate gallery, ESC goes back ── */
