@@ -4879,8 +4879,13 @@ footer::after{
 }
 .pdp-specs-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 12px;
+}
+@media (max-width: 600px) {
+  .pdp-specs-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 .pdp-spec-item {
   display: flex;
@@ -5323,46 +5328,7 @@ footer::after{
 }
 
 /* ── SEO Internal Link Section ── */
-.pdp-seo-links {
-  background: var(--p, #1B3A6B);
-  padding: 32px 20px;
-  margin-top: 48px;
-}
-.pdp-seo-links-inner {
-  max-width: 1200px;
-  margin: 0 auto;
-}
-.pdp-seo-links h2 {
-  font-size: 15px;
-  font-weight: 700;
-  color: rgba(255,255,255,.6);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 16px;
-}
-.pdp-seo-link-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 20px;
-}
-.pdp-seo-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 6px 14px;
-  background: rgba(255,255,255,.1);
-  border: 1px solid rgba(255,255,255,.15);
-  border-radius: 20px;
-  color: rgba(255,255,255,.85);
-  font-size: 12px;
-  text-decoration: none;
-  transition: background .15s;
-}
-.pdp-seo-link:hover {
-  background: rgba(255,255,255,.2);
-  color: #fff;
-}
+/* pdp-seo-links CSS removed — section deleted */
 
 /* ── Loading skeleton ── */
 .pdp-skeleton {
@@ -25113,23 +25079,7 @@ function resetAdvFilter(){
       </div>
     </section>
 
-    <!-- SEO Internal Links Footer — Programmatic SEO -->
-    <aside class="pdp-seo-links" aria-label="ค้นหาเพิ่มเติม">
-      <div class="pdp-seo-links-inner">
-        <div class="pdp-seo-link-group">
-          <h2>ประเภทอสังหาฯ</h2>
-          <div id="pdp-seo-type-links"></div>
-        </div>
-        <div class="pdp-seo-link-group">
-          <h2>ทำเลยอดนิยม</h2>
-          <div id="pdp-seo-loc-links"></div>
-        </div>
-        <div class="pdp-seo-link-group">
-          <h2>ใกล้รถไฟฟ้า</h2>
-          <div id="pdp-seo-transit-links"></div>
-        </div>
-      </div>
-    </aside>
+    <!-- SEO Internal Links section removed -->
 
   </article>
 
@@ -27082,13 +27032,19 @@ async function adminDeletePortfolio(id, title){
     /* below-fold sections — defer until browser is idle */
     var _rIC = window.requestIdleCallback || function(cb){ setTimeout(cb, 100); };
     _rIC(function(){ _pdpRenderRelated(p); });
-    _rIC(function(){ _pdpRenderSeoLinks(p); });
+    /* _pdpRenderSeoLinks removed */
     _pdpRenderMobileCTA(p);
     _pdpUpdateMetaAndSchema(p);
     _pdpUpdateBackLabel();
 
     /* Scroll to top */
     window.scrollTo(0, 0);
+
+    /* ── Dispatch event เพื่อแจ้ง subsystems (reviews, etc.) ว่า render เสร็จแล้ว ── */
+    /* ใช้ rAF เพื่อให้ DOM paint ก่อน แล้วค่อย fire event */
+    requestAnimationFrame(function(){
+      document.dispatchEvent(new CustomEvent('pdp:rendered', { detail: { propId: p.id } }));
+    });
 
     /* ── Keyboard nav: ← → navigate gallery, ESC goes back ── */
     window._pdpKeyHandler && document.removeEventListener('keydown', window._pdpKeyHandler);
@@ -27652,44 +27608,7 @@ async function adminDeletePortfolio(id, title){
   }
 
   /* ── SEO Internal Links Footer ── */
-  function _pdpRenderSeoLinks(p) {
-    var types = ['คอนโด','บ้านเดี่ยว','ทาวน์โฮม','ที่ดิน','อาคารพาณิชย์','วิลล่า'];
-    /* Include current property's province + common Bangkok districts */
-    var locs  = ['สุขุมวิท','อโศก','ทองหล่อ','พระราม 9','สาทร','สีลม','จตุจักร','ลาดพร้าว','รัชดา'];
-    if (p.province && locs.indexOf(p.province) === -1) locs.unshift(p.province);
-    if (p.location && locs.indexOf(p.location) === -1) locs.splice(1, 0, p.location);
-    locs = locs.slice(0, 9);
-    var transit = ['BTS อโศก','BTS ทองหล่อ','BTS เอกมัย','MRT พระราม 9','MRT ลาดพร้าว','BTS พร้อมพงษ์'];
-    if (p.bts && transit.indexOf('BTS '+p.bts) === -1) transit.unshift('BTS '+p.bts);
-    if (p.mrt && transit.indexOf('MRT '+p.mrt) === -1) transit.unshift('MRT '+p.mrt);
-    transit = transit.slice(0, 7);
-
-    var typeEl = document.getElementById('pdp-seo-type-links');
-    var locEl  = document.getElementById('pdp-seo-loc-links');
-    var trEl   = document.getElementById('pdp-seo-transit-links');
-
-    if (typeEl) {
-      typeEl.innerHTML = types.map(function(t){
-        return '<a class="pdp-seo-link" href="/listings?type=' + encodeURIComponent(t) + '" ' +
-          'onclick="event.preventDefault();if(typeof setCatNav===\'function\')setCatNav(\'' + t + '\')">' +
-          '<i class="fas fa-home"></i> ' + t + 'กรุงเทพ</a>';
-      }).join('');
-    }
-    if (locEl) {
-      locEl.innerHTML = locs.map(function(l){
-        return '<a class="pdp-seo-link" href="/listings?q=' + encodeURIComponent(l) + '" ' +
-          'onclick="event.preventDefault();if(typeof quickSearch===\'function\')quickSearch(\'' + l + '\')">' +
-          '<i class="fas fa-map-marker-alt"></i> อสังหาฯ' + l + '</a>';
-      }).join('');
-    }
-    if (trEl) {
-      trEl.innerHTML = transit.map(function(t){
-        return '<a class="pdp-seo-link" href="/listings?q=' + encodeURIComponent(t) + '" ' +
-          'onclick="event.preventDefault();if(typeof quickSearch===\'function\')quickSearch(\'' + t + '\')">' +
-          '<i class="fas fa-train"></i> ใกล้ ' + t + '</a>';
-      }).join('');
-    }
-  }
+  /* _pdpRenderSeoLinks — removed */
 
   /* ── Meta tags + Schema.org per property ── */
   function _pdpUpdateMetaAndSchema(p) {
@@ -28628,16 +28547,17 @@ window.rvRenderAll = async function(){
   }, 100);
 };
 
-/* ── Hook into PDP render (called after pdpShowPage loads a property) ── */
-var _origPdpShowPage = window.pdpShowPage;
-window.pdpShowPage = function(propId){
-  if(typeof _origPdpShowPage === 'function') _origPdpShowPage(propId);
-  _rvCurrentPropId = String(propId);
-  // Wait a tick for DOM to be ready
-  setTimeout(function(){
-    rvLoadSection('property', String(propId), 'pdp-rv');
-  }, 300);
-};
+/* ── Hook into PDP render via custom event (ไม่ override pdpShowPage ซ้ำซ้อน) ── */
+/* ใช้ CustomEvent แทน — ไม่ block render pipeline หลัก */
+document.addEventListener('pdp:rendered', function(e){
+  if(!e.detail || !e.detail.propId) return;
+  _rvCurrentPropId = String(e.detail.propId);
+  /* โหลด reviews แบบ lazy — ไม่รีบ ไม่ block */
+  var _rIC = window.requestIdleCallback || function(cb){ setTimeout(cb, 200); };
+  _rIC(function(){
+    rvLoadSection('property', String(e.detail.propId), 'pdp-rv');
+  });
+});
 
 /* ── Init on data ready ── */
 function _rvInitHome(){
