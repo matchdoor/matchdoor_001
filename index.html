@@ -6922,10 +6922,12 @@ footer::after{
         var tagMatches = text.match(/#[\u0E00-\u0E7F\w]+/g);
         if(tagMatches) hashtags = tagMatches.concat(['#Matchdoor']);
 
-        // Determine author name
+        // Determine author name & uid
         var authorName = 'สมาชิก';
+        var uid = null;
         if(typeof user !== 'undefined' && user){
           authorName = (user.user_metadata && user.user_metadata.full_name) || user.email || 'สมาชิก';
+          uid = user.id || null;
         }
 
         var post = {
@@ -6939,17 +6941,24 @@ footer::after{
           createdAt: new Date().toISOString()
         };
 
-        // Submit to Supabase in background (optional)
+        // Submit to Supabase social_posts in background
         try {
-          if(typeof sb!=='undefined' && sb && typeof sbInsertRateLimited==='function'){
-            sbInsertRateLimited('listings', {
-              name: authorName,
-              phone: '',
-              details: '[inline-post] ' + text,
-              status: 'รอตรวจสอบ',
-              consent_given: true,
-              consent_timestamp: new Date().toISOString()
-            }, null, null);
+          if(typeof sb!=='undefined' && sb && uid){
+            sb.from('social_posts').insert({
+              user_id: uid,
+              content: text,
+              photos: [],
+              post_type: 'general'
+            }).select().single().then(function(res){
+              if(!res.error && res.data){
+                // Update local post with real DB id for boost support
+                var dbId = res.data.id;
+                var localCard = document.querySelector('.md-post-card[data-pid="lp-'+post.id+'"]');
+                if(localCard) localCard.setAttribute('data-pid','db-'+dbId);
+                // Refresh DB posts in background
+                loadSocialPostsFromDB && loadSocialPostsFromDB();
+              }
+            });
           }
         } catch(e){}
 
@@ -7543,54 +7552,160 @@ window.mdBnavCloseMenu = function(){
   /* ── Render feed ── */
   var mdPostPage = 0;
   var mdPostsPerPage = 5;
+  var _dbSocialPosts = [];
+  var _dbSocialLoaded = false;
+
+  /* ── Load social_posts from Supabase DB ── */
+  async function loadSocialPostsFromDB(){
+    if(!window.sb) return;
+    try {
+      var { data, error } = await window.sb
+        .from('social_posts')
+        .select('*')
+        .order('boosted_at', { ascending: false, nullsFirst: false })
+        .order('created_at', { ascending: false })
+        .limit(50);
+      if(!error && data){
+        _dbSocialPosts = data;
+        _dbSocialLoaded = true;
+      }
+    } catch(e){ console.warn('loadSocialPostsFromDB error', e); }
+  }
+
+  /* ── Build DB social post card ── */
+  function buildDBPostCard(p){
+    var uid = (typeof user!=='undefined' && user) ? user.id : null;
+    var isOwn = uid && p.user_id === uid;
+    var initial = (p._author_name||'ส').charAt(0).toUpperCase();
+    var avHtml = p._author_photo
+      ? '<img src="'+esc(p._author_photo)+'" alt="" onerror="this.parentNode.innerHTML=\''+initial+'\'">'
+      : initial;
+    var imgHtml = '';
+    if(p.photos && p.photos.length){
+      imgHtml = '<div class="md-post-media"><img src="'+esc(p.photos[0])+'" alt="" loading="lazy" onerror="this.parentNode.style.display=\'none\'" style="width:100%;max-height:420px;object-fit:cover"></div>';
+    }
+    var tagMap = {'general':'ทั่วไป','review':'รีวิว','listing_share':'แชร์ทรัพย์','question':'ถามตอบ'};
+    var typeLabel = tagMap[p.post_type||'general']||'ทั่วไป';
+    var isBoosted = !!p.boosted_at;
+    var pid = esc(p.id);
+    var boostBtn = isOwn
+      ? '<div class="md-post-action" style="color:#C8922A;font-weight:600" onclick="mdBoostPost(\''+pid+'\')" title="ใช้ 1 Token เพื่อ Boost โพสต์นี้ขึ้นบน Feed"><i class="fas fa-rocket"></i> Boost'+(isBoosted?' <span style=\'font-size:10px;color:#888\'>(boosted)</span>':'')+'</div>'
+      : '';
+    return '<div class="md-fb-card md-post-card" data-pid="db-'+pid+'"'+(isBoosted?' style="border-left:3px solid #C8922A"':'')+'>'
+      +'<div class="md-post-hd">'
+        +'<div class="md-post-author">'
+          +'<div class="md-post-av" style="background:linear-gradient(135deg,#1B3A6B,#2a5298);color:#fff;font-weight:700;font-size:16px">'+avHtml+'</div>'
+          +'<div>'
+            +'<div class="md-post-name">'+esc(p._author_name||'สมาชิก')+' <span class="md-verified member">✓ สมาชิก</span>'+(isBoosted?' <span style="background:#FFF3E0;color:#e65100;font-size:10px;padding:1px 6px;border-radius:10px;font-weight:600">🚀 Boosted</span>':'')+'</div>'
+            +'<div class="md-post-meta"><i class="fas fa-clock" style="font-size:11px"></i> '+timeAgo(p.created_at)+' · <span style="font-size:10px;color:#999">'+typeLabel+'</span></div>'
+          +'</div>'
+        +'</div>'
+        +'<button class="md-post-more" onclick="event.stopPropagation();mdPostMore(this,\'db-'+pid+'\')">···</button>'
+      +'</div>'
+      +'<div class="md-post-text">'+esc(p.content).replace(/\n/g,'<br>')+'</div>'
+      +imgHtml
+      +'<div class="md-reaction-count"><span>❤️ 0</span> · ความคิดเห็น 0 · แชร์ 0</div>'
+      +'<div class="md-post-actions">'
+        +'<div class="md-post-action" onclick="mdToggleLike(this)"><i class="far fa-heart"></i> ถูกใจ</div>'
+        +'<div class="md-post-action" onclick="mdToggleComment(this)"><i class="far fa-comment"></i> คอมเมนต์</div>'
+        +'<div class="md-post-action" onclick="mdSharePost(\'db-'+pid+'\')"><i class="fas fa-share"></i> แชร์</div>'
+        +boostBtn
+      +'</div>'
+      +'<div class="md-comment-collapse" style="display:none">'
+        +'<div class="md-comments"></div>'
+        +'<div class="md-comment-box">'
+          +'<div class="md-compose-av" style="width:32px;height:32px;font-size:13px"><i class="fas fa-user"></i></div>'
+          +'<input class="md-comment-input" placeholder="เขียนความคิดเห็น..." onkeydown="if(event.key===\'Enter\'&&!event.shiftKey){event.preventDefault();mdSendComment(this);}">'
+          +'<button class="md-comment-send" onclick="mdSendComment(this.previousElementSibling)"><i class="fas fa-paper-plane"></i></button>'
+        +'</div>'
+      +'</div>'
+      +'</div>';
+  }
+
+  /* ── Boost post via DB function ── */
+  window.mdBoostPost = async function(postId){
+    if(!window.sb){ typeof toast==='function' && toast('กรุณาล็อกอินก่อน Boost', true); return; }
+    var uid = (typeof user!=='undefined' && user) ? user.id : null;
+    if(!uid){ typeof toast==='function' && toast('กรุณาล็อกอินก่อน Boost', true); return; }
+    try {
+      var { data, error } = await window.sb.rpc('boost_post', { p_post_id: postId, p_user_id: uid });
+      var result = data;
+      if(error || (result && result.success === false)){
+        var msg = (result && result.error) || (error && error.message) || 'เกิดข้อผิดพลาด';
+        if(msg.includes('insufficient_tokens')) msg = 'Token ไม่เพียงพอ กรุณาซื้อ Token เพิ่ม';
+        typeof toast==='function' && toast(msg, true);
+        return;
+      }
+      typeof toast==='function' && toast('🚀 Boost สำเร็จ! Token คงเหลือ: '+(result&&result.balance_after));
+      // Refresh feed after boost
+      await loadSocialPostsFromDB();
+      renderFeedPosts(false);
+    } catch(e){
+      typeof toast==='function' && toast('เกิดข้อผิดพลาด: '+e.message, true);
+    }
+  };
 
   function renderFeedPosts(append){
     var feedEl = el('md-feed-posts');
     if(!feedEl) return;
-    var props = (typeof properties !== 'undefined' && Array.isArray(properties)) ? properties : [];
-    if(!props.length && !window._localFeedPosts.length){ setTimeout(renderFeedPosts, 1200); return; }
 
-    var agArr = (typeof agents !== 'undefined' && Array.isArray(agents)) ? agents : [];
     if(!append){ feedEl.innerHTML = ''; mdPostPage = 0; }
 
-    // Render local posts at top on first render
+    // Render local (optimistic) posts at top on first render
     if(!append && window._localFeedPosts.length){
       var localHtml = window._localFeedPosts.map(buildLocalPostCard).join('');
       feedEl.insertAdjacentHTML('beforeend', localHtml);
     }
 
+    // Use DB social_posts if loaded
+    if(_dbSocialLoaded && _dbSocialPosts.length){
+      var start = mdPostPage * mdPostsPerPage;
+      var slice = _dbSocialPosts.slice(start, start + mdPostsPerPage);
+      if(!slice.length && append) return;
+      var html = slice.map(function(p, idx){
+        var card = buildDBPostCard(p);
+        // Inject promoted ad every 3 posts
+        if(idx===2){
+          card += '<div class="md-fb-card md-post-card" style="border:2px solid rgba(200,146,42,.3)">'
+            +'<div class="md-post-hd"><div class="md-post-author">'
+              +'<div class="md-post-av" style="background:linear-gradient(135deg,#C8922A,#a07020)"><i class="fas fa-star"></i></div>'
+              +'<div><div class="md-post-name">Origin Property <span class="md-promoted-badge">โฆษณา</span></div>'
+              +'<div class="md-post-meta">โครงการพรีเมียม · สนใจติดต่อได้เลย</div></div>'
+            +'</div></div>'
+            +'<div class="md-post-text">🏙️ <strong>Origin Place พระราม 9</strong> — คอนโดหรูใจกลางเมือง เริ่ม <strong>3.2 ล้านบาท</strong><br>'
+            +'<span class="md-hashtag">#พระราม9</span> <span class="md-hashtag">#MRTพระราม9</span> <span class="md-hashtag">#PreSale</span></div>'
+            +'<div class="md-post-actions"><div class="md-post-action" style="flex:2;color:#1B3A6B;font-weight:700" onclick="quickSearch&&quickSearch(\'Origin พระราม 9\')"><i class="fas fa-phone-alt" style="color:#C8922A"></i> โทรสอบถามเลย</div>'
+            +'<div class="md-post-action" onclick="mdSharePost(\'promo-origin\')"><i class="fas fa-share"></i> แชร์</div></div></div>';
+        }
+        return card;
+      }).join('');
+      feedEl.insertAdjacentHTML('beforeend', html);
+      mdPostPage++;
+      return;
+    }
+
+    // Fallback: use properties data
+    var props = (typeof properties !== 'undefined' && Array.isArray(properties)) ? properties : [];
+    if(!props.length && !window._localFeedPosts.length){ setTimeout(renderFeedPosts, 1200); return; }
+    var agArr = (typeof agents !== 'undefined' && Array.isArray(agents)) ? agents : [];
     var start = mdPostPage * mdPostsPerPage;
     var slice = props.slice(start, start + mdPostsPerPage);
     if(!slice.length && append) return;
-
     var html = '';
     slice.forEach(function(p, idx){
       var ag = agArr.find(function(a){ return String(a.id)===String(p.agent_id); }) || agArr[0] || null;
       html += buildPostCard(p, ag);
-      // Inject promoted ad every 3 posts
       if(idx===2){
         html += '<div class="md-fb-card md-post-card" style="border:2px solid rgba(200,146,42,.3)">'
-          +'<div class="md-post-hd">'
-            +'<div class="md-post-author">'
-              +'<div class="md-post-av" style="background:linear-gradient(135deg,#C8922A,#a07020)"><i class="fas fa-star"></i></div>'
-              +'<div>'
-                +'<div class="md-post-name">Origin Property <span class="md-promoted-badge">โฆษณา</span></div>'
-                +'<div class="md-post-meta">โครงการพรีเมียม · สนใจติดต่อได้เลย</div>'
-              +'</div>'
-            +'</div>'
-          +'</div>'
-          +'<div class="md-post-text">🏙️ <strong>Origin Place พระราม 9</strong> — คอนโดหรูใจกลางเมือง ราคา Pre-Sale พิเศษ เริ่ม <strong>3.2 ล้านบาท</strong><br>'
+          +'<div class="md-post-hd"><div class="md-post-author">'
+            +'<div class="md-post-av" style="background:linear-gradient(135deg,#C8922A,#a07020)"><i class="fas fa-star"></i></div>'
+            +'<div><div class="md-post-name">Origin Property <span class="md-promoted-badge">โฆษณา</span></div>'
+            +'<div class="md-post-meta">โครงการพรีเมียม · สนใจติดต่อได้เลย</div></div>'
+          +'</div></div>'
+          +'<div class="md-post-text">🏙️ <strong>Origin Place พระราม 9</strong> — คอนโดหรูใจกลางเมือง เริ่ม <strong>3.2 ล้านบาท</strong><br>'
           +'<span class="md-hashtag">#พระราม9</span> <span class="md-hashtag">#MRTพระราม9</span> <span class="md-hashtag">#PreSale</span></div>'
-          +'<div class="md-post-media" style="background:linear-gradient(135deg,#1B3A6B,#7C6FCD);height:160px;display:flex;align-items:center;justify-content:center;color:#fff">'
-            +'<div style="text-align:center"><div style="font-size:36px;margin-bottom:8px">🏢</div>'
-            +'<div style="font-weight:700">Origin Place · พระราม 9</div>'
-            +'<div style="font-size:12px;opacity:.8;margin-top:4px">เริ่ม 3.2 ล้านบาท · ลดสูงสุด 20%</div></div>'
-          +'</div>'
-          +'<div class="md-post-actions">'
-            +'<div class="md-post-action" style="flex:2;color:#1B3A6B;font-weight:700" onclick="quickSearch&&quickSearch(\'Origin พระราม 9\');typeof toast===\'function\'&&toast(\'โทรสอบถาม: 061-589-7459 📞\')"><i class="fas fa-phone-alt" style="color:#C8922A"></i> โทรสอบถามเลย</div>'
-            +'<div class="md-post-action" onclick="mdSharePost(\'promo-origin\')"><i class="fas fa-share"></i> แชร์</div>'
-          +'</div>'
-          +'</div>';
+          +'<div class="md-post-actions"><div class="md-post-action" style="flex:2;color:#1B3A6B;font-weight:700" onclick="quickSearch&&quickSearch(\'Origin พระราม 9\')"><i class="fas fa-phone-alt" style="color:#C8922A"></i> โทรสอบถามเลย</div>'
+          +'<div class="md-post-action" onclick="mdSharePost(\'promo-origin\')"><i class="fas fa-share"></i> แชร์</div></div></div>';
       }
     });
     feedEl.insertAdjacentHTML('beforeend', html);
@@ -7731,8 +7846,12 @@ window.mdBnavCloseMenu = function(){
 
   window.mdLoadMorePosts = function(){ renderFeedPosts(true); };
 
-  function initSocialFeed(){
+  async function initSocialFeed(){
     renderAgentSidebar();
+    // Load social_posts from DB first, then render
+    if(window.sb){
+      await loadSocialPostsFromDB();
+    }
     renderFeedPosts(false);
   }
   window.initSocialFeed = initSocialFeed;
@@ -29078,122 +29197,3 @@ if(document.readyState === 'loading'){
       document.querySelectorAll('.hamburger.active').forEach(function(el){ el.classList.remove('active'); });
       _delta = _threshold;
     } else if(_delta < -_threshold * 0.5){
-      nav.classList.remove('nav-hidden');
-      _delta = -_threshold * 0.5;
-    }
-  }
-
-  function _onScrollThrottle(){
-    if(!_ticking){
-      requestAnimationFrame(function(){
-        _onScroll();
-        _ticking = false;
-      });
-      _ticking = true;
-    }
-  }
-
-  window.addEventListener('scroll', _onScrollThrottle, { passive: true });
-
-  document.addEventListener('click', function(e){
-    var nav = _getNav();
-    if(!nav) return;
-    if(e.target && e.target.closest && (
-        e.target.closest('[data-modal]') ||
-        e.target.closest('.ov-close') ||
-        e.target.closest('.btn-close') ||
-        e.target.closest('.logo')
-    )){
-      nav.classList.remove('nav-hidden');
-      _delta = 0;
-    }
-  });
-
-  var _spWrap = setInterval(function(){
-    if(typeof window.showPage === 'function'){
-      clearInterval(_spWrap);
-      var _orig = window.showPage;
-      window.showPage = function(){
-        var nav = _getNav();
-        if(nav) nav.classList.remove('nav-hidden');
-        _delta = 0;
-        _lastY = 0;
-        _orig.apply(this, arguments);
-      };
-    }
-  }, 300);
-})();
-</script>
-
-
-<!-- ══ SUB-HEADER STICKY SYNC (PDP Breadcrumb + Community Banner) ══════ -->
-<script>
-(function(){
-  'use strict';
-
-  /* ── Helper: ดึง sub-header elements ตามหน้าที่ active ── */
-  function _getSubHeaders(){
-    return [
-      document.querySelector('.pdp-breadcrumb'),
-      document.getElementById('community-sub-header')
-    ].filter(Boolean);
-  }
-
-  /* ── ตรวจว่า navbar หลักซ่อนอยู่ไหม ── */
-  function _isNavHidden(){
-    var nav = document.querySelector('nav:not(#md-bottom-nav)');
-    return nav && nav.classList.contains('nav-hidden');
-  }
-
-  /* ── อัปเดต sub-header position ── */
-  function _syncSubHeaders(){
-    var hidden = _isNavHidden();
-    _getSubHeaders().forEach(function(el){
-      if(hidden){
-        el.classList.add('sub-nav-top');   /* top: 0 — navbar ซ่อน */
-      } else {
-        el.classList.remove('sub-nav-top'); /* top: 64px — navbar แสดง */
-      }
-    });
-  }
-
-  /* ── MutationObserver เฝ้า nav-hidden class change ── */
-  function _watchNav(){
-    var nav = document.querySelector('nav:not(#md-bottom-nav)');
-    if(!nav){
-      setTimeout(_watchNav, 300);
-      return;
-    }
-    var obs = new MutationObserver(function(mutations){
-      mutations.forEach(function(m){
-        if(m.attributeName === 'class') _syncSubHeaders();
-      });
-    });
-    obs.observe(nav, { attributes: true, attributeFilter: ['class'] });
-    /* sync ทันที */
-    _syncSubHeaders();
-  }
-
-  /* ── เริ่ม observer หลัง DOM พร้อม ── */
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', _watchNav);
-  } else {
-    _watchNav();
-  }
-
-  /* ── Sync ทุกครั้งที่ scroll ด้วย (fallback) ── */
-  var _ticking = false;
-  window.addEventListener('scroll', function(){
-    if(!_ticking){
-      requestAnimationFrame(function(){
-        _syncSubHeaders();
-        _ticking = false;
-      });
-      _ticking = true;
-    }
-  }, { passive: true });
-
-})();
-</script>
-</body>
-</html>
