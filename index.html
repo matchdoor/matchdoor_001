@@ -4179,6 +4179,7 @@ footer::after{
   font-size:14px;font-weight:700;margin-bottom:12px;
 }
 .md-story-bar-hd a{font-size:13px;color:#1877F2;font-weight:600;cursor:pointer}
+@keyframes md-pulse{0%,100%{opacity:1}50%{opacity:.35}}
 .md-stories-scroll{
   display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;
 }
@@ -6776,7 +6777,11 @@ footer::after{
         <div class="md-story-bar">
           <div class="md-story-bar-hd">
             <span>📹 Story ทรัพย์แนะนำ</span>
-            <a onclick="window.openShareStoryModal()" style="cursor:pointer">+ ลงประกาศ Story</a>
+            <div style="display:flex;align-items:center;gap:8px;margin-left:auto">
+              <span id="md-live-badge" style="display:none;align-items:center;gap:4px;font-size:11px;font-weight:700;color:#166534;background:#dcfce7;border:1px solid #bbf7d0;border-radius:20px;padding:2px 8px"></span>
+              <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:#94a3b8" title="สถานะ Realtime"><span id="md-realtime-dot" style="width:7px;height:7px;border-radius:50%;background:#94a3b8;display:inline-block;transition:background .4s"></span>&nbsp;Live</span>
+              <a onclick="window.openShareStoryModal()" style="cursor:pointer">+ ลงประกาศ Story</a>
+            </div>
           </div>
           <div class="md-stories-scroll" id="md-stories-scroll">
             <!-- Add story card -->
@@ -6951,12 +6956,18 @@ footer::after{
               post_type: 'general'
             }).select().single().then(function(res){
               if(!res.error && res.data){
-                // Update local post with real DB id for boost support
+                // Map local optimistic card → real DB id (for boost/delete)
                 var dbId = res.data.id;
                 var localCard = document.querySelector('.md-post-card[data-pid="lp-'+post.id+'"]');
                 if(localCard) localCard.setAttribute('data-pid','db-'+dbId);
-                // Refresh DB posts in background
-                loadSocialPostsFromDB && loadSocialPostsFromDB();
+                // Add real id to _dbSocialPosts so realtime duplicate-check works
+                var dbPost = res.data;
+                dbPost._author_name  = authorName;
+                dbPost._author_photo = (typeof user!=='undefined'&&user&&user.user_metadata&&user.user_metadata.avatar_url)||null;
+                _dbSocialPosts = _dbSocialPosts.filter(function(x){ return x.id !== dbId; });
+                _dbSocialPosts.unshift(dbPost);
+                // NOTE: do NOT call loadSocialPostsFromDB() here — Realtime channel
+                // will push the INSERT event to all other subscribers automatically.
               }
             });
           }
@@ -7554,23 +7565,199 @@ window.mdBnavCloseMenu = function(){
   var mdPostsPerPage = 5;
   var _dbSocialPosts = [];
   var _dbSocialLoaded = false;
+  var _mdRealtimeChannel = null;   // Supabase Realtime channel handle
+  var _mdRealtimeActive = false;   // flag: subscription alive?
 
-  /* ── Load social_posts from Supabase DB ── */
+  /* ── Load social_posts from Supabase DB (with author join) ── */
   async function loadSocialPostsFromDB(){
     if(!window.sb) return;
     try {
       var { data, error } = await window.sb
         .from('social_posts')
-        .select('*')
+        .select('*, user_profiles(display_name, avatar_url)')
         .order('boosted_at', { ascending: false, nullsFirst: false })
         .order('created_at', { ascending: false })
         .limit(50);
       if(!error && data){
-        _dbSocialPosts = data;
+        // Flatten author fields onto each post
+        _dbSocialPosts = data.map(function(p){
+          var prof = p.user_profiles || {};
+          p._author_name  = prof.display_name || 'สมาชิก';
+          p._author_photo = prof.avatar_url   || null;
+          delete p.user_profiles;
+          return p;
+        });
         _dbSocialLoaded = true;
       }
     } catch(e){ console.warn('loadSocialPostsFromDB error', e); }
   }
+
+  /* ── Update live-viewer counter badge ── */
+  function _mdSetLiveCount(n){
+    var badge = document.getElementById('md-live-badge');
+    if(!badge) return;
+    if(n > 0){
+      badge.style.display = 'inline-flex';
+      badge.innerHTML = '<i class="fas fa-circle" style="color:#22c55e;font-size:7px;animation:md-pulse 1.4s ease-in-out infinite"></i>&nbsp;' + n + ' ออนไลน์';
+    } else {
+      badge.style.display = 'none';
+    }
+  }
+
+  /* ── Subscribe Supabase Realtime for social_posts ── */
+  function subscribeRealtimePosts(){
+    if(!window.sb || typeof window.sb.channel !== 'function') return;
+    if(_mdRealtimeChannel){
+      try { window.sb.removeChannel(_mdRealtimeChannel); } catch(e){}
+      _mdRealtimeChannel = null;
+    }
+    _mdRealtimeActive = false;
+
+    _mdRealtimeChannel = window.sb
+      .channel('md-social-posts-rt', {
+        config: { presence: { key: 'online' } }
+      })
+      /* ── Presence: count viewers ── */
+      .on('presence', { event: 'sync' }, function(){
+        try {
+          var state  = _mdRealtimeChannel.presenceState();
+          var count  = Object.keys(state).reduce(function(s,k){ return s + state[k].length; }, 0);
+          _mdSetLiveCount(count);
+        } catch(e){}
+      })
+      /* ── New post inserted ── */
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'social_posts' },
+        async function(payload){
+          var p = payload.new;
+          if(!p) return;
+          // Remove duplicate if already optimistically inserted
+          _dbSocialPosts = _dbSocialPosts.filter(function(x){ return x.id !== p.id; });
+          // Fetch author info for the new post
+          try {
+            if(window.sb && p.user_id){
+              var r = await window.sb.from('user_profiles')
+                .select('display_name, avatar_url')
+                .eq('user_id', p.user_id)
+                .maybeSingle();
+              if(r && r.data){
+                p._author_name  = r.data.display_name || 'สมาชิก';
+                p._author_photo = r.data.avatar_url   || null;
+              }
+            }
+          } catch(e){}
+          p._author_name  = p._author_name  || 'สมาชิก';
+          p._author_photo = p._author_photo || null;
+          // Prepend to DB array
+          _dbSocialPosts.unshift(p);
+          _dbSocialLoaded = true;
+
+          // Check if the new post is from someone else (not optimistic)
+          var myUid = (typeof user !== 'undefined' && user) ? user.id : null;
+          if(!myUid || p.user_id !== myUid){
+            // Animate new card into the feed
+            var feedEl = document.getElementById('md-feed-posts');
+            if(feedEl){
+              var tmp = document.createElement('div');
+              tmp.innerHTML = buildDBPostCard(p);
+              var card = tmp.firstChild;
+              card.style.transition = 'opacity .45s, transform .45s';
+              card.style.opacity = '0';
+              card.style.transform = 'translateY(-14px)';
+              feedEl.insertBefore(card, feedEl.firstChild);
+              requestAnimationFrame(function(){
+                requestAnimationFrame(function(){
+                  card.style.opacity = '1';
+                  card.style.transform = 'translateY(0)';
+                });
+              });
+              // Show live toast
+              typeof toast === 'function' && toast('🆕 ' + (p._author_name||'สมาชิก') + ' โพสต์ใหม่เข้ามา');
+            }
+          }
+        }
+      )
+      /* ── Post updated (e.g. boosted) ── */
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'social_posts' },
+        function(payload){
+          var updated = payload.new;
+          if(!updated) return;
+          // Update in-memory array
+          var idx = _dbSocialPosts.findIndex(function(x){ return x.id === updated.id; });
+          if(idx !== -1){
+            // Preserve author fields we fetched
+            updated._author_name  = _dbSocialPosts[idx]._author_name;
+            updated._author_photo = _dbSocialPosts[idx]._author_photo;
+            _dbSocialPosts[idx] = updated;
+          }
+          // Re-render the specific card in DOM
+          var card = document.querySelector('.md-post-card[data-pid="db-' + updated.id + '"]');
+          if(card){
+            var tmp = document.createElement('div');
+            tmp.innerHTML = buildDBPostCard(updated);
+            var newCard = tmp.firstChild;
+            newCard.style.transition = 'opacity .3s';
+            newCard.style.opacity = '0';
+            card.parentNode.replaceChild(newCard, card);
+            requestAnimationFrame(function(){
+              requestAnimationFrame(function(){
+                newCard.style.opacity = '1';
+              });
+            });
+          }
+        }
+      )
+      /* ── Post deleted ── */
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'social_posts' },
+        function(payload){
+          var old = payload.old;
+          if(!old || !old.id) return;
+          // Remove from array
+          _dbSocialPosts = _dbSocialPosts.filter(function(x){ return x.id !== old.id; });
+          // Remove from DOM with animation
+          var card = document.querySelector('.md-post-card[data-pid="db-' + old.id + '"]');
+          if(card){
+            card.style.transition = 'opacity .3s, transform .3s, max-height .4s';
+            card.style.opacity = '0';
+            card.style.transform = 'scale(.97)';
+            card.style.overflow = 'hidden';
+            card.style.maxHeight = card.offsetHeight + 'px';
+            setTimeout(function(){
+              card.style.maxHeight = '0';
+              card.style.padding = '0';
+              card.style.margin = '0';
+              setTimeout(function(){ if(card.parentNode) card.parentNode.removeChild(card); }, 400);
+            }, 300);
+          }
+        }
+      )
+      .subscribe(function(status){
+        _mdRealtimeActive = (status === 'SUBSCRIBED');
+        // Track presence once subscribed
+        if(_mdRealtimeActive){
+          try {
+            _mdRealtimeChannel.track({ online_at: new Date().toISOString() });
+          } catch(e){}
+        }
+        // Update live indicator
+        var dot = document.getElementById('md-realtime-dot');
+        if(dot) dot.style.background = _mdRealtimeActive ? '#22c55e' : '#f59e0b';
+      });
+  }
+
+  /* ── Teardown realtime channel (called on page leave) ── */
+  function unsubscribeRealtimePosts(){
+    _mdSetLiveCount(0);
+    if(_mdRealtimeChannel && window.sb){
+      try {
+        window.sb.removeChannel(_mdRealtimeChannel);
+      } catch(e){}
+      _mdRealtimeChannel = null;
+    }
+    _mdRealtimeActive = false;
+    var dot = document.getElementById('md-realtime-dot');
+    if(dot) dot.style.background = '#94a3b8';
+  }
+  window.unsubscribeRealtimePosts = unsubscribeRealtimePosts;
 
   /* ── Build DB social post card ── */
   function buildDBPostCard(p){
@@ -7637,9 +7824,12 @@ window.mdBnavCloseMenu = function(){
         return;
       }
       typeof toast==='function' && toast('🚀 Boost สำเร็จ! Token คงเหลือ: '+(result&&result.balance_after));
-      // Refresh feed after boost
-      await loadSocialPostsFromDB();
-      renderFeedPosts(false);
+      // Realtime UPDATE event will re-render the card automatically.
+      // Fallback: manual reload only if realtime channel isn't active.
+      if(!_mdRealtimeActive){
+        await loadSocialPostsFromDB();
+        renderFeedPosts(false);
+      }
     } catch(e){
       typeof toast==='function' && toast('เกิดข้อผิดพลาด: '+e.message, true);
     }
@@ -7760,18 +7950,21 @@ window.mdBnavCloseMenu = function(){
     var menu = document.createElement('div');
     menu.id = 'md-post-menu-'+pid;
     menu.style.cssText = 'position:absolute;right:8px;top:40px;background:#fff;border:1px solid #E4E6EB;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.15);z-index:100;min-width:180px;overflow:hidden';
-    /* ── Check if this is the current user's own post (lp- = local/own post) ── */
-    var isOwnPost = pid && pid.toString().startsWith('lp-');
+    /* Own post = lp- (optimistic) OR db- where user_id matches current user */
+    var myUid = (typeof user !== 'undefined' && user) ? user.id : null;
+    var isLpPost = pid && pid.toString().startsWith('lp-');
+    var isDbOwn  = false;
+    if(!isLpPost && pid && pid.toString().startsWith('db-') && myUid){
+      var dbId2 = pid.toString().slice(3);
+      var dbPost2 = _dbSocialPosts.find(function(p){ return p.id === dbId2; });
+      isDbOwn = !!(dbPost2 && dbPost2.user_id === myUid);
+    }
+    var isOwnPost = isLpPost || isDbOwn;
     var deleteItem = '';
     if(isOwnPost){
-      deleteItem = '<div style="padding:10px 14px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px;color:#e74c3c;border-top:1px solid #F0F2F5" '
-        +'onclick="mdConfirmDeletePost(\''+pid+'\');this.closest(\'[id^=md-post-menu]\').remove()">'
-        +'<i class="fas fa-trash-alt" style="width:16px"></i> ลบโพสต์</div>';
+      deleteItem = '<div style="padding:10px 14px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px;color:#e74c3c;border-top:1px solid #F0F2F5" '        +'onclick="mdConfirmDeletePost(\''+pid+'\');this.closest(\'[id^=md-post-menu]\').remove()">'        +'<i class="fas fa-trash-alt" style="width:16px"></i> ลบโพสต์</div>';
     }
-    menu.innerHTML = '<div style="padding:10px 14px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px" onclick="mdSharePost(\''+pid+'\');this.closest(\'[id^=md-post-menu]\').remove()"><i class="fas fa-share" style="color:#1B3A6B;width:16px"></i> แชร์โพสต์นี้</div>'
-      +'<div style="padding:10px 14px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px;color:#555" onclick="this.closest(\'[id^=md-post-menu]\').remove()"><i class="fas fa-bookmark" style="color:#C8922A;width:16px"></i> บันทึกโพสต์</div>'
-      +(isOwnPost ? '' : '<div style="padding:10px 14px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px;color:#e74c3c" onclick="this.closest(\'[id^=md-post-menu]\').remove()"><i class="fas fa-flag" style="width:16px"></i> รายงานโพสต์</div>')
-      +deleteItem;
+    menu.innerHTML = '<div style="padding:10px 14px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px" onclick="mdSharePost(\''+pid+'\');this.closest(\'[id^=md-post-menu]\').remove()"><i class="fas fa-share" style="color:#1B3A6B;width:16px"></i> แชร์โพสต์นี้</div>'      +'<div style="padding:10px 14px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px;color:#555" onclick="this.closest(\'[id^=md-post-menu]\').remove()"><i class="fas fa-bookmark" style="color:#C8922A;width:16px"></i> บันทึกโพสต์</div>'      +(isOwnPost ? '' : '<div style="padding:10px 14px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px;color:#e74c3c" onclick="this.closest(\'[id^=md-post-menu]\').remove()"><i class="fas fa-flag" style="width:16px"></i> รายงานโพสต์</div>')      +deleteItem;
     var card = btn.closest('.md-post-card');
     if(card){ card.style.position='relative'; card.appendChild(menu); }
     setTimeout(function(){ document.addEventListener('click', function rm(e){ if(!menu.contains(e.target)&&e.target!==btn){ menu.remove(); document.removeEventListener('click',rm); } }); },10);
@@ -7801,19 +7994,31 @@ window.mdBnavCloseMenu = function(){
 
   /* ── Actually remove the post card from DOM & local array ── */
   window.mdDoDeletePost = function(pid){
-    /* Remove from DOM */
+    /* Remove from DOM with animation */
     var card = document.querySelector('.md-post-card[data-pid="'+pid+'"]');
     if(card){
       card.style.transition = 'opacity .3s,transform .3s,max-height .4s';
       card.style.opacity = '0';
       card.style.transform = 'scale(.97)';
-      setTimeout(function(){ card.remove(); }, 320);
+      setTimeout(function(){ if(card.parentNode) card.remove(); }, 320);
     }
     /* Remove from local feed array */
     if(window._localFeedPosts){
       var localId = pid.startsWith('lp-') ? pid.slice(3) : pid;
       window._localFeedPosts = window._localFeedPosts.filter(function(p){
         return String(p.id) !== String(localId);
+      });
+    }
+    /* Delete from Supabase DB if this is a real DB post */
+    if(pid.startsWith('db-') && typeof sb !== 'undefined' && sb){
+      var dbId = pid.slice(3);
+      // Remove from in-memory array too
+      _dbSocialPosts = _dbSocialPosts.filter(function(p){ return p.id !== dbId; });
+      // Delete from DB — realtime DELETE event will update all other clients
+      sb.from('social_posts').delete().eq('id', dbId).then(function(res){
+        if(res && res.error){
+          console.warn('[mdDoDeletePost] DB delete error:', res.error.message);
+        }
       });
     }
     typeof toast === 'function' && toast('ลบโพสต์แล้ว 🗑️');
@@ -7851,6 +8056,8 @@ window.mdBnavCloseMenu = function(){
     // Load social_posts from DB first, then render
     if(window.sb){
       await loadSocialPostsFromDB();
+      // Start Realtime subscription (idempotent)
+      subscribeRealtimePosts();
     }
     renderFeedPosts(false);
   }
@@ -8459,6 +8666,10 @@ window.mdBnavCloseMenu = function(){
 
   var _origShowPage = window.showPage;
   window.showPage = function(page){
+    // Teardown realtime when navigating AWAY from social
+    if(page !== 'social' && typeof window.unsubscribeRealtimePosts === 'function'){
+      window.unsubscribeRealtimePosts();
+    }
     if(typeof _origShowPage==='function') _origShowPage.apply(this, arguments);
     if(page==='social'){
       setTimeout(function(){
