@@ -13530,6 +13530,7 @@ function afterLoad(){
     var sectionMap = {
       '/listings': 'listings', '/agents': 'agents',
       '/portfolio': 'portfolio', '/favorites': 'favorites',
+      '/my-account': 'my-account', '/social': 'social', '/admin': 'admin',
     };
     var targetPage = sectionMap[location.pathname];
     var ap = document.querySelector('.page.active');
@@ -14104,6 +14105,7 @@ const PAGE_ROUTES = {
   'my-account':     { path: '/my-account', title: 'บัญชีของฉัน — Matchdoor',                                 desc: 'จัดการโปรไฟล์ รายการโปรด และประกาศของคุณบน Matchdoor' },
   'social':         { path: '/social',     title: 'ฟีดชุมชน Matchdoor — อสังหาฯ บ้าน คอนโด กรุงเทพ',    desc: 'ชุมชนอสังหาริมทรัพย์ Matchdoor แชร์ทรัพย์ ถามตอบ ติดตามข่าวสารอสังหาฯ กรุงเทพ' },
   'property':       { path: '/property', title: 'ทรัพย์ — Matchdoor', desc: 'รายละเอียดทรัพย์อสังหาริมทรัพย์ กรุงเทพ — Matchdoor' },
+  'admin':          { path: '/admin',    title: 'Admin Panel — Matchdoor', desc: 'Admin Dashboard' },
 };
 
 // Section → filter context for "buy" / "rent" sub-pages
@@ -14443,6 +14445,12 @@ function _silentShowPage(name, skipScrollTop) {
       setTimeout(function(){ initSocialFeed && initSocialFeed(); }, 100);
     }
   }
+  else if (name === 'admin') {
+    // ทริก admin login flow เมื่อ navigate มาด้วย URL โดยตรง
+    setTimeout(function(){
+      if(typeof openAdminLogin === 'function') openAdminLogin();
+    }, 200);
+  }
   // seo-toggle-btn: แสดงบนหน้า home และ listings เท่านั้น
   const _seoBtn = document.getElementById('seo-toggle-btn');
   if(_seoBtn) _seoBtn.setAttribute('data-page', (name === 'listings' || name === 'home') ? name : 'other');
@@ -14552,6 +14560,7 @@ function _initRouteFromUrl() {
     '/listings': 'listings',
     '/my-account': 'my-account',
     '/social': 'social',
+    '/admin': 'admin',
   };
   // /property/* and /agent/* are handled by match blocks above — not in sectionMap
   const targetPage = sectionMap[path];
@@ -23381,6 +23390,7 @@ document.addEventListener('DOMContentLoaded', function ensureHomeVisible(){
     '/buy': 'home', '/rent': 'home',
     '/my-account': 'my-account',
     '/social': 'social',
+    '/admin': 'admin',
   };
   const effectivePath = location.pathname;
   const targetName = sectionMap[effectivePath] || 'home';
