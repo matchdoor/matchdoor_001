@@ -91,32 +91,37 @@ h1{font-family:'Kanit',sans-serif;font-size:26px;font-weight:800;color:var(--p);
 
 <script>
 (function(){
-  // Known SPA routes → redirect ไป index.html แบบ SPA
-  var KNOWN = ['/listings','/agents','/portfolio','/favorites','/buy','/rent','/careers'];
+  // ── SPA routes ทั้งหมดที่ index.html รองรับ ──
+  var KNOWN_EXACT = [
+    '/listings', '/agents', '/portfolio', '/favorites',
+    '/buy', '/rent', '/careers',
+    '/my-account', '/social', '/admin'   // ← เพิ่ม 3 route ที่ขาดไป
+  ];
+
   var path = window.location.pathname;
 
-  var isKnown = KNOWN.indexOf(path) !== -1
-    || KNOWN.some(function(p){ return path.indexOf(p+'/') === 0; })
-    || /^\/property\//.test(path);
+  // ตรวจสอบ: exact match หรือ prefix match หรือ dynamic route
+  var isSPA = KNOWN_EXACT.indexOf(path) !== -1
+    || /^\/property\//.test(path)
+    || /^\/agent\//.test(path);   // ← เพิ่ม /agent/slug
 
-  if(isKnown){
+  if(isSPA){
     // encode path → ส่งไป index.html via /?/path
-    var search = window.location.search
+    var qs = window.location.search
       ? '&' + window.location.search.slice(1).replace(/&/g,'~and~') : '';
     var hash = window.location.hash || '';
-    var encoded = path.slice(1).replace(/&/g,'~and~');
-    window.location.replace('/?/' + encoded + search + hash);
+    var encoded = path.slice(1);  // ไม่ต้อง replace เพิ่ม — browser handle encoding แล้ว
+    window.location.replace('/?/' + encoded + qs + hash);
     return;
   }
 
-  // ---- Path ไม่รู้จัก: แสดงหน้า 404 จริงๆ ----
+  // ── Path ไม่รู้จักจริงๆ: แสดงหน้า 404 ──
 
-  // กำหนด href ปลายทางของทุก link
   function spaUrl(p){ return '/?/' + p.slice(1); }
-  document.getElementById('btn-ls').href = spaUrl('/listings');
-  document.getElementById('ql-home').href = '/';
-  document.getElementById('ql-listings').href = spaUrl('/listings');
-  document.getElementById('ql-agents').href = spaUrl('/agents');
+  document.getElementById('btn-ls').href       = spaUrl('/listings');
+  document.getElementById('ql-home').href      = '/';
+  document.getElementById('ql-listings').href  = spaUrl('/listings');
+  document.getElementById('ql-agents').href    = spaUrl('/agents');
   document.getElementById('ql-portfolio').href = spaUrl('/portfolio');
 
   // แสดง URL ที่ขอ
@@ -125,7 +130,7 @@ h1{font-family:'Kanit',sans-serif;font-size:26px;font-weight:800;color:var(--p);
   if(reqUrl){ reqUrl.textContent = window.location.href; urlBox.style.display='block'; }
 
   // Countdown 5 วินาทีแล้วกลับหน้าหลัก
-  var autoEl = document.getElementById('auto-redirect');
+  var autoEl  = document.getElementById('auto-redirect');
   var countEl = document.getElementById('countdown');
   if(autoEl){ autoEl.style.display='inline'; }
   var n = 5;
