@@ -2643,7 +2643,7 @@ footer::after{
 .loc-opt{padding:5px 12px;border-radius:20px;border:1.5px solid var(--bd);background:#fff;cursor:pointer;font-size:12px;color:var(--tx2);transition:.2s}
 .loc-opt:hover{border-color:var(--p);color:var(--p);background:var(--lt)}
 @media(max-width:950px){
-  .nav-links{display:none!important;flex-direction:column;position:absolute;top:64px;left:0;right:0;background:var(--p2);padding:12px;z-index:1050;overflow:visible}
+  .nav-links{display:none!important;flex-direction:column;position:fixed;top:64px;left:0;right:0;background:var(--p2);padding:12px;z-index:1200;overflow:visible}
   .nav-links.mob-open{display:flex!important;overflow:visible}
   .hamburger{display:flex}
   .sf{grid-template-columns:1fr 1fr}
@@ -2766,8 +2766,8 @@ footer::after{
    ═══════════════════════════════════════════════════════════════ */
 @media(max-width:1200px){
   /* ซ่อน nav-links แล้วให้ hamburger เปิด */
-  /* z-index:1050 — อยู่เหนือ nav (1000) แต่ต่ำกว่า dd-panel mobile (1100) */
-  .nav-links{display:none!important;flex-direction:column;position:absolute;top:64px;left:0;right:0;background:var(--p2);padding:12px;z-index:1050;overflow:visible}
+  /* z-index:1200 — ใช้ position:fixed เพื่อหลุดจาก nav stacking context และอยู่เหนือ breadcrumb (990) */
+  .nav-links{display:none!important;flex-direction:column;position:fixed;top:64px;left:0;right:0;background:var(--p2);padding:12px;z-index:1200;overflow:visible}
   .nav-links.mob-open{display:flex!important;overflow:visible}
   /* แสดง hamburger */
   .hamburger{display:flex}
@@ -4515,10 +4515,11 @@ footer::after{
   top: 64px !important;
   left: 0;
   right: 0;
-  z-index: 990 !important;
+  /* z-index ต้องต่ำกว่า nav-links.mob-open (1200) เสมอ
+     ไม่ใช้ will-change:top เพราะสร้าง stacking context ที่ทำให้บัง hamburger dropdown */
+  z-index: 500 !important;
   box-shadow: 0 2px 8px rgba(10,22,40,.3) !important;
   transition: top 0.35s cubic-bezier(0.4,0,0.2,1) !important;
-  will-change: top;
 }
 /* เมื่อ navbar ซ่อน breadcrumb เลื่อนขึ้นแทน */
 .pdp-breadcrumb.sub-nav-top {
@@ -25773,7 +25774,7 @@ function resetAdvFilter(){
       <div class="pdp-related-grid" id="pdp-related-grid"></div>
       <div style="text-align:center;margin-top:20px">
         <a href="/listings" class="pdp-cta-btn pdp-cta-share"
-           onclick="event.preventDefault();window.scrollTo({top:0,behavior:'smooth'});setTimeout(function(){openAllModal('all');},400)"
+           onclick="event.preventDefault();showPage('listings')"
            style="display:inline-flex;padding:11px 28px">
           <i class="fas fa-search"></i> ดูประกาศทั้งหมด
         </a>
@@ -29001,7 +29002,7 @@ async function adminDeletePortfolio(id, title){
     var hrefDef = document.querySelector('link[hreflang="x-default"]');
     if (hrefDef) hrefDef.href = 'https://matchdoor.co';
     var state = history.state;
-    var prevPage = (state && state._prevPage) ? state._prevPage : 'home';
+    var prevPage = (state && state._prevPage) ? state._prevPage : 'listings';
     if (typeof showPage === 'function') showPage(prevPage);
   };
 
