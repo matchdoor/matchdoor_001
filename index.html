@@ -604,7 +604,7 @@ body:not(:has(.ov.open)):not(:has(.apply-overlay.open)):not(:has(.seo-drawer.ope
    หลักการ: nav ต้องไม่มี will-change:transform หรือ transform ขณะที่มองเห็น
    เพราะ transform สร้าง stacking context ใหม่ที่กักดัก z-index ของ child ไว้
    ════════════════════════════════════════════════════════════════════════ */
-nav:not(#md-bottom-nav){z-index:1000!important}
+nav:not(#md-bottom-nav):not(#pdp-breadcrumb-nav){z-index:1000!important}
 /* dd-panel desktop: absolute ใน nav — อยู่เหนือ nav content */
 .dd-panel,.qs-dd-panel{z-index:1050!important}
 /* dd-panel mobile/tablet: fixed — ต้องสูงกว่า nav-links (999) และ nav (1000) */
@@ -25556,7 +25556,7 @@ function resetAdvFilter(){
 <div id="page-property" class="page" style="display:none" role="main">
 
   <!-- Breadcrumb — SEO visible navigation -->
-  <nav class="pdp-breadcrumb" aria-label="เส้นทางนำทาง" itemscope itemtype="https://schema.org/BreadcrumbList">
+  <nav id="pdp-breadcrumb-nav" class="pdp-breadcrumb" aria-label="เส้นทางนำทาง" itemscope itemtype="https://schema.org/BreadcrumbList">
     <div class="pdp-breadcrumb-inner" id="pdp-breadcrumb-inner">
       <span itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
         <a href="/" itemprop="item" onclick="event.preventDefault();showPage('home')">
