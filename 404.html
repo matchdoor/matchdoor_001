@@ -451,9 +451,28 @@ iframe#gmap-inline-iframe{
 #md-map-wrap{position:relative;border-radius:10px;overflow:hidden;border:2px solid rgba(200,146,42,.25);height:calc(100vh - 210px);min-height:300px}
 @media(max-width:1100px){#md-map-panel{width:360px}}
 @media(max-width:768px){
-  #md-map-panel{width:100vw;right:0;top:auto;bottom:0;height:72vh;border-left:none;border-top:2px solid rgba(200,146,42,.35);border-radius:20px 20px 0 0;box-shadow:0 -8px 40px rgba(0,0,0,.55);transform:translateY(100%)}
+  #md-map-panel{
+    width:100vw;right:0;top:auto;bottom:0;
+    height:72vh;
+    border-left:none;border-top:2px solid rgba(200,146,42,.35);
+    border-radius:20px 20px 0 0;
+    box-shadow:0 -8px 40px rgba(0,0,0,.55);
+    transform:translateY(100%);
+    overflow:hidden;               /* clip during drag */
+    will-change:transform;
+  }
   #md-map-panel.open{transform:translateY(0)}
+  /* ── peek: only header visible ── */
+  #md-map-panel.peek{
+    transform:translateY(calc(100% - var(--md-peek-h, 58px)));
+    transition:transform .32s cubic-bezier(.32,.72,.48,1);
+  }
+  #md-map-panel.peek #md-map-body{pointer-events:none;opacity:0}
+  #md-map-panel.peek #md-map-expand-btn{display:inline-flex!important}
+  #md-map-panel.peek #md-map-fit-btn{display:none!important}
   #md-map-wrap{height:calc(72vh - 155px);min-height:220px}
+  /* dragging: no transition */
+  #md-map-panel.dragging{transition:none!important}
 }
 #md-leaflet-map{width:100%;height:100%}
 .md-map-price-pin{background:var(--p);color:#fff;padding:5px 9px;border-radius:20px;font-size:12px;font-weight:700;white-space:nowrap;box-shadow:0 2px 8px rgba(27,58,107,.45);border:2px solid rgba(255,255,255,.25);cursor:pointer;transition:.15s;line-height:1}
@@ -2382,6 +2401,7 @@ footer::after{
 /* Sidebar info cards */
 .ma-info-card{background:#fff;border-radius:16px;padding:18px;border:1.5px solid var(--bd);box-shadow:0 2px 10px rgba(27,58,107,.05)}
 .ma-info-card-title{font-size:13px;font-weight:700;color:var(--p);margin-bottom:12px;display:flex;align-items:center;gap:7px;padding-bottom:10px;border-bottom:1.5px solid var(--lt)}
+@media(max-width:600px){.ma-info-card{padding:14px;border-radius:12px}}
 /* About / Bio section */
 .ma-bio-text{font-size:13px;color:var(--tx2);line-height:1.7;white-space:pre-line}
 .ma-read-more-btn{background:none;border:none;color:var(--p);font-size:12px;font-weight:600;cursor:pointer;padding:4px 0;margin-top:4px}
@@ -2410,6 +2430,7 @@ footer::after{
 .ma-token-bar-num{font-size:26px;font-weight:900}
 .ma-token-bar-btn{background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3);border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;transition:.2s}
 .ma-token-bar-btn:hover{background:rgba(255,255,255,.25)}
+@media(max-width:600px){.ma-token-bar{padding:11px 14px;margin-bottom:12px}.ma-token-bar-num{font-size:20px}}
 .ma-token-bar-btn.gold{background:rgba(241,196,15,.2);border-color:#f1c40f;color:#f1c40f}
 /* Edit modal overlay */
 .ma-edit-modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);z-index:9000;display:flex;align-items:center;justify-content:center;padding:16px}
@@ -2420,7 +2441,7 @@ footer::after{
 .ma-edit-modal-close:hover{background:var(--bd);color:var(--tx)}
 .ma-edit-modal-body{padding:22px}
 /* ── New Profile Hero (Living Insider style but better) ── */
-.ma-hero{position:relative;overflow:hidden;border-radius:24px;margin-bottom:28px;color:#fff;background:linear-gradient(135deg,#1B3A6B 0%,#2a5298 50%,#1a6a4a 100%)}
+.ma-hero{position:relative;overflow:hidden;border-radius:24px;margin-bottom:20px;color:#fff;background:linear-gradient(135deg,#1B3A6B 0%,#2a5298 50%,#1a6a4a 100%)}
 .ma-hero-cover{height:180px;background:linear-gradient(135deg,#1B3A6B 0%,#2a5298 40%,#1a7a4a 100%);position:relative;overflow:hidden}
 .ma-hero-cover::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")}
 .ma-hero-cover-btns{position:absolute;top:12px;right:14px;display:flex;gap:8px}
@@ -2500,14 +2521,22 @@ footer::after{
 .ma-lp-btn-ghost:hover{background:var(--lt)}
 .ma-lp-skip{margin-top:8px;font-size:12px;color:var(--gr);background:none;border:none;cursor:pointer;text-decoration:underline}
 @media(max-width:600px){
-  .ma-hero-body{padding:0 16px 20px;gap:14px;margin-top:-48px}
-  .ma-av-ring{width:90px;height:90px;font-size:28px}
-  .ma-hero-cover{height:140px}
+  .ma-hero-body{padding:0 16px 16px;gap:10px;margin-top:-40px}
+  .ma-av-ring{width:80px;height:80px;font-size:24px}
+  .ma-hero-cover{height:110px}
   .ma-profile-grid{grid-template-columns:1fr}
-  .ma-tab{min-width:60px;font-size:11px;padding:8px 5px}
-  .ma-tab i{font-size:14px}
-  .my-account-wrap{padding:20px 10px 50px}
-  .ma-profile-grid{grid-template-columns:1fr}
+  .ma-tab{min-width:56px;font-size:10px;padding:7px 4px}
+  .ma-tab i{font-size:13px}
+  .my-account-wrap{padding:16px 10px 50px}
+  .ma-hero-name{font-size:18px!important;margin-bottom:2px!important}
+  .ma-hero-role-tag{font-size:11px!important;padding:3px 10px!important;margin-bottom:4px!important}
+  .ma-hero-email{font-size:11px!important;margin-bottom:6px!important}
+  .ma-hero-stats{gap:8px!important}
+  .ma-hero-stat{padding:4px 10px!important}
+  .ma-hero-stat-num{font-size:15px!important}
+  .ma-hero-stat-lbl{font-size:9px!important}
+  .ma-hero-cover-btns{gap:5px!important}
+  .ma-hero-cover-btn{padding:5px 10px!important;font-size:11px!important}
 }
 .float-grp{position:relative;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
 .float-items{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
@@ -3072,6 +3101,20 @@ footer::after{
 /* Body layout */
 .agp-body{max-width:1100px;margin:0 auto;padding:32px 24px;display:grid;grid-template-columns:1fr 340px;gap:28px;align-items:start}
 @media(max-width:900px){.agp-body{grid-template-columns:1fr;gap:20px}}
+@media(max-width:600px){
+  .agp-hero{padding:24px 0 20px}
+  .agp-av-wrap{width:88px;height:88px;font-size:30px}
+  .agp-name{font-size:20px}
+  .agp-role{font-size:12px;margin-bottom:6px}
+  .agp-rating-row{margin-bottom:10px}
+  .agp-stats{gap:8px;margin-bottom:12px}
+  .agp-stat{padding:7px 12px;min-width:56px}
+  .agp-stat-val{font-size:16px}
+  .agp-stat-lbl{font-size:9px}
+  .agp-btn{padding:9px 14px;font-size:12px;gap:6px}
+  .agp-back{margin-bottom:12px;padding:6px 11px}
+  .agp-hero-inner{gap:16px;padding:0 16px}
+}
 @media(max-width:600px){.agp-body{padding:20px 16px}}
 
 /* Cards */
@@ -3079,6 +3122,7 @@ footer::after{
 .agp-card:last-child{margin-bottom:0}
 .agp-card-title{font-size:12px;font-weight:800;color:var(--p);text-transform:uppercase;letter-spacing:.7px;margin-bottom:14px;display:flex;align-items:center;gap:7px}
 .agp-card-title i{color:var(--a);font-size:14px}
+@media(max-width:600px){.agp-card{padding:16px 14px;margin-bottom:14px}}
 
 /* Bio */
 .agp-bio-text{font-size:14px;color:var(--tx2);line-height:1.8;margin:0}
@@ -3184,6 +3228,12 @@ footer::after{
 .agp-prop-title{font-size:12px;font-weight:600;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .agp-prop-loc{font-size:11px;color:var(--gr);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .agp-prop-type-badge{display:inline-block;background:var(--lt);border-radius:4px;padding:1px 6px;font-size:10px;font-weight:600;color:var(--tx2);margin-top:4px}
+@media(max-width:600px){
+  .agp-prop-thumb{height:100px;font-size:28px}
+  .agp-prop-info{padding:8px 10px}
+  .agp-prop-price{font-size:12px}
+  .agp-prop-title{font-size:11px}
+}
 
 /* Reviews */
 .agp-review-summary{display:flex;align-items:center;gap:24px;background:linear-gradient(135deg,#f8f6f2,#f0ebe0);border-radius:14px;padding:18px 22px;margin-bottom:20px}
@@ -5263,9 +5313,10 @@ footer::after{
 }
 .pdp-related-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
 }
+@media(min-width:600px){.pdp-related-grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}}
 
 /* Related card — compact */
 .pdp-rel-card {
@@ -5287,6 +5338,7 @@ footer::after{
   object-fit: cover;
   display: block;
 }
+@media(max-width:600px){.pdp-rel-img,.pdp-rel-img-ph{height:120px}}
 .pdp-rel-img-ph {
   width: 100%;
   height: 150px;
@@ -6178,15 +6230,15 @@ footer::after{
   <div class="stat-counters" id="hero-stat-counters">
     <div class="stat-counter-card" onclick="showPage('listings')" style="cursor:pointer" title="ดูประกาศทั้งหมด">
       <span class="stat-counter-icon">🏠</span>
-      <div class="stat-text-group"><span class="stat-counter-num" data-target="200"><span class="suf-num">0</span><span class="suf">+</span></span><span class="stat-counter-label" data-i18n="stat.prop">อสังหาริมทรัพย์</span></div>
+      <div class="stat-text-group"><span class="stat-counter-num" data-target="135"><span class="suf-num">135</span><span class="suf">+</span></span><span class="stat-counter-label" data-i18n="stat.prop">อสังหาริมทรัพย์</span></div>
     </div>
     <div class="stat-counter-card" onclick="showPage('agents')" style="cursor:pointer" title="ดูทีมตัวแทน">
       <span class="stat-counter-icon">👤</span>
-      <div class="stat-text-group"><span class="stat-counter-num" data-target="20"><span class="suf-num">0</span><span class="suf">+</span></span><span class="stat-counter-label" data-i18n="stat.agents">ตัวแทนมืออาชีพ</span></div>
+      <div class="stat-text-group"><span class="stat-counter-num" data-target="6"><span class="suf-num">6</span><span class="suf">+</span></span><span class="stat-counter-label" data-i18n="stat.agents">ตัวแทนมืออาชีพ</span></div>
     </div>
     <div class="stat-counter-card" onclick="showPage('portfolio')" style="cursor:pointer" title="ดูผลงาน">
       <span class="stat-counter-icon">🏆</span>
-      <div class="stat-text-group"><span class="stat-counter-num" data-target="300"><span class="suf-num">0</span><span class="suf">+</span></span><span class="stat-counter-label" data-i18n="stat.closed">ปิดการขายแล้ว</span></div>
+      <div class="stat-text-group"><span class="stat-counter-num" data-target="12"><span class="suf-num">12</span><span class="suf">+</span></span><span class="stat-counter-label" data-i18n="stat.closed">ปิดการขายแล้ว</span></div>
     </div>
   </div>
   <div class="search-box">
@@ -8833,6 +8885,9 @@ window.mdBnavCloseMenu = function(){
 <!-- ===== GOOGLE MY MAPS INLINE PANEL — injected dynamically into all-modal ===== -->
 <script>
 var _gmapPanelOpen = false;
+/* stubs — overridden by initMapPanelDrag() on mobile */
+window._mdMapSnapFull   = function(){ var p=document.getElementById('md-map-panel'); if(p){p.classList.remove('peek');p.classList.add('open');p.style.transform='';setTimeout(function(){if(window._mdMap)window._mdMap.invalidateSize();},340);} };
+window._mdMapHeaderTap  = function(){ var p=document.getElementById('md-map-panel'); if(p&&p.classList.contains('peek')) window._mdMapSnapFull(); };
 var _popupLeafletMap = null;
 var _popupLeafletMarkers = [];
 var _popupLeafletInitDone = false;
@@ -9591,7 +9646,7 @@ function _popupRefreshMarkersFromData(data){
 <div class="ov" id="ag-modal" onclick="if(event.target===this)_closeModal('ag-modal')">
   <div class="modal" style="max-width:680px;width:95vw;max-height:92vh;overflow:hidden;display:flex;flex-direction:column;padding:0">
     <!-- Hero Banner -->
-    <div id="ag-modal-hero" style="background:linear-gradient(135deg,#1B3A6B 0%,#2a5298 60%,#10b981 100%);padding:28px 24px 20px;position:relative;flex-shrink:0">
+    <div id="ag-modal-hero" style="background:linear-gradient(135deg,#1B3A6B 0%,#2a5298 60%,#10b981 100%);padding:20px 18px 16px;position:relative;flex-shrink:0">
       <span class="mclose" style="position:absolute;top:12px;right:14px;color:#fff;opacity:.8;font-size:22px;line-height:1;cursor:pointer;background:rgba(0,0,0,.2);width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center" onclick="_closeModal('ag-modal')">×</span>
       <div style="display:flex;align-items:flex-end;gap:16px">
         <div id="ag-modal-av" style="width:80px;height:80px;border-radius:50%;border:3px solid rgba(255,255,255,.8);overflow:hidden;flex-shrink:0;background:#1B3A6B;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:#fff;box-shadow:0 4px 16px rgba(0,0,0,.25)"></div>
@@ -9602,10 +9657,10 @@ function _popupRefreshMarkersFromData(data){
           <div id="ag-modal-rating" style="display:flex;align-items:center;gap:6px"></div>
         </div>
       </div>
-      <div id="ag-modal-stats" style="display:flex;gap:16px;margin-top:16px"></div>
+      <div id="ag-modal-stats" style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap"></div>
     </div>
     <!-- Scrollable body -->
-    <div class="mbody" id="ag-body" style="overflow-y:auto;flex:1;padding:20px 24px;-webkit-overflow-scrolling:touch"></div>
+    <div class="mbody" id="ag-body" style="overflow-y:auto;flex:1;padding:16px 18px;-webkit-overflow-scrolling:touch"></div>
   </div>
 </div>
 <div class="ov" id="phone-otp-modal" onclick="if(event.target===this)_closeModal('phone-otp-modal')">
@@ -13464,7 +13519,11 @@ function syncAllStats(){
     if(val === undefined) return;
     wrapper.dataset.target = String(val);
     const numEl = wrapper.querySelector('.suf-num');
-    if(numEl) animateCounter(numEl, val, 900);
+    if(numEl){
+      const current = parseInt(numEl.textContent, 10) || 0;
+      if(Math.abs(current - val) > 2) animateCounter(numEl, val, 900);
+      else numEl.textContent = val;
+    }
   });
 
   // ── หน้าผลงาน: Portfolio stat counters ──
@@ -15664,10 +15723,13 @@ function toggleListingsMapPanel() {
   const mdPanel = document.getElementById('md-map-panel');
   const overlay = document.getElementById('listings-map-overlay');
   if(!mdPanel) return;
-  const isOpen = mdPanel.classList.contains('open');
+  const isOpen = mdPanel.classList.contains('open') || mdPanel.classList.contains('peek');
 
   if(isOpen) {
-    mdPanel.classList.remove('open');
+    /* close: remove all states, reset drag so it can re-init on next open */
+    mdPanel.classList.remove('open','peek');
+    mdPanel.style.transform = '';
+    mdPanel._dragInited = false;   // allow re-init on next open
     if(overlay){ overlay.style.opacity='0'; setTimeout(()=>{ overlay.style.display='none'; overlay.classList.remove('open'); },350); }
   } else {
     if(overlay){ overlay.style.display='block'; requestAnimationFrame(()=>overlay.classList.add('open')); }
@@ -18079,7 +18141,7 @@ function showAgentDetail(a){
       <div style="font-size:12px;font-weight:800;color:var(--p);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;display:flex;align-items:center;gap:6px">
         <i class="fas fa-home" style="color:var(--a)"></i> ทรัพย์ที่ดูแล <span style="background:var(--p);color:#fff;border-radius:20px;padding:1px 8px;font-size:10px">${myProps.length}</span>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px">
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px">
         ${myProps.map(p=>`
           <div onclick="_closeModal('ag-modal');setTimeout(()=>openModal('${p.id}'),220)"
                style="border:1.5px solid var(--bd);border-radius:12px;overflow:hidden;cursor:pointer;transition:.2s;background:#fff"
@@ -25650,37 +25712,53 @@ function resetAdvFilter(){
   <!-- ══ MATCHDOOR INTERACTIVE MAP PANEL — Right Side / Mobile Bottom Sheet ══ -->
   <div id="listings-map-panel">
     <div id="md-map-panel">
-      <!-- Mobile drag handle -->
-      <div data-drag-handle style="display:none;width:40px;height:4px;background:rgba(255,255,255,.25);border-radius:2px;margin:10px auto 0;cursor:grab" id="md-map-drag-handle"></div>
+      <!-- ── Drag Handle (mobile only) ── -->
+      <div id="md-map-drag-handle" style="display:none;padding:10px 0 4px;cursor:grab;touch-action:none;-webkit-user-select:none;user-select:none">
+        <div style="width:40px;height:4px;background:rgba(255,255,255,.3);border-radius:2px;margin:0 auto;pointer-events:none"></div>
+      </div>
       <style>@media(max-width:768px){#md-map-drag-handle{display:block!important}}</style>
-      <div style="padding:14px 14px 0">
-        <!-- Header -->
-        <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:12px;border-bottom:1px solid rgba(200,146,42,.2)">
+
+      <!-- ── Header bar (always visible in peek mode) ── -->
+      <div id="md-map-header-bar" style="padding:0 14px 12px;border-bottom:1px solid rgba(200,146,42,.2);cursor:pointer" onclick="_mdMapHeaderTap()">
+        <div style="display:flex;align-items:center;justify-content:space-between">
           <div style="color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px">
-            <i class="fas fa-map-marked-alt" style="color:var(--a)"></i> แผนที่ประกาศอสังหาฯ
-            <span id="md-map-pin-count" style="font-size:11px;opacity:.6;font-weight:400"></span>
+            <i class="fas fa-map-marked-alt" style="color:var(--a)"></i>
+            แผนที่ประกาศอสังหาฯ — <span id="md-map-pin-count" style="font-size:12px;opacity:.7;font-weight:500"></span>
           </div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <button onclick="mdMapFitAll()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer;display:flex;align-items:center;gap:5px"><i class="fas fa-compress-arrows-alt"></i></button>
-            <button onclick="toggleListingsMapPanel()" style="background:rgba(255,80,80,.15);border:1px solid rgba(255,80,80,.3);color:#fff;border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px"><i class="fas fa-times"></i> ปิด</button>
+          <div style="display:flex;align-items:center;gap:6px" onclick="event.stopPropagation()">
+            <button id="md-map-expand-btn" onclick="_mdMapSnapFull()" title="ขยายแผนที่"
+              style="display:none;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer;align-items:center;gap:5px">
+              <i class="fas fa-chevron-up"></i> เปิดแผนที่
+            </button>
+            <button id="md-map-fit-btn" onclick="mdMapFitAll()"
+              style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer;display:flex;align-items:center;gap:5px">
+              <i class="fas fa-compress-arrows-alt"></i>
+            </button>
+            <button onclick="toggleListingsMapPanel()"
+              style="background:rgba(255,80,80,.15);border:1px solid rgba(255,80,80,.3);color:#fff;border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px">
+              <i class="fas fa-times"></i> ปิด
+            </button>
           </div>
         </div>
+      </div>
+
+      <!-- ── Collapsible body (filter + map) ── -->
+      <div id="md-map-body" style="padding:12px 14px 0;overflow:hidden">
         <!-- Filter chips -->
-        <div class="md-map-filter-bar" id="md-map-filter-bar" style="margin-top:12px">
+        <div class="md-map-filter-bar" id="md-map-filter-bar">
           <button class="md-map-fchip active" data-tx="ALL" onclick="mdMapFilterTx('ALL',this)">ทั้งหมด</button>
           <button class="md-map-fchip" data-tx="BUY" onclick="mdMapFilterTx('BUY',this)">ซื้อ</button>
           <button class="md-map-fchip" data-tx="RENT" onclick="mdMapFilterTx('RENT',this)">เช่า</button>
           <span class="md-map-count" id="md-map-showing-count"></span>
         </div>
         <!-- Map container -->
-        <div id="md-map-wrap" style="margin-top:12px">
+        <div id="md-map-wrap" style="margin-top:12px;position:relative">
           <div id="md-leaflet-map"></div>
-          <!-- Tooltip hint -->
           <div id="md-map-hint" style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);background:rgba(10,22,40,.88);color:#fff;font-size:11px;padding:6px 14px;border-radius:20px;pointer-events:none;white-space:nowrap;z-index:500;transition:opacity .4s">
             <i class="fas fa-hand-pointer" style="color:var(--a)"></i> แตะปักหมุดเพื่อดูรายละเอียด
           </div>
         </div>
-        <!-- Active location chips from map click -->
+        <!-- Active location chips -->
         <div style="display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap;padding-bottom:16px" id="map-filter-chips"></div>
       </div>
     </div>
@@ -25864,49 +25942,181 @@ function resetAdvFilter(){
 
   /* ── Wire up map panel drag-to-close (mobile) ── */
   function initMapPanelDrag(){
-    var panel = document.getElementById('md-map-panel');
+    var panel   = document.getElementById('md-map-panel');
     var overlay = document.getElementById('listings-map-overlay');
     if (!panel || panel._dragInited) return;
-    if (window.innerWidth > 768) return; // only on mobile
+    if (window.innerWidth > 768) return; // desktop: side panel only
+
     panel._dragInited = true;
-    var startY = 0, startTime = 0, curY = 0, dragging = false;
-    var DISMISS_DIST = 80, DISMISS_VEL = 0.4;
-    var handle = document.getElementById('md-map-drag-handle') || panel;
+
+    /* ── snap heights ─────────────────────────────────────────────
+       full   = panel.offsetHeight (72 vh, translateY 0)
+       peek   = just the header bar (drag-handle + header-bar)
+       closed = panel off-screen (toggleListingsMapPanel handles this)
+    ────────────────────────────────────────────────────────────── */
+    var SNAP_VEL   = 0.35;  // px/ms threshold for flick
+    var SNAP_DOWN  = 80;    // px drag-down from full → peek
+    var SNAP_UP    = 50;    // px drag-up from peek → full
+
+    /* measure peek height once panel is visible */
+    function getPeekH(){
+      var handle = document.getElementById('md-map-drag-handle');
+      var header = document.getElementById('md-map-header-bar');
+      var h = (handle ? handle.offsetHeight : 0) + (header ? header.offsetHeight : 0);
+      return h || 58;
+    }
+
+    /* current snap state: 'full' | 'peek' */
+    var _state = 'full';
+
+    /* snap helpers */
+    function snapFull(){
+      _state = 'full';
+      panel.classList.remove('dragging','peek');
+      panel.classList.add('open');
+      panel.style.transform = '';
+      var body = document.getElementById('md-map-body');
+      if(body){ body.style.pointerEvents=''; body.style.opacity=''; }
+      /* re-init leaflet after expansion */
+      setTimeout(function(){
+        if(_mdMap) _mdMap.invalidateSize();
+      }, 340);
+    }
+    function snapPeek(){
+      _state = 'peek';
+      var peekH = getPeekH();
+      panel.style.setProperty('--md-peek-h', peekH + 'px');
+      panel.classList.remove('dragging','open');
+      panel.classList.add('peek');
+      panel.style.transform = '';
+    }
+    function snapClose(){
+      _state = 'closed';
+      panel.classList.remove('dragging','open','peek');
+      panel.style.transform = '';
+      /* delegate to the existing toggle function which handles button state */
+      if(typeof toggleListingsMapPanel === 'function') toggleListingsMapPanel();
+    }
+
+    /* expose to header tap (click when peeked → expand) */
+    window._mdMapSnapFull = snapFull;
+    window._mdMapHeaderTap = function(){
+      if(_state === 'peek') snapFull();
+    };
+
+    /* ── drag tracking ───────────────────────────────────────── */
+    var startY = 0, startTime = 0, curDelta = 0, isDragging = false;
+    var baseTranslate = 0; // translateY at drag start
+
+    function getCurrentTranslate(){
+      /* read current translateY from matrix */
+      var st = window.getComputedStyle(panel).transform;
+      if(st && st !== 'none'){
+        var m = st.match(/matrix\([^,]+,[^,]+,[^,]+,[^,]+,([^,]+),([^)]+)\)/);
+        if(m) return parseFloat(m[2]) || 0;
+      }
+      return 0;
+    }
+
     function onStart(e){
       if(e.touches && e.touches.length > 1) return;
       var t = e.touches ? e.touches[0] : e;
-      startY = t.clientY; startTime = Date.now(); curY = 0; dragging = true;
-      panel.style.transition = 'none';
+      startY      = t.clientY;
+      startTime   = Date.now();
+      curDelta    = 0;
+      isDragging  = true;
+      baseTranslate = getCurrentTranslate();
+      panel.classList.add('dragging');
     }
+
     function onMove(e){
-      if(!dragging) return;
+      if(!isDragging) return;
       var t = e.touches ? e.touches[0] : e;
-      curY = t.clientY - startY;
-      if(curY < 0) curY = 0;
-      panel.style.transform = 'translateY(' + curY + 'px)';
-      if(curY > 4 && e.cancelable) e.preventDefault();
-    }
-    function onEnd(){
-      if(!dragging) return; dragging = false;
-      var elapsed = Date.now() - startTime;
-      var vel = elapsed > 0 ? curY / elapsed : 0;
-      panel.style.transition = '';
-      if(curY > DISMISS_DIST || vel > DISMISS_VEL){
-        panel.style.transition = 'transform .28s cubic-bezier(.32,.6,.56,1)';
-        panel.style.transform = 'translateY(110%)';
-        setTimeout(function(){
-          panel.style.transform = '';
-          panel.style.transition = '';
-          if(typeof toggleListingsMapPanel === 'function') toggleListingsMapPanel();
-        }, 280);
+      var dy = t.clientY - startY; // positive = finger moving down
+      curDelta = dy;
+
+      /* calculate raw translateY */
+      var panelH   = panel.offsetHeight;
+      var peekH    = getPeekH();
+      var peekOff  = panelH - peekH;   // translateY when peeked
+
+      var rawY;
+      if(_state === 'full'){
+        /* full → can only drag down; add rubber-band upward */
+        rawY = dy > 0 ? dy : dy * 0.15;
       } else {
-        panel.style.transform = '';
+        /* peek → already offset by peekOff; dragging relative */
+        rawY = peekOff + dy;
+        /* clamp: can't go above full (rawY < 0 → rubber band) */
+        if(rawY < 0) rawY = rawY * 0.15;
+        /* clamp: can't go more than 30px below peek */
+        if(rawY > peekOff + 30) rawY = peekOff + 30;
       }
-      curY = 0;
+
+      panel.style.transform = 'translateY(' + rawY + 'px)';
+
+      /* prevent page scroll while dragging */
+      if(Math.abs(dy) > 5 && e.cancelable) e.preventDefault();
     }
-    handle.addEventListener('touchstart', onStart, {passive: true});
-    document.addEventListener('touchmove', function(e){ if(dragging) onMove(e); }, {passive: false});
-    document.addEventListener('touchend', onEnd, {passive: true});
+
+    function onEnd(){
+      if(!isDragging) return;
+      isDragging = false;
+      panel.classList.remove('dragging');
+
+      var elapsed = Math.max(Date.now() - startTime, 1);
+      var vel     = curDelta / elapsed; // px/ms, positive = downward
+
+      if(_state === 'full'){
+        /* flick down hard → close; moderate down → peek; else → snap back full */
+        if(vel > SNAP_VEL || curDelta > panel.offsetHeight * 0.55){
+          snapClose();
+        } else if(curDelta > SNAP_DOWN){
+          snapPeek();
+        } else {
+          snapFull();
+        }
+      } else {
+        /* peek state: flick/drag up → full; else → peek */
+        if(vel < -SNAP_VEL || curDelta < -SNAP_UP){
+          snapFull();
+        } else {
+          snapPeek();
+        }
+      }
+
+      curDelta = 0;
+    }
+
+    /* ── attach listeners ──────────────────────────────────────
+       Handle: drag-handle + header bar (most natural for thumb)
+    ─────────────────────────────────────────────────────────── */
+    var dragZone = document.getElementById('md-map-drag-handle');
+    var headerBar = document.getElementById('md-map-header-bar');
+
+    [dragZone, headerBar].forEach(function(el){
+      if(!el) return;
+      el.addEventListener('touchstart', onStart, {passive: true});
+    });
+    document.addEventListener('touchmove', function(e){ if(isDragging) onMove(e); }, {passive: false});
+    document.addEventListener('touchend',  onEnd, {passive: true});
+
+    /* mouse fallback (desktop-like test on mobile emulator) */
+    [dragZone, headerBar].forEach(function(el){
+      if(!el) return;
+      el.addEventListener('mousedown', function(e){
+        onStart(e);
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', function up(){
+          onEnd();
+          document.removeEventListener('mousemove', onMove);
+          document.removeEventListener('mouseup', up);
+        });
+      });
+    });
+
+    /* set initial state */
+    _state = 'full';
   }
 
   /* ── Wire up apply-overlay modals (mobile bottom-sheet) ── */
@@ -28128,12 +28338,12 @@ async function adminDeletePortfolio(id, title){
     if (!grid) return;
     var allProps = (typeof props !== 'undefined' && props.length) ? props
                 : (typeof MOCK !== 'undefined' ? (MOCK.props||[]) : []);
-    /* Filter: same type OR same province, exclude current, max 4 */
+    /* Filter: same type OR same province, exclude current, max 6 */
     var related = allProps.filter(function(x){
       return String(x.id) !== String(p.id) && (x.type === p.type || x.province === p.province);
-    }).slice(0, 4);
+    }).slice(0, 6);
     if (!related.length) {
-      related = allProps.filter(function(x){ return String(x.id) !== String(p.id); }).slice(0, 4);
+      related = allProps.filter(function(x){ return String(x.id) !== String(p.id); }).slice(0, 6);
     }
     if (!related.length) {
       var sec = document.getElementById('pdp-related-section');
