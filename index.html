@@ -451,9 +451,28 @@ iframe#gmap-inline-iframe{
 #md-map-wrap{position:relative;border-radius:10px;overflow:hidden;border:2px solid rgba(200,146,42,.25);height:calc(100vh - 210px);min-height:300px}
 @media(max-width:1100px){#md-map-panel{width:360px}}
 @media(max-width:768px){
-  #md-map-panel{width:100vw;right:0;top:auto;bottom:0;height:72vh;border-left:none;border-top:2px solid rgba(200,146,42,.35);border-radius:20px 20px 0 0;box-shadow:0 -8px 40px rgba(0,0,0,.55);transform:translateY(100%)}
+  #md-map-panel{
+    width:100vw;right:0;top:auto;bottom:0;
+    height:72vh;
+    border-left:none;border-top:2px solid rgba(200,146,42,.35);
+    border-radius:20px 20px 0 0;
+    box-shadow:0 -8px 40px rgba(0,0,0,.55);
+    transform:translateY(100%);
+    overflow:hidden;               /* clip during drag */
+    will-change:transform;
+  }
   #md-map-panel.open{transform:translateY(0)}
+  /* ── peek: only header visible ── */
+  #md-map-panel.peek{
+    transform:translateY(calc(100% - var(--md-peek-h, 58px)));
+    transition:transform .32s cubic-bezier(.32,.72,.48,1);
+  }
+  #md-map-panel.peek #md-map-body{pointer-events:none;opacity:0}
+  #md-map-panel.peek #md-map-expand-btn{display:inline-flex!important}
+  #md-map-panel.peek #md-map-fit-btn{display:none!important}
   #md-map-wrap{height:calc(72vh - 155px);min-height:220px}
+  /* dragging: no transition */
+  #md-map-panel.dragging{transition:none!important}
 }
 #md-leaflet-map{width:100%;height:100%}
 .md-map-price-pin{background:var(--p);color:#fff;padding:5px 9px;border-radius:20px;font-size:12px;font-weight:700;white-space:nowrap;box-shadow:0 2px 8px rgba(27,58,107,.45);border:2px solid rgba(255,255,255,.25);cursor:pointer;transition:.15s;line-height:1}
@@ -2382,6 +2401,7 @@ footer::after{
 /* Sidebar info cards */
 .ma-info-card{background:#fff;border-radius:16px;padding:18px;border:1.5px solid var(--bd);box-shadow:0 2px 10px rgba(27,58,107,.05)}
 .ma-info-card-title{font-size:13px;font-weight:700;color:var(--p);margin-bottom:12px;display:flex;align-items:center;gap:7px;padding-bottom:10px;border-bottom:1.5px solid var(--lt)}
+@media(max-width:600px){.ma-info-card{padding:14px;border-radius:12px}}
 /* About / Bio section */
 .ma-bio-text{font-size:13px;color:var(--tx2);line-height:1.7;white-space:pre-line}
 .ma-read-more-btn{background:none;border:none;color:var(--p);font-size:12px;font-weight:600;cursor:pointer;padding:4px 0;margin-top:4px}
@@ -2410,6 +2430,7 @@ footer::after{
 .ma-token-bar-num{font-size:26px;font-weight:900}
 .ma-token-bar-btn{background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3);border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;transition:.2s}
 .ma-token-bar-btn:hover{background:rgba(255,255,255,.25)}
+@media(max-width:600px){.ma-token-bar{padding:11px 14px;margin-bottom:12px}.ma-token-bar-num{font-size:20px}}
 .ma-token-bar-btn.gold{background:rgba(241,196,15,.2);border-color:#f1c40f;color:#f1c40f}
 /* Edit modal overlay */
 .ma-edit-modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);z-index:9000;display:flex;align-items:center;justify-content:center;padding:16px}
@@ -2420,7 +2441,7 @@ footer::after{
 .ma-edit-modal-close:hover{background:var(--bd);color:var(--tx)}
 .ma-edit-modal-body{padding:22px}
 /* ── New Profile Hero (Living Insider style but better) ── */
-.ma-hero{position:relative;overflow:hidden;border-radius:24px;margin-bottom:28px;color:#fff;background:linear-gradient(135deg,#1B3A6B 0%,#2a5298 50%,#1a6a4a 100%)}
+.ma-hero{position:relative;overflow:hidden;border-radius:24px;margin-bottom:20px;color:#fff;background:linear-gradient(135deg,#1B3A6B 0%,#2a5298 50%,#1a6a4a 100%)}
 .ma-hero-cover{height:180px;background:linear-gradient(135deg,#1B3A6B 0%,#2a5298 40%,#1a7a4a 100%);position:relative;overflow:hidden}
 .ma-hero-cover::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")}
 .ma-hero-cover-btns{position:absolute;top:12px;right:14px;display:flex;gap:8px}
@@ -2500,14 +2521,22 @@ footer::after{
 .ma-lp-btn-ghost:hover{background:var(--lt)}
 .ma-lp-skip{margin-top:8px;font-size:12px;color:var(--gr);background:none;border:none;cursor:pointer;text-decoration:underline}
 @media(max-width:600px){
-  .ma-hero-body{padding:0 16px 20px;gap:14px;margin-top:-48px}
-  .ma-av-ring{width:90px;height:90px;font-size:28px}
-  .ma-hero-cover{height:140px}
+  .ma-hero-body{padding:0 16px 16px;gap:10px;margin-top:-40px}
+  .ma-av-ring{width:80px;height:80px;font-size:24px}
+  .ma-hero-cover{height:110px}
   .ma-profile-grid{grid-template-columns:1fr}
-  .ma-tab{min-width:60px;font-size:11px;padding:8px 5px}
-  .ma-tab i{font-size:14px}
-  .my-account-wrap{padding:20px 10px 50px}
-  .ma-profile-grid{grid-template-columns:1fr}
+  .ma-tab{min-width:56px;font-size:10px;padding:7px 4px}
+  .ma-tab i{font-size:13px}
+  .my-account-wrap{padding:16px 10px 50px}
+  .ma-hero-name{font-size:18px!important;margin-bottom:2px!important}
+  .ma-hero-role-tag{font-size:11px!important;padding:3px 10px!important;margin-bottom:4px!important}
+  .ma-hero-email{font-size:11px!important;margin-bottom:6px!important}
+  .ma-hero-stats{gap:8px!important}
+  .ma-hero-stat{padding:4px 10px!important}
+  .ma-hero-stat-num{font-size:15px!important}
+  .ma-hero-stat-lbl{font-size:9px!important}
+  .ma-hero-cover-btns{gap:5px!important}
+  .ma-hero-cover-btn{padding:5px 10px!important;font-size:11px!important}
 }
 .float-grp{position:relative;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
 .float-items{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
@@ -3072,6 +3101,20 @@ footer::after{
 /* Body layout */
 .agp-body{max-width:1100px;margin:0 auto;padding:32px 24px;display:grid;grid-template-columns:1fr 340px;gap:28px;align-items:start}
 @media(max-width:900px){.agp-body{grid-template-columns:1fr;gap:20px}}
+@media(max-width:600px){
+  .agp-hero{padding:24px 0 20px}
+  .agp-av-wrap{width:88px;height:88px;font-size:30px}
+  .agp-name{font-size:20px}
+  .agp-role{font-size:12px;margin-bottom:6px}
+  .agp-rating-row{margin-bottom:10px}
+  .agp-stats{gap:8px;margin-bottom:12px}
+  .agp-stat{padding:7px 12px;min-width:56px}
+  .agp-stat-val{font-size:16px}
+  .agp-stat-lbl{font-size:9px}
+  .agp-btn{padding:9px 14px;font-size:12px;gap:6px}
+  .agp-back{margin-bottom:12px;padding:6px 11px}
+  .agp-hero-inner{gap:16px;padding:0 16px}
+}
 @media(max-width:600px){.agp-body{padding:20px 16px}}
 
 /* Cards */
@@ -3079,6 +3122,7 @@ footer::after{
 .agp-card:last-child{margin-bottom:0}
 .agp-card-title{font-size:12px;font-weight:800;color:var(--p);text-transform:uppercase;letter-spacing:.7px;margin-bottom:14px;display:flex;align-items:center;gap:7px}
 .agp-card-title i{color:var(--a);font-size:14px}
+@media(max-width:600px){.agp-card{padding:16px 14px;margin-bottom:14px}}
 
 /* Bio */
 .agp-bio-text{font-size:14px;color:var(--tx2);line-height:1.8;margin:0}
@@ -3184,6 +3228,12 @@ footer::after{
 .agp-prop-title{font-size:12px;font-weight:600;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .agp-prop-loc{font-size:11px;color:var(--gr);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .agp-prop-type-badge{display:inline-block;background:var(--lt);border-radius:4px;padding:1px 6px;font-size:10px;font-weight:600;color:var(--tx2);margin-top:4px}
+@media(max-width:600px){
+  .agp-prop-thumb{height:100px;font-size:28px}
+  .agp-prop-info{padding:8px 10px}
+  .agp-prop-price{font-size:12px}
+  .agp-prop-title{font-size:11px}
+}
 
 /* Reviews */
 .agp-review-summary{display:flex;align-items:center;gap:24px;background:linear-gradient(135deg,#f8f6f2,#f0ebe0);border-radius:14px;padding:18px 22px;margin-bottom:20px}
@@ -5263,9 +5313,10 @@ footer::after{
 }
 .pdp-related-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
 }
+@media(min-width:600px){.pdp-related-grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}}
 
 /* Related card — compact */
 .pdp-rel-card {
@@ -5287,6 +5338,7 @@ footer::after{
   object-fit: cover;
   display: block;
 }
+@media(max-width:600px){.pdp-rel-img,.pdp-rel-img-ph{height:120px}}
 .pdp-rel-img-ph {
   width: 100%;
   height: 150px;
@@ -6178,15 +6230,15 @@ footer::after{
   <div class="stat-counters" id="hero-stat-counters">
     <div class="stat-counter-card" onclick="showPage('listings')" style="cursor:pointer" title="ดูประกาศทั้งหมด">
       <span class="stat-counter-icon">🏠</span>
-      <div class="stat-text-group"><span class="stat-counter-num" data-target="200"><span class="suf-num">0</span><span class="suf">+</span></span><span class="stat-counter-label" data-i18n="stat.prop">อสังหาริมทรัพย์</span></div>
+      <div class="stat-text-group"><span class="stat-counter-num" data-target="135"><span class="suf-num">135</span><span class="suf">+</span></span><span class="stat-counter-label" data-i18n="stat.prop">อสังหาริมทรัพย์</span></div>
     </div>
     <div class="stat-counter-card" onclick="showPage('agents')" style="cursor:pointer" title="ดูทีมตัวแทน">
       <span class="stat-counter-icon">👤</span>
-      <div class="stat-text-group"><span class="stat-counter-num" data-target="20"><span class="suf-num">0</span><span class="suf">+</span></span><span class="stat-counter-label" data-i18n="stat.agents">ตัวแทนมืออาชีพ</span></div>
+      <div class="stat-text-group"><span class="stat-counter-num" data-target="6"><span class="suf-num">6</span><span class="suf">+</span></span><span class="stat-counter-label" data-i18n="stat.agents">ตัวแทนมืออาชีพ</span></div>
     </div>
     <div class="stat-counter-card" onclick="showPage('portfolio')" style="cursor:pointer" title="ดูผลงาน">
       <span class="stat-counter-icon">🏆</span>
-      <div class="stat-text-group"><span class="stat-counter-num" data-target="300"><span class="suf-num">0</span><span class="suf">+</span></span><span class="stat-counter-label" data-i18n="stat.closed">ปิดการขายแล้ว</span></div>
+      <div class="stat-text-group"><span class="stat-counter-num" data-target="12"><span class="suf-num">12</span><span class="suf">+</span></span><span class="stat-counter-label" data-i18n="stat.closed">ปิดการขายแล้ว</span></div>
     </div>
   </div>
   <div class="search-box">
@@ -8833,6 +8885,9 @@ window.mdBnavCloseMenu = function(){
 <!-- ===== GOOGLE MY MAPS INLINE PANEL — injected dynamically into all-modal ===== -->
 <script>
 var _gmapPanelOpen = false;
+/* stubs — overridden by initMapPanelDrag() on mobile */
+window._mdMapSnapFull   = function(){ var p=document.getElementById('md-map-panel'); if(p){p.classList.remove('peek');p.classList.add('open');p.style.transform='';setTimeout(function(){if(window._mdMap)window._mdMap.invalidateSize();},340);} };
+window._mdMapHeaderTap  = function(){ var p=document.getElementById('md-map-panel'); if(p&&p.classList.contains('peek')) window._mdMapSnapFull(); };
 var _popupLeafletMap = null;
 var _popupLeafletMarkers = [];
 var _popupLeafletInitDone = false;
@@ -9591,7 +9646,7 @@ function _popupRefreshMarkersFromData(data){
 <div class="ov" id="ag-modal" onclick="if(event.target===this)_closeModal('ag-modal')">
   <div class="modal" style="max-width:680px;width:95vw;max-height:92vh;overflow:hidden;display:flex;flex-direction:column;padding:0">
     <!-- Hero Banner -->
-    <div id="ag-modal-hero" style="background:linear-gradient(135deg,#1B3A6B 0%,#2a5298 60%,#10b981 100%);padding:28px 24px 20px;position:relative;flex-shrink:0">
+    <div id="ag-modal-hero" style="background:linear-gradient(135deg,#1B3A6B 0%,#2a5298 60%,#10b981 100%);padding:20px 18px 16px;position:relative;flex-shrink:0">
       <span class="mclose" style="position:absolute;top:12px;right:14px;color:#fff;opacity:.8;font-size:22px;line-height:1;cursor:pointer;background:rgba(0,0,0,.2);width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center" onclick="_closeModal('ag-modal')">×</span>
       <div style="display:flex;align-items:flex-end;gap:16px">
         <div id="ag-modal-av" style="width:80px;height:80px;border-radius:50%;border:3px solid rgba(255,255,255,.8);overflow:hidden;flex-shrink:0;background:#1B3A6B;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:#fff;box-shadow:0 4px 16px rgba(0,0,0,.25)"></div>
@@ -9602,10 +9657,10 @@ function _popupRefreshMarkersFromData(data){
           <div id="ag-modal-rating" style="display:flex;align-items:center;gap:6px"></div>
         </div>
       </div>
-      <div id="ag-modal-stats" style="display:flex;gap:16px;margin-top:16px"></div>
+      <div id="ag-modal-stats" style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap"></div>
     </div>
     <!-- Scrollable body -->
-    <div class="mbody" id="ag-body" style="overflow-y:auto;flex:1;padding:20px 24px;-webkit-overflow-scrolling:touch"></div>
+    <div class="mbody" id="ag-body" style="overflow-y:auto;flex:1;padding:16px 18px;-webkit-overflow-scrolling:touch"></div>
   </div>
 </div>
 <div class="ov" id="phone-otp-modal" onclick="if(event.target===this)_closeModal('phone-otp-modal')">
@@ -10747,6 +10802,20 @@ function renderMyAccount(){
           </button>
         </div>
       </div>
+    </div>
+  </div>
+  <!-- ═══ AGENT PROFILE PREVIEW (แสดงเมื่อ show_on_agents=true) ═══ -->
+  <div id="ma-agent-preview-section" style="display:none;margin:0 16px 16px;border-radius:16px;overflow:hidden;border:2px solid rgba(16,185,129,.25);background:linear-gradient(135deg,rgba(16,185,129,.04),rgba(255,255,255,.95))">
+    <div style="background:linear-gradient(135deg,#10b981,#059669);padding:12px 18px;display:flex;align-items:center;justify-content:space-between">
+      <div style="display:flex;align-items:center;gap:8px;color:#fff;font-size:13px;font-weight:700">
+        <i class="fas fa-id-badge"></i> ตัวอย่างโปรไฟล์ตัวแทนของคุณ
+      </div>
+      <button onclick="_viewMyAgentProfile()" style="background:rgba(255,255,255,.2);color:#fff;border:1.5px solid rgba(255,255,255,.4);border-radius:20px;padding:5px 14px;font-size:11px;font-weight:700;cursor:pointer">
+        <i class="fas fa-external-link-alt"></i> ดูหน้าเต็ม
+      </button>
+    </div>
+    <div id="ma-agent-preview-body" style="padding:16px">
+      <!-- Filled by _maRenderAgentPreview() -->
     </div>
   </div>
   <!-- ═══ TABS ═══ -->
@@ -12601,6 +12670,10 @@ async function _maRenderProfileListings(){
   const area = document.getElementById('ma-profile-listings-area');
   if(!area) return;
   if(!window._maDevBypass) await loadUserTokenData();
+  // อัปเดต preview โปรไฟล์ตัวแทน (ถ้า show_on_agents=true) หลังโหลด listings
+  if(window._myAgentProfileShown && typeof _maRenderAgentPreview === 'function'){
+    setTimeout(_maRenderAgentPreview, 100);
+  }
 
   const statusBadge=s=>{
     const map={'รอตรวจสอบ':['#f39c12','fa-clock','รอตรวจสอบ'],'อนุมัติ':['#2ecc71','fa-check-circle','อนุมัติ'],'ปฏิเสธ':['#e74c3c','fa-times-circle','ปฏิเสธ'],'ปิด':['#95a5a6','fa-ban','ปิด'],'หมดอายุ':['#7f8c8d','fa-hourglass-end','หมดอายุ']};
@@ -13464,7 +13537,11 @@ function syncAllStats(){
     if(val === undefined) return;
     wrapper.dataset.target = String(val);
     const numEl = wrapper.querySelector('.suf-num');
-    if(numEl) animateCounter(numEl, val, 900);
+    if(numEl){
+      const current = parseInt(numEl.textContent, 10) || 0;
+      if(Math.abs(current - val) > 2) animateCounter(numEl, val, 900);
+      else numEl.textContent = val;
+    }
   });
 
   // ── หน้าผลงาน: Portfolio stat counters ──
@@ -15664,10 +15741,13 @@ function toggleListingsMapPanel() {
   const mdPanel = document.getElementById('md-map-panel');
   const overlay = document.getElementById('listings-map-overlay');
   if(!mdPanel) return;
-  const isOpen = mdPanel.classList.contains('open');
+  const isOpen = mdPanel.classList.contains('open') || mdPanel.classList.contains('peek');
 
   if(isOpen) {
-    mdPanel.classList.remove('open');
+    /* close: remove all states, reset drag so it can re-init on next open */
+    mdPanel.classList.remove('open','peek');
+    mdPanel.style.transform = '';
+    mdPanel._dragInited = false;   // allow re-init on next open
     if(overlay){ overlay.style.opacity='0'; setTimeout(()=>{ overlay.style.display='none'; overlay.classList.remove('open'); },350); }
   } else {
     if(overlay){ overlay.style.display='block'; requestAnimationFrame(()=>overlay.classList.add('open')); }
@@ -17807,86 +17887,136 @@ function showPortDetail(p){
   _openModal('port-modal');
 }
 
-/* ── Helper: save show_on_agents to user_profiles DB ── */
-async function _saveAgentProfileVisibility(visible){
-  try{
-    const user = (typeof sb !== 'undefined' && sb) ? (await sb.auth.getUser()).data?.user : null;
-    if(user && typeof sb !== 'undefined'){
-      await sb.from('user_profiles').upsert(
-        { user_id: user.id, show_on_agents: visible, updated_at: new Date().toISOString() },
-        { onConflict: 'user_id' }
-      );
-    }
-    // Also persist in localStorage as fast fallback
-    try{ localStorage.setItem('md_show_on_agents', visible ? '1' : '0'); }catch(e){}
-    if(_cachedUserProfile) _cachedUserProfile.show_on_agents = visible;
-  } catch(e){ console.warn('_saveAgentProfileVisibility:', e); }
+/* ══════════════════════════════════════════════════════════════
+ *  MEMBER AGENT PROFILE SYSTEM — v25
+ *  ทุก function ที่เกี่ยวข้องกับการแสดงโปรไฟล์สมาชิกบนหน้าตัวแทน
+ *  เชื่อมต่อ Supabase ครบถ้วน (user_profiles + v_member_agents + properties)
+ * ══════════════════════════════════════════════════════════════ */
+
+/* ── Helper: สร้าง propIds จาก user_listings ที่ approved แล้ว (property_id) ── */
+function _getMemberPropIds(){
+  if(typeof _myUserListings === 'undefined' || !Array.isArray(_myUserListings)) return [];
+  // เอาเฉพาะ listing ที่ approved และมี property_id (ถูก admin map เข้า properties แล้ว)
+  const approvedPropIds = _myUserListings
+    .filter(ul => ul.status === 'อนุมัติ' && ul.property_id)
+    .map(ul => ul.property_id);
+  return approvedPropIds;
 }
 
-/* ── Helper: build memberAgent object from current user ── */
+/* ── Helper: build memberAgent object จาก current user + metadata + listings ── */
 function _buildMemberAgent(){
-  const _u = window._currentUser;
+  const _u   = window._currentUser;
   const _meta = window._currentMeta || {};
   const dispName = _meta.display_name || (_u?.email?.split('@')[0]) || 'ฉัน';
   const init = (dispName||'U')[0].toUpperCase();
-  const uid = _u?.email || dispName;
+  const uid  = _u?.email || dispName;
+
+  // ใช้ agent_* fields ก่อน ถ้าไม่มีค่อย fallback ไป phone/line_id ทั่วไป
+  const agentPhone  = _meta.agent_phone  || _meta.phone    || '';
+  const agentLineId = _meta.agent_line_id|| _meta.line_id  || '';
+  const agentTitle  = _meta.agent_title  ||
+                      (_meta.role === 'agent' ? 'นายหน้า / ตัวแทน' : 'สมาชิก Matchdoor');
+  const agentBio    = _meta.agent_bio    || _meta.bio      || '';
+  const agentRating = Number(_meta.agent_rating) || Number(_meta.rating) || 5.0;
+  const agentDeals  = Number(_meta.agent_deals)  || Number(_meta.deals)  || 0;
+  const agentPhotos = Array.isArray(_meta.agent_photos) ? _meta.agent_photos : [];
+
+  // propIds: ดึงจาก properties ที่ approved แล้ว (ผ่าน user_listings.property_id)
+  const propIds = _getMemberPropIds();
+
   return {
-    id: 'member_' + uid,
-    _isMember: true,
-    _uid: uid,
-    name: dispName,
-    title: _meta.agent_title || _meta.title || (_meta.role==='agent' ? 'นายหน้า / ตัวแทน' : 'สมาชิก Matchdoor'),
-    phone: _meta.phone || '',
-    lineId: _meta.line_id || _meta.lineId || '',
-    email: _u?.email || '',
-    initials: init + (dispName[1]||''),
-    color: '#10b981',
-    avatar_url: _meta.avatar_url || '',
-    photos: [],
-    rating: Number(_meta.rating) || 5.0,
-    propIds: (typeof _myUserListings !== 'undefined' ? _myUserListings : []).map(p=>p.id),
-    deals: Number(_meta.deals) || 0,
-    bio: _meta.bio || ''
+    id:          'member_' + uid,
+    _isMember:   true,
+    _uid:        uid,
+    _userId:     _u?.id || '',       // Supabase auth.users.id สำหรับ query
+    name:        dispName,
+    title:       agentTitle,
+    phone:       agentPhone,
+    lineId:      agentLineId,
+    email:       _u?.email || '',
+    initials:    init + (dispName[1]||''),
+    color:       '#10b981',
+    avatar_url:  _meta.avatar_url || '',
+    photos:      agentPhotos,
+    rating:      agentRating,
+    propIds:     propIds,
+    deals:       agentDeals,
+    bio:         agentBio
   };
 }
 
+/* ── Helper: บันทึก show_on_agents + agent fields ลง Supabase ── */
+async function _saveAgentProfileVisibility(visible){
+  try{
+    const authUser = (typeof sb !== 'undefined' && sb)
+      ? (await sb.auth.getUser()).data?.user : null;
+
+    if(authUser && typeof sb !== 'undefined'){
+      const _meta = window._currentMeta || {};
+      // upsert ครบทุก agent field พร้อมกัน ไม่ใช่แค่ show_on_agents
+      await sb.from('user_profiles').upsert(
+        {
+          user_id:       authUser.id,
+          show_on_agents: visible,
+          agent_title:   _meta.agent_title   || _meta.title    || '',
+          agent_bio:     _meta.agent_bio     || _meta.bio      || '',
+          agent_phone:   _meta.agent_phone   || _meta.phone    || '',
+          agent_line_id: _meta.agent_line_id || _meta.line_id  || '',
+          agent_photos:  Array.isArray(_meta.agent_photos) ? _meta.agent_photos : [],
+          updated_at:    new Date().toISOString()
+        },
+        { onConflict: 'user_id' }
+      );
+    }
+    // localStorage fallback สำหรับ offline/slow load
+    try{ localStorage.setItem('md_show_on_agents', visible ? '1' : '0'); }catch(e){}
+    if(_cachedUserProfile) _cachedUserProfile.show_on_agents = visible;
+    console.log('[MemberAgent] saved show_on_agents=', visible);
+  } catch(e){ console.warn('[MemberAgent] _saveAgentProfileVisibility:', e); }
+}
+
+/* ── Toggle: กด "แสดง/ยกเลิกโปรไฟล์ที่หน้าตัวแทน" ── */
 function _toggleMyAgentProfile(btn){
-  const _u = window._currentUser;
+  const _u   = window._currentUser;
   const _meta = window._currentMeta || {};
   const dispName = _meta.display_name || (_u?.email?.split('@')[0]) || 'ฉัน';
-  const uid = _u?.email || dispName;
+  const uid  = _u?.email || dispName;
 
   const existIdx = agents.findIndex(a => a._isMember && a._uid === uid);
-  const viewBtn = document.getElementById('btn-view-agent-profile');
+  const viewBtn  = document.getElementById('btn-view-agent-profile');
 
   if(existIdx >= 0){
-    // ── ยกเลิก: ลบออกจาก agents ──
+    // ── ยกเลิกแสดง ──
     agents.splice(existIdx, 1);
     window._myAgentProfileShown = false;
     if(btn){
       btn.style.background = 'linear-gradient(135deg,#10b981,#059669)';
-      btn.style.boxShadow = '0 2px 8px rgba(16,185,129,.4)';
+      btn.style.boxShadow  = '0 2px 8px rgba(16,185,129,.4)';
       btn.innerHTML = '<i class="fas fa-id-badge"></i> แสดงโปรไฟล์ที่หน้าตัวแทน';
     }
-    if(viewBtn) viewBtn.style.display = 'none';
-    if(typeof renderAgents==='function') renderAgents();
+    if(viewBtn){ viewBtn.style.display = 'none'; }
+    // ซ่อน preview section
+    var prevSec = document.getElementById('ma-agent-preview-section');
+    if(prevSec) prevSec.style.display = 'none';
+    if(typeof renderAgents === 'function') renderAgents();
     _saveAgentProfileVisibility(false);
     toast('ซ่อนโปรไฟล์ของคุณจากหน้าตัวแทนแล้ว');
   } else {
-    // ── แสดง: เพิ่มเข้า agents ──
+    // ── แสดงโปรไฟล์ ── สร้าง object พร้อม propIds ล่าสุด
     const memberAgent = _buildMemberAgent();
-    // ลบของเก่าก่อน (ถ้ามี) แล้วใส่ใหม่ที่ตำแหน่งบนสุด
     const oldIdx = agents.findIndex(a => a._isMember && a._uid === uid);
     if(oldIdx >= 0) agents.splice(oldIdx, 1);
     agents.unshift(memberAgent);
     window._myAgentProfileShown = true;
     if(btn){
       btn.style.background = 'linear-gradient(135deg,#e74c3c,#c0392b)';
-      btn.style.boxShadow = '0 2px 8px rgba(231,76,60,.4)';
+      btn.style.boxShadow  = '0 2px 8px rgba(231,76,60,.4)';
       btn.innerHTML = '<i class="fas fa-eye-slash"></i> ยกเลิกแสดงโปรไฟล์';
     }
-    if(viewBtn){ viewBtn.style.display='inline-flex'; }
-    if(typeof renderAgents==='function') renderAgents();
+    if(viewBtn){ viewBtn.style.display = 'inline-flex'; }
+    if(typeof renderAgents === 'function') renderAgents();
+    // แสดง preview section ทันที
+    if(typeof _maRenderAgentPreview === 'function') _maRenderAgentPreview();
     _saveAgentProfileVisibility(true);
     toast('แสดงโปรไฟล์ของคุณที่หน้าตัวแทนแล้ว ✅');
   }
@@ -17894,10 +18024,15 @@ function _toggleMyAgentProfile(btn){
 
 /* ── Navigate to own agent profile page ── */
 function _viewMyAgentProfile(){
-  const _u = window._currentUser;
+  const _u   = window._currentUser;
   const _meta = window._currentMeta || {};
   const dispName = _meta.display_name || (_u?.email?.split('@')[0]) || 'ฉัน';
-  const uid = _u?.email || dispName;
+  const uid  = _u?.email || dispName;
+  // อัปเดต propIds ก่อน navigate เพื่อให้แสดงทรัพย์ล่าสุด
+  const existIdx = agents.findIndex(a => a._isMember && a._uid === uid);
+  if(existIdx >= 0){
+    agents[existIdx].propIds = _getMemberPropIds();
+  }
   const myAgent = agents.find(a => a._isMember && a._uid === uid);
   if(myAgent && typeof showPage === 'function'){
     showPage('agent-profile', String(myAgent.id));
@@ -17911,19 +18046,85 @@ async function _restoreAgentProfileVisibility(){
   const _u = window._currentUser;
   if(!_u) return;
   const _meta = window._currentMeta || {};
-  const uid = _u.email || (_meta.display_name||'');
-  // Check DB first, then localStorage fallback
-  let shouldShow = false;
+  const uid   = _u.email || (_meta.display_name||'');
+
+  let shouldShow  = false;
+  let agentDbData = null;   // เก็บข้อมูล agent fields จาก DB
+
   try{
     if(typeof sb !== 'undefined' && sb){
-      const user = (await sb.auth.getUser()).data?.user;
-      if(user){
-        const { data } = await sb.from('user_profiles').select('show_on_agents').eq('user_id', user.id).single();
-        if(data) shouldShow = !!data.show_on_agents;
-        else {
-          // fallback: localStorage
+      const authUser = (await sb.auth.getUser()).data?.user;
+      if(authUser){
+        // ดึง show_on_agents + agent fields ทั้งหมดพร้อมกัน
+        const { data } = await sb.from('user_profiles')
+          .select('show_on_agents,agent_title,agent_bio,agent_phone,agent_line_id,agent_rating,agent_deals,agent_photos,role')
+          .eq('user_id', authUser.id)
+          .single();
+
+        if(data){
+          shouldShow  = !!data.show_on_agents;
+          agentDbData = data;
+          // sync ข้อมูล agent fields กลับเข้า _currentMeta เพื่อให้ _buildMemberAgent() ใช้ได้ทันที
+          if(window._currentMeta){
+            if(data.agent_title)   window._currentMeta.agent_title   = data.agent_title;
+            if(data.agent_bio)     window._currentMeta.agent_bio     = data.agent_bio;
+            if(data.agent_phone)   window._currentMeta.agent_phone   = data.agent_phone;
+            if(data.agent_line_id) window._currentMeta.agent_line_id = data.agent_line_id;
+            if(data.agent_rating)  window._currentMeta.agent_rating  = data.agent_rating;
+            if(data.agent_deals)   window._currentMeta.agent_deals   = data.agent_deals;
+            if(data.agent_photos)  window._currentMeta.agent_photos  = data.agent_photos;
+            if(data.role)          window._currentMeta.role          = data.role;
+          }
+        } else {
           shouldShow = localStorage.getItem('md_show_on_agents') === '1';
         }
+
+        // ── โหลด member agents คนอื่นๆ จาก v_member_agents เข้า agents array ──
+        // (ทำให้หน้าตัวแทนแสดง member ที่ show_on_agents=TRUE คนอื่นด้วย)
+        try{
+          const { data: memberAgentsData } = await sb.from('v_member_agents').select('*');
+          if(memberAgentsData && memberAgentsData.length){
+            memberAgentsData.forEach(ma => {
+              const maUid  = ma.user_id;
+              const maEmail = ma.display_name || maUid;
+              // ข้ามตัวเอง — จะ upsert ด้านล่างแยก
+              if(authUser && ma.user_id === authUser.id) return;
+              // ตรวจว่ามีใน agents array แล้วหรือยัง
+              const existInArray = agents.findIndex(
+                a => a._isMember && (a._userId === maUid || a._uid === maEmail)
+              );
+              // สร้าง propIds จาก approved_prop_ids (array ของ property_id จาก view)
+              const maPropIds = Array.isArray(ma.approved_prop_ids)
+                ? ma.approved_prop_ids.filter(Boolean)
+                : [];
+              const maAgent = {
+                id:         'member_' + maUid,
+                _isMember:  true,
+                _uid:       maEmail,
+                _userId:    maUid,
+                name:       ma.display_name || 'สมาชิก',
+                title:      ma.agent_title  || 'สมาชิก Matchdoor',
+                phone:      ma.agent_phone  || ma.phone    || '',
+                lineId:     ma.agent_line_id|| ma.line_id  || '',
+                email:      maEmail,
+                initials:   (ma.display_name||'U')[0].toUpperCase(),
+                color:      '#10b981',
+                avatar_url: ma.avatar_url   || '',
+                photos:     Array.isArray(ma.agent_photos) ? ma.agent_photos : [],
+                rating:     Number(ma.agent_rating) || 5.0,
+                propIds:    maPropIds,
+                deals:      Number(ma.agent_deals)  || 0,
+                bio:        ma.agent_bio    || ''
+              };
+              if(existInArray >= 0){
+                agents[existInArray] = maAgent; // อัปเดตข้อมูลล่าสุด
+              } else {
+                agents.push(maAgent);
+              }
+            });
+            if(typeof renderAgents === 'function') renderAgents();
+          }
+        } catch(e2){ console.warn('[MemberAgent] v_member_agents load:', e2); }
       }
     } else {
       shouldShow = localStorage.getItem('md_show_on_agents') === '1';
@@ -17931,28 +18132,154 @@ async function _restoreAgentProfileVisibility(){
   } catch(e){ shouldShow = localStorage.getItem('md_show_on_agents') === '1'; }
 
   if(shouldShow){
+    // ── Upsert ตัวเองเข้า agents array ด้วยข้อมูลล่าสุด ──
     const existIdx = agents.findIndex(a => a._isMember && a._uid === uid);
-    if(existIdx < 0){
-      const memberAgent = _buildMemberAgent();
+    const memberAgent = _buildMemberAgent();
+    if(existIdx >= 0){
+      agents[existIdx] = memberAgent;
+    } else {
       agents.unshift(memberAgent);
     }
     window._myAgentProfileShown = true;
     if(typeof renderAgents === 'function') renderAgents();
-    // Update button state if profile page is already rendered
+
+    // อัปเดตปุ่มถ้า profile page render อยู่แล้ว
     const toggleBtn = document.getElementById('btn-toggle-agent-profile');
     const viewBtn   = document.getElementById('btn-view-agent-profile');
     if(toggleBtn){
       toggleBtn.style.background = 'linear-gradient(135deg,#e74c3c,#c0392b)';
-      toggleBtn.style.boxShadow = '0 2px 8px rgba(231,76,60,.4)';
+      toggleBtn.style.boxShadow  = '0 2px 8px rgba(231,76,60,.4)';
       toggleBtn.innerHTML = '<i class="fas fa-eye-slash"></i> ยกเลิกแสดงโปรไฟล์';
     }
-    if(viewBtn) viewBtn.style.display='inline-flex';
+    if(viewBtn){ viewBtn.style.display = 'inline-flex'; }
+    // แสดง preview section ด้วยข้อมูลล่าสุด
+    if(typeof _maRenderAgentPreview === 'function') _maRenderAgentPreview();
   }
 }
 
 function _showMyProfileOnAgentsPage(){
-  // kept for backward compat — delegate to toggle
+  // kept for backward compat
   _toggleMyAgentProfile(document.getElementById('btn-toggle-agent-profile'));
+}
+
+/* ══════════════════════════════════════════════════════════════
+ *  _maRenderAgentPreview — แสดง preview โปรไฟล์ตัวแทนใน My Profile
+ *  (agent card style + property cards — เหมือนหน้า agent-profile เดิม)
+ * ══════════════════════════════════════════════════════════════ */
+function _maRenderAgentPreview(){
+  const previewSection = document.getElementById('ma-agent-preview-section');
+  const previewBody    = document.getElementById('ma-agent-preview-body');
+  if(!previewSection || !previewBody) return;
+
+  const _u    = window._currentUser;
+  const _meta = window._currentMeta || {};
+  const uid   = _u?.email || (_meta.display_name||'');
+
+  // ดึง member agent object ล่าสุด
+  const myAgent = agents.find(a => a._isMember && a._uid === uid) || _buildMemberAgent();
+  if(!myAgent){ previewSection.style.display = 'none'; return; }
+
+  const rating    = Number(myAgent.rating)  || 5.0;
+  const stars     = Math.min(5, Math.round(rating));
+  const starsHtml = '★'.repeat(stars) + '<span style="opacity:.3">' + '★'.repeat(5-stars) + '</span>';
+
+  // Avatar HTML
+  const avHtml = myAgent.avatar_url
+    ? `<img src="${myAgent.avatar_url}" alt="${myAgent.name}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,.8)">`
+    : `<div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#10b981,#059669);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:#fff;border:3px solid rgba(255,255,255,.8)">${(myAgent.initials||(myAgent.name||'U')[0]).toUpperCase()}</div>`;
+
+  // Properties HTML — ใช้ propIds ที่เป็น property_id จาก approved listings
+  const myProps = (typeof props !== 'undefined' && Array.isArray(props) && myAgent.propIds?.length)
+    ? props.filter(p => myAgent.propIds.includes(p.id))
+    : [];
+
+  let propsHtml = '';
+  if(myProps.length){
+    const sliceProps = myProps.slice(0, 6);
+    propsHtml = `
+      <div style="margin-top:16px">
+        <div style="font-size:13px;font-weight:700;color:var(--tx);margin-bottom:10px;display:flex;align-items:center;gap:6px">
+          <i class="fas fa-building" style="color:var(--p)"></i> ทรัพย์ที่ประกาศ
+          <span style="font-size:11px;background:var(--p);color:#fff;border-radius:20px;padding:1px 8px">${myProps.length}</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px">
+          ${sliceProps.map(p => {
+            const thumb = p.photos&&p.photos[0]
+              ? `<img src="${p.photos[0]}" loading="lazy" style="width:100%;height:100%;object-fit:cover">`
+              : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:28px;background:var(--lt)">🏠</div>`;
+            const price = (typeof fmtPrice==='function') ? fmtPrice(p.price, p.tx) : (p.price||0).toLocaleString()+'฿';
+            return `<div onclick="typeof openModal==='function'&&openModal('${p.id}')" style="border:1.5px solid var(--bd);border-radius:10px;overflow:hidden;cursor:pointer;transition:.2s" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 16px rgba(0,0,0,.12)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+              <div style="height:90px;overflow:hidden">${thumb}</div>
+              <div style="padding:8px">
+                <div style="font-size:12px;font-weight:700;color:var(--p);margin-bottom:2px">${price}</div>
+                <div style="font-size:11px;color:var(--tx);line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.title||''}</div>
+                <div style="font-size:10px;color:var(--tx2);margin-top:3px"><i class="fas fa-map-marker-alt" style="color:var(--a)"></i> ${p.location||p.province||''}</div>
+              </div>
+            </div>`;
+          }).join('')}
+        </div>
+        ${myProps.length > 6 ? `<div style="text-align:center;margin-top:10px"><button onclick="_viewMyAgentProfile()" style="background:var(--p);color:#fff;border:none;border-radius:8px;padding:7px 18px;font-size:12px;font-weight:600;cursor:pointer">ดูทั้งหมด ${myProps.length} รายการ</button></div>` : ''}
+      </div>`;
+  } else {
+    // ถ้ายังไม่มีทรัพย์ approved — แสดง user_listings ทั้งหมดแทน (พร้อม status)
+    const allListings = (typeof _myUserListings !== 'undefined' && _myUserListings.length)
+      ? _myUserListings.slice(0,4)
+      : [];
+    if(allListings.length){
+      const statusColor = {'รอตรวจสอบ':'#f39c12','อนุมัติ':'#2ecc71','ปฏิเสธ':'#e74c3c','ปิด':'#95a5a6'};
+      propsHtml = `
+        <div style="margin-top:16px">
+          <div style="font-size:13px;font-weight:700;color:var(--tx);margin-bottom:10px;display:flex;align-items:center;gap:6px">
+            <i class="fas fa-building" style="color:var(--p)"></i> ประกาศของคุณ (รอ Admin อนุมัติ)
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            ${allListings.map(ul => {
+              const c = statusColor[ul.status]||'#bbb';
+              const photo = (ul.photos||[])[0]||'';
+              return `<div style="display:grid;grid-template-columns:60px 1fr;gap:8px;border:1px solid var(--bd);border-radius:10px;overflow:hidden;padding:8px">
+                ${photo ? `<img src="${photo}" style="width:60px;height:50px;object-fit:cover;border-radius:6px">` : '<div style="width:60px;height:50px;background:var(--lt);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:20px">🏠</div>'}
+                <div>
+                  <div style="font-size:12px;font-weight:700;color:var(--tx);line-height:1.3">${ul.title||'ไม่มีชื่อ'}</div>
+                  <div style="display:flex;align-items:center;gap:6px;margin-top:4px">
+                    <span style="background:${c}22;color:${c};border:1px solid ${c}44;border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700">${ul.status||'?'}</span>
+                    <span style="font-size:11px;color:var(--tx2)">${(ul.price||0).toLocaleString()}฿</span>
+                  </div>
+                </div>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>`;
+    } else {
+      propsHtml = `<div style="text-align:center;padding:16px 0;color:var(--tx2);font-size:13px"><i class="fas fa-building" style="opacity:.3;font-size:24px;display:block;margin-bottom:8px"></i>ยังไม่มีทรัพย์<div style="font-size:11px;margin-top:4px"><a href="#" onclick="event.preventDefault();openUserListingModal()" style="color:var(--p)">+ ลงประกาศ</a> เพื่อแสดงบนหน้าตัวแทน</div></div>`;
+    }
+  }
+
+  // Contact links
+  const contactHtml = [
+    myAgent.phone  ? `<a href="tel:${myAgent.phone}" style="display:inline-flex;align-items:center;gap:5px;background:var(--p);color:#fff;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;text-decoration:none"><i class="fas fa-phone"></i> ${myAgent.phone}</a>` : '',
+    myAgent.lineId ? `<a href="https://line.me/ti/p/~${encodeURIComponent(myAgent.lineId)}" target="_blank" style="display:inline-flex;align-items:center;gap:5px;background:#06c755;color:#fff;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;text-decoration:none"><i class="fab fa-line"></i> ${myAgent.lineId}</a>` : ''
+  ].filter(Boolean).join('');
+
+  previewBody.innerHTML = `
+    <!-- Agent Card Header -->
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">
+      ${avHtml}
+      <div style="flex:1">
+        <div style="font-size:17px;font-weight:800;color:var(--tx)">${myAgent.name||''}</div>
+        <div style="font-size:12px;color:#10b981;font-weight:600;margin-bottom:4px">${myAgent.title||'สมาชิก Matchdoor'}</div>
+        <div style="font-size:13px;color:#f1c40f;margin-bottom:4px">${starsHtml} <span style="font-size:11px;color:var(--tx2)">${rating.toFixed(1)}</span></div>
+        <div style="display:flex;gap:12px;font-size:12px;color:var(--tx2)">
+          <span><strong style="color:var(--p)">${myAgent.propIds?.length||0}</strong> ทรัพย์</span>
+          <span><strong style="color:var(--p)">${myAgent.deals||0}</strong> ดีล</span>
+        </div>
+      </div>
+    </div>
+    ${myAgent.bio ? `<div style="font-size:12px;color:var(--tx2);line-height:1.6;padding:10px;background:var(--lt);border-radius:8px;margin-bottom:12px">"${myAgent.bio}"</div>` : ''}
+    ${contactHtml ? `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:4px">${contactHtml}</div>` : ''}
+    ${propsHtml}
+  `;
+
+  previewSection.style.display = 'block';
 }
 
 function renderAgents(){
@@ -18079,7 +18406,7 @@ function showAgentDetail(a){
       <div style="font-size:12px;font-weight:800;color:var(--p);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;display:flex;align-items:center;gap:6px">
         <i class="fas fa-home" style="color:var(--a)"></i> ทรัพย์ที่ดูแล <span style="background:var(--p);color:#fff;border-radius:20px;padding:1px 8px;font-size:10px">${myProps.length}</span>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px">
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px">
         ${myProps.map(p=>`
           <div onclick="_closeModal('ag-modal');setTimeout(()=>openModal('${p.id}'),220)"
                style="border:1.5px solid var(--bd);border-radius:12px;overflow:hidden;cursor:pointer;transition:.2s;background:#fff"
@@ -18310,9 +18637,42 @@ function showAgentDetail(a){
   /* ── Main render function ── */
   window.renderAgentProfilePage = function(a){
     if(!a) return;
+
+    /* -- รวบรวม properties สำหรับหน้า Agent Profile --
+     * member agent (_isMember=true): propIds = property_id จาก approved user_listings
+     * team agent: ใช้ agent_id หรือ propIds ตามเดิม
+     */
     var myProps = [];
     if(typeof props !== 'undefined' && Array.isArray(props)){
-      myProps = props.filter(function(p){ return (a.propIds && a.propIds.includes(p.id)) || p.agentId === a.id; });
+      if(a._isMember && Array.isArray(a.propIds) && a.propIds.length > 0){
+        myProps = props.filter(function(p){ return a.propIds.includes(p.id); });
+        // ถ้า props array ยังไม่มีข้อมูล (race condition) -> fetch จาก DB
+        if(!myProps.length && typeof sb !== 'undefined' && sb){
+          var propGridEl = document.getElementById('agp-prop-grid');
+          if(propGridEl) propGridEl.innerHTML =
+            '<div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--gr)">' +
+            '<i class="fas fa-spinner fa-spin" style="font-size:24px"></i>' +
+            '<div style="margin-top:8px;font-size:13px">กำลังโหลดทรัพย์...</div></div>';
+          sb.from('properties').select('*').in('id', a.propIds).eq('status','approved')
+            .then(function(res){
+              if(res.data && res.data.length){
+                var fetchedProps = res.data.map(function(p){
+                  return (typeof mapProp === 'function') ? mapProp(p) : p;
+                });
+                fetchedProps.forEach(function(fp){
+                  var idx = props.findIndex(function(gp){ return gp.id === fp.id; });
+                  if(idx < 0) props.push(fp); else props[idx] = fp;
+                });
+                window._agpAllProps = fetchedProps;
+                if(typeof window._agpGoPage === 'function') window._agpGoPage(1);
+                var propCountEl2 = document.getElementById('agp-prop-count');
+                if(propCountEl2) propCountEl2.textContent = fetchedProps.length;
+              }
+            }).catch(function(e){ console.warn('[agp] fetch member props:', e); });
+        }
+      } else {
+        myProps = props.filter(function(p){ return (a.propIds && a.propIds.includes(p.id)) || p.agentId === a.id; });
+      }
     }
     var isMember = !!a._isMember;
     var rating = Number(a.rating) || 4.5;
@@ -25650,37 +26010,53 @@ function resetAdvFilter(){
   <!-- ══ MATCHDOOR INTERACTIVE MAP PANEL — Right Side / Mobile Bottom Sheet ══ -->
   <div id="listings-map-panel">
     <div id="md-map-panel">
-      <!-- Mobile drag handle -->
-      <div data-drag-handle style="display:none;width:40px;height:4px;background:rgba(255,255,255,.25);border-radius:2px;margin:10px auto 0;cursor:grab" id="md-map-drag-handle"></div>
+      <!-- ── Drag Handle (mobile only) ── -->
+      <div id="md-map-drag-handle" style="display:none;padding:10px 0 4px;cursor:grab;touch-action:none;-webkit-user-select:none;user-select:none">
+        <div style="width:40px;height:4px;background:rgba(255,255,255,.3);border-radius:2px;margin:0 auto;pointer-events:none"></div>
+      </div>
       <style>@media(max-width:768px){#md-map-drag-handle{display:block!important}}</style>
-      <div style="padding:14px 14px 0">
-        <!-- Header -->
-        <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:12px;border-bottom:1px solid rgba(200,146,42,.2)">
+
+      <!-- ── Header bar (always visible in peek mode) ── -->
+      <div id="md-map-header-bar" style="padding:0 14px 12px;border-bottom:1px solid rgba(200,146,42,.2);cursor:pointer" onclick="_mdMapHeaderTap()">
+        <div style="display:flex;align-items:center;justify-content:space-between">
           <div style="color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px">
-            <i class="fas fa-map-marked-alt" style="color:var(--a)"></i> แผนที่ประกาศอสังหาฯ
-            <span id="md-map-pin-count" style="font-size:11px;opacity:.6;font-weight:400"></span>
+            <i class="fas fa-map-marked-alt" style="color:var(--a)"></i>
+            แผนที่ประกาศอสังหาฯ — <span id="md-map-pin-count" style="font-size:12px;opacity:.7;font-weight:500"></span>
           </div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <button onclick="mdMapFitAll()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer;display:flex;align-items:center;gap:5px"><i class="fas fa-compress-arrows-alt"></i></button>
-            <button onclick="toggleListingsMapPanel()" style="background:rgba(255,80,80,.15);border:1px solid rgba(255,80,80,.3);color:#fff;border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px"><i class="fas fa-times"></i> ปิด</button>
+          <div style="display:flex;align-items:center;gap:6px" onclick="event.stopPropagation()">
+            <button id="md-map-expand-btn" onclick="_mdMapSnapFull()" title="ขยายแผนที่"
+              style="display:none;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer;align-items:center;gap:5px">
+              <i class="fas fa-chevron-up"></i> เปิดแผนที่
+            </button>
+            <button id="md-map-fit-btn" onclick="mdMapFitAll()"
+              style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer;display:flex;align-items:center;gap:5px">
+              <i class="fas fa-compress-arrows-alt"></i>
+            </button>
+            <button onclick="toggleListingsMapPanel()"
+              style="background:rgba(255,80,80,.15);border:1px solid rgba(255,80,80,.3);color:#fff;border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px">
+              <i class="fas fa-times"></i> ปิด
+            </button>
           </div>
         </div>
+      </div>
+
+      <!-- ── Collapsible body (filter + map) ── -->
+      <div id="md-map-body" style="padding:12px 14px 0;overflow:hidden">
         <!-- Filter chips -->
-        <div class="md-map-filter-bar" id="md-map-filter-bar" style="margin-top:12px">
+        <div class="md-map-filter-bar" id="md-map-filter-bar">
           <button class="md-map-fchip active" data-tx="ALL" onclick="mdMapFilterTx('ALL',this)">ทั้งหมด</button>
           <button class="md-map-fchip" data-tx="BUY" onclick="mdMapFilterTx('BUY',this)">ซื้อ</button>
           <button class="md-map-fchip" data-tx="RENT" onclick="mdMapFilterTx('RENT',this)">เช่า</button>
           <span class="md-map-count" id="md-map-showing-count"></span>
         </div>
         <!-- Map container -->
-        <div id="md-map-wrap" style="margin-top:12px">
+        <div id="md-map-wrap" style="margin-top:12px;position:relative">
           <div id="md-leaflet-map"></div>
-          <!-- Tooltip hint -->
           <div id="md-map-hint" style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);background:rgba(10,22,40,.88);color:#fff;font-size:11px;padding:6px 14px;border-radius:20px;pointer-events:none;white-space:nowrap;z-index:500;transition:opacity .4s">
             <i class="fas fa-hand-pointer" style="color:var(--a)"></i> แตะปักหมุดเพื่อดูรายละเอียด
           </div>
         </div>
-        <!-- Active location chips from map click -->
+        <!-- Active location chips -->
         <div style="display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap;padding-bottom:16px" id="map-filter-chips"></div>
       </div>
     </div>
@@ -25864,49 +26240,181 @@ function resetAdvFilter(){
 
   /* ── Wire up map panel drag-to-close (mobile) ── */
   function initMapPanelDrag(){
-    var panel = document.getElementById('md-map-panel');
+    var panel   = document.getElementById('md-map-panel');
     var overlay = document.getElementById('listings-map-overlay');
     if (!panel || panel._dragInited) return;
-    if (window.innerWidth > 768) return; // only on mobile
+    if (window.innerWidth > 768) return; // desktop: side panel only
+
     panel._dragInited = true;
-    var startY = 0, startTime = 0, curY = 0, dragging = false;
-    var DISMISS_DIST = 80, DISMISS_VEL = 0.4;
-    var handle = document.getElementById('md-map-drag-handle') || panel;
+
+    /* ── snap heights ─────────────────────────────────────────────
+       full   = panel.offsetHeight (72 vh, translateY 0)
+       peek   = just the header bar (drag-handle + header-bar)
+       closed = panel off-screen (toggleListingsMapPanel handles this)
+    ────────────────────────────────────────────────────────────── */
+    var SNAP_VEL   = 0.35;  // px/ms threshold for flick
+    var SNAP_DOWN  = 80;    // px drag-down from full → peek
+    var SNAP_UP    = 50;    // px drag-up from peek → full
+
+    /* measure peek height once panel is visible */
+    function getPeekH(){
+      var handle = document.getElementById('md-map-drag-handle');
+      var header = document.getElementById('md-map-header-bar');
+      var h = (handle ? handle.offsetHeight : 0) + (header ? header.offsetHeight : 0);
+      return h || 58;
+    }
+
+    /* current snap state: 'full' | 'peek' */
+    var _state = 'full';
+
+    /* snap helpers */
+    function snapFull(){
+      _state = 'full';
+      panel.classList.remove('dragging','peek');
+      panel.classList.add('open');
+      panel.style.transform = '';
+      var body = document.getElementById('md-map-body');
+      if(body){ body.style.pointerEvents=''; body.style.opacity=''; }
+      /* re-init leaflet after expansion */
+      setTimeout(function(){
+        if(_mdMap) _mdMap.invalidateSize();
+      }, 340);
+    }
+    function snapPeek(){
+      _state = 'peek';
+      var peekH = getPeekH();
+      panel.style.setProperty('--md-peek-h', peekH + 'px');
+      panel.classList.remove('dragging','open');
+      panel.classList.add('peek');
+      panel.style.transform = '';
+    }
+    function snapClose(){
+      _state = 'closed';
+      panel.classList.remove('dragging','open','peek');
+      panel.style.transform = '';
+      /* delegate to the existing toggle function which handles button state */
+      if(typeof toggleListingsMapPanel === 'function') toggleListingsMapPanel();
+    }
+
+    /* expose to header tap (click when peeked → expand) */
+    window._mdMapSnapFull = snapFull;
+    window._mdMapHeaderTap = function(){
+      if(_state === 'peek') snapFull();
+    };
+
+    /* ── drag tracking ───────────────────────────────────────── */
+    var startY = 0, startTime = 0, curDelta = 0, isDragging = false;
+    var baseTranslate = 0; // translateY at drag start
+
+    function getCurrentTranslate(){
+      /* read current translateY from matrix */
+      var st = window.getComputedStyle(panel).transform;
+      if(st && st !== 'none'){
+        var m = st.match(/matrix\([^,]+,[^,]+,[^,]+,[^,]+,([^,]+),([^)]+)\)/);
+        if(m) return parseFloat(m[2]) || 0;
+      }
+      return 0;
+    }
+
     function onStart(e){
       if(e.touches && e.touches.length > 1) return;
       var t = e.touches ? e.touches[0] : e;
-      startY = t.clientY; startTime = Date.now(); curY = 0; dragging = true;
-      panel.style.transition = 'none';
+      startY      = t.clientY;
+      startTime   = Date.now();
+      curDelta    = 0;
+      isDragging  = true;
+      baseTranslate = getCurrentTranslate();
+      panel.classList.add('dragging');
     }
+
     function onMove(e){
-      if(!dragging) return;
+      if(!isDragging) return;
       var t = e.touches ? e.touches[0] : e;
-      curY = t.clientY - startY;
-      if(curY < 0) curY = 0;
-      panel.style.transform = 'translateY(' + curY + 'px)';
-      if(curY > 4 && e.cancelable) e.preventDefault();
-    }
-    function onEnd(){
-      if(!dragging) return; dragging = false;
-      var elapsed = Date.now() - startTime;
-      var vel = elapsed > 0 ? curY / elapsed : 0;
-      panel.style.transition = '';
-      if(curY > DISMISS_DIST || vel > DISMISS_VEL){
-        panel.style.transition = 'transform .28s cubic-bezier(.32,.6,.56,1)';
-        panel.style.transform = 'translateY(110%)';
-        setTimeout(function(){
-          panel.style.transform = '';
-          panel.style.transition = '';
-          if(typeof toggleListingsMapPanel === 'function') toggleListingsMapPanel();
-        }, 280);
+      var dy = t.clientY - startY; // positive = finger moving down
+      curDelta = dy;
+
+      /* calculate raw translateY */
+      var panelH   = panel.offsetHeight;
+      var peekH    = getPeekH();
+      var peekOff  = panelH - peekH;   // translateY when peeked
+
+      var rawY;
+      if(_state === 'full'){
+        /* full → can only drag down; add rubber-band upward */
+        rawY = dy > 0 ? dy : dy * 0.15;
       } else {
-        panel.style.transform = '';
+        /* peek → already offset by peekOff; dragging relative */
+        rawY = peekOff + dy;
+        /* clamp: can't go above full (rawY < 0 → rubber band) */
+        if(rawY < 0) rawY = rawY * 0.15;
+        /* clamp: can't go more than 30px below peek */
+        if(rawY > peekOff + 30) rawY = peekOff + 30;
       }
-      curY = 0;
+
+      panel.style.transform = 'translateY(' + rawY + 'px)';
+
+      /* prevent page scroll while dragging */
+      if(Math.abs(dy) > 5 && e.cancelable) e.preventDefault();
     }
-    handle.addEventListener('touchstart', onStart, {passive: true});
-    document.addEventListener('touchmove', function(e){ if(dragging) onMove(e); }, {passive: false});
-    document.addEventListener('touchend', onEnd, {passive: true});
+
+    function onEnd(){
+      if(!isDragging) return;
+      isDragging = false;
+      panel.classList.remove('dragging');
+
+      var elapsed = Math.max(Date.now() - startTime, 1);
+      var vel     = curDelta / elapsed; // px/ms, positive = downward
+
+      if(_state === 'full'){
+        /* flick down hard → close; moderate down → peek; else → snap back full */
+        if(vel > SNAP_VEL || curDelta > panel.offsetHeight * 0.55){
+          snapClose();
+        } else if(curDelta > SNAP_DOWN){
+          snapPeek();
+        } else {
+          snapFull();
+        }
+      } else {
+        /* peek state: flick/drag up → full; else → peek */
+        if(vel < -SNAP_VEL || curDelta < -SNAP_UP){
+          snapFull();
+        } else {
+          snapPeek();
+        }
+      }
+
+      curDelta = 0;
+    }
+
+    /* ── attach listeners ──────────────────────────────────────
+       Handle: drag-handle + header bar (most natural for thumb)
+    ─────────────────────────────────────────────────────────── */
+    var dragZone = document.getElementById('md-map-drag-handle');
+    var headerBar = document.getElementById('md-map-header-bar');
+
+    [dragZone, headerBar].forEach(function(el){
+      if(!el) return;
+      el.addEventListener('touchstart', onStart, {passive: true});
+    });
+    document.addEventListener('touchmove', function(e){ if(isDragging) onMove(e); }, {passive: false});
+    document.addEventListener('touchend',  onEnd, {passive: true});
+
+    /* mouse fallback (desktop-like test on mobile emulator) */
+    [dragZone, headerBar].forEach(function(el){
+      if(!el) return;
+      el.addEventListener('mousedown', function(e){
+        onStart(e);
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', function up(){
+          onEnd();
+          document.removeEventListener('mousemove', onMove);
+          document.removeEventListener('mouseup', up);
+        });
+      });
+    });
+
+    /* set initial state */
+    _state = 'full';
   }
 
   /* ── Wire up apply-overlay modals (mobile bottom-sheet) ── */
@@ -28128,12 +28636,12 @@ async function adminDeletePortfolio(id, title){
     if (!grid) return;
     var allProps = (typeof props !== 'undefined' && props.length) ? props
                 : (typeof MOCK !== 'undefined' ? (MOCK.props||[]) : []);
-    /* Filter: same type OR same province, exclude current, max 4 */
+    /* Filter: same type OR same province, exclude current, max 6 */
     var related = allProps.filter(function(x){
       return String(x.id) !== String(p.id) && (x.type === p.type || x.province === p.province);
-    }).slice(0, 4);
+    }).slice(0, 6);
     if (!related.length) {
-      related = allProps.filter(function(x){ return String(x.id) !== String(p.id); }).slice(0, 4);
+      related = allProps.filter(function(x){ return String(x.id) !== String(p.id); }).slice(0, 6);
     }
     if (!related.length) {
       var sec = document.getElementById('pdp-related-section');
