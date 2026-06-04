@@ -568,9 +568,12 @@ body:not(:has(.ov.open)):not(:has(.apply-overlay.open)):not(:has(.seo-drawer.ope
    1000  nav bar (fixed, no transform when visible → ไม่สร้าง stacking context)
    1050  dd-panel desktop (position:absolute ใน nav)
    1100  dd-panel mobile/tablet (position:fixed ลอยเหนือทุกอย่างใน layer นี้)
+   1100  bottom nav bar (#md-bottom-nav)
+   1200  adv-sheet-overlay, seo-drawer-overlay (ต้องสูงกว่า bottom nav)
+   1300  adv-sheet, qs-mob-sheet (ต้องสูงกว่า bottom nav)
    3200  overlay base (.ov)
-   3300  seo-drawer-overlay, adv-sheet-overlay
-   3400  adv-sheet, seo-drawer, adv-fp
+   3300  seo-drawer-overlay override, adv-sheet-overlay override
+   3400  adv-sheet override, seo-drawer, adv-fp
    3490  adv-desktop-overlay
    3500  adv-filter-panel
    3600  prop-modal
@@ -597,6 +600,7 @@ nav:not(#md-bottom-nav){z-index:1000!important}
 .ov,.loading-overlay{z-index:3200!important}
 .seo-drawer-overlay,.adv-sheet-overlay{z-index:3300!important}
 .adv-desktop-overlay{z-index:3490!important}
+/* adv-sheet และ qs-mob-sheet ต้องอยู่เหนือ bottom nav (1100) เสมอ */
 .adv-sheet,.seo-drawer,.adv-fp{z-index:3400!important}
 .adv-filter-panel{z-index:3500!important;pointer-events:auto!important}
 .toast{z-index:9999!important}
@@ -637,6 +641,7 @@ nav:not(#md-bottom-nav){z-index:1000!important}
    ════════════════════════════════════════════════════ */
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
+  --bnav-h:0px; /* ความสูง bottom nav — JS จะปรับเป็น 60px เมื่อ bottom nav แสดง */
   /* Real Estate Psychology Palette */
   /* Navy = trust/authority | Gold = luxury/aspiration | Sage = growth/harmony */
   --p:#1B3A6B;      /* Deep Navy Blue — primary brand */
@@ -661,10 +666,7 @@ nav:not(#md-bottom-nav){z-index:1000!important}
 }
 *,*::before,*::after{box-sizing:border-box}
 body{font-family:'Noto Sans Thai','Sarabun',sans-serif;background:var(--bg);color:var(--tx);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden;width:100%;max-width:100vw}
-/* เพิ่ม padding-bottom เฉพาะ mobile/tablet เพื่อไม่ให้ content ถูก bottom nav บัง */
-@media(max-width:960px){
-  body{ padding-bottom:calc(60px + env(safe-area-inset-bottom,0px)); }
-}
+/* padding-bottom สำหรับ bottom nav จัดการโดย JS ผ่าน --bnav-h variable แทน */
 
 a{text-decoration:none;color:inherit}
 button,input,select,textarea{font-family:inherit;font-size:15px}
@@ -981,6 +983,7 @@ body{padding-top:64px}
   /* display:none — ไม่มี layout box → ไม่ block touch บน iOS/Android */
   display:none;
   align-items:center;justify-content:center;padding:16px;
+  padding-bottom:max(16px, calc(16px + var(--bnav-h,0px)));
   -webkit-tap-highlight-color:transparent;
   /* iOS safe scroll */
   -webkit-overflow-scrolling:touch;
@@ -1051,12 +1054,12 @@ body{padding-top:64px}
 @media(max-width:600px){
   .modal.wide{
     width:100vw!important;
-    max-height:calc(100dvh - 16px)!important;
+    max-height:calc(100dvh - 16px - var(--bnav-h,0px))!important;
     border-radius:14px 14px 0 0;
     margin-top:auto;
     align-self:flex-end;
   }
-  #all-modal{align-items:flex-end}
+  #all-modal{align-items:flex-end;padding-bottom:var(--bnav-h,0px)}
 
   /* ── Filterbar compact: mobile 3 rows ── */
   #all-modal-filter-sticky{padding:6px 10px}
@@ -1810,9 +1813,9 @@ footer{background:linear-gradient(135deg,#2d2650 0%,#3d3373 100%);color:rgba(255
 .adv-reset-btn:hover{background:var(--lt)}
 
 /* Mobile sheet */
-.adv-sheet-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:410}
+.adv-sheet-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1200}
 .adv-sheet-overlay.open{display:block}
-.adv-sheet{position:fixed;bottom:0;left:0;right:0;background:#fff;border-radius:22px 22px 0 0;z-index:420;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,1,.56,1);max-height:88vh;display:flex;flex-direction:column;overflow:hidden;touch-action:pan-x}
+.adv-sheet{position:fixed;bottom:var(--bnav-h,0px);left:0;right:0;background:#fff;border-radius:22px 22px 0 0;z-index:1300;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,1,.56,1);max-height:88vh;display:flex;flex-direction:column;overflow:hidden;touch-action:pan-x}
 .adv-sheet.open{transform:translateY(0)}
 .adv-sheet-drag{width:40px;height:4px;background:#ddd;border-radius:4px;margin:10px auto 0}
 .adv-sheet-hd{padding:12px 20px 8px;border-bottom:1px solid var(--bd);flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
@@ -2571,7 +2574,7 @@ footer::after{
 .btn-sub.loading .btn-icon{display:none}
 
 /* Cookie Banner */
-#cookie-banner{position:fixed;bottom:0;left:0;right:0;z-index:430;background:linear-gradient(135deg,#2d2650,#3d3373);color:#fff;padding:16px 20px;box-shadow:0 -4px 20px rgba(0,0,0,.3);transform:translateY(100%);transition:transform .4s cubic-bezier(.22,1,.36,1)}
+#cookie-banner{position:fixed;bottom:var(--bnav-h,0px);left:0;right:0;z-index:430;background:linear-gradient(135deg,#2d2650,#3d3373);color:#fff;padding:16px 20px;box-shadow:0 -4px 20px rgba(0,0,0,.3);transform:translateY(100%);transition:transform .4s cubic-bezier(.22,1,.36,1)}
 #cookie-banner.show{transform:translateY(0)}
 .cookie-banner-inner{max-width:1320px;margin:0 auto;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
 .cookie-banner-text{flex:1;min-width:200px;font-size:13px;line-height:1.5;opacity:.9}
@@ -2626,7 +2629,7 @@ footer::after{
   .footer-brand-col{text-align:left}
   .footer-logo{justify-content:flex-start!important}
   .flink-inner{grid-template-columns:repeat(3,1fr)}
-  .dd-panel{position:fixed;top:auto;bottom:60px;left:0;right:0;width:100%;max-height:70vh;border-radius:20px 20px 0 0;transform:none;margin:0;z-index:1100;pointer-events:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;animation:ddSlideUp .25s cubic-bezier(.32,1,.56,1) both}
+  .dd-panel{position:fixed;top:auto;bottom:var(--bnav-h,0px);left:0;right:0;width:100%;max-height:70vh;border-radius:20px 20px 0 0;transform:none;margin:0;z-index:1100;pointer-events:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;animation:ddSlideUp .25s cubic-bezier(.32,1,.56,1) both}
   @keyframes ddSlideUp{from{transform:translateY(30px);opacity:.6}to{transform:translateY(0);opacity:1}}
   .dd-panel::before{content:'';display:block;width:36px;height:4px;background:rgba(0,0,0,.18);border-radius:2px;margin:10px auto 0;flex-shrink:0}
   .dd-panel.right{left:0;right:0}
@@ -3279,6 +3282,7 @@ footer::after{
   background:linear-gradient(135deg,rgba(200,146,42,.08),rgba(255,255,255,.03));
   pointer-events:none;
 }
+.stat-counter-card[onclick]:hover{transform:translateY(-3px) scale(1.04);box-shadow:0 8px 28px rgba(200,146,42,.35);}
 .stat-counter-card:hover{
   background:rgba(10,22,48,0.72);
   border-color:rgba(232,184,75,.6);
@@ -3503,7 +3507,7 @@ footer::after{
 @media(max-width:600px){
   .agent-apply-btns{flex-direction:column;align-items:center;gap:8px}
   .apply-modal{max-width:100%;border-radius:var(--rl) var(--rl) 0 0;max-height:92vh}
-  .apply-overlay{align-items:flex-end;padding:0}
+  .apply-overlay{align-items:flex-end;padding:0;padding-bottom:var(--bnav-h,0px)}
   .apply-modal{animation:applySlideUp .3s cubic-bezier(.34,1.2,.64,1)}
   @keyframes applySlideUp{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
 }
@@ -6172,15 +6176,15 @@ footer::after{
 <h1 data-i18n-html="hero.h1"><span>อสังหาริมทรัพย์</span>ที่ใช่<br><span class="hero-white">ใน</span><span>สไตล์</span>ที่เป็นคุณ</h1>
   <p id="hero-sub" data-i18n="hero.sub">บ้าน คอนโด ที่ดิน ทุกประเภท ทุกทำเล ราคาดีที่สุด</p>
   <div class="stat-counters" id="hero-stat-counters">
-    <div class="stat-counter-card">
+    <div class="stat-counter-card" onclick="showPage('listings')" style="cursor:pointer" title="ดูประกาศทั้งหมด">
       <span class="stat-counter-icon">🏠</span>
       <div class="stat-text-group"><span class="stat-counter-num" data-target="200"><span class="suf-num">0</span><span class="suf">+</span></span><span class="stat-counter-label" data-i18n="stat.prop">อสังหาริมทรัพย์</span></div>
     </div>
-    <div class="stat-counter-card">
+    <div class="stat-counter-card" onclick="showPage('agents')" style="cursor:pointer" title="ดูทีมตัวแทน">
       <span class="stat-counter-icon">👤</span>
       <div class="stat-text-group"><span class="stat-counter-num" data-target="20"><span class="suf-num">0</span><span class="suf">+</span></span><span class="stat-counter-label" data-i18n="stat.agents">ตัวแทนมืออาชีพ</span></div>
     </div>
-    <div class="stat-counter-card">
+    <div class="stat-counter-card" onclick="showPage('portfolio')" style="cursor:pointer" title="ดูผลงาน">
       <span class="stat-counter-icon">🏆</span>
       <div class="stat-text-group"><span class="stat-counter-num" data-target="300"><span class="suf-num">0</span><span class="suf">+</span></span><span class="stat-counter-label" data-i18n="stat.closed">ปิดการขายแล้ว</span></div>
     </div>
@@ -7148,7 +7152,7 @@ footer::after{
 <!-- ══ BOTTOM NAV — More Menu Sheet ══ -->
 <div id="md-bnav-sheet" style="display:none;position:fixed;inset:0;z-index:3600" onclick="if(event.target===this||event.target.id==='md-bnav-backdrop') mdBnavCloseMenu()">
   <div id="md-bnav-backdrop" style="position:absolute;inset:0;background:rgba(0,0,0,.4);cursor:pointer"></div>
-  <div id="md-bnav-sheet-panel" style="position:absolute;bottom:60px;left:0;right:0;z-index:1;background:#fff;border-radius:20px 20px 0 0;padding:16px 12px 24px;box-shadow:0 -8px 32px rgba(0,0,0,.18);max-height:75vh;overflow-y:auto">
+  <div id="md-bnav-sheet-panel" style="position:absolute;bottom:0;left:0;right:0;z-index:1;background:#fff;border-radius:20px 20px 0 0;padding:16px 12px 24px;box-shadow:0 -8px 32px rgba(0,0,0,.18);max-height:75vh;overflow-y:auto">
     <div id="md-bnav-drag-handle" style="width:40px;height:5px;background:#CBD0D6;border-radius:99px;margin:0 auto 18px;cursor:pointer;touch-action:none" title="ลากลงเพื่อปิด"></div>
     <div style="font-size:12px;font-weight:700;color:#65676B;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;padding:0 4px">เมนูหลัก</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
@@ -7207,6 +7211,10 @@ window.mdBnavToggleMenu = function(){
   sheet.style.display='block';
   var panel = document.getElementById('md-bnav-sheet-panel');
   if(panel){
+    /* ปรับ bottom ตาม bottom nav: ถ้า bottom nav แสดงอยู่ → ยกขึ้น 60px */
+    var bnav = document.getElementById('md-bottom-nav');
+    var bnavH = (bnav && bnav.offsetParent !== null && getComputedStyle(bnav).display !== 'none') ? bnav.offsetHeight : 0;
+    panel.style.bottom = bnavH + 'px';
     panel.style.transition='none'; panel.style.transform='translateY(110%)';
     requestAnimationFrame(function(){
       panel.style.transition='transform .32s cubic-bezier(.32,1,.56,1)';
@@ -7349,6 +7357,26 @@ window.mdBnavCloseMenu = function(){
   } else {
     _bnavBind();
   }
+})();
+
+/* ── Init --bnav-h CSS variable on load ── */
+(function(){
+  function _syncBnavH(){
+    var bnav = document.getElementById('md-bottom-nav');
+    if(!bnav) return;
+    var visible = getComputedStyle(bnav).display !== 'none' && bnav.style.display !== 'none';
+    var h = visible ? (bnav.offsetHeight || 60) : 0;
+    document.documentElement.style.setProperty('--bnav-h', h + 'px');
+    /* sync body padding-bottom เฉพาะเมื่อ bottom nav แสดง */
+    document.body.style.paddingBottom = h > 0 ? (h + 'px') : '';
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', _syncBnavH);
+  } else {
+    _syncBnavH();
+  }
+  window.addEventListener('resize', _syncBnavH);
+  window._syncBnavH = _syncBnavH;
 })();
 </script>
 
@@ -13530,7 +13558,6 @@ function afterLoad(){
     var sectionMap = {
       '/listings': 'listings', '/agents': 'agents',
       '/portfolio': 'portfolio', '/favorites': 'favorites',
-      '/my-account': 'my-account', '/social': 'social', '/admin': 'admin',
     };
     var targetPage = sectionMap[location.pathname];
     var ap = document.querySelector('.page.active');
@@ -14105,7 +14132,6 @@ const PAGE_ROUTES = {
   'my-account':     { path: '/my-account', title: 'บัญชีของฉัน — Matchdoor',                                 desc: 'จัดการโปรไฟล์ รายการโปรด และประกาศของคุณบน Matchdoor' },
   'social':         { path: '/social',     title: 'ฟีดชุมชน Matchdoor — อสังหาฯ บ้าน คอนโด กรุงเทพ',    desc: 'ชุมชนอสังหาริมทรัพย์ Matchdoor แชร์ทรัพย์ ถามตอบ ติดตามข่าวสารอสังหาฯ กรุงเทพ' },
   'property':       { path: '/property', title: 'ทรัพย์ — Matchdoor', desc: 'รายละเอียดทรัพย์อสังหาริมทรัพย์ กรุงเทพ — Matchdoor' },
-  'admin':          { path: '/admin',    title: 'Admin Panel — Matchdoor', desc: 'Admin Dashboard' },
 };
 
 // Section → filter context for "buy" / "rent" sub-pages
@@ -14397,6 +14423,19 @@ function _silentShowPage(name, skipScrollTop) {
   if(!skipScrollTop) scrollTo(0, 0);
   closeAllDD();
   _closeHamburger();
+  /* ── Bottom nav: แสดงเฉพาะหน้า community + sync --bnav-h ── */
+  (function(){
+    var bnav = document.getElementById('md-bottom-nav');
+    if(!bnav) return;
+    var isMobile = window.innerWidth <= 960;
+    if(name === 'community' && isMobile){
+      bnav.style.removeProperty('display');
+      document.documentElement.style.setProperty('--bnav-h', bnav.offsetHeight + 'px');
+    } else {
+      bnav.style.display = 'none';
+      document.documentElement.style.setProperty('--bnav-h', '0px');
+    }
+  })();
   if (name === 'listings') {
     window._lsSeoSidebarRendered = false;
     // NOTE: ไม่ clear _pageBeforeModal ที่นี่ — closeModal ต้องการค่านี้เพื่อ restore page หลังปิดการ์ด
@@ -14444,12 +14483,6 @@ function _silentShowPage(name, skipScrollTop) {
     if(typeof initSocialFeed === 'function') {
       setTimeout(function(){ initSocialFeed && initSocialFeed(); }, 100);
     }
-  }
-  else if (name === 'admin') {
-    // ทริก admin login flow เมื่อ navigate มาด้วย URL โดยตรง
-    setTimeout(function(){
-      if(typeof openAdminLogin === 'function') openAdminLogin();
-    }, 200);
   }
   // seo-toggle-btn: แสดงบนหน้า home และ listings เท่านั้น
   const _seoBtn = document.getElementById('seo-toggle-btn');
@@ -14560,7 +14593,6 @@ function _initRouteFromUrl() {
     '/listings': 'listings',
     '/my-account': 'my-account',
     '/social': 'social',
-    '/admin': 'admin',
   };
   // /property/* and /agent/* are handled by match blocks above — not in sectionMap
   const targetPage = sectionMap[path];
@@ -15649,7 +15681,7 @@ function toggleListingsMapPanel() {
       : '<i class="fas fa-times"></i> <span class="ls-map-btn-label">ปิดแผนที่</span>';
   }
 
-  if(!isOpen){ setTimeout(function(){ mdMapInit(); }, 80); }
+  if(!isOpen){ setTimeout(function(){ mdMapInit(); if(typeof initMapPanelDrag==='function') initMapPanelDrag(); }, 80); }
 }
 
 /* ════════════════════════════════════════════════════════════════
@@ -20167,7 +20199,7 @@ function openQsSheet(panelId, btn){
     document.body.appendChild(overlay);
     sheet = document.createElement('div');
     sheet.id = 'qs-mob-sheet';
-    sheet.style.cssText='position:fixed;bottom:0;left:0;right:0;background:#fff;border-radius:22px 22px 0 0;z-index:420;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,1,.56,1);max-height:88vh;display:flex;flex-direction:column;overflow:hidden';
+    sheet.style.cssText='position:fixed;bottom:var(--bnav-h,0px);left:0;right:0;background:#fff;border-radius:22px 22px 0 0;z-index:1300;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,1,.56,1);max-height:88vh;display:flex;flex-direction:column;overflow:hidden';
     sheet.innerHTML='<div style="width:40px;height:4px;background:#ddd;border-radius:4px;margin:10px auto 0"></div><div id="qs-mob-sheet-hd" style="padding:12px 20px 8px;border-bottom:1px solid #e8e0d4;display:flex;align-items:center;justify-content:space-between;flex-shrink:0"><h3 style="font-size:15px;font-weight:700;font-family:Kanit,sans-serif"></h3><button onclick="closeQsSheet()" style="background:none;border:none;font-size:18px;color:#888;cursor:pointer">×</button></div><div id="qs-mob-sheet-body" style="flex:1;overflow-y:auto;padding:10px 12px"></div>';
     document.body.appendChild(sheet);
   }
@@ -23390,7 +23422,6 @@ document.addEventListener('DOMContentLoaded', function ensureHomeVisible(){
     '/buy': 'home', '/rent': 'home',
     '/my-account': 'my-account',
     '/social': 'social',
-    '/admin': 'admin',
   };
   const effectivePath = location.pathname;
   const targetName = sectionMap[effectivePath] || 'home';
@@ -25595,7 +25626,6 @@ function resetAdvFilter(){
           </div>
           <div class="ls-btn-row" style="display:contents">
           <button onclick="listingsDoSearchAndScroll()" style="background:var(--a);color:#1A1A2E;border:none;border-radius:9px;padding:9px 20px;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:6px;height:42px"><i class="fas fa-search"></i> ค้นหา</button>
-          <button onclick="listingsResetSearch()" style="background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.35);border-radius:9px;padding:9px 16px;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:6px;height:42px" title="รีเซ็ตการค้นหา"><i class="fas fa-undo"></i> Reset</button>
           </div>
         </div>
         <!-- Filter tags row -->
@@ -25607,6 +25637,7 @@ function resetAdvFilter(){
           <button onclick="listingsFilterNew()" id="ls-tab-new" style="flex-shrink:0;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;border:1.5px solid rgba(0,200,150,.4);background:rgba(0,200,150,.12);color:#7dfcd8;cursor:pointer;white-space:nowrap">✨ มาใหม่</button>
           <div style="flex-shrink:0;display:flex;align-items:center;gap:8px;margin-left:4px">
             <button id="ls-adv-filter-btn" onclick="openListingsAdvFilter()" style="flex-shrink:0;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;border:1.5px solid rgba(200,146,42,.6);background:rgba(200,146,42,.15);color:var(--a2);cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap"><i class="fas fa-sliders-h"></i> Filter เพิ่มเติม</button>
+            <button onclick="listingsResetSearch()" style="flex-shrink:0;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:700;border:1.5px solid rgba(255,255,255,.3);background:rgba(255,255,255,.12);color:rgba(255,255,255,.8);cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap" title="รีเซ็ตการค้นหา"><i class="fas fa-undo"></i> รีเซ็ต</button>
           </div>
         </div>
       </div>
@@ -25831,6 +25862,53 @@ function resetAdvFilter(){
     if (sheet && !sheet._dragInited) initSheetDrag(sheet, function(){ closeAdvFilter(); }, overlay);
   }
 
+  /* ── Wire up map panel drag-to-close (mobile) ── */
+  function initMapPanelDrag(){
+    var panel = document.getElementById('md-map-panel');
+    var overlay = document.getElementById('listings-map-overlay');
+    if (!panel || panel._dragInited) return;
+    if (window.innerWidth > 768) return; // only on mobile
+    panel._dragInited = true;
+    var startY = 0, startTime = 0, curY = 0, dragging = false;
+    var DISMISS_DIST = 80, DISMISS_VEL = 0.4;
+    var handle = document.getElementById('md-map-drag-handle') || panel;
+    function onStart(e){
+      if(e.touches && e.touches.length > 1) return;
+      var t = e.touches ? e.touches[0] : e;
+      startY = t.clientY; startTime = Date.now(); curY = 0; dragging = true;
+      panel.style.transition = 'none';
+    }
+    function onMove(e){
+      if(!dragging) return;
+      var t = e.touches ? e.touches[0] : e;
+      curY = t.clientY - startY;
+      if(curY < 0) curY = 0;
+      panel.style.transform = 'translateY(' + curY + 'px)';
+      if(curY > 4 && e.cancelable) e.preventDefault();
+    }
+    function onEnd(){
+      if(!dragging) return; dragging = false;
+      var elapsed = Date.now() - startTime;
+      var vel = elapsed > 0 ? curY / elapsed : 0;
+      panel.style.transition = '';
+      if(curY > DISMISS_DIST || vel > DISMISS_VEL){
+        panel.style.transition = 'transform .28s cubic-bezier(.32,.6,.56,1)';
+        panel.style.transform = 'translateY(110%)';
+        setTimeout(function(){
+          panel.style.transform = '';
+          panel.style.transition = '';
+          if(typeof toggleListingsMapPanel === 'function') toggleListingsMapPanel();
+        }, 280);
+      } else {
+        panel.style.transform = '';
+      }
+      curY = 0;
+    }
+    handle.addEventListener('touchstart', onStart, {passive: true});
+    document.addEventListener('touchmove', function(e){ if(dragging) onMove(e); }, {passive: false});
+    document.addEventListener('touchend', onEnd, {passive: true});
+  }
+
   /* ── Wire up apply-overlay modals (mobile bottom-sheet) ── */
   function initApplyDrag(){
     ['apply-agent-modal','apply-other-modal'].forEach(function(id){
@@ -25890,6 +25968,7 @@ function resetAdvFilter(){
   function tryInit(){
     initAdvSheetDrag();
     initApplyDrag();
+    initMapPanelDrag();
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', tryInit);
   else tryInit();
