@@ -18306,7 +18306,7 @@ function renderAgents(){
         <div class="agent-name">${a.name}</div>
         <div class="agent-role">${a.title}</div>
         <div class="agent-rating"><span class="stars">${'★'.repeat(Math.min(5,Math.round(a.rating||4.5)))}</span><span class="rating-num">${(a.rating||4.5).toFixed(1)}</span></div>
-        <div class="agent-stats"><div class="agst"><div class="n">${myProps.length}</div><div class="l">${ui('ag.props')}</div></div><div class="agst"><div class="n">${port.length}</div><div class="l">${ui('ag.deals')}</div></div></div>
+        <div class="agent-stats"><div class="agst"><div class="n">${myProps.length}</div><div class="l">${ui('ag.props')}</div></div><div class="agst"><div class="n">${a.deals||0}</div><div class="l">${ui('ag.deals')}</div></div></div>
         <div class="agent-btns" onclick="event.stopPropagation()"><a class="ab ab-ln" href="${lineUrl(a.lineId)}" target="_blank"><i class="fab fa-line"></i> Line</a><a class="ab ab-tel" href="tel:${a.phone}"><i class="fas fa-mobile-alt"></i> โทร</a></div>
         <a class="agp-profile-link" href="/agent/${a.id}-${(a.name||'').toLowerCase().replace(/[^ก-๙a-z0-9\s-]/g,'').trim().replace(/\s+/g,'-').slice(0,80)}"
            onclick="event.stopPropagation();event.preventDefault();showPage('agent-profile','${a.id}')"
