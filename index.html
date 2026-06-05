@@ -2424,6 +2424,23 @@ footer::after{
 .ma-listing-card-price{font-size:18px;font-weight:800;color:var(--p);margin-bottom:6px}
 .ma-listing-card-meta{display:flex;flex-wrap:wrap;gap:8px;font-size:12px;color:var(--tx2)}
 .ma-listing-card-tag{display:inline-flex;align-items:center;gap:4px;background:var(--lt);border-radius:6px;padding:3px 8px;font-size:11px}
+/* Listing card — stats & action bar */
+.ma-listing-card-stats{display:flex;align-items:center;gap:12px;font-size:11px;color:var(--tx2);margin-top:8px;padding-top:8px;border-top:1px solid var(--bd)}
+.ma-listing-card-actions{display:flex;align-items:center;gap:6px;margin-top:10px;flex-wrap:wrap}
+.ma-lca-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid transparent;transition:.15s;font-family:inherit;white-space:nowrap}
+.ma-lca-btn:hover{filter:brightness(1.07)}
+.ma-lca-boost{background:#fff8e1;color:#c8922a;border-color:#f1c40f}
+.ma-lca-boost.boosted{background:#f1c40f22;color:#b8860b;border-color:#c8922a}
+.ma-lca-share{background:var(--lt);color:var(--p);border-color:var(--bd)}
+.ma-lca-report{background:#fff5f5;color:#c0392b;border-color:#f5c6cb}
+.ma-lca-delete{background:#fff5f5;color:#e74c3c;border-color:#f5c6cb}
+.ma-lca-delete:hover{background:#e74c3c;color:#fff;border-color:#e74c3c}
+.ma-boost-badge{display:inline-flex;align-items:center;gap:4px;background:linear-gradient(135deg,#f1c40f,#c8922a);color:#fff;border-radius:20px;padding:2px 9px;font-size:10px;font-weight:800;margin-left:4px}
+/* Share sub-menu */
+.ma-share-menu{display:none;position:absolute;z-index:200;background:#fff;border:1.5px solid var(--bd);border-radius:12px;padding:6px;box-shadow:0 8px 24px rgba(0,0,0,.12);min-width:160px;top:calc(100% + 4px);left:0}
+.ma-share-menu.open{display:block}
+.ma-share-menu-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;color:var(--tx);transition:.12s}
+.ma-share-menu-item:hover{background:var(--lt)}
 /* Token banner on profile top */
 .ma-token-bar{background:linear-gradient(135deg,#1B3A6B,#2a5298);border-radius:14px;padding:14px 18px;margin-bottom:16px;color:#fff;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
 .ma-token-bar-left{display:flex;align-items:center;gap:12px}
@@ -10070,8 +10087,8 @@ function _popupRefreshMarkersFromData(data){
 // 🔧 จุด CONFIG ทั้งหมด — แก้ไขตรงนี้ที่เดียว
 const C = {
   // --- [1] Supabase Project ---
-  SUPABASE_URL:'https://upfubsjnzyebwsrmflkz.supabase.co', // 🔧 [CONFIG-1] Supabase Project URL
-  SUPABASE_KEY:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVwZnVic2puenllYndzcm1mbGt6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTQyMzMsImV4cCI6MjA5NTk3MDIzM30.oSbIbJ1USOjZt_h9ympXIptR5aWZPLLYaZpNfgXGNxg', // 🔧 [CONFIG-2] Supabase Anon/Public Key เท่านั้น!
+  SUPABASE_URL:'https://kmcdrnfqlsdanevmbzoy.supabase.co', // 🔧 [CONFIG-1] Supabase Project URL
+  SUPABASE_KEY:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttY2RybmZxbHNkYW5ldm1iem95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1OTgxNDEsImV4cCI6MjA5NjE3NDE0MX0.9Cd6J81jL1pQPDl1H2xRM53T8LOAwC27EYVGP7V9_KQ', // 🔧 [CONFIG-2] Supabase Anon/Public Key เท่านั้น!
 
   // --- [2] Supabase Storage ---
   STORAGE_BUCKET: 'matchdoor-assets', // 🔧 [CONFIG-3] ชื่อ Storage Bucket หลัก
@@ -12551,6 +12568,26 @@ function _maOpenEditModal(){
         <input type="text" id="ma-areas-modal" value="${(_meta.expertise_areas||['กรุงเทพฯ']).join(', ')}" placeholder="สุขุมวิท, อโศก, พระราม 9">
       </div>
 
+      <!-- จังหวัด / Social / Cover -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
+        <div class="ma-field">
+          <label>จังหวัด</label>
+          <input type="text" id="ma-province-modal" value="${_meta.province||''}" placeholder="กรุงเทพฯ">
+        </div>
+        <div class="ma-field">
+          <label>Facebook URL</label>
+          <input type="url" id="ma-facebook-modal" value="${_meta.facebook_url||''}" placeholder="https://facebook.com/...">
+        </div>
+        <div class="ma-field">
+          <label>Instagram URL</label>
+          <input type="url" id="ma-instagram-modal" value="${_meta.instagram_url||''}" placeholder="https://instagram.com/...">
+        </div>
+        <div class="ma-field">
+          <label>Cover Image URL</label>
+          <input type="url" id="ma-cover-modal" value="${_meta.cover_url||''}" placeholder="https://...">
+        </div>
+      </div>
+
       <!-- เปลี่ยนรหัสผ่าน -->
       <div style="background:var(--lt);border-radius:12px;padding:14px;margin-top:6px">
         <div style="font-size:13px;font-weight:700;color:var(--p);margin-bottom:12px;display:flex;align-items:center;gap:6px"><i class="fas fa-lock"></i> เปลี่ยนรหัสผ่าน</div>
@@ -12643,24 +12680,54 @@ async function _maSaveProfileModal(){
   const bioVal=document.getElementById('ma-bio-modal')?.value.trim()||'';
   const langsRaw=document.getElementById('ma-langs-modal')?.value||'';
   const areasRaw=document.getElementById('ma-areas-modal')?.value||'';
+  const provinceVal=document.getElementById('ma-province-modal')?.value.trim()||'';
+  const facebookVal=document.getElementById('ma-facebook-modal')?.value.trim()||'';
+  const instagramVal=document.getElementById('ma-instagram-modal')?.value.trim()||'';
+  const coverVal=document.getElementById('ma-cover-modal')?.value.trim()||'';
   const languages=langsRaw.split(',').map(s=>s.trim()).filter(Boolean);
   const expertise_areas=areasRaw.split(',').map(s=>s.trim()).filter(Boolean);
   const terms=document.getElementById('ma-terms-accept-modal');
   if(terms&&!terms.checked){ toast('กรุณายอมรับข้อกำหนดก่อนบันทึก',true); return; }
   const btn=document.getElementById('ma-save-profile-btn-modal');
   if(btn){btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> กำลังบันทึก...';}
-  const metaPayload={display_name:name,phone,line_id:lineId,role:roleVal,bio:bioVal,languages,expertise_areas};
+
+  // 1) อัปเดต auth metadata
+  const metaPayload={display_name:name,phone,line_id:lineId,role:roleVal,bio:bioVal,languages,expertise_areas,province:provinceVal,facebook_url:facebookVal,instagram_url:instagramVal};
   if(avatarUrl) metaPayload.avatar_url=avatarUrl;
-  const {error}=await sb.auth.updateUser({data:metaPayload});
-  if(error){
+  if(coverVal) metaPayload.cover_url=coverVal;
+  const {error:authErr}=await sb.auth.updateUser({data:metaPayload});
+  if(authErr){
     if(btn){btn.disabled=false;btn.innerHTML='<i class="fas fa-save"></i> บันทึกข้อมูล';btn.style.opacity='1';}
-    toast('เกิดข้อผิดพลาด: '+error.message,true); return;
+    toast('เกิดข้อผิดพลาด: '+authErr.message,true); return;
   }
-  // Sync to user_profiles table
+
+  // 2) Sync ผ่าน update_user_profile() RPC
   try{
-    await sb.from('user_profiles').upsert({user_id:user.id,...metaPayload,updated_at:new Date().toISOString()},{onConflict:'user_id'});
-  }catch(e){}
-  _cachedUserProfile={...(_cachedUserProfile||{}), ...metaPayload};
+    const rpcParams={
+      p_display_name:name||null,
+      p_phone:phone||null,
+      p_line_id:lineId||null,
+      p_role:roleVal||null,
+      p_bio:bioVal||null,
+      p_languages:languages.length?languages:null,
+      p_expertise_areas:expertise_areas.length?expertise_areas:null,
+      p_province:provinceVal||null,
+      p_facebook_url:facebookVal||null,
+      p_instagram_url:instagramVal||null,
+      p_cover_url:coverVal||null,
+    };
+    if(avatarUrl) rpcParams.p_avatar_url=avatarUrl;
+    const {error:rpcErr}=await sb.rpc('update_user_profile',rpcParams);
+    if(rpcErr) throw rpcErr;
+  }catch(e){
+    // RPC fallback: upsert ตรง
+    try{
+      const upsertData={user_id:user.id,...metaPayload,updated_at:new Date().toISOString()};
+      await sb.from('user_profiles').upsert(upsertData,{onConflict:'user_id'});
+    }catch(e2){}
+  }
+
+  _cachedUserProfile={...(_cachedUserProfile||{}),...metaPayload};
   toast('✅ บันทึกข้อมูลเรียบร้อย');
   document.getElementById('ma-edit-profile-modal')?.remove();
   renderMyAccount();
@@ -12699,11 +12766,17 @@ async function _maRenderProfileListings(){
     const priceStr=ul.price>=1e6?(ul.price/1e6).toFixed(1)+'M':(ul.price||0).toLocaleString();
     const txLabel=ul.transaction==='RENT'?'ให้เช่า':'ขาย';
     const exp=ul.expires_at?new Date(ul.expires_at).toLocaleDateString('th-TH'):'';
-    return `<div class="ma-listing-card">
+    const isBoosted = !!ul.is_boosted && ul.boost_expires_at && new Date(ul.boost_expires_at) > new Date();
+    const boostExpStr = isBoosted ? new Date(ul.boost_expires_at).toLocaleDateString('th-TH') : '';
+    const viewCnt = ul.view_count || 0;
+    const shareCnt = ul.share_count || 0;
+    const safeId = ul.id;
+    const safePropId = ul.property_id || '';
+    return `<div class="ma-listing-card" id="ulcard-${safeId}">
       ${photo?`<img class="ma-listing-card-img" src="${photo}" alt="listing" loading="lazy">`:`<div class="ma-listing-card-img-placeholder">🏠</div>`}
       <div class="ma-listing-card-body">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px">
-          <div class="ma-listing-card-title">${sanitize(ul.title)}</div>
+          <div class="ma-listing-card-title">${sanitize(ul.title)}${isBoosted?`<span class="ma-boost-badge"><i class="fas fa-bolt"></i> Boost</span>`:''}</div>
           ${statusBadge(ul.status)}
         </div>
         <div class="ma-listing-card-price">฿${priceStr} ${txLabel==='ให้เช่า'?'<span style="font-size:12px;font-weight:500;color:var(--tx2)">/เดือน</span>':''}</div>
@@ -12713,8 +12786,20 @@ async function _maRenderProfileListings(){
           <span class="ma-listing-card-tag"><i class="fas fa-calendar" style="color:var(--p)"></i>${new Date(ul.created_at).toLocaleDateString('th-TH')}</span>
           ${exp?`<span class="ma-listing-card-tag"><i class="fas fa-hourglass-end" style="color:#e74c3c"></i>หมดอายุ ${exp}</span>`:''}
         </div>
+        ${isBoosted?`<div style="font-size:11px;color:#c8922a;margin-top:6px"><i class="fas fa-bolt"></i> Boost ถึง ${boostExpStr}</div>`:''}
         ${ul.admin_note?`<div style="font-size:11px;color:#e74c3c;margin-top:8px;padding:6px 10px;background:#e74c3c11;border-radius:6px"><i class="fas fa-comment"></i> ${sanitize(ul.admin_note)}</div>`:''}
-        ${ul.status==='อนุมัติ'&&ul.property_id?`<button onclick="openModal('${ul.property_id}')" style="margin-top:10px;font-size:12px;padding:6px 14px;background:var(--p);color:#fff;border:none;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:5px"><i class="fas fa-eye"></i> ดูประกาศ</button>`:''}
+        <div class="ma-listing-card-stats">
+          <span><i class="fas fa-eye" style="color:var(--p)"></i> ${viewCnt.toLocaleString()} ครั้ง</span>
+          <span><i class="fas fa-share-nodes" style="color:#2ecc71"></i> ${shareCnt.toLocaleString()} แชร์</span>
+        </div>
+        <div class="ma-listing-card-actions">
+          ${ul.status==='อนุมัติ'&&safePropId?`<button class="ma-lca-btn ma-lca-share" style="position:relative" onclick="_maShareMenu(event,'${safeId}','${safePropId}')"><i class="fas fa-share-nodes"></i> แชร์<i class="fas fa-chevron-down" style="font-size:9px;margin-left:2px"></i><div class="ma-share-menu" id="shmenu-${safeId}"><div class="ma-share-menu-item" onclick="event.stopPropagation();_maShareListing('${safeId}','${safePropId}','copy')"><i class="fas fa-link" style="color:var(--p)"></i> คัดลอกลิงก์</div><div class="ma-share-menu-item" onclick="event.stopPropagation();_maShareListing('${safeId}','${safePropId}','line')"><i class="fab fa-line" style="color:#06c755"></i> Line</div><div class="ma-share-menu-item" onclick="event.stopPropagation();_maShareListing('${safeId}','${safePropId}','facebook')"><i class="fab fa-facebook" style="color:#1877f2"></i> Facebook</div></div></button>`:
+            `<button class="ma-lca-btn ma-lca-share" disabled style="opacity:.4;cursor:not-allowed"><i class="fas fa-share-nodes"></i> แชร์</button>`}
+          <button class="ma-lca-btn ma-lca-boost ${isBoosted?'boosted':''}" onclick="_maBoostListing('${safeId}',${isBoosted})">${isBoosted?'<i class="fas fa-bolt"></i> Boosted':'<i class="fas fa-bolt"></i> Boost (1T)'}</button>
+          <button class="ma-lca-btn ma-lca-report" onclick="_maReportListing('${safeId}','${safePropId}')"><i class="fas fa-flag"></i> รายงาน</button>
+          <button class="ma-lca-btn ma-lca-delete" onclick="_maDeleteListing('${safeId}')"><i class="fas fa-trash"></i> ลบ</button>
+        </div>
+        ${ul.status==='อนุมัติ'&&safePropId?`<button onclick="showPage('property','${safePropId}')" style="margin-top:8px;font-size:12px;padding:6px 14px;background:var(--p);color:#fff;border:none;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:5px"><i class="fas fa-eye"></i> ดูประกาศ</button>`:''}
       </div>
     </div>`;
   }).join('');
@@ -12729,6 +12814,81 @@ async function _maRenderProfileListings(){
     ${html}`;
 }
 
+
+/* ── Listing Card Actions ──────────────────────────────────── */
+
+async function _maBoostListing(listingId, isBoosted){
+  if(!user||!sb){ toast('กรุณาเข้าสู่ระบบ',true); return; }
+  if(isBoosted){ toast('ประกาศนี้กำลัง Boost อยู่แล้ว ✅'); return; }
+  if(_tokenBalance < 1){ toast('Token ไม่พอ — ต้องการ 1 Token เพื่อ Boost',true); return; }
+  if(!confirm('ใช้ 1 Token เพื่อ Boost ประกาศนี้ 7 วัน?')) return;
+  const { error } = await sb.rpc('boost_user_listing', { listing_id: listingId });
+  if(error){ toast('Boost ไม่สำเร็จ: '+error.message, true); return; }
+  toast('🚀 Boost สำเร็จ! ประกาศจะถูกดันขึ้นสูง 7 วัน');
+  await loadUserTokenData();
+  _maRenderProfileListings();
+}
+
+async function _maDeleteListing(listingId){
+  if(!user||!sb){ toast('กรุณาเข้าสู่ระบบ',true); return; }
+  if(!confirm('ลบประกาศนี้? Token จะถูกคืนให้คุณ 1 Token')) return;
+  const { error } = await sb.rpc('delete_user_listing', { listing_id: listingId });
+  if(error){ toast('ลบไม่สำเร็จ: '+error.message, true); return; }
+  toast('🗑️ ลบประกาศแล้ว — Token ถูกคืน 1 รายการ');
+  await loadUserTokenData();
+  _maRenderProfileListings();
+}
+
+function _maReportListing(listingId, propertyId){
+  // Simple inline prompt for reason
+  const reasons = ['ข้อมูลไม่ถูกต้อง','ราคาผิดพลาด','ประกาศซ้ำ','หลอกลวง','เนื้อหาไม่เหมาะสม','อื่นๆ'];
+  const reasonStr = reasons.map((r,i)=>`${i+1}. ${r}`).join('\n');
+  const choice = prompt(`รายงานประกาศนี้ — เลือกเหตุผล:\n${reasonStr}\n\nพิมพ์หมายเลข (1-${reasons.length}):`);
+  if(!choice) return;
+  const idx = parseInt(choice) - 1;
+  const reason = reasons[idx] || 'อื่นๆ';
+  const detail = prompt(`รายละเอียดเพิ่มเติม (ไม่บังคับ):`) || '';
+  sb.rpc('report_property', {
+    listing_id: listingId || null,
+    property_id: propertyId || null,
+    reason,
+    detail
+  }).then(({ error }) => {
+    if(error){ toast('รายงานไม่สำเร็จ: '+error.message, true); return; }
+    toast('✅ ส่งรายงานแล้ว — ทีมงานจะตรวจสอบโดยเร็ว');
+  });
+}
+
+function _maShareMenu(event, listingId, propertyId){
+  event.stopPropagation();
+  const menu = document.getElementById('shmenu-'+listingId);
+  if(!menu) return;
+  // close all other open menus
+  document.querySelectorAll('.ma-share-menu.open').forEach(m=>{ if(m!==menu) m.classList.remove('open'); });
+  menu.classList.toggle('open');
+  // close on outside click
+  const handler = (e)=>{ if(!menu.contains(e.target)){ menu.classList.remove('open'); document.removeEventListener('click', handler); } };
+  if(menu.classList.contains('open')) setTimeout(()=>document.addEventListener('click', handler), 0);
+}
+
+async function _maShareListing(listingId, propertyId, platform){
+  // close menu
+  const menu = document.getElementById('shmenu-'+listingId);
+  if(menu) menu.classList.remove('open');
+  const url = `${location.origin}${location.pathname}?prop=${propertyId}`;
+  const title = document.querySelector(`#ulcard-${listingId} .ma-listing-card-title`)?.textContent?.trim() || 'ดูประกาศนี้';
+  if(platform === 'copy'){
+    navigator.clipboard?.writeText(url).then(()=>toast('📋 คัดลอกลิงก์แล้ว ✅')).catch(()=>toast('ไม่สามารถคัดลอกได้',true));
+  } else if(platform === 'line'){
+    window.open(`https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(url)}`, '_blank');
+  } else if(platform === 'facebook'){
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
+  }
+  // log to DB
+  if(sb && propertyId){
+    sb.rpc('log_share', { listing_id: listingId, property_id: propertyId, platform }).catch(()=>{});
+  }
+}
 
 function _maSelectRole(role){
   const roleInput = document.getElementById('ma-role');
@@ -13173,13 +13333,18 @@ async function saveProfile(){
   if(btn){ btn.disabled=false; btn.innerHTML='<i class="fas fa-save"></i> บันทึก'; }
   if(error){ toast('เกิดข้อผิดพลาด: ' + error.message, true); return; }
 
-  // 2) sync user_profiles โดยตรง
+  // 2) Sync ผ่าน update_user_profile() RPC (fallback: upsert ตรง)
   try {
-    await sb.from('user_profiles').upsert(
-      { user_id: user.id, display_name: displayName, updated_at: new Date().toISOString() },
-      { onConflict: 'user_id' }
-    );
-  } catch(e){ /* silent */ }
+    const {error:rpcErr} = await sb.rpc('update_user_profile', { p_display_name: displayName });
+    if(rpcErr) throw rpcErr;
+  } catch(e) {
+    try {
+      await sb.from('user_profiles').upsert(
+        { user_id: user.id, display_name: displayName, updated_at: new Date().toISOString() },
+        { onConflict: 'user_id' }
+      );
+    } catch(e2){ /* silent */ }
+  }
 
   // 3) อัปเดต local user object และ re-render
   user.user_metadata = user.user_metadata || {};
@@ -13285,6 +13450,73 @@ function mapProp(r){
     contact_line:r.contact_line||''
   };
 }
+// ── mapUserListing: แปลง v_approved_user_listings → shape เดียวกับ mapProp ──
+// view columns: listing_id, title, type, province, district, location, price, tx,
+//   bed, bath, area, land_area, photos, description, created_at,
+//   agent_id, agent_name, agent_phone, agent_line_id, agent_avatar_url,
+//   is_boosted, boost_expires_at
+function mapUserListing(r){
+  const rawPhotos = Array.isArray(r.photos) ? r.photos : (r.photos ? [r.photos] : []);
+  const ph = rawPhotos.filter(Boolean).map(p => sbImg(p));
+  return {
+    id: 'ul_' + String(r.listing_id),   // prefix เพื่อไม่ชน id กับ properties
+    title: r.title,
+    type: r.type,
+    province: r.province,
+    location: r.location,
+    district: r.district || '',
+    amphoe: r.district || '',
+    price: Number(r.price) || 0,
+    tx: (()=>{
+      const v = (r.tx || '').toString().toUpperCase().trim();
+      if(v === 'RENT' || v === 'เช่า' || v === 'ให้เช่า') return 'RENT';
+      return 'BUY';
+    })(),
+    bed: r.bed || 0, bath: r.bath || 0,
+    area: Number(r.area) || 0,
+    land_area: Number(r.land_area) || 0,
+    floors: r.floors || 0, floor_no: r.floor_no || 0,
+    parking: r.parking || 0,
+    furniture: r.furniture || '',
+    pets_allowed: r.pets_allowed || false,
+    appliances: [],
+    desc: r.description || r.desc || '',
+    isNew: false, isRec: false,
+    agentId: r.agent_id || null,
+    createdAt: r.created_at,
+    status: 'approved',
+    adminNote: '',
+    photos: ph,
+    panorama_url: null,
+    nearby_places: r.nearby_places || null,
+    deposit: r.deposit || null,
+    advance_payment: r.advance_payment || null,
+    electric_rate: r.electric_rate || null,
+    water_rate: r.water_rate || null,
+    service_fee: r.service_fee || null,
+    furniture_items: r.furniture_items || null,
+    amenities: r.amenities || null,
+    invest_tag: r.invest_tag || '',
+    yield_pct: Number(r.yield_pct) || 0,
+    below_market_pct: Number(r.below_market_pct) || 0,
+    discount_flag: r.discount_flag || false,
+    lease_terms: r.lease_terms || null,
+    min_lease_months: r.min_lease_months || null,
+    rent_duration: r.rent_duration || null,
+    near_bts: r.near_bts || '',
+    bts: r.bts || r.near_bts || '',
+    mrt: r.mrt || '',
+    arl: r.arl || '',
+    transit: r.transit || '',
+    contact_name: r.agent_name || r.contact_name || '',
+    contact_phone: r.agent_phone || r.contact_phone || '',
+    contact_line: r.agent_line_id || r.contact_line || '',
+    // บอกว่ามาจาก user_listings (ไว้ใช้ render badge ได้ในอนาคต)
+    _source: 'user_listing',
+    _is_boosted: r.is_boosted || false,
+    _boost_expires_at: r.boost_expires_at || null,
+  };
+}
 function mapAgent(r){
   // 🖼️ [IMG-AGENT] แปลง avatar_url และ photos → Supabase Storage URL
   // DB เก็บเป็น path เช่น "agents/a1/avatar.webp" หรือ URL เต็มก็ได้
@@ -13336,12 +13568,13 @@ async function loadData(){
     loading(false);
     if(hasSB){
       try{
-        const p = await sb.from('properties')
-          .select('*')
-          .eq('status','approved')
-          .order('created_at',{ascending:false})
-          .range(0, 999);
-        if(p.data){ props = p.data.map(mapProp); }
+        const [p, ul] = await Promise.all([
+          sb.from('properties').select('*').eq('status','approved').order('created_at',{ascending:false}).range(0, 999),
+          sb.from('v_approved_user_listings').select('*').order('created_at',{ascending:false}).range(0, 999)
+        ]);
+        const adminProps = (p.data || []).map(mapProp);
+        const userProps  = (ul.data || []).map(mapUserListing);
+        if(adminProps.length || userProps.length){ props = [...adminProps, ...userProps]; }
         agents = MOCK.agents; port = MOCK.port; services = MOCK.services; blogs = MOCK.blogs;
         agents.forEach(a=>{a.propIds=props.filter(p=>p.agentId===a.id).map(p=>p.id);});
         afterLoad();
@@ -13381,13 +13614,15 @@ async function loadData(){
     loading(false);
     if(hasSB){
       try{
-        const p = await sb.from('properties')
-          .select('*')
-          .eq('status','approved')
-          .order('created_at',{ascending:false})
-          .range(0, 999);
-        if(p.data && p.data.length){
-          props = p.data.map(mapProp);
+        const [p, ul] = await Promise.all([
+          sb.from('properties').select('*').eq('status','approved').order('created_at',{ascending:false}).range(0, 999),
+          sb.from('v_approved_user_listings').select('*').order('created_at',{ascending:false}).range(0, 999)
+        ]);
+        const adminProps = (p.data || []).map(mapProp);
+        const userProps  = (ul.data || []).map(mapUserListing);
+        const merged = [...adminProps, ...userProps];
+        if(merged.length){
+          props = merged;
           // ถ้า fast path ยังทำงานอยู่ (ยังไม่ render) → ช่วยเซ็ต data ให้
           if(!window._listingsFastFetchDone){
             _listingsBaseData = [...props];
@@ -13434,15 +13669,17 @@ async function loadData(){
 
   if(hasSB){
     try{
-      // ── PHASE 1: โหลด properties ทั้งหมดก่อน — SELECT * เพื่อไม่ให้ข้อมูลหาย ──────────
-      // ใช้ .range() เพื่อดึงครบทุก row แม้ Supabase project มี custom row limit ต่ำ
-      const p = await sb.from('properties')
-        .select('*')
-        .eq('status','approved')      // public: เห็นเฉพาะ approved
-        .order('created_at',{ascending:false})
-        .range(0, 999); // ดึงสูงสุด 1,000 rows — ป้องกัน PostgREST default limit ตัด
-      if(p.data){ props = p.data.map(mapProp); console.log(`✅ Properties loaded: ${props.length}`); }
-      else { if(p.error) console.error('[properties]',p.error); }
+      // ── PHASE 1: โหลด properties + v_approved_user_listings พร้อมกัน ────────────
+      const [p, ul] = await Promise.all([
+        sb.from('properties').select('*').eq('status','approved').order('created_at',{ascending:false}).range(0, 999),
+        sb.from('v_approved_user_listings').select('*').order('created_at',{ascending:false}).range(0, 999)
+      ]);
+      const _adminProps = (p.data || []).map(mapProp);
+      const _userProps  = (ul.data || []).map(mapUserListing);
+      if(_adminProps.length || _userProps.length){
+        props = [..._adminProps, ..._userProps];
+        console.log(`✅ Properties loaded: ${_adminProps.length} admin + ${_userProps.length} user = ${props.length}`);
+      } else { if(p.error) console.error('[properties]',p.error); }
 
       if(!props.length){
         console.warn('No properties from Supabase, using mock');
