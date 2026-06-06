@@ -3522,7 +3522,6 @@ footer::after{
   perspective:1200px;
   padding:24px 0 32px;
   position:relative;
-  touch-action:pan-y;
 }
 .gallery-track-wrap.dragging{cursor:grabbing;}
 .gallery-track{
@@ -21757,68 +21756,50 @@ function gcRenderDots() {
 
 function gcInitDrag() {
   const wrap = document.getElementById('gc-wrap');
-  if(!wrap || wrap._gcDragInit) return;
-  wrap._gcDragInit = true;
-  let _startY = 0, _isVert = null; // null = ยังไม่รู้ทิศ
-
+  if(!wrap) return;
+  let _startY = 0, _isVert = false;
   const onDown = e => {
     gcStopAuto();
     gcDragging = false;
     gcStartX = e.touches ? e.touches[0].clientX : e.clientX;
-    _startY  = e.touches ? e.touches[0].clientY  : 0;
-    _isVert  = null;
+    _startY = e.touches ? e.touches[0].clientY : 0;
+    _isVert = false;
     gcDragDelta = 0;
     wrap.classList.add('dragging');
     document.addEventListener('mousemove', onMove);
-    document.addEventListener('mouseup',   onUp);
-    // non-passive — เพื่อให้ preventDefault() ได้เมื่อ swipe แนวนอน
-    document.addEventListener('touchmove', onMove, {passive:false});
-    document.addEventListener('touchend',  onUp,   {passive:true});
+    document.addEventListener('mouseup', onUp);
+    document.addEventListener('touchmove', onMove, {passive:true});
+    document.addEventListener('touchend', onUp);
   };
-
   const onMove = e => {
-    const x  = e.touches ? e.touches[0].clientX : e.clientX;
-    const y  = e.touches ? e.touches[0].clientY  : 0;
+    const x = e.touches ? e.touches[0].clientX : e.clientX;
+    const y = e.touches ? e.touches[0].clientY : 0;
     const dx = x - gcStartX;
     const dy = y - _startY;
-
-    // กำหนดทิศทางครั้งเดียว เมื่อเคลื่อนพอ
-    if(_isVert === null) {
+    if(!gcDragging && e.touches) {
       if(Math.abs(dx) > 6 || Math.abs(dy) > 6) {
         _isVert = Math.abs(dy) > Math.abs(dx);
+        if(!_isVert) gcDragging = true;
       }
-    }
-
-    if(_isVert === false) {
-      // swipe แนวนอน: block page scroll + live preview
-      if(e.cancelable) e.preventDefault();
+    } else if(!e.touches) {
       gcDragDelta = dx;
-      gcDragging  = Math.abs(dx) > 8;
+      if(Math.abs(gcDragDelta) > 8) gcDragging = true;
     }
-    // ถ้า _isVert === true → ปล่อย browser scroll ตามปกติ ไม่ทำอะไร
+    if(!_isVert) gcDragDelta = dx;
   };
-
   const onUp = () => {
     wrap.classList.remove('dragging');
     document.removeEventListener('mousemove', onMove);
-    document.removeEventListener('mouseup',   onUp);
+    document.removeEventListener('mouseup', onUp);
     document.removeEventListener('touchmove', onMove);
-    document.removeEventListener('touchend',  onUp);
-    if(_isVert === false && Math.abs(gcDragDelta) > 50) {
-      gcMove(gcDragDelta < 0 ? 1 : -1);
-    }
+    document.removeEventListener('touchend', onUp);
+    if(!_isVert && Math.abs(gcDragDelta) > 50) gcMove(gcDragDelta < 0 ? 1 : -1);
     setTimeout(() => { gcDragging = false; }, 50);
-    _isVert  = null;
-    gcDragDelta = 0;
-    // resume auto — ทั้งกรณี swipe แนวนอน และ scroll แนวตั้ง
+    _isVert = false;
     gcStartAuto();
   };
-
-  wrap.addEventListener('mousedown',  onDown);
+  wrap.addEventListener('mousedown', onDown);
   wrap.addEventListener('touchstart', onDown, {passive:true});
-  // mouseenter/leave: หยุด/เริ่ม auto บน desktop
-  wrap.addEventListener('mouseenter', gcStopAuto);
-  wrap.addEventListener('mouseleave', gcStartAuto);
 }
 
 function gcStartAuto() {
