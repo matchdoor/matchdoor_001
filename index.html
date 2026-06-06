@@ -2134,9 +2134,9 @@ footer::after{
 .admin-dev-bypass:hover{background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);border-color:rgba(255,255,255,.3)}
 .admin-login-err{color:#ff6b6b;font-size:12px;margin-top:-6px;margin-bottom:8px;display:none;padding:8px 12px;background:rgba(255,107,107,.1);border-radius:6px;border-left:3px solid #ff6b6b}
 /* ── Admin Panel Page ── */
-#page-admin{background:#0a1628}
-.admin-layout{display:flex;min-height:calc(100vh - 60px)}
-.admin-sidebar{width:240px;flex-shrink:0;background:linear-gradient(180deg,#0d1b2e 0%,#0a1422 100%);border-right:1px solid rgba(255,200,100,.08);display:flex;flex-direction:column;position:sticky;top:60px;height:calc(100vh - 60px);overflow-y:auto}
+#page-admin{background:#0a1628;height:calc(100vh - 64px);display:flex;flex-direction:column}
+.admin-layout{display:flex;overflow:clip}
+.admin-sidebar{width:240px;flex-shrink:0;background:linear-gradient(180deg,#0d1b2e 0%,#0a1422 100%);border-right:1px solid rgba(255,200,100,.08);display:flex;flex-direction:column;position:sticky;top:0;height:100%;overflow-y:auto;align-self:flex-start;max-height:calc(100vh - 64px)}
 .admin-sidebar-header{padding:24px 20px 16px;border-bottom:1px solid rgba(255,200,100,.08)}
 .admin-sidebar-logo{display:flex;align-items:center;gap:10px;margin-bottom:4px}
 .admin-sidebar-logo i{color:#c8922a;font-size:22px}
@@ -2156,7 +2156,7 @@ footer::after{
 .admin-sidebar-footer{padding:16px 20px;border-top:1px solid rgba(255,255,255,.06)}
 .admin-sidebar-footer button{width:100%;padding:9px 14px;background:rgba(255,80,80,.08);border:1px solid rgba(255,80,80,.2);border-radius:8px;color:rgba(255,120,120,.7);font-size:12px;cursor:pointer;transition:all .2s;text-align:left;display:flex;align-items:center;gap:8px}
 .admin-sidebar-footer button:hover{background:rgba(255,80,80,.15);color:#ff6b6b}
-.admin-main{flex:1;overflow-y:auto;background:#0c1526}
+.admin-main{flex:1;overflow-y:auto;background:#0c1526;min-height:0;scroll-behavior:smooth}
 .admin-topbar{padding:16px 28px;background:rgba(13,27,46,.95);border-bottom:1px solid rgba(255,200,100,.07);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px)}
 .admin-topbar-title{font-size:16px;font-weight:700;color:#fff;display:flex;align-items:center;gap:10px}
 .admin-topbar-title i{color:#c8922a}
@@ -2184,7 +2184,7 @@ footer::after{
 .admin-stat-change{font-size:11px;display:flex;align-items:center;gap:4px}
 .admin-stat-change.up{color:#2ecc71}
 .admin-stat-change.dn{color:#e74c3c}
-.admin-section{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:16px;margin-bottom:20px;overflow:hidden}
+.admin-section{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:16px;margin-bottom:20px;overflow:clip}
 .admin-section-head{padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between}
 .admin-section-title{font-size:14px;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px}
 .admin-section-title i{color:#c8922a;font-size:13px}
@@ -2228,7 +2228,39 @@ footer::after{
 .admin-chart-placeholder .chart-bars{display:flex;align-items:flex-end;justify-content:center;gap:6px;height:80px;margin-bottom:10px}
 .admin-chart-bar{width:20px;background:linear-gradient(180deg,#c8922a,rgba(200,146,42,.3));border-radius:3px 3px 0 0}
 @media(max-width:900px){.admin-sidebar{width:200px}.admin-stats-grid{grid-template-columns:repeat(2,1fr)}.admin-analytics-grid{grid-template-columns:1fr}}
-@media(max-width:640px){.admin-layout{flex-direction:column}.admin-sidebar{width:100%;height:auto;position:static;flex-direction:row;overflow-x:auto;padding:0}.admin-sidebar-header,.admin-user-info,.admin-nav-section,.admin-sidebar-footer{display:none}.admin-nav{display:flex;flex-direction:row;padding:0}.admin-nav-item{padding:12px 14px;border-left:none;border-bottom:2px solid transparent;white-space:nowrap;font-size:12px}.admin-nav-item.active{border-bottom-color:#c8922a;border-left:none}.admin-stats-grid{grid-template-columns:repeat(2,1fr)}.admin-content{padding:16px 14px}.admin-topbar{padding:12px 16px}.admin-topbar-title{font-size:14px}}
+@media(max-width:640px){.admin-layout{flex-direction:column;min-height:0;height:auto}.admin-sidebar{width:100%;height:auto;position:static;flex-direction:row;overflow-x:auto;padding:0}.admin-sidebar-header,.admin-user-info,.admin-nav-section,.admin-sidebar-footer{display:none}.admin-nav{display:flex;flex-direction:row;padding:0}.admin-nav-item{padding:12px 14px;border-left:none;border-bottom:2px solid transparent;white-space:nowrap;font-size:12px}.admin-nav-item.active{border-bottom-color:#c8922a;border-left:none}.admin-stats-grid{grid-template-columns:repeat(2,1fr)}.admin-content{padding:16px 14px}.admin-topbar{padding:12px 16px}.admin-topbar-title{font-size:14px}}
+@media(max-width:640px){
+  #page-admin{height:auto;min-height:100dvh}
+  #page-admin .admin-main{height:auto;max-height:none}
+}
+
+/* ═══ ADMIN PANEL LAYOUT FIX (v2) ═══
+   แก้ไขปัญหา: content area ว่างในครึ่งบน, sidebar ล้น, topbar บัง content
+   ══════════════════════════════════ */
+
+/* admin-layout ใช้พื้นที่ที่เหลือทั้งหมด */
+#page-admin .admin-layout{
+  flex:1;
+  min-height:0;
+  overflow:clip;
+  align-items:stretch;
+}
+/* admin-main เป็น scroll container หลัก */
+#page-admin .admin-main{
+  flex:1;
+  min-height:0;
+  height:100%;
+  overflow-y:auto;
+}
+/* ป้องกัน admin-topbar บัง first row ของ content */
+#page-admin .admin-content{
+  position:relative;
+}
+/* empty td fallback */
+.admin-table td:empty::before{content:"-";color:rgba(255,255,255,.3)}
+/* admin-section ไม่มี min-height */
+.admin-section{min-height:unset!important}
+
 
 .footer-legal-bar{
   border-top:1px solid rgba(255,255,255,.07);
@@ -12078,17 +12110,23 @@ if (document.readyState === 'loading') {
 async function _renderAdminTokenOrders(el, devBanner) {
   let orders = [];
   if (!_adminDevMode && sb) {
+    const _toTimeout = (ms) => new Promise((_,rej) => setTimeout(() => rej(new Error('timeout')), ms));
     try {
-      const { data } = await sb
-        .from('token_orders')
-        .select('*, user_profiles(display_name,phone), auth_users:user_id(email)')
-        .order('created_at', { ascending: false })
-        .range(0, 199);
+      const { data } = await Promise.race([
+        sb.from('token_orders')
+          .select('*, user_profiles(display_name,phone), auth_users:user_id(email)')
+          .order('created_at', { ascending: false })
+          .range(0, 199),
+        _toTimeout(6000)
+      ]);
       orders = data || [];
     } catch(e) {
-      // ดึงแบบ simple ถ้า join ไม่ work
+      // ดึงแบบ simple ถ้า join ไม่ work หรือ timeout
       try {
-        const { data } = await sb.from('token_orders').select('*').order('created_at', { ascending: false }).range(0, 199);
+        const { data } = await Promise.race([
+          sb.from('token_orders').select('*').order('created_at', { ascending: false }).range(0, 199),
+          _toTimeout(5000)
+        ]);
         orders = data || [];
       } catch(e2) {}
     }
@@ -12151,18 +12189,21 @@ async function _renderAdminTokenOrders(el, devBanner) {
 async function _renderAdminUserListings(el, devBanner) {
   let userListings = [];
   if (!_adminDevMode && sb) {
+    const _ulTimeout = (ms) => new Promise((_,rej) => setTimeout(() => rej(new Error('timeout')), ms));
     try {
-      const { data } = await sb
-        .from('v_admin_user_listings')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .range(0, 299);
+      const { data } = await Promise.race([
+        sb.from('v_admin_user_listings').select('*').order('created_at', { ascending: false }).range(0, 299),
+        _ulTimeout(6000)
+      ]);
       userListings = data || [];
     } catch(e) {
       try {
-        const { data } = await sb.from('user_listings').select('*').order('created_at', { ascending: false }).range(0, 299);
+        const { data } = await Promise.race([
+          sb.from('user_listings').select('*').order('created_at', { ascending: false }).range(0, 299),
+          _ulTimeout(5000)
+        ]);
         userListings = data || [];
-      } catch(e2) {}
+      } catch(e2) { console.warn('user_listings fetch failed, showing empty:', e2.message); }
     }
   }
 
@@ -27576,6 +27617,10 @@ function _openAdminPanel(){
   document.getElementById('admin-user-av').textContent = init;
   document.getElementById('admin-user-name').textContent = name;
   showPage('admin');
+  // reset scroll ทุก container เมื่อเปิด admin panel
+  window.scrollTo(0, 0);
+  var _adminMain = document.querySelector('.admin-main');
+  if(_adminMain) _adminMain.scrollTop = 0;
   adminNav('dashboard', document.querySelector('.admin-nav-item'));
 }
 
@@ -27592,6 +27637,9 @@ function adminNav(panel, el){
   _adminCurrentPanel = panel;
   document.querySelectorAll('.admin-nav-item').forEach(i=>i.classList.remove('active'));
   if(el) el.classList.add('active');
+  // reset scroll position ของ admin-main เมื่อเปลี่ยน panel
+  var _adminMainEl = document.querySelector('.admin-main');
+  if(_adminMainEl) _adminMainEl.scrollTop = 0;
   const icons = {dashboard:'fas fa-tachometer-alt',properties:'fas fa-building',requests:'fas fa-file-alt',agents:'fas fa-users',portfolio:'fas fa-trophy',analytics:'fas fa-chart-bar',notifications:'fas fa-bell','token-orders':'fas fa-coins','user-listings':'fas fa-home'};
   const titles = {dashboard:'Dashboard',properties:'ประกาศทรัพย์ — จัดการ & อนุมัติ',requests:'Buy Requests — ติดตามลูกค้า',agents:'Agents & Portfolio',portfolio:'ผลงานปิดดีล',analytics:'Analytics Dashboard',notifications:'Broadcast Notifications','token-orders':'Token Orders — ยืนยันการซื้อ','user-listings':'User Listings — อนุมัติประกาศ'};
   document.getElementById('admin-topbar-icon').className = (icons[panel]||'fas fa-circle') + ' ';
@@ -27603,7 +27651,9 @@ function adminNav(panel, el){
 async function _renderAdminPanel(panel){
   const el = document.getElementById('admin-content');
   if(!el) return;
-  el.innerHTML = '<div style="text-align:center;padding:60px 20px;color:rgba(255,255,255,.3)"><i class="fas fa-spinner fa-spin" style="font-size:24px"></i></div>';
+  el.innerHTML = '<div style="text-align:center;padding:40px 20px;color:rgba(255,255,255,.3)"><i class="fas fa-spinner fa-spin" style="font-size:24px"></i><div style="margin-top:12px;font-size:13px">กำลังโหลดข้อมูล...</div></div>';
+  // wrap ทั้งหมดใน try-catch เพื่อป้องกัน spinner ค้างถ้า error
+  try {
   const devBanner = _adminDevMode ? `<div class="admin-dev-banner"><i class="fas fa-flask"></i> <strong>DEV MODE</strong> — ข้อมูลที่แสดงเป็น mock / ดึงจาก local state ไม่ได้เขียนลง Supabase จริง</div>` : '';
 
   // ดึงข้อมูลจาก Supabase (ถ้าไม่ใช่ dev mode และ sb พร้อม)
@@ -27614,25 +27664,36 @@ async function _renderAdminPanel(panel){
   if(!_adminDevMode && sb){
     try{
       // Admin ดึงทุก properties รวม pending/rejected (ไม่กรอง status)
-      // ใช้ range(0,999) ป้องกัน PostgREST default limit ตัด
-      const [{data:pData},{data:aData},{data:ptData}] = await Promise.all([
-        sb.from('properties').select('*').order('created_at',{ascending:false}).range(0,999),
-        sb.from('agents').select('*').order('created_at',{ascending:false}).range(0,99),
-        sb.from('portfolio').select('*').order('created_at',{ascending:false}).range(0,99)
+      // ใช้ race กับ timeout 8s ป้องกัน spinner ค้างถ้า network ช้า
+      const _timeout = (ms) => new Promise((_,rej) => setTimeout(() => rej(new Error('timeout')), ms));
+      const [{data:pData},{data:aData},{data:ptData}] = await Promise.race([
+        Promise.all([
+          sb.from('properties').select('*').order('created_at',{ascending:false}).range(0,999),
+          sb.from('agents').select('*').order('created_at',{ascending:false}).range(0,99),
+          sb.from('portfolio').select('*').order('created_at',{ascending:false}).range(0,99)
+        ]),
+        _timeout(8000).then(() => { throw new Error('Admin data fetch timeout'); })
       ]);
       if(pData && pData.length)  allProps   = pData.map(mapProp);
       if(aData && aData.length)  allAgents  = aData.map(mapAgent);
       if(ptData && ptData.length) allPort   = ptData.map(mapPort);
-    }catch(e){ console.warn('Admin data load error:',e.message); }
+    }catch(e){
+      console.warn('Admin data load error (using local fallback):', e.message);
+      // fallback: ใช้ local data ที่โหลดมาแล้ว ไม่ปล่อยให้ spinner ค้าง
+    }
   }
 
   // ดึง buy_requests จาก Supabase
   let buyRequests = [];
   if(!_adminDevMode && sb){
     try{
-      const {data} = await sb.from('buy_requests').select('*').order('created_at',{ascending:false}).range(0,499);
+      const _brTimeout = new Promise((_,rej) => setTimeout(() => rej(new Error('timeout')), 5000));
+      const {data} = await Promise.race([
+        sb.from('buy_requests').select('*').order('created_at',{ascending:false}).range(0,499),
+        _brTimeout
+      ]);
       if(data) buyRequests = data;
-    }catch(e){}
+    }catch(e){ console.warn('buy_requests fetch error (using mock):', e.message); }
   }
   if(!buyRequests.length) buyRequests = [
     {id:1,name:'คุณสมชาย',email:'somchai@example.com',phone:'081-xxx-xxxx',property_title:'คอนโด Ashton Asoke',status:'new',created_at:new Date().toISOString()},
@@ -27644,9 +27705,13 @@ async function _renderAdminPanel(panel){
     let dashSummary = null;
     if(!_adminDevMode && sb){
       try {
-        const { data } = await sb.from('v_dashboard_summary').select('*').single();
+        const _dsTimeout = new Promise((_,rej) => setTimeout(() => rej(new Error('timeout')), 5000));
+        const { data } = await Promise.race([
+          sb.from('v_dashboard_summary').select('*').single(),
+          _dsTimeout
+        ]);
         if(data) dashSummary = data;
-      } catch(e){ /* fallback to local count */ }
+      } catch(e){ console.warn('v_dashboard_summary timeout/error, using local count'); }
     }
 
     const pending   = dashSummary?.pending_properties ?? allProps.filter(p=>p.status==='pending'||!p.status).length;
@@ -28202,6 +28267,12 @@ async function adminSendNotification(){
 
   // ── refresh รายการ notifications ──
   if(!_adminDevMode) _renderNotifHistory();
+}
+  } catch(e) {
+    // แสดง error state แทน spinner ค้าง
+    console.error('[Admin] _renderAdminPanel error:', e);
+    if(el) el.innerHTML = `<div style="text-align:center;padding:60px 20px"><div style="color:#ff6b6b;font-size:40px;margin-bottom:16px"><i class="fas fa-exclamation-triangle"></i></div><div style="color:rgba(255,255,255,.6);font-size:14px;margin-bottom:20px">เกิดข้อผิดพลาดในการโหลดข้อมูล</div><div style="font-size:12px;color:rgba(255,255,255,.3);background:rgba(255,255,255,.05);padding:10px 16px;border-radius:8px;margin:0 auto;max-width:400px;font-family:monospace">${e.message||String(e)}</div><button onclick="adminRefreshData()" class="admin-btn admin-btn-primary" style="margin-top:20px"><i class="fas fa-redo"></i> ลองใหม่</button></div>`;
+  }
 }
 function adminRefreshData(){ adminNav(_adminCurrentPanel, document.querySelector('.admin-nav-item.active')); toast('🔄 Refresh แล้ว'); }
 
