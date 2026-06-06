@@ -1687,7 +1687,8 @@ footer{background:linear-gradient(135deg,#2d2650 0%,#3d3373 100%);color:rgba(255
 .hero-bg-clip{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}
 #hero-canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0}
 .hero-content{position:relative;z-index:2;padding-bottom:20px;isolation:auto}
-.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(10,22,48,0.65);border:1.5px solid rgba(232,184,75,.7);border-radius:30px;padding:8px 22px;font-size:13px;font-weight:700;color:#FFE082;margin-bottom:24px;backdrop-filter:blur(16px);letter-spacing:.5px;font-family:'Kanit','Noto Sans Thai',sans-serif;text-shadow:0 1px 4px rgba(0,0,0,.6);box-shadow:0 2px 12px rgba(0,0,0,.3)}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(10,22,48,0.65);border:1.5px solid rgba(232,184,75,.7);border-radius:30px;padding:8px 22px;font-size:13px;font-weight:700;color:#FFE082;margin-bottom:24px;backdrop-filter:blur(16px);letter-spacing:.5px;font-family:'Kanit','Noto Sans Thai',sans-serif;text-shadow:0 1px 4px rgba(0,0,0,.6);box-shadow:0 2px 12px rgba(0,0,0,.3);transition:all .2s}
+.hero-badge:hover{background:rgba(10,22,48,0.85);border-color:rgba(232,184,75,1);box-shadow:0 4px 20px rgba(232,184,75,.35);transform:translateY(-1px)}
 .hero h1{font-size:clamp(30px,5vw,54px);font-weight:700;margin-bottom:14px;text-align:center;line-height:1.15;letter-spacing:-.5px;font-family:'Playfair Display','Sarabun','Noto Sans Thai',serif;color:#FFFFFF;text-shadow:0 1px 3px rgba(0,0,0,.30),0 4px 16px rgba(0,0,0,.18),0 8px 32px rgba(0,0,0,.10)}
 .hero h1 span{background:linear-gradient(135deg,#F5D060,#E8B84B,#C8922A);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;display:inline-block;font-weight:700;text-shadow:none;filter:drop-shadow(0 1px 2px rgba(0,0,0,.30)) drop-shadow(0 3px 8px rgba(0,0,0,.15))}
 .hero h1 span.hero-white{background:none;-webkit-background-clip:unset;background-clip:unset;-webkit-text-fill-color:#fff!important;color:#fff!important;filter:none;text-shadow:0 1px 3px rgba(0,0,0,.25),0 4px 12px rgba(0,0,0,.12)}
@@ -3250,7 +3251,7 @@ footer::after{
   background:linear-gradient(135deg,rgba(200,146,42,.08),rgba(255,255,255,.03));
   pointer-events:none;
 }
-.stat-counter-card[onclick]:hover{transform:translateY(-3px) scale(1.04);box-shadow:0 8px 28px rgba(200,146,42,.35);}
+
 .stat-counter-card:hover{
   background:rgba(10,22,48,0.72);
   border-color:rgba(232,184,75,.6);
@@ -6155,19 +6156,19 @@ footer::after{
     <img class="hero-banner-img" src="" alt="" loading="lazy" aria-hidden="true" style="display:none">
   <div class="hero-bg-clip"><canvas id="hero-canvas"></canvas></div>
   <div class="hero-content">
-  <div class="hero-badge"><i class="fas fa-door-open"></i> <span data-i18n="hero.badge">แพลตฟอร์มอสังหาฯ ที่คุณไว้วางใจ ✨</span></div>
+  <div class="hero-badge" onclick="showListingsPage()" style="cursor:pointer"><i class="fas fa-door-open"></i> <span data-i18n="hero.badge">แพลตฟอร์มอสังหาฯ ที่คุณไว้วางใจ ✨</span></div>
 <h1 data-i18n-html="hero.h1"><span>อสังหาริมทรัพย์</span>ที่ใช่<br><span class="hero-white">ใน</span><span>สไตล์</span>ที่เป็นคุณ</h1>
   <p id="hero-sub" data-i18n="hero.sub">บ้าน คอนโด ที่ดิน ทุกประเภท ทุกทำเล ราคาดีที่สุด</p>
   <div class="stat-counters" id="hero-stat-counters">
-    <div class="stat-counter-card" onclick="showPage('listings')" style="cursor:pointer" title="ดูประกาศทั้งหมด">
+    <div class="stat-counter-card">
       <span class="stat-counter-icon">🏠</span>
       <div class="stat-text-group"><span class="stat-counter-num" data-target="135"><span class="suf-num">135</span><span class="suf">+</span></span><span class="stat-counter-label" data-i18n="stat.prop">อสังหาริมทรัพย์</span></div>
     </div>
-    <div class="stat-counter-card" onclick="showPage('agents')" style="cursor:pointer" title="ดูทีมตัวแทน">
+    <div class="stat-counter-card">
       <span class="stat-counter-icon">👤</span>
       <div class="stat-text-group"><span class="stat-counter-num" data-target="6"><span class="suf-num">6</span><span class="suf">+</span></span><span class="stat-counter-label" data-i18n="stat.agents">ตัวแทนมืออาชีพ</span></div>
     </div>
-    <div class="stat-counter-card" onclick="showPage('portfolio')" style="cursor:pointer" title="ดูผลงาน">
+    <div class="stat-counter-card">
       <span class="stat-counter-icon">🏆</span>
       <div class="stat-text-group"><span class="stat-counter-num" data-target="12"><span class="suf-num">12</span><span class="suf">+</span></span><span class="stat-counter-label" data-i18n="stat.closed">ปิดการขายแล้ว</span></div>
     </div>
@@ -10279,7 +10280,17 @@ function resetSearch(){
     else { window.scrollTo({top:0,behavior:'smooth'}); }
   });
 }
-function handleLogoClick(){ resetSearch(); showPage('home'); }
+function handleLogoClick(){
+  resetSearch();
+  showPage('home');
+  setTimeout(function(){
+    if(window._dataReady && typeof syncAllStats==='function') syncAllStats();
+    else if(typeof animateStatCounters==='function'){
+      var hero=document.querySelector('#hero-stat-counters');
+      if(hero) animateStatCounters(hero.closest('.page')||document);
+    }
+  }, 80);
+}
 
 async function loadLegalPages(){
   if(!sb) return;
