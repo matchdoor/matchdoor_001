@@ -595,10 +595,14 @@ body:not(:has(.ov.open)):not(:has(.apply-overlay.open)):not(:has(.seo-drawer.ope
    3400  adv-sheet override, seo-drawer, adv-fp
    3490  adv-desktop-overlay
    3500  adv-filter-panel
+   3550  apply-overlay
    3600  prop-modal
    3700  ag-modal
+   3800  seo-drawer-overlay
+   3801  seo-drawer
    9000  autocomplete list (ac-list)
    9100  ls-ac-list
+   9500  madv-loc-panel
    9999  toast (สูงสุดเสมอ)
    ─────────────────────────────────────────────────────────────────────────
    หลักการ: nav ต้องไม่มี will-change:transform หรือ transform ขณะที่มองเห็น
@@ -617,7 +621,10 @@ nav:not(#md-bottom-nav):not(#pdp-breadcrumb-nav){z-index:1000!important}
 /* dd-panel.open: ไม่สร้าง stacking context เพิ่ม */
 .dd-panel.open{isolation:auto}
 .ov,.loading-overlay{z-index:3200!important}
+.apply-overlay{z-index:3550!important}
 .seo-drawer-overlay,.adv-sheet-overlay{z-index:3300!important}
+.seo-drawer-overlay{z-index:3800!important}
+.seo-drawer{z-index:3801!important}
 .adv-desktop-overlay{z-index:3490!important}
 /* adv-sheet และ qs-mob-sheet ต้องอยู่เหนือ bottom nav (1100) เสมอ */
 .adv-sheet,.seo-drawer,.adv-fp{z-index:3400!important}
@@ -654,6 +661,34 @@ nav:not(#md-bottom-nav):not(#pdp-breadcrumb-nav){z-index:1000!important}
 @media(max-width:1200px){
   .qs-group .qs-dd-panel{z-index:1110!important}
 }
+
+/* ════════════════════════════════════════════════════
+   Z-INDEX MASTER TABLE (v27 — source of truth)
+   ────────────────────────────────────────────────────
+   100   admin-topbar (sticky ใน admin panel)
+   500   float-wrap (FAB buttons), cookie-banner (mobile)
+   500   pdp-breadcrumb, community-sub-header
+   990   community-sub-header
+   1000  nav (global navbar)
+   1050  dd-panel (desktop dropdown)
+   1100  md-bottom-nav, dd-panel (mobile)
+   1200  float-wrap, cookie-banner
+   1300  nav-links (mobile menu open)
+   3200  .ov (modal overlay), loading-overlay, sheet overlay
+   3300  adv-sheet-overlay, seo-drawer-overlay-alt
+   3400  adv-sheet, seo-drawer, adv-fp
+   3490  adv-desktop-overlay
+   3500  adv-filter-panel
+   3550  apply-overlay
+   3600  prop-modal
+   3700  ag-modal
+   3800  seo-drawer-overlay
+   3801  seo-drawer
+   9000  ac-list (autocomplete)
+   9100  ls-ac-list
+   9500  madv-loc-panel
+   9999  toast (สูงสุดเสมอ)
+   ════════════════════════════════════════════════════ */
 
 /* ════════════════════════════════════════════════════
    GLOBAL STYLES
@@ -717,7 +752,7 @@ img{max-width:100%;height:auto}
 .back-btn{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.15);color:#fff;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:20px;border:none}
 .badge{padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700}
 
-.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.85);color:#fff;padding:10px 22px;border-radius:30px;font-size:14px;z-index:490;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.85);color:#fff;padding:10px 22px;border-radius:30px;font-size:14px;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1}
 /* ── Cooldown state: ปุ่มระหว่างรอ cooldown ──────────────────── */
 .btn-sub:disabled:not(.loading){
@@ -726,7 +761,7 @@ img{max-width:100%;height:auto}
   opacity:.85;
 }
 .btn-sub:disabled:not(.loading) .fas{color:rgba(255,255,255,.7)!important}
-.loading-overlay{position:fixed;inset:0;background:rgba(255,255,255,.92);z-index:480;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;opacity:0;pointer-events:none;transition:opacity .3s}
+.loading-overlay{position:fixed;inset:0;background:rgba(255,255,255,.92);z-index:3200;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;opacity:0;pointer-events:none;transition:opacity .3s}
 .loading-overlay.show{opacity:1;pointer-events:auto}
 
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -1832,9 +1867,9 @@ footer{background:linear-gradient(135deg,#2d2650 0%,#3d3373 100%);color:rgba(255
 .adv-reset-btn:hover{background:var(--lt)}
 
 /* Mobile sheet */
-.adv-sheet-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1200}
+.adv-sheet-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:3300}
 .adv-sheet-overlay.open{display:block}
-.adv-sheet{position:fixed;bottom:var(--bnav-h,0px);left:0;right:0;background:#fff;border-radius:22px 22px 0 0;z-index:1300;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,1,.56,1);max-height:88vh;display:flex;flex-direction:column;overflow:hidden;touch-action:pan-x}
+.adv-sheet{position:fixed;bottom:var(--bnav-h,0px);left:0;right:0;background:#fff;border-radius:22px 22px 0 0;z-index:3400;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,1,.56,1);max-height:88vh;display:flex;flex-direction:column;overflow:hidden;touch-action:pan-x}
 .adv-sheet.open{transform:translateY(0)}
 .adv-sheet-drag{width:40px;height:4px;background:#ddd;border-radius:4px;margin:10px auto 0}
 .adv-sheet-hd{padding:12px 20px 8px;border-bottom:1px solid var(--bd);flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
@@ -2122,7 +2157,7 @@ footer::after{
 .admin-sidebar-footer button{width:100%;padding:9px 14px;background:rgba(255,80,80,.08);border:1px solid rgba(255,80,80,.2);border-radius:8px;color:rgba(255,120,120,.7);font-size:12px;cursor:pointer;transition:all .2s;text-align:left;display:flex;align-items:center;gap:8px}
 .admin-sidebar-footer button:hover{background:rgba(255,80,80,.15);color:#ff6b6b}
 .admin-main{flex:1;overflow-y:auto;background:#0c1526}
-.admin-topbar{padding:16px 28px;background:rgba(13,27,46,.95);border-bottom:1px solid rgba(255,200,100,.07);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;backdrop-filter:blur(10px)}
+.admin-topbar{padding:16px 28px;background:rgba(13,27,46,.95);border-bottom:1px solid rgba(255,200,100,.07);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px)}
 .admin-topbar-title{font-size:16px;font-weight:700;color:#fff;display:flex;align-items:center;gap:10px}
 .admin-topbar-title i{color:#c8922a}
 .admin-topbar-meta{font-size:11px;color:rgba(255,255,255,.35);margin-left:12px;font-weight:400}
@@ -2319,9 +2354,9 @@ footer::after{
 
 /* ── SEO sidebar toggle: mobile only ── */
 .seo-toggle-btn[data-page="listings"],.seo-toggle-btn[data-page="home"]{display:flex}
-.seo-drawer-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:4000;backdrop-filter:blur(3px)}
+.seo-drawer-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:3800;backdrop-filter:blur(3px)}
 .seo-drawer-overlay.open{display:block}
-.seo-drawer{position:fixed;top:0;right:0;bottom:0;width:min(320px,90vw);background:#fff;z-index:4001;transform:translateX(100%);transition:transform .35s cubic-bezier(.32,1,.56,1);overflow-y:auto;box-shadow:-4px 0 24px rgba(0,0,0,.18)}
+.seo-drawer{position:fixed;top:0;right:0;bottom:0;width:min(320px,90vw);background:#fff;z-index:3801;transform:translateX(100%);transition:transform .35s cubic-bezier(.32,1,.56,1);overflow-y:auto;box-shadow:-4px 0 24px rgba(0,0,0,.18)}
 .seo-drawer.open{transform:translateX(0)}
 .seo-drawer-hd{position:sticky;top:0;background:#fff;padding:14px 16px 10px;border-bottom:1.5px solid var(--bd);display:flex;align-items:center;justify-content:space-between;z-index:2}
 .seo-drawer-hd h3{font-size:14px;font-weight:700;color:var(--p);display:flex;align-items:center;gap:7px;margin:0}
@@ -2380,7 +2415,7 @@ footer::after{
 .ab-tel{background:var(--p);color:#fff}
 .fav-actions{display:flex;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap}
 .btn-fa{padding:8px 18px;border-radius:8px;font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:6px;border:1.5px solid rgba(255,255,255,.35);color:#fff;cursor:pointer;background:rgba(255,255,255,.12)}
-.float-wrap{position:fixed;bottom:24px;right:14px;z-index:900;display:flex;flex-direction:column;align-items:flex-end;gap:10px;transition:opacity .2s,pointer-events .2s}
+.float-wrap{position:fixed;bottom:24px;right:14px;z-index:1200;display:flex;flex-direction:column;align-items:flex-end;gap:10px;transition:opacity .2s,pointer-events .2s}
 .float-wrap.dd-open{opacity:0;pointer-events:none!important}
 /* scroll-top sits at top of float-wrap stack — hidden by default, shown on scroll */
 .float-top{width:42px;height:42px;border-radius:50%;background:rgba(15,52,96,.85);color:#fff;font-size:17px;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;cursor:pointer;border:none;transform:translateY(6px)}
@@ -2603,7 +2638,7 @@ footer::after{
 .btn-sub.loading .btn-icon{display:none}
 
 /* Cookie Banner */
-#cookie-banner{position:fixed;bottom:var(--bnav-h,0px);left:0;right:0;z-index:430;background:linear-gradient(135deg,#2d2650,#3d3373);color:#fff;padding:16px 20px;box-shadow:0 -4px 20px rgba(0,0,0,.3);transform:translateY(100%);transition:transform .4s cubic-bezier(.22,1,.36,1)}
+#cookie-banner{position:fixed;bottom:var(--bnav-h,0px);left:0;right:0;z-index:1200;background:linear-gradient(135deg,#2d2650,#3d3373);color:#fff;padding:16px 20px;box-shadow:0 -4px 20px rgba(0,0,0,.3);transform:translateY(100%);transition:transform .4s cubic-bezier(.22,1,.36,1)}
 #cookie-banner.show{transform:translateY(0)}
 .cookie-banner-inner{max-width:1320px;margin:0 auto;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
 .cookie-banner-text{flex:1;min-width:200px;font-size:13px;line-height:1.5;opacity:.9}
@@ -2643,7 +2678,7 @@ footer::after{
 .loc-opt{padding:5px 12px;border-radius:20px;border:1.5px solid var(--bd);background:#fff;cursor:pointer;font-size:12px;color:var(--tx2);transition:.2s}
 .loc-opt:hover{border-color:var(--p);color:var(--p);background:var(--lt)}
 @media(max-width:950px){
-  .nav-links{display:none!important;flex-direction:column;position:fixed;top:64px;left:0;right:0;background:var(--p2);padding:12px;z-index:1200;overflow:visible}
+  .nav-links{display:none!important;flex-direction:column;position:fixed;top:64px;left:0;right:0;background:var(--p2);padding:12px;z-index:1300;overflow:visible}
   .nav-links.mob-open{display:flex!important;overflow:visible}
   .hamburger{display:flex}
   .sf{grid-template-columns:1fr 1fr}
@@ -2766,8 +2801,8 @@ footer::after{
    ═══════════════════════════════════════════════════════════════ */
 @media(max-width:1200px){
   /* ซ่อน nav-links แล้วให้ hamburger เปิด */
-  /* z-index:1200 — ใช้ position:fixed เพื่อหลุดจาก nav stacking context และอยู่เหนือ breadcrumb (990) */
-  .nav-links{display:none!important;flex-direction:column;position:fixed;top:64px;left:0;right:0;background:var(--p2);padding:12px;z-index:1200;overflow:visible}
+  /* z-index:1300 — ใช้ position:fixed เพื่อหลุดจาก nav stacking context และอยู่เหนือ breadcrumb (990) */
+  .nav-links{display:none!important;flex-direction:column;position:fixed;top:64px;left:0;right:0;background:var(--p2);padding:12px;z-index:1300;overflow:visible}
   .nav-links.mob-open{display:flex!important;overflow:visible}
   /* แสดง hamburger */
   .hamburger{display:flex}
@@ -3391,7 +3426,7 @@ footer::after{
 .apply-overlay{
   display:none;position:fixed;inset:0;
   background:rgba(10,22,40,.55);
-  z-index:4500;
+  z-index:3550;
   align-items:center;justify-content:center;
   padding:16px;
   backdrop-filter:blur(2px);
@@ -3913,7 +3948,7 @@ footer::after{
 #madv-loc-chevron { font-size:10px; color:#888; transition:transform .2s; flex-shrink:0; margin-left:4px; }
 #madv-loc-btn.open #madv-loc-chevron { transform:rotate(180deg); }
 #madv-loc-panel {
-  position:fixed; z-index:99999;
+  position:fixed; z-index:9500;
   background:#fff; border:1.5px solid var(--p,#1B3A6B);
   border-radius:0 0 8px 8px; box-shadow:0 8px 24px rgba(27,58,107,.18);
   max-height:260px; overflow-y:auto;
@@ -4582,7 +4617,7 @@ footer::after{
   border-bottom: 1px solid rgba(200,146,42,0.25) !important;
   box-shadow: 0 4px 24px rgba(0,0,0,.35), 0 1px 0 rgba(200,146,42,.12) !important;
   transition: top 0.35s cubic-bezier(0.4,0,0.2,1);
-  will-change: top;
+  /* will-change:top ถูกลบออก -- สร้าง stacking context ที่กักดัก z-index child */
   /* kill inline style bg via specificity — handled by !important above */
 }
 #community-sub-header.sub-nav-top {
@@ -15410,7 +15445,7 @@ function openULDetailModal(listingId){
     ? `<a href="https://line.me/ti/p/${ul.contact_line || ul._agentLine}" target="_blank" rel="noopener" style="flex:1;display:flex;align-items:center;justify-content:center;gap:7px;background:#06C755;color:#fff;border-radius:10px;padding:12px;font-size:13px;font-weight:700;text-decoration:none"><i class="fab fa-line"></i> LINE</a>` : '';
 
   const html = `
-    <div class="ov open" id="ul-detail-modal" onclick="if(event.target===this){document.getElementById('ul-detail-modal').remove();document.body.classList.remove('modal-open')}" style="z-index:1001">
+    <div class="ov open" id="ul-detail-modal" onclick="if(event.target===this){document.getElementById('ul-detail-modal').remove();document.body.classList.remove('modal-open')}" style="z-index:3250">
       <div class="modal" style="max-width:520px;border-radius:16px;padding:0;overflow:hidden">
         <div style="position:relative">
           ${thumbHtml}
@@ -17559,7 +17594,7 @@ function openModalAdvExtraFilter(type) {
   const mo = document.createElement('div');
   mo.id = 'modal-extra-filter-sheet';
   // ── Center on screen (same style as adv-filter-panel) ──
-  mo.style.cssText = 'position:fixed;inset:0;background:rgba(10,22,40,.55);z-index:11000;display:flex;align-items:center;justify-content:center;padding:16px';
+  mo.style.cssText = 'position:fixed;inset:0;background:rgba(10,22,40,.55);z-index:9800;display:flex;align-items:center;justify-content:center;padding:16px';
   mo.innerHTML = `
   <div style="background:#fff;border-radius:20px;width:100%;max-width:560px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 28px 70px rgba(0,0,0,.38),0 2px 12px rgba(0,0,0,.15);border:1.5px solid rgba(200,146,42,.25);animation:advPopupIn .22s cubic-bezier(.34,1.4,.64,1)">
     <!-- Header -->
@@ -21152,12 +21187,12 @@ function openQsSheet(panelId, btn){
   if(!sheet){
     const overlay = document.createElement('div');
     overlay.id = 'qs-mob-overlay';
-    overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:410;display:none';
+    overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1150;display:none';
     overlay.onclick = closeQsSheet;
     document.body.appendChild(overlay);
     sheet = document.createElement('div');
     sheet.id = 'qs-mob-sheet';
-    sheet.style.cssText='position:fixed;bottom:var(--bnav-h,0px);left:0;right:0;background:#fff;border-radius:22px 22px 0 0;z-index:1300;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,1,.56,1);max-height:88vh;display:flex;flex-direction:column;overflow:hidden';
+    sheet.style.cssText='position:fixed;bottom:var(--bnav-h,0px);left:0;right:0;background:#fff;border-radius:22px 22px 0 0;z-index:3200;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,1,.56,1);max-height:88vh;display:flex;flex-direction:column;overflow:hidden';
     sheet.innerHTML='<div style="width:40px;height:4px;background:#ddd;border-radius:4px;margin:10px auto 0"></div><div id="qs-mob-sheet-hd" style="padding:12px 20px 8px;border-bottom:1px solid #e8e0d4;display:flex;align-items:center;justify-content:space-between;flex-shrink:0"><h3 style="font-size:15px;font-weight:700;font-family:Kanit,sans-serif"></h3><button onclick="closeQsSheet()" style="background:none;border:none;font-size:18px;color:#888;cursor:pointer">×</button></div><div id="qs-mob-sheet-body" style="flex:1;overflow-y:auto;padding:10px 12px"></div>';
     document.body.appendChild(sheet);
   }
@@ -27977,7 +28012,7 @@ function adminEditProp(id){
   if(existing) existing.remove();
   const mo = document.createElement('div');
   mo.className='ov'; mo.id='admin-edit-prop-modal';
-  mo.style.cssText='display:flex;z-index:10000';
+  mo.style.cssText='display:flex;z-index:9800';
   mo.innerHTML=`<div class="modal" style="max-width:560px;background:#0d1b2e;border:1px solid rgba(255,200,100,.2);color:#fff">
     <div class="mhd" style="background:rgba(27,58,107,.8);border-bottom:1px solid rgba(255,200,100,.1)">
       <h2 style="color:#fff"><i class="fas fa-edit" style="color:#c8922a"></i> แก้ไขทรัพย์ #${id}</h2>
@@ -28050,7 +28085,7 @@ function adminEditAgent(id){
   if(existing) existing.remove();
   const mo = document.createElement('div');
   mo.className='ov'; mo.id='admin-edit-agent-modal';
-  mo.style.cssText='display:flex;z-index:10000';
+  mo.style.cssText='display:flex;z-index:9800';
   mo.innerHTML=`<div class="modal" style="max-width:480px;background:#0d1b2e;border:1px solid rgba(255,200,100,.2);color:#fff">
     <div class="mhd" style="background:rgba(27,58,107,.8);border-bottom:1px solid rgba(255,200,100,.1)">
       <h2 style="color:#fff"><i class="fas fa-user-edit" style="color:#c8922a"></i> แก้ไข Agent</h2>
@@ -28240,7 +28275,7 @@ function adminAddProp(){
   if(existing) existing.remove();
   const mo = document.createElement('div');
   mo.className='ov'; mo.id='admin-add-prop-modal';
-  mo.style.cssText='display:flex;z-index:10000';
+  mo.style.cssText='display:flex;z-index:9800';
   mo.innerHTML=`<div class="modal" style="max-width:520px;background:#0d1b2e;border:1px solid rgba(255,200,100,.2);color:#fff;max-height:90vh;overflow-y:auto">
     <div class="mhd" style="background:rgba(27,58,107,.8);border-bottom:1px solid rgba(255,200,100,.1);position:sticky;top:0;z-index:1">
       <h2 style="color:#fff"><i class="fas fa-plus-circle" style="color:#c8922a"></i> เพิ่มทรัพย์ใหม่</h2>
@@ -28339,7 +28374,7 @@ function adminAddAgent(){
   if(existing) existing.remove();
   const mo = document.createElement('div');
   mo.className='ov'; mo.id='admin-add-agent-modal';
-  mo.style.cssText='display:flex;z-index:10000';
+  mo.style.cssText='display:flex;z-index:9800';
   mo.innerHTML=`<div class="modal" style="max-width:480px;background:#0d1b2e;border:1px solid rgba(255,200,100,.2);color:#fff">
     <div class="mhd" style="background:rgba(27,58,107,.8);border-bottom:1px solid rgba(255,200,100,.1)">
       <h2 style="color:#fff"><i class="fas fa-user-plus" style="color:#c8922a"></i> เพิ่ม Agent ใหม่</h2>
@@ -28446,7 +28481,7 @@ function _adminOpenPortfolioModal(p){
   if(existing) existing.remove();
   const mo = document.createElement('div');
   mo.className='ov'; mo.id=mid;
-  mo.style.cssText='display:flex;z-index:10000';
+  mo.style.cssText='display:flex;z-index:9800';
   mo.innerHTML=`<div class="modal" style="max-width:460px;background:#0d1b2e;border:1px solid rgba(255,200,100,.2);color:#fff">
     <div class="mhd" style="background:rgba(27,58,107,.8);border-bottom:1px solid rgba(255,200,100,.1)">
       <h2 style="color:#fff"><i class="fas fa-trophy" style="color:#c8922a"></i> ${isEdit?'แก้ไข':'เพิ่ม'} Portfolio</h2>
