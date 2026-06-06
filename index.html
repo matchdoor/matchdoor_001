@@ -3522,6 +3522,7 @@ footer::after{
   perspective:1200px;
   padding:24px 0 32px;
   position:relative;
+  touch-action:pan-y;
 }
 .gallery-track-wrap.dragging{cursor:grabbing;}
 .gallery-track{
@@ -10284,7 +10285,7 @@ function handleLogoClick(){
   resetSearch();
   showPage('home');
   setTimeout(function(){
-    if(window._dataReady && typeof syncAllStats==='function') syncAllStats();
+    if(window._dataReady && typeof syncAllStats==='function') syncAllStats(true);
     else if(typeof animateStatCounters==='function'){
       var hero=document.querySelector('#hero-stat-counters');
       if(hero) animateStatCounters(hero.closest('.page')||document);
@@ -13494,7 +13495,7 @@ async function loadData(){
   afterLoad();
 }
 // ── syncAllStats: อัปเดตตัวเลข stats ทั้งหมดจากข้อมูลจริง ──────────────
-function syncAllStats(){
+function syncAllStats(forceAnimate){
   // คำนวณจากข้อมูลจริงใน memory (props, agents, port)
   const soldCount   = port.filter(p=>p.status==='SOLD').length;
   const rentCount   = port.filter(p=>p.status==='RENTED').length;
@@ -13512,9 +13513,14 @@ function syncAllStats(){
     wrapper.dataset.target = String(val);
     const numEl = wrapper.querySelector('.suf-num');
     if(numEl){
-      const current = parseInt(numEl.textContent, 10) || 0;
-      if(Math.abs(current - val) > 2) animateCounter(numEl, val, 900);
-      else numEl.textContent = val;
+      if(forceAnimate){
+        numEl.textContent = '0';
+        animateCounter(numEl, val, 1000);
+      } else {
+        const current = parseInt(numEl.textContent, 10) || 0;
+        if(Math.abs(current - val) > 2) animateCounter(numEl, val, 900);
+        else numEl.textContent = val;
+      }
     }
   });
 
@@ -13819,7 +13825,7 @@ function _refreshPriceOpts(){
 function setPriceRange(val){ const parts=(val||'0|0').split('|'); const mn=parseInt(parts[0])||0; const mx=parseInt(parts[1])||999000000; $('s-min').value=String(mn); $('s-max').value=String(mx||999000000); }
 function updatePriceMax(){const min=+$('s-min').value;$$('#s-max option').forEach(o=>{o.disabled=+o.value>0&&+o.value<min;});}
 
-function setTx(t,el){ tx=t; $$('.tx-tab').forEach(b=>b.classList.remove('active')); el.classList.add('active'); const pb=$('price-buy-section'),pr=$('price-rent-section'); if(pb&&pr){ pb.style.display=t==='RENT'?'none':'block'; pr.style.display=t==='RENT'?'block':'none'; } if(typeof _refreshPriceOpts==='function') _refreshPriceOpts(); applyFilters().catch(console.error); const _heroStats=document.getElementById('hero-stat-counters'); if(_heroStats){ if(window._dataReady && typeof syncAllStats==='function'){ syncAllStats(); } else if(typeof animateStatCounters==='function'){ animateStatCounters(_heroStats.closest('.page')||document); } } }
+function setTx(t,el){ tx=t; $$('.tx-tab').forEach(b=>b.classList.remove('active')); el.classList.add('active'); const pb=$('price-buy-section'),pr=$('price-rent-section'); if(pb&&pr){ pb.style.display=t==='RENT'?'none':'block'; pr.style.display=t==='RENT'?'block':'none'; } if(typeof _refreshPriceOpts==='function') _refreshPriceOpts(); applyFilters().catch(console.error); const _heroStats=document.getElementById('hero-stat-counters'); if(_heroStats){ if(window._dataReady && typeof syncAllStats==='function'){ syncAllStats(true); } else if(typeof animateStatCounters==='function'){ animateStatCounters(_heroStats.closest('.page')||document); } } }
 function setCat(type,el){ curType=type; $$('.cat-card').forEach(c=>c.classList.remove('active')); if(el)el.classList.add('active'); applyFilters().catch(console.error); scrollToEl('all-sec'); }
 function setCatNav(t){ showPage('home'); setTimeout(()=>{curType=t;applyFilters().catch(console.error);scrollToEl('all-sec');},100); }
 function _syncTxTabs(newTx){
@@ -21751,50 +21757,68 @@ function gcRenderDots() {
 
 function gcInitDrag() {
   const wrap = document.getElementById('gc-wrap');
-  if(!wrap) return;
-  let _startY = 0, _isVert = false;
+  if(!wrap || wrap._gcDragInit) return;
+  wrap._gcDragInit = true;
+  let _startY = 0, _isVert = null; // null = ยังไม่รู้ทิศ
+
   const onDown = e => {
     gcStopAuto();
     gcDragging = false;
     gcStartX = e.touches ? e.touches[0].clientX : e.clientX;
-    _startY = e.touches ? e.touches[0].clientY : 0;
-    _isVert = false;
+    _startY  = e.touches ? e.touches[0].clientY  : 0;
+    _isVert  = null;
     gcDragDelta = 0;
     wrap.classList.add('dragging');
     document.addEventListener('mousemove', onMove);
-    document.addEventListener('mouseup', onUp);
-    document.addEventListener('touchmove', onMove, {passive:true});
-    document.addEventListener('touchend', onUp);
+    document.addEventListener('mouseup',   onUp);
+    // non-passive — เพื่อให้ preventDefault() ได้เมื่อ swipe แนวนอน
+    document.addEventListener('touchmove', onMove, {passive:false});
+    document.addEventListener('touchend',  onUp,   {passive:true});
   };
+
   const onMove = e => {
-    const x = e.touches ? e.touches[0].clientX : e.clientX;
-    const y = e.touches ? e.touches[0].clientY : 0;
+    const x  = e.touches ? e.touches[0].clientX : e.clientX;
+    const y  = e.touches ? e.touches[0].clientY  : 0;
     const dx = x - gcStartX;
     const dy = y - _startY;
-    if(!gcDragging && e.touches) {
+
+    // กำหนดทิศทางครั้งเดียว เมื่อเคลื่อนพอ
+    if(_isVert === null) {
       if(Math.abs(dx) > 6 || Math.abs(dy) > 6) {
         _isVert = Math.abs(dy) > Math.abs(dx);
-        if(!_isVert) gcDragging = true;
       }
-    } else if(!e.touches) {
-      gcDragDelta = dx;
-      if(Math.abs(gcDragDelta) > 8) gcDragging = true;
     }
-    if(!_isVert) gcDragDelta = dx;
+
+    if(_isVert === false) {
+      // swipe แนวนอน: block page scroll + live preview
+      if(e.cancelable) e.preventDefault();
+      gcDragDelta = dx;
+      gcDragging  = Math.abs(dx) > 8;
+    }
+    // ถ้า _isVert === true → ปล่อย browser scroll ตามปกติ ไม่ทำอะไร
   };
+
   const onUp = () => {
     wrap.classList.remove('dragging');
     document.removeEventListener('mousemove', onMove);
-    document.removeEventListener('mouseup', onUp);
+    document.removeEventListener('mouseup',   onUp);
     document.removeEventListener('touchmove', onMove);
-    document.removeEventListener('touchend', onUp);
-    if(!_isVert && Math.abs(gcDragDelta) > 50) gcMove(gcDragDelta < 0 ? 1 : -1);
+    document.removeEventListener('touchend',  onUp);
+    if(_isVert === false && Math.abs(gcDragDelta) > 50) {
+      gcMove(gcDragDelta < 0 ? 1 : -1);
+    }
     setTimeout(() => { gcDragging = false; }, 50);
-    _isVert = false;
+    _isVert  = null;
+    gcDragDelta = 0;
+    // resume auto — ทั้งกรณี swipe แนวนอน และ scroll แนวตั้ง
     gcStartAuto();
   };
-  wrap.addEventListener('mousedown', onDown);
+
+  wrap.addEventListener('mousedown',  onDown);
   wrap.addEventListener('touchstart', onDown, {passive:true});
+  // mouseenter/leave: หยุด/เริ่ม auto บน desktop
+  wrap.addEventListener('mouseenter', gcStopAuto);
+  wrap.addEventListener('mouseleave', gcStartAuto);
 }
 
 function gcStartAuto() {
