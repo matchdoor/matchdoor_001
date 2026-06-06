@@ -4311,6 +4311,18 @@ footer::after{
 /* Compose modal improvements */
 #md-compose-modal .modal,#md-story-modal .modal{border-radius:16px;overflow:hidden}
 #md-compose-modal textarea:focus{border-color:var(--p)!important;box-shadow:0 0 0 3px rgba(27,58,107,.08)}
+@keyframes mdProgressPulse{0%,100%{opacity:1}50%{opacity:.4}}
+.md-post-media-grid{display:grid;gap:3px;border-radius:10px;overflow:hidden;margin-top:8px}
+.md-post-media-grid.g1{grid-template-columns:1fr}
+.md-post-media-grid.g2{grid-template-columns:1fr 1fr}
+.md-post-media-grid.g3{grid-template-columns:1fr 1fr;grid-template-rows:auto auto}
+.md-post-media-grid.g4{grid-template-columns:1fr 1fr}
+.md-post-media-grid.g3 .mg-item:first-child{grid-column:1/-1}
+.mg-item img{width:100%;height:220px;object-fit:cover;display:block;cursor:pointer;transition:.15s}
+.md-post-media-grid.g1 .mg-item img{height:auto;max-height:480px}
+.mg-item img:hover{opacity:.9}
+.mg-item video{width:100%;max-height:340px;display:block;background:#000}
+.md-post-media-grid.g1 .mg-item video{max-height:420px}
 .md-post-card[data-pid^="lp-"]{box-shadow:0 0 0 2px rgba(200,146,42,.2),0 4px 16px rgba(200,146,42,.08)}
 
 /* ─── Post Card ─── */
@@ -6957,7 +6969,28 @@ footer::after{
         document.getElementById('md-inline-actions').style.display='flex';
       };
 
-      window.mdInlineSubmit = function(){
+      /* ── Upload community media to Supabase Storage ── */
+      window.uploadCommunityMedia = async function(fileItems) {
+        if (!window.sb || !fileItems || !fileItems.length) return [];
+        var urls = [];
+        for (var i = 0; i < fileItems.length; i++) {
+          var item = fileItems[i];
+          var f = item.file;
+          var ext = (f.name.split('.').pop() || (item.type === 'video' ? 'mp4' : 'jpg')).toLowerCase();
+          var path = (typeof user !== 'undefined' && user ? user.id : 'anon')
+            + '/' + Date.now() + '_' + Math.random().toString(36).slice(2) + '.' + ext;
+          try {
+            var up = await window.sb.storage.from('community-media').upload(path, f, { upsert: false });
+            if (!up.error) {
+              var pub = window.sb.storage.from('community-media').getPublicUrl(path);
+              urls.push({ url: pub.data.publicUrl, type: item.type || 'image' });
+            }
+          } catch(e) { console.warn('[community-media upload]', e.message); }
+        }
+        return urls;
+      };
+
+      window.mdInlineSubmit = async function(){
         var ta = document.getElementById('md-inline-text');
         var text = (ta ? ta.value : '').trim();
         if(!text && !window._mdInlineFiles.length){
@@ -6966,12 +6999,29 @@ footer::after{
           return;
         }
 
-        // Build preview URL
-        var previewUrl = null;
-        var postType = 'text';
+        // Disable button & show progress
+        var btn = document.getElementById('md-inline-post-btn');
+        if(btn){ btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:4px"></i> กำลังโพสต์...'; }
+
+        // Show progress bar
+        var progressBar = document.createElement('div');
+        progressBar.id = 'md-inline-progress';
+        progressBar.style.cssText = 'height:3px;background:linear-gradient(90deg,#1B3A6B,#C8922A);border-radius:2px;margin-top:6px;animation:mdProgressPulse 1.2s ease-in-out infinite';
+        var prevEl = document.getElementById('md-inline-preview');
+        if(prevEl && prevEl.parentNode) prevEl.parentNode.insertBefore(progressBar, prevEl);
+
+        // Upload media files
+        var mediaItems = [];
         if(window._mdInlineFiles.length){
-          previewUrl = URL.createObjectURL(window._mdInlineFiles[0].file);
-          postType = window._mdInlineFiles[0].type === 'video' ? 'video' : 'photo';
+          mediaItems = await window.uploadCommunityMedia(window._mdInlineFiles);
+        }
+        var mediaUrls = mediaItems.map(function(m){ return m.url; });
+        var mediaTypes = mediaItems.map(function(m){ return m.type; });
+
+        // Determine postType
+        var postType = 'text';
+        if(mediaItems.length){
+          postType = mediaItems.some(function(m){ return m.type === 'video'; }) ? 'video' : 'photo';
         }
 
         // Build hashtags from text
@@ -6985,6 +7035,15 @@ footer::after{
           authorName = (user.user_metadata && user.user_metadata.full_name) || user.email || 'สมาชิก';
         }
 
+        // Build local preview URLs (for immediate feed display)
+        var localPreviews = window._mdInlineFiles.map(function(item){
+          return { url: URL.createObjectURL(item.file), type: item.type };
+        });
+
+        // Show in local feed immediately (using uploaded URLs if available, else local preview)
+        var displayMedia = mediaUrls.length ? mediaItems : localPreviews;
+        var previewUrl = displayMedia.length ? displayMedia[0].url : null;
+
         var post = {
           id: 'lp' + Date.now(),
           authorName: authorName,
@@ -6992,32 +7051,39 @@ footer::after{
           text: text,
           type: postType,
           previewUrl: previewUrl,
+          mediaItems: displayMedia,
           hashtags: hashtags,
           createdAt: new Date().toISOString()
         };
 
-        // Submit to Supabase in background (optional)
+        // Save to Supabase DB
         try {
-          if(typeof sb!=='undefined' && sb && typeof sbInsertRateLimited==='function'){
-            sbInsertRateLimited('listings', {
-              name: authorName,
-              phone: '',
-              details: '[inline-post] ' + text,
-              status: 'รอตรวจสอบ',
-              consent_given: true,
-              consent_timestamp: new Date().toISOString()
-            }, null, null);
+          if(typeof window._v26SubmitPost === 'function'){
+            var res = await window._v26SubmitPost(text, mediaUrls, postType, null, null, mediaTypes);
+            if(!res.success){
+              // "กรุณาเข้าสู่ระบบ" — prompt login but still show local post
+              if(res.error && res.error.indexOf('เข้าสู่ระบบ') !== -1){
+                typeof toast === 'function' && toast('โพสต์ในเครื่องแล้ว — เข้าสู่ระบบเพื่อบันทึกบน Cloud 📲');
+              } else {
+                console.warn('[inline-submit] DB save failed:', res.error);
+              }
+            }
           }
-        } catch(e){}
+        } catch(e){ console.warn('[inline-submit]', e.message); }
 
-        // Prepend post to feed immediately
+        // Prepend post to feed
         window.mdPrependLocalPost(post);
+
+        // Remove progress bar & restore button
+        var pb = document.getElementById('md-inline-progress');
+        if(pb) pb.remove();
+        if(btn){ btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane" style="margin-right:4px"></i> โพสต์'; }
 
         // Reset compose box
         if(ta){ ta.value=''; ta.style.height='auto'; ta.style.background='#F0F2F5'; ta.style.borderColor='transparent'; }
         window._mdInlineFiles = [];
-        var prev = document.getElementById('md-inline-preview');
-        if(prev) prev.innerHTML = '';
+        var prev2 = document.getElementById('md-inline-preview');
+        if(prev2) prev2.innerHTML = '';
         document.getElementById('md-inline-actions').style.display='none';
 
         typeof toast==='function' && toast('โพสต์สำเร็จแล้ว 🎉');
@@ -7512,13 +7578,26 @@ window.mdBnavCloseMenu = function(){
       ? '<img src="'+esc(p.authorPhoto)+'" alt="" onerror="this.parentNode.innerHTML=\''+initial+'\'">'
       : initial;
     var imgHtml = '';
-    if(p.previewUrl){
+    if(p.mediaItems && p.mediaItems.length){
+      var cnt = Math.min(p.mediaItems.length, 4);
+      var gridClass = 'g' + cnt;
+      var items = '';
+      for(var mi = 0; mi < cnt; mi++){
+        var mItem = p.mediaItems[mi];
+        var mUrl = mItem.url || mItem;
+        var isVid = (mItem.type === 'video') || /\.(mp4|mov|webm|ogg)(\?|$)/i.test(mUrl);
+        if(isVid){
+          items += '<div class="mg-item"><video src="'+esc(mUrl)+'" controls preload="metadata" style="width:100%"></video></div>';
+        } else {
+          items += '<div class="mg-item"><img src="'+esc(mUrl)+'" alt="" style="object-fit:cover"></div>';
+        }
+      }
+      imgHtml = '<div class="md-post-media-grid ' + gridClass + '">' + items + '</div>';
+    } else if(p.previewUrl){
       if(p.type==='video'){
-        imgHtml = '<div class="md-post-media" style="background:#000;max-height:300px;display:flex;align-items:center;justify-content:center">'
-          +'<video src="'+esc(p.previewUrl)+'" controls style="width:100%;max-height:300px"></video>'
-          +'</div>';
+        imgHtml = '<div class="md-post-media-grid g1"><div class="mg-item"><video src="'+esc(p.previewUrl)+'" controls preload="metadata" style="width:100%"></video></div></div>';
       } else {
-        imgHtml = '<div class="md-post-media"><img src="'+esc(p.previewUrl)+'" alt="" style="width:100%;max-height:420px;object-fit:cover"></div>';
+        imgHtml = '<div class="md-post-media-grid g1"><div class="mg-item"><img src="'+esc(p.previewUrl)+'" alt="" style="object-fit:cover"></div></div>';
       }
     }
     var hashtags = p.hashtags||['#Matchdoor'];
@@ -8123,25 +8202,37 @@ window.mdBnavCloseMenu = function(){
       localPost.authorPhoto = (user.user_metadata&&user.user_metadata.avatar_url) || null;
     }
 
-    // Upload to backend if available
+    // Upload to backend if available — use v26 create_post()
     try {
-      if(typeof sb!=='undefined' && sb){
-        var phoneRaw = ((document.getElementById('cm-phone')||{}).value||'').trim();
-        var typeLabel = {text:'ข้อความ/คำถาม',photo:'แชร์รูปทรัพย์',video:'แชร์วิดีโอทรัพย์'}[type]||type;
-        var details = '['+typeLabel+'] '+textVal;
-        var payload = {
-          name: nameRaw,
-          phone: phoneRaw||'',
-          details: details,
-          status: 'รอตรวจสอบ',
-          consent_given: true,
-          consent_timestamp: new Date().toISOString()
-        };
-        if(typeof user!=='undefined'&&user) payload.user_id = user.id;
-        if(typeof sbInsertRateLimited==='function'){
-          await sbInsertRateLimited('listings', payload, null, null);
-        } else if(typeof sb.from==='function'){
-          await sb.from('listings').insert([payload]);
+      if(typeof sb!=='undefined' && sb && uid){
+        var selectedPropertyId  = null;
+        var selectedListingId   = null;
+        // รับ property_id / user_listing_id ถ้า user เลือกแนบทรัพย์
+        var propSel = document.getElementById('cm-property-select');
+        if (propSel && propSel.value) selectedPropertyId = propSel.value;
+        var listSel = document.getElementById('cm-listing-select');
+        if (listSel && listSel.value) selectedListingId = listSel.value;
+
+        // Upload files to community-media bucket
+        var cmMediaItems = [];
+        var cmMediaUrls  = [];
+        var cmMediaTypes = [];
+        if(window._cmFiles.length && typeof window.uploadCommunityMedia === 'function'){
+          var cmFileItems = window._cmFiles.map(function(f){
+            return { file: f, type: f.type.startsWith('video/') ? 'video' : 'image' };
+          });
+          cmMediaItems = await window.uploadCommunityMedia(cmFileItems);
+          cmMediaUrls  = cmMediaItems.map(function(m){ return m.url; });
+          cmMediaTypes = cmMediaItems.map(function(m){ return m.type; });
+          if(cmMediaUrls.length){ localPost.mediaItems = cmMediaItems; }
+        }
+
+        var postResult = await window._v26SubmitPost(textVal, cmMediaUrls, type, selectedPropertyId, selectedListingId, cmMediaTypes);
+        if (!postResult.success) {
+          console.warn('[v26] compose submit failed:', postResult.error);
+        } else {
+          // reset cursor เพื่อให้ infinite scroll โหลดโพสต์ใหม่ได้
+          _feedCursorAt = null; _feedCursorId = null; _feedExhausted = false;
         }
       }
     } catch(e){ console.warn('[compose-submit]', e.message||e); }
@@ -10303,7 +10394,7 @@ async function loadLegalPages(){
         else h2.textContent = page.title;
       }
     });
-    console.log(`✅ Legal pages loaded: ${data.length}`);
+    // Legal pages loaded: ${data.length}
   } catch(e){ console.warn('[loadLegalPages] skipped:', e.message); }
 }
 
@@ -10701,6 +10792,10 @@ async function _loadUserProfile(forceRefresh){
       user.user_metadata.instagram_url= data.instagram_url|| null;
       user.user_metadata.province     = data.province     || null;
       _cachedUserProfile = data;
+      // [v26] sync token_balance จาก get_full_user_profile → _tokenBalance
+      if(typeof data.token_balance === 'number' && data.token_balance >= 0){
+        _tokenBalance = data.token_balance;
+      }
     } else {
       _cachedUserProfile = null;
     }
@@ -12987,11 +13082,17 @@ async function _maSaveProfile(){
     toast('เกิดข้อผิดพลาด: '+error.message,true); return;
   }
 
-  // 2) upsert ลง user_profiles โดยตรง (รองรับกรณี trigger ยังไม่ทำงาน)
+  // 2) [v26] update_user_profile RPC (fallback → direct upsert)
   try {
-    const profilePayload = { user_id: user.id, display_name: name, phone, line_id: lineId, updated_at: new Date().toISOString() };
-    if(avatarUrl) profilePayload.avatar_url = avatarUrl;
-    await sb.from('user_profiles').upsert(profilePayload, { onConflict: 'user_id' });
+    const _profRpcParams = { p_display_name: name, p_phone: phone, p_line_id: lineId };
+    if(avatarUrl) _profRpcParams.p_avatar_url = avatarUrl;
+    const { error: _profRpcErr } = await sb.rpc('update_user_profile', _profRpcParams);
+    if(_profRpcErr){
+      // fallback: direct upsert
+      const profilePayload = { user_id: user.id, display_name: name, phone, line_id: lineId, updated_at: new Date().toISOString() };
+      if(avatarUrl) profilePayload.avatar_url = avatarUrl;
+      await sb.from('user_profiles').upsert(profilePayload, { onConflict: 'user_id' });
+    }
   } catch(e){ /* silent — trigger จะ sync ให้เองอยู่แล้ว */ }
 
   if(btn){btn.disabled=false;btn.innerHTML=`<i class="fas fa-save"></i> ${ui('ma.profile.save')||'บันทึก'}`;btn.style.opacity='1';btn.style.cursor='pointer';}
@@ -13102,12 +13203,19 @@ async function _maUpdateMarketingConsent(checked){
       marketing_consent:    checked,
       marketing_consent_at: ts
     }});
-    await sb.from('user_profiles').upsert({
-      user_id:              user.id,
-      marketing_consent:    checked,
-      marketing_consent_at: ts,
-      updated_at:           new Date().toISOString()
-    }, { onConflict: 'user_id' });
+    // [v26] update_user_profile RPC (fallback → direct upsert)
+    const { error: _mktRpcErr } = await sb.rpc('update_user_profile', {
+      p_marketing_consent:    checked,
+      p_marketing_consent_at: ts
+    });
+    if(_mktRpcErr){
+      await sb.from('user_profiles').upsert({
+        user_id:              user.id,
+        marketing_consent:    checked,
+        marketing_consent_at: ts,
+        updated_at:           new Date().toISOString()
+      }, { onConflict: 'user_id' });
+    }
     if(tsEl){
       tsEl.textContent = checked
         ? 'ยินยอมเมื่อ: ' + new Date(ts).toLocaleDateString('th-TH')
@@ -13726,7 +13834,7 @@ async function loadData(){
         .eq('status','approved')      // public: เห็นเฉพาะ approved
         .order('created_at',{ascending:false})
         .range(0, 999); // ดึงสูงสุด 1,000 rows — ป้องกัน PostgREST default limit ตัด
-      if(p.data){ props = p.data.map(mapProp); console.log(`✅ Properties loaded: ${props.length}`); }
+      if(p.data){ props = p.data.map(mapProp); }
       else { if(p.error) console.error('[properties]',p.error); }
 
       if(!props.length){
@@ -13751,7 +13859,7 @@ async function loadData(){
               sb.from('blogs').select('*').eq('is_published',true).order('sort_order',{ascending:true})
             ]);
             let updated = false;
-            if(a.data && a.data.length){ agents = a.data.map(mapAgent); agents.forEach(ag=>{ag.propIds=props.filter(p=>p.agentId===ag.id).map(p=>p.id);}); updated=true; console.log(`✅ Agents loaded: ${agents.length}`); }
+            if(a.data && a.data.length){ agents = a.data.map(mapAgent); agents.forEach(ag=>{ag.propIds=props.filter(p=>p.agentId===ag.id).map(p=>p.id);}); updated=true; }
             if(po.data && po.data.length){ port = po.data.map(mapPort); updated=true; }
             if(s.data && s.data.length){ services = s.data; updated=true; }
             if(b.data && b.data.length){
@@ -13790,7 +13898,6 @@ async function loadData(){
             }
             // โหลด legal pages แบบ background
             loadLegalPages().catch(e=>console.warn('[loadLegalPages]',e));
-            console.log('✅ Background data loaded');
           } catch(e){ console.warn('[background load]',e); }
         }, 400); // เริ่ม background load หลัง 400ms (ให้ first render เสร็จก่อน)
         return; // ออกจาก loadData — afterLoad ถูกเรียกแล้ว
@@ -13850,7 +13957,7 @@ function syncAllStats(){
   if(agSaleEl)  animateCounter(agSaleEl,  totalClosed, 900);
   if(agAgentEl) animateCounter(agAgentEl, agentCount,  900);
 
-  console.log(`[syncAllStats] props=${propCount} agents=${agentCount} sold=${soldCount} rented=${rentCount} happy=${happyCount} totalClosed=${totalClosed}`);
+  // stats synced
 }
 function afterLoad(){
   // ── Safety: ถ้า props ว่างให้ใช้ MOCK ทันที ──────────────────────
@@ -13917,7 +14024,6 @@ function afterLoad(){
     try {
       const ulCards = await loadApprovedUserListings();
       window._userListingCards = ulCards;
-      console.log(`✅ User listings loaded: ${ulCards.length}`);
       // ถ้าหน้า listings กำลัง active อยู่ → re-render เพื่อรวม user listings
       const _lpEl = document.getElementById('page-listings');
       if(_lpEl && _lpEl.classList.contains('active') && typeof renderListingsPage === 'function'){
@@ -18431,25 +18537,39 @@ async function _saveAgentProfileVisibility(visible){
 
     if(authUser && typeof sb !== 'undefined'){
       const _meta = window._currentMeta || {};
-      // upsert ครบทุก agent field พร้อมกัน ไม่ใช่แค่ show_on_agents
-      await sb.from('user_profiles').upsert(
-        {
-          user_id:       authUser.id,
-          show_on_agents: visible,
-          agent_title:   _meta.agent_title   || _meta.title    || '',
-          agent_bio:     _meta.agent_bio     || _meta.bio      || '',
-          agent_phone:   _meta.agent_phone   || _meta.phone    || '',
-          agent_line_id: _meta.agent_line_id || _meta.line_id  || '',
-          agent_photos:  Array.isArray(_meta.agent_photos) ? _meta.agent_photos : [],
-          updated_at:    new Date().toISOString()
-        },
-        { onConflict: 'user_id' }
-      );
+      const _agentRpc = {
+        p_show_on_agents: visible,
+        p_agent_title:    _meta.agent_title   || _meta.title    || '',
+        p_agent_bio:      _meta.agent_bio     || _meta.bio      || '',
+        p_agent_phone:    _meta.agent_phone   || _meta.phone    || '',
+        p_agent_line:     _meta.agent_line_id || _meta.line_id  || ''
+      };
+      // [v26] update_user_profile RPC (fallback → direct upsert)
+      let _agentRpcOk = false;
+      try {
+        const { error: _agentRpcErr } = await sb.rpc('update_user_profile', _agentRpc);
+        if(!_agentRpcErr) _agentRpcOk = true;
+        else console.warn('[v26] update_user_profile (agent):', _agentRpcErr.message);
+      } catch(_agentEx){ /* fallback */ }
+      if(!_agentRpcOk){
+        await sb.from('user_profiles').upsert(
+          {
+            user_id:        authUser.id,
+            show_on_agents: visible,
+            agent_title:    _agentRpc.p_agent_title,
+            agent_bio:      _agentRpc.p_agent_bio,
+            agent_phone:    _agentRpc.p_agent_phone,
+            agent_line_id:  _agentRpc.p_agent_line,
+            updated_at:     new Date().toISOString()
+          },
+          { onConflict: 'user_id' }
+        );
+      }
     }
     // localStorage fallback สำหรับ offline/slow load
     try{ localStorage.setItem('md_show_on_agents', visible ? '1' : '0'); }catch(e){}
     if(_cachedUserProfile) _cachedUserProfile.show_on_agents = visible;
-    console.log('[MemberAgent] saved show_on_agents=', visible);
+    // show_on_agents saved
   } catch(e){ console.warn('[MemberAgent] _saveAgentProfileVisibility:', e); }
 }
 
@@ -27500,6 +27620,15 @@ async function _renderAdminPanel(panel){
     const jobApps   = dashSummary?.new_job_apps       ?? 0;
     const activeNotifs = dashSummary?.active_notifications ?? 0;
     const totalUsers   = dashSummary?.total_users     ?? 0;
+    // [v26] community + token + review stats
+    const totalPosts       = dashSummary?.total_posts              ?? 0;
+    const postsToday       = dashSummary?.posts_today              ?? 0;
+    const totalLikes       = dashSummary?.total_likes              ?? 0;
+    const totalComments    = dashSummary?.total_comments           ?? 0;
+    const avgRating        = dashSummary?.avg_rating               ?? null;
+    const totalReviews     = dashSummary?.total_reviews            ?? 0;
+    const tokensOutstanding= dashSummary?.total_tokens_outstanding ?? 0;
+    const pendingTokenOrders=dashSummary?.pending_token_orders     ?? 0;
 
     document.getElementById('admin-pending-badge').textContent = pending||0;
     const totalVal = dashSummary
@@ -27541,6 +27670,55 @@ async function _renderAdminPanel(panel){
             <div style="font-size:20px;font-weight:800;color:#fff">${activeNotifs}</div>
             <div style="font-size:11px;color:rgba(255,255,255,.4)">Notifications active</div>
           </div>
+        </div>
+      </div>
+    </div>
+    <!-- [v26] Community + Token + Review stats row -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px">
+      <div class="admin-stat-card" style="padding:14px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="admin-stat-icon" style="background:rgba(99,102,241,.15);color:#6366f1;margin-bottom:0;width:34px;height:34px;font-size:14px"><i class="fas fa-comments"></i></div>
+          <div>
+            <div style="font-size:20px;font-weight:800;color:#fff">${totalPosts}</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.4)">โพสต์ชุมชน <span style="color:#6366f1">(+${postsToday} วันนี้)</span></div>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;margin-top:10px;border-top:1px solid rgba(255,255,255,.06);padding-top:10px">
+          <div style="font-size:11px;color:rgba(255,255,255,.5)"><i class="fas fa-heart" style="color:#f43f5e"></i> ${totalLikes} likes</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.5)"><i class="fas fa-comment" style="color:#60a5fa"></i> ${totalComments} comments</div>
+        </div>
+      </div>
+      <div class="admin-stat-card" style="padding:14px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="admin-stat-icon" style="background:rgba(241,196,15,.15);color:#f1c40f;margin-bottom:0;width:34px;height:34px;font-size:14px"><i class="fas fa-coins"></i></div>
+          <div>
+            <div style="font-size:20px;font-weight:800;color:#fff">${tokensOutstanding.toLocaleString()}</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.4)">Token คงค้าง</div>
+          </div>
+        </div>
+        <div style="margin-top:10px;border-top:1px solid rgba(255,255,255,.06);padding-top:10px;cursor:pointer" onclick="adminNav('token-orders',null)">
+          <div style="font-size:11px;color:${pendingTokenOrders>0?'#f1c40f':'rgba(255,255,255,.4)'}"><i class="fas fa-shopping-cart"></i> ${pendingTokenOrders} คำสั่งซื้อรอยืนยัน</div>
+        </div>
+      </div>
+      <div class="admin-stat-card" style="padding:14px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="admin-stat-icon" style="background:rgba(255,159,64,.15);color:#ff9f40;margin-bottom:0;width:34px;height:34px;font-size:14px"><i class="fas fa-star"></i></div>
+          <div>
+            <div style="font-size:20px;font-weight:800;color:#fff">${avgRating!==null?Number(avgRating).toFixed(1):'—'}</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.4)">คะแนนเฉลี่ย <span style="color:#ff9f40">${totalReviews} รีวิว</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="admin-stat-card" style="padding:14px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="admin-stat-icon" style="background:rgba(16,185,129,.15);color:#10b981;margin-bottom:0;width:34px;height:34px;font-size:14px"><i class="fas fa-heart"></i></div>
+          <div>
+            <div style="font-size:20px;font-weight:800;color:#fff">${totalLikes}</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.4)">Likes ทั้งหมด</div>
+          </div>
+        </div>
+        <div style="margin-top:10px;border-top:1px solid rgba(255,255,255,.06);padding-top:10px">
+          <div style="font-size:11px;color:rgba(255,255,255,.4)"><i class="fas fa-comment" style="color:#60a5fa"></i> ${totalComments} Comments</div>
         </div>
       </div>
     </div>
@@ -29584,23 +29762,27 @@ function _rvLocalAdd(review){
   } catch(e){ return review; }
 }
 
-/* ── Supabase fetch ── */
+/* ── Supabase fetch — v26: ใช้ v_reviews_with_user ── */
 async function _rvFetch(type, targetId){
   var cacheKey = type + ':' + targetId;
   if(_rvCache[cacheKey]) return _rvCache[cacheKey];
-  // Try Supabase
   if(typeof sb !== 'undefined' && sb){
     try {
-      var res = await sb.from('reviews').select('*')
+      var res = await sb.from('v_reviews_with_user').select('*')
         .eq('type', type).eq('target_id', String(targetId))
         .order('created_at', {ascending: false}).limit(200);
       if(!res.error && res.data){
-        _rvCache[cacheKey] = res.data;
-        return res.data;
+        var mapped = res.data.map(function(r){
+          return Object.assign({}, r, {
+            author: r.display_author || r.author || 'ผู้ใช้',
+            avatar_url: r.display_avatar || r.avatar_url || null
+          });
+        });
+        _rvCache[cacheKey] = mapped;
+        return mapped;
       }
     } catch(e){ /* fall through to localStorage */ }
   }
-  // Fallback: localStorage
   var local = _rvLocalGet(type, targetId);
   _rvCache[cacheKey] = local;
   return local;
@@ -29610,16 +29792,23 @@ async function _rvInsert(review){
   var cacheKey = review.type + ':' + review.target_id;
   if(typeof sb !== 'undefined' && sb){
     try {
-      var payload = Object.assign({}, review);
-      var res = await sb.from('reviews').insert(payload).select().single();
-      if(!res.error && res.data){
-        _rvLocalAdd(review); // mirror locally
-        _rvCache[cacheKey] = null; // invalidate cache
-        return res.data;
+      // v26: ใช้ submit_review RPC แทน insert ตรง
+      var res = await sb.rpc('submit_review', {
+        p_type:      review.type,
+        p_target_id: String(review.target_id),
+        p_rating:    review.rating,
+        p_title:     review.title || '',
+        p_body:      review.body || '',
+        p_author:    review.author || 'ผู้ใช้'
+      });
+      if(!res.error){
+        _rvLocalAdd(review);
+        _rvCache[cacheKey] = null;
+        return res.data || review;
       }
-    } catch(e){}
+      console.warn('[_rvInsert RPC]', res.error);
+    } catch(e){ console.warn('[_rvInsert]', e); }
   }
-  // localStorage only
   var saved = _rvLocalAdd(review);
   _rvCache[cacheKey] = null;
   return saved;
@@ -29678,7 +29867,6 @@ function _rvCardHtml(r, showTarget){
       targetName = ag ? ag.name : 'ตัวแทน';
     }
   }
-  /* ── Check if this review belongs to the current logged-in user ── */
   var currentUid = (typeof window._currentUser !== 'undefined' && window._currentUser && window._currentUser.id)
     ? window._currentUser.id
     : (typeof user !== 'undefined' && user && user.id ? user.id : null);
@@ -29688,23 +29876,59 @@ function _rvCardHtml(r, showTarget){
     +'style="position:absolute;top:8px;right:8px;background:none;border:none;cursor:pointer;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#65676B;line-height:1" '
     +'title="ตัวเลือก">···</button>';
 
+  /* v26: verified badge */
+  var verifiedBadge = r.is_verified
+    ? ' <span style="font-size:10px;background:#e3f7ec;color:#1a7a4a;border-radius:8px;padding:2px 7px;font-weight:700;margin-left:4px"><i class="fas fa-check-circle"></i> ยืนยันแล้ว</span>'
+    : '';
+
+  /* v26: review title */
+  var titleHtml = r.title
+    ? '<div style="font-size:14px;font-weight:700;color:var(--tx);margin:8px 0 4px;line-height:1.4">'
+        + (typeof sanitize==='function' ? sanitize(r.title) : r.title) + '</div>'
+    : '';
+
+  /* v26: helpful button */
+  var helpCount = Number(r.helpful_count) || 0;
+  var helpfulBtn = r.id
+    ? '<button id="'+id+'-help" onclick="event.stopPropagation();rvToggleHelpful(\''+r.id+'\',\''+id+'\')" '
+        +'style="display:inline-flex;align-items:center;gap:5px;background:none;border:1px solid var(--bd);border-radius:20px;padding:4px 12px;font-size:12px;color:var(--tx2);cursor:pointer;margin-top:8px;transition:.15s" '
+        +'onmouseover="this.style.borderColor=\'var(--a)\';this.style.color=\'var(--a)\'" '
+        +'onmouseout="this.style.borderColor=\'var(--bd)\';this.style.color=\'var(--tx2)\'">'
+        +'<i class="far fa-thumbs-up"></i> มีประโยชน์'+(helpCount>0?' ('+helpCount+')':'')
+        +'</button>'
+    : '';
+
+  /* v26: agent reply */
+  var replyHtml = r.reply
+    ? '<div style="margin-top:10px;padding:10px 14px;background:var(--lt);border-left:3px solid var(--a);border-radius:0 8px 8px 0">'
+        +'<div style="font-size:11px;font-weight:700;color:var(--a);margin-bottom:4px"><i class="fas fa-reply"></i> ตอบกลับจากตัวแทน'
+        +(r.reply_at?' · <span style="font-weight:400;color:var(--gr)">'+_rvTimeAgo(r.reply_at)+'</span>':'')+'</div>'
+        +'<div style="font-size:13px;color:var(--tx);line-height:1.6">'+(typeof sanitize==='function'?sanitize(r.reply):r.reply)+'</div>'
+        +'</div>'
+    : '';
+
   return '<div class="rv-card" id="'+id+'" style="position:relative">' +
     '<div class="rv-card-hd">' +
       _rvAvatar(r) +
       '<div class="rv-meta">' +
-        '<div class="rv-author">' + (r.author||'ผู้ใช้') + (isOwnReview ? ' <span style="font-size:10px;background:#e8f4e8;color:#2e7d32;border-radius:8px;padding:1px 6px;font-weight:600;margin-left:4px">โพสต์ของคุณ</span>' : '') + '</div>' +
+        '<div class="rv-author">' + (r.author||'ผู้ใช้')
+          + (isOwnReview ? ' <span style="font-size:10px;background:#e8f4e8;color:#2e7d32;border-radius:8px;padding:1px 6px;font-weight:600;margin-left:4px">โพสต์ของคุณ</span>' : '')
+          + verifiedBadge + '</div>' +
         '<div class="rv-date">' + _rvTimeAgo(r.created_at) + '</div>' +
         '<div class="rv-stars" style="margin-top:4px">' + _rvStars(r.rating, 13) + '</div>' +
       '</div>' +
-      (showTarget ? '<span class="rv-type-badge'+(r.type==='agent'?' rv-type-agent':'')+'">'+
-        (r.type==='property'?'<i class="fas fa-home"></i>':'<i class="fas fa-user-tie"></i>')+'</span>' : '') +
+      (showTarget ? '<span class="rv-type-badge'+(r.type==='agent'?' rv-type-agent':'')+'">'
+        +(r.type==='property'?'<i class="fas fa-home"></i>':'<i class="fas fa-user-tie"></i>')+'</span>' : '') +
       moreBtn +
     '</div>' +
+    titleHtml +
     '<div class="rv-body collapsed" id="'+id+'-body">' + (r.body||'') + '</div>' +
     '<button class="rv-expand-btn" id="'+id+'-btn" onclick="rvToggleBody(\''+id+'\')"><i class="fas fa-chevron-down"></i> อ่านเพิ่มเติม</button>' +
-    (showTarget && targetName ? '<div class="rv-home-footer"><span class="rv-home-target" title="'+targetName+'">' +
-      (r.type==='property'?'<i class="fas fa-home"></i> ':'<i class="fas fa-user-tie"></i> ')+targetName+'</span>' +
-      '<span>'+_rvTimeAgo(r.created_at)+'</span></div>' : '') +
+    helpfulBtn +
+    replyHtml +
+    (showTarget && targetName ? '<div class="rv-home-footer"><span class="rv-home-target" title="'+targetName+'">'
+      +(r.type==='property'?'<i class="fas fa-home"></i> ':'<i class="fas fa-user-tie"></i> ')+targetName+'</span>'
+      +'<span>'+_rvTimeAgo(r.created_at)+'</span></div>' : '') +
   '</div>';
 }
 
@@ -29775,6 +29999,49 @@ window.rvToggleBody = function(id){
     : '<i class="fas fa-chevron-down"></i> อ่านเพิ่มเติม';
 };
 
+/* ── v26: Toggle helpful (👍 มีประโยชน์) ── */
+window.rvToggleHelpful = async function(reviewId, cardId){
+  var btn = document.getElementById(cardId+'-help');
+  if(!btn) return;
+  if(typeof user === 'undefined' || !user){
+    if(typeof _openModal === 'function') _openModal('login-modal');
+    return;
+  }
+  var isActive = btn.dataset.active === '1';
+  if(isActive){
+    // ยกเลิก helpful
+    try {
+      await sb.from('review_helpful')
+        .delete()
+        .eq('review_id', reviewId)
+        .eq('user_id', user.id);
+      var cur = parseInt(btn.textContent.match(/\d+/)?.[0]||'0');
+      var newCount = Math.max(0, cur - 1);
+      btn.dataset.active = '0';
+      btn.innerHTML = '<i class="far fa-thumbs-up"></i> มีประโยชน์' + (newCount>0?' ('+newCount+')':'');
+      btn.style.color = 'var(--tx2)';
+      btn.style.borderColor = 'var(--bd)';
+    } catch(e){}
+  } else {
+    // กด helpful
+    try {
+      var res = await sb.from('review_helpful').insert({ review_id: reviewId, user_id: user.id });
+      if(res.error && res.error.code === '23505'){
+        // duplicate — toggle off
+        btn.dataset.active = '0';
+        return;
+      }
+      var cur2 = parseInt(btn.textContent.match(/\d+/)?.[0]||'0');
+      var newCount2 = cur2 + 1;
+      btn.dataset.active = '1';
+      btn.innerHTML = '<i class="fas fa-thumbs-up"></i> มีประโยชน์ (' + newCount2 + ')';
+      btn.style.color = 'var(--a)';
+      btn.style.borderColor = 'var(--a)';
+      typeof toast === 'function' && toast('ขอบคุณ! 👍');
+    } catch(e){ console.warn('[rvToggleHelpful]', e); }
+  }
+};
+
 function _rvSummaryHtml(reviews){
   if(!reviews.length) return '';
   var avg = reviews.reduce(function(s,r){ return s+r.rating; }, 0) / reviews.length;
@@ -29832,6 +30099,8 @@ function _rvFormHtml(prefix, type, targetId){
     '<div class="rv-form-title"><i class="fas fa-pen" style="color:var(--a)"></i> เขียนรีวิว</div>' +
     '<div style="margin-bottom:8px;font-size:12px;color:var(--gr)">คะแนน:</div>' +
     _rvStarPickHtml(prefix) +
+    '<input type="text" class="rv-title-input" id="'+prefix+'-title" placeholder="หัวข้อรีวิว (ไม่บังคับ)" maxlength="120"' +
+    ' style="width:100%;box-sizing:border-box;padding:9px 12px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;margin:10px 0 6px;font-family:inherit;background:var(--bg);color:var(--tx);outline:none">' +
     '<textarea class="rv-textarea" id="'+prefix+'-text" placeholder="แชร์ประสบการณ์ของคุณ... (อย่างน้อย 10 ตัวอักษร)" maxlength="500"></textarea>' +
     '<div style="font-size:11px;color:var(--gr);margin-top:5px;text-align:right"><span id="'+prefix+'-charcount">0</span>/500</div>' +
     '<button class="rv-submit-btn" id="'+prefix+'-submit" onclick="rvSubmit(\''+prefix+'\',\''+type+'\',\''+targetId+'\')">' +
@@ -29928,11 +30197,13 @@ window.rvLoadMoreAgent = async function(){
 window.rvSubmit = async function(prefix, type, targetId){
   var pick = document.getElementById(prefix+'-pick');
   var ta = document.getElementById(prefix+'-text');
+  var titleInput = document.getElementById(prefix+'-title'); // v26
   var btn = document.getElementById(prefix+'-submit');
   if(!pick || !ta) return;
 
   var rating = parseInt(pick.dataset.val || '0');
   var body = (ta.value || '').trim();
+  var title = titleInput ? (titleInput.value || '').trim() : ''; // v26
 
   if(!rating){ toast('กรุณาเลือกคะแนนดาวก่อน', true); return; }
   if(body.length < 10){ toast('กรุณาเขียนรีวิวอย่างน้อย 10 ตัวอักษร', true); return; }
@@ -29953,15 +30224,14 @@ window.rvSubmit = async function(prefix, type, targetId){
     author: authorName,
     avatar_url: avatarUrl,
     rating: rating,
+    title: title, // v26
     body: body
   };
 
   try {
     await _rvInsert(review);
     toast('ขอบคุณสำหรับรีวิว! ✅');
-    // Re-render section
     await rvLoadSection(type, targetId, prefix);
-    // Refresh home section stats
     rvRenderHome();
   } catch(e){
     toast('เกิดข้อผิดพลาด กรุณาลองใหม่', true);
@@ -29971,14 +30241,20 @@ window.rvSubmit = async function(prefix, type, targetId){
 
 /* ── Home Reviews ── */
 async function _rvFetchAll(){
-  // Supabase: fetch latest 100 reviews across all types
+  // v26: ใช้ v_reviews_with_user เพื่อได้ display_author, display_avatar
   if(typeof sb !== 'undefined' && sb){
     try {
-      var res = await sb.from('reviews').select('*').order('created_at', {ascending: false}).limit(100);
-      if(!res.error && res.data) return res.data;
+      var res = await sb.from('v_reviews_with_user').select('*').order('created_at', {ascending: false}).limit(100);
+      if(!res.error && res.data){
+        return res.data.map(function(r){
+          return Object.assign({}, r, {
+            author: r.display_author || r.author || 'ผู้ใช้',
+            avatar_url: r.display_avatar || r.avatar_url || null
+          });
+        });
+      }
     } catch(e){}
   }
-  // localStorage fallback
   return _rvLsAll().slice(0, 100);
 }
 
@@ -30333,7 +30609,7 @@ async function loadTransitStationsFromDB() {
           });
         });
         if (typeof renderTransitButtons === 'function') renderTransitButtons();
-        console.log('[v24] transit_stations merged: +' + newBTS.length + ' BTS stations');
+        // v24: BTS stations merged
       }
     }
 
@@ -30353,13 +30629,13 @@ async function loadTransitStationsFromDB() {
           });
         });
         if (typeof renderTransitButtons === 'function') renderTransitButtons();
-        console.log('[v24] transit_stations merged: +' + newMRT.length + ' MRT stations');
+        // v24: MRT stations merged
       }
     }
 
     // เก็บข้อมูล transit ไว้ global สำหรับ SEO + autocomplete
     window._transitStationsDB = res.data;
-    console.log('[v24] transit_stations loaded: ' + res.data.length + ' total');
+    // v24: transit_stations loaded
   } catch (e) {
     console.warn('[v24] loadTransitStationsFromDB error:', e.message);
   }
@@ -30405,7 +30681,7 @@ async function loadPopularLocationsFromDB() {
       sel.appendChild(dbGroup);
     }
 
-    console.log('[v24] popular_locations loaded: ' + res.data.length);
+    // v24: popular_locations loaded
   } catch (e) {
     console.warn('[v24] loadPopularLocationsFromDB error:', e.message);
   }
@@ -30467,7 +30743,7 @@ async function loadFooterLinksFromDB() {
       fi.appendChild(wrapper);
     });
 
-    console.log('[v24] footer_links loaded: ' + res.data.length + ' links, ' + catKeys.length + ' categories');
+    // v24: footer_links loaded
   } catch (e) {
     console.warn('[v24] loadFooterLinksFromDB error:', e.message);
   }
@@ -30500,62 +30776,107 @@ window._v24NavFooter = function(url) {
 };
 
 /* ─────────────────────────────────────────────
-   4. SOCIAL POSTS — โหลดจาก DB แล้ว prepend
-      ก่อน property posts ใน Community Feed
-      (property posts ยังแสดงอยู่เหมือนเดิม)
+   4. COMMUNITY POSTS (v26) — get_feed() + cursor
+      Backward-compat: fallback → community_posts
+      → social_posts ถ้า rpc ไม่มี
 ───────────────────────────────────────────── */
-var _sbPostsLoaded = false;
-var _sbPostsPage   = 0;
-var _sbPostsPerPage = 5;
+var _sbPostsLoaded  = false;
+var _feedCursorAt   = null;   // created_at ของโพสต์สุดท้ายใน batch
+var _feedCursorId   = null;   // id ของโพสต์สุดท้ายใน batch
+var _feedExhausted  = false;  // ไม่มีข้อมูลเพิ่มแล้ว
+var _feedLoading    = false;
+var _FEED_LIMIT     = 20;
+
+// ตาราง/columns ที่ใช้ map ผลลัพธ์จากทั้ง get_feed และ direct query
+function _normCommunityPost(p) {
+  return {
+    id:           p.id,
+    user_id:      p.user_id || p.author_id,
+    content:      p.content || p.text || '',
+    post_type:    p.post_type || p.type || 'text',
+    media_urls:   Array.isArray(p.media_urls) ? p.media_urls : (Array.isArray(p.photos) ? p.photos : []),
+    like_count:   parseInt(p.like_count || p.likes_count || 0, 10),
+    comment_count:parseInt(p.comment_count || p.comments_count || 0, 10),
+    liked_by_me:  !!p.liked_by_me,
+    is_boosted:   !!(p.is_boosted || p.boosted_at),
+    boosted_at:   p.boosted_at || null,
+    author_name:  p.author_name || p.display_name || null,
+    author_avatar:p.author_avatar || p.avatar_url || null,
+    property_id:  p.property_id || null,
+    user_listing_id: p.user_listing_id || null,
+    tags:         Array.isArray(p.tags) ? p.tags : [],
+    created_at:   p.created_at
+  };
+}
 
 async function loadSocialPostsFromDB(append) {
-  if (!sb) return;
+  if (!sb || _feedLoading || _feedExhausted) return;
+  _feedLoading = true;
   try {
-    var from = _sbPostsPage * _sbPostsPerPage;
-    var to   = from + _sbPostsPerPage - 1;
+    var posts = [];
 
-    var res = await sb
-      .from('social_posts')
-      .select('id, user_id, content, photos, post_type, listing_id, boosted_at, created_at')
-      .eq('is_published', true)   // ถ้ามี column
-      .order('boosted_at',  { ascending: false, nullsFirst: false })
-      .order('created_at',  { ascending: false })
-      .range(from, to);
+    // 1) ลองเรียก get_feed() RPC ก่อน (v26)
+    var rpcParams = { p_limit: _FEED_LIMIT };
+    if (append && _feedCursorAt)  rpcParams.p_cursor_at = _feedCursorAt;
+    if (append && _feedCursorId)  rpcParams.p_cursor_id = _feedCursorId;
 
-    // is_published อาจไม่มี — fallback ไม่ filter
-    if (res.error && res.error.message && res.error.message.indexOf('is_published') !== -1) {
-      res = await sb
-        .from('social_posts')
-        .select('id, user_id, content, photos, post_type, listing_id, boosted_at, created_at')
-        .order('boosted_at',  { ascending: false, nullsFirst: false })
+    var rpcRes = await sb.rpc('get_feed', rpcParams);
+
+    if (!rpcRes.error && Array.isArray(rpcRes.data) && rpcRes.data.length > 0) {
+      posts = rpcRes.data.map(_normCommunityPost);
+    } else if (rpcRes.error) {
+      // 2) Fallback: query community_posts ตรง
+      var fbRes = await sb
+        .from('community_posts')
+        .select('id, user_id, content, post_type, media_urls, like_count, comment_count, is_boosted, boosted_at, tags, created_at')
+        .order('is_boosted', { ascending: false, nullsFirst: false })
         .order('created_at',  { ascending: false })
-        .range(from, to);
+        .limit(_FEED_LIMIT);
+
+      if (!fbRes.error && fbRes.data && fbRes.data.length > 0) {
+        posts = fbRes.data.map(_normCommunityPost);
+      } else {
+        // 3) Final fallback: social_posts (v24)
+        var legRes = await sb
+          .from('social_posts')
+          .select('id, user_id, content, photos, post_type, boosted_at, created_at')
+          .order('boosted_at', { ascending: false, nullsFirst: false })
+          .order('created_at', { ascending: false })
+          .limit(_FEED_LIMIT);
+        if (!legRes.error && legRes.data && legRes.data.length > 0) {
+          posts = legRes.data.map(_normCommunityPost);
+        }
+      }
     }
 
-    if (!res.data || !res.data.length) return;
+    if (!posts.length) {
+      if (append) _feedExhausted = true;
+      _feedLoading = false;
+      return;
+    }
+
+    // บันทึก cursor จากโพสต์สุดท้าย
+    var last = posts[posts.length - 1];
+    _feedCursorAt = last.created_at;
+    _feedCursorId = last.id;
+    if (posts.length < _FEED_LIMIT) _feedExhausted = true;
 
     var feedEl = document.getElementById('md-feed-posts');
-    if (!feedEl) return;
+    if (!feedEl) { _feedLoading = false; return; }
 
-    var html = res.data.map(function(post) {
-      return _buildSBPostCard(post);
-    }).join('');
+    var html = posts.map(function(p) { return _buildSBPostCard(p); }).join('');
 
     if (!append) {
-      // Prepend ก่อน posts เดิม
       feedEl.insertAdjacentHTML('afterbegin', html);
     } else {
       feedEl.insertAdjacentHTML('beforeend', html);
     }
 
-    _sbPostsPage++;
-    if (!_sbPostsLoaded) {
-      _sbPostsLoaded = true;
-      console.log('[v24] social_posts loaded from DB: ' + res.data.length);
-    }
+    _sbPostsLoaded = true;
   } catch (e) {
-    console.warn('[v24] loadSocialPostsFromDB error:', e.message);
+    console.warn('[v26] loadSocialPostsFromDB error:', e.message);
   }
+  _feedLoading = false;
 }
 
 function _buildSBPostCard(post) {
@@ -30569,31 +30890,75 @@ function _buildSBPostCard(post) {
     return Math.floor(diff/86400) + ' วันที่แล้ว';
   }
 
-  var pid = 'sb-' + esc(post.id);
-  var boosted = post.boosted_at ? '<span style="background:#fff3cd;color:#856404;font-size:10px;padding:1px 6px;border-radius:10px;font-weight:600;margin-left:4px">🚀 Boosted</span>' : '';
+  var pid       = 'sb-' + esc(post.id);
+  var rawId     = esc(post.id);
+  var isBoosted = post.is_boosted || post.boosted_at;
+  var boostedBadge = isBoosted
+    ? '<span style="background:#fff3cd;color:#856404;font-size:10px;padding:1px 6px;border-radius:10px;font-weight:600;margin-left:4px">🚀 Boosted</span>'
+    : '';
 
-  // รูปภาพ (ถ้ามี)
-  var photos = Array.isArray(post.photos) ? post.photos.filter(Boolean) : [];
+  // Avatar
+  var avHtml = post.author_avatar
+    ? '<img src="' + esc(post.author_avatar) + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">'
+    : '<i class="fas fa-user"></i>';
+  var avStyle = post.author_avatar ? '' : 'background:linear-gradient(135deg,#1B3A6B,#7c6fcd);color:#fff;font-weight:700;font-size:15px';
+
+  var authorName = post.author_name ? esc(post.author_name) : 'สมาชิก Matchdoor';
+
+  // รูปภาพ/วิดีโอ (media_urls หรือ photos)
+  var media = post.media_urls || [];
+  var mediaTypes = post.media_types || [];
   var imgHtml = '';
-  if (photos.length) {
-    var imgSrc = typeof sbImg === 'function' ? sbImg(photos[0]) : photos[0];
-    imgHtml = '<div class="md-post-media"><img src="' + esc(imgSrc) + '" alt="" loading="lazy" style="width:100%;max-height:420px;object-fit:cover" onerror="this.parentNode.style.display=\'none\'"></div>';
+  if (media.length) {
+    var cnt = Math.min(media.length, 4);
+    var gridClass = 'g' + cnt;
+    var items = '';
+    for (var mi = 0; mi < cnt; mi++) {
+      var mUrl = typeof sbImg === 'function' ? sbImg(media[mi]) : media[mi];
+      var mType = mediaTypes[mi] || (post.post_type === 'video' && mi === 0 ? 'video' : 'image');
+      // detect video by extension or type
+      var isVid = mType === 'video' || /\.(mp4|mov|webm|ogg)(\?|$)/i.test(mUrl);
+      if (isVid) {
+        items += '<div class="mg-item"><video src="' + esc(mUrl) + '" controls preload="metadata" style="width:100%"></video></div>';
+      } else {
+        items += '<div class="mg-item"><img src="' + esc(mUrl) + '" alt="" loading="lazy" onerror="this.closest(\'.md-post-media-grid\').style.display=\'none\'"></div>';
+      }
+    }
+    imgHtml = '<div class="md-post-media-grid ' + gridClass + '">' + items + '</div>';
   }
 
-  // Hashtag จาก post_type
+  // Tags / post_type
   var typeTag = '';
-  if (post.post_type && post.post_type !== 'general') {
-    var tagMap = { review: '#รีวิว', listing_share: '#แชร์ทรัพย์', question: '#ถามตอบ' };
+  if (post.post_type && post.post_type !== 'text' && post.post_type !== 'general') {
+    var tagMap = { review:'#รีวิว', listing_share:'#แชร์ทรัพย์', question:'#ถามตอบ', link:'#ลิงก์' };
     typeTag = '<span class="md-hashtag">' + esc(tagMap[post.post_type] || '#' + post.post_type) + '</span> ';
+  }
+  if (Array.isArray(post.tags) && post.tags.length) {
+    post.tags.forEach(function(t) { typeTag += '<span class="md-hashtag">#' + esc(t) + '</span> '; });
   }
   typeTag += '<span class="md-hashtag">#Matchdoor</span>';
 
-  return '<div class="md-fb-card md-post-card" data-pid="' + pid + '" style="border-left:3px solid #1B3A6B">'
+  var likeCount    = post.like_count || 0;
+  var commentCount = post.comment_count || 0;
+  var likedCls     = post.liked_by_me ? ' liked' : '';
+  var likeIcon     = post.liked_by_me ? '<i class="fas fa-heart" style="color:#f43f5e"></i>' : '<i class="far fa-heart"></i>';
+  var likeColor    = post.liked_by_me ? 'color:#f43f5e' : '';
+
+  // เจ้าของโพสต์เท่านั้นเห็นปุ่ม Boost / Delete
+  var isOwner = typeof user !== 'undefined' && user && user.id === post.user_id;
+  var boostBtn  = isOwner && !isBoosted
+    ? '<div class="md-post-action" style="color:#C8922A" onclick="_v26BoostPost(\'' + rawId + '\',this)"><i class="fas fa-rocket"></i> Boost</div>'
+    : '';
+  var deleteBtn = isOwner
+    ? '<div class="md-post-action" style="color:#e74c3c" onclick="_v26DeletePost(\'' + rawId + '\',this)"><i class="fas fa-trash-alt"></i> ลบ</div>'
+    : '';
+
+  return '<div class="md-fb-card md-post-card" data-pid="' + pid + '" data-post-id="' + rawId + '" data-uid="' + esc(post.user_id||'') + '" style="border-left:3px solid #1B3A6B">'
     + '<div class="md-post-hd">'
       + '<div class="md-post-author">'
-        + '<div class="md-post-av" style="background:linear-gradient(135deg,#1B3A6B,#7c6fcd);color:#fff;font-weight:700;font-size:15px"><i class="fas fa-user"></i></div>'
+        + '<div class="md-post-av" style="' + avStyle + '">' + avHtml + '</div>'
         + '<div>'
-          + '<div class="md-post-name">สมาชิก Matchdoor <span class="md-verified member">✓ สมาชิก</span>' + boosted + '</div>'
+          + '<div class="md-post-name">' + authorName + ' <span class="md-verified member">✓ สมาชิก</span>' + boostedBadge + '</div>'
           + '<div class="md-post-meta"><i class="fas fa-clock" style="font-size:11px"></i> ' + timeAgo(post.created_at) + ' · <i class="fas fa-globe-asia" style="font-size:11px"></i></div>'
         + '</div>'
       + '</div>'
@@ -30601,64 +30966,267 @@ function _buildSBPostCard(post) {
     + '</div>'
     + '<div class="md-post-text">' + esc(post.content).replace(/\n/g,'<br>') + '<br>' + typeTag + '</div>'
     + imgHtml
-    + '<div class="md-reaction-count"><span>❤️ 0</span> · ความคิดเห็น 0 · แชร์ 0</div>'
+    + '<div class="md-reaction-count"><span>❤️ ' + likeCount + '</span> · ความคิดเห็น ' + commentCount + ' · แชร์ 0</div>'
     + '<div class="md-post-actions">'
-      + '<div class="md-post-action" onclick="mdToggleLike(this)"><i class="far fa-heart"></i> ถูกใจ</div>'
-      + '<div class="md-post-action" onclick="mdToggleComment(this)"><i class="far fa-comment"></i> คอมเมนต์</div>'
+      + '<div class="md-post-action' + likedCls + '" style="' + likeColor + '" onclick="_v26ToggleLike(\'' + rawId + '\',this)">' + likeIcon + ' ถูกใจ</div>'
+      + '<div class="md-post-action" onclick="_v26LoadComments(\'' + rawId + '\',this)"><i class="far fa-comment"></i> ' + commentCount + ' ความเห็น</div>'
       + '<div class="md-post-action" onclick="mdSharePost(\'' + pid + '\')"><i class="fas fa-share"></i> แชร์</div>'
-      + (post.user_id ? '<div class="md-post-action" style="color:#C8922A" onclick="_v24BoostPost(\'' + esc(post.id) + '\')"><i class="fas fa-rocket"></i> Boost</div>' : '')
+      + boostBtn
+      + deleteBtn
     + '</div>'
     + '<div class="md-comment-collapse" style="display:none">'
-      + '<div class="md-comments"></div>'
+      + '<div class="md-comments" data-loaded="0"></div>'
       + '<div class="md-comment-box">'
         + '<div class="md-compose-av" style="width:32px;height:32px;font-size:13px"><i class="fas fa-user"></i></div>'
-        + '<input class="md-comment-input" placeholder="เขียนความคิดเห็น..." onkeydown="if(event.key===\'Enter\'&&!event.shiftKey){event.preventDefault();mdSendComment(this);}"/>'
-        + '<button class="md-comment-send" onclick="mdSendComment(this.previousElementSibling)"><i class="fas fa-paper-plane"></i></button>'
+        + '<input class="md-comment-input" placeholder="เขียนความคิดเห็น..." onkeydown="if(event.key===\'Enter\'&&!event.shiftKey){event.preventDefault();_v26SendComment(\'' + rawId + '\',this);}"/>'
+        + '<button class="md-comment-send" onclick="_v26SendComment(\'' + rawId + '\',this.previousElementSibling)"><i class="fas fa-paper-plane"></i></button>'
       + '</div>'
     + '</div>'
     + '</div>';
 }
 
 /* ─────────────────────────────────────────────
-   5. BOOST POST — เรียก boost_post() DB function
+   5a. LIKE — toggle_post_like() (v26)
 ───────────────────────────────────────────── */
-window._v24BoostPost = async function(postId) {
-  if (!sb) { if (typeof toast === 'function') toast('กรุณาเข้าสู่ระบบก่อน Boost 🔒'); return; }
-
-  // ตรวจ session
+window._v26ToggleLike = async function(postId, btn) {
+  if (!sb) { typeof toast === 'function' && toast('กรุณาเข้าสู่ระบบก่อน 🔒'); return; }
   var sess = await sb.auth.getSession();
   var uid  = sess.data && sess.data.session && sess.data.session.user ? sess.data.session.user.id : null;
-  if (!uid) {
-    if (typeof toast === 'function') toast('กรุณาเข้าสู่ระบบก่อน Boost 🔒');
-    if (typeof openAuthModal === 'function') openAuthModal();
+  if (!uid) { typeof openAuthModal === 'function' && openAuthModal(); return; }
+
+  var isLiked = btn.classList.contains('liked');
+  // Optimistic update
+  btn.classList.toggle('liked');
+  var card = btn.closest('.md-post-card');
+  var countEl = card && card.querySelector('.md-reaction-count');
+  var newCount = 0;
+  if (countEl) {
+    countEl.innerHTML = countEl.innerHTML.replace(/❤️ (\d+)/, function(m, n) {
+      newCount = isLiked ? Math.max(0, parseInt(n) - 1) : parseInt(n) + 1;
+      return '❤️ ' + newCount;
+    });
+  }
+  btn.innerHTML = (!isLiked ? '<i class="fas fa-heart" style="color:#f43f5e"></i>' : '<i class="far fa-heart"></i>') + ' ถูกใจ';
+  btn.style.color = !isLiked ? '#f43f5e' : '';
+
+  try {
+    var res = await sb.rpc('toggle_post_like', { p_post_id: postId });
+    if (res.error) throw res.error;
+    // ถ้า server ส่ง count กลับมาให้อัปเดตอีกครั้ง
+    if (res.data && typeof res.data.count === 'number' && countEl) {
+      countEl.innerHTML = countEl.innerHTML.replace(/❤️ (\d+)/, '❤️ ' + res.data.count);
+    }
+  } catch (e) {
+    // Revert on error
+    btn.classList.toggle('liked');
+    btn.innerHTML = (isLiked ? '<i class="fas fa-heart" style="color:#f43f5e"></i>' : '<i class="far fa-heart"></i>') + ' ถูกใจ';
+    btn.style.color = isLiked ? '#f43f5e' : '';
+    if (countEl) {
+      countEl.innerHTML = countEl.innerHTML.replace(/❤️ (\d+)/, function(m, n) {
+        return '❤️ ' + (isLiked ? parseInt(n) + 1 : Math.max(0, parseInt(n) - 1));
+      });
+    }
+    console.warn('[v26] toggle_post_like error:', e.message);
+  }
+};
+
+/* ─────────────────────────────────────────────
+   5b. COMMENTS — get_comments() + add_comment()
+───────────────────────────────────────────── */
+window._v26LoadComments = async function(postId, btn) {
+  var card = btn.closest('.md-post-card');
+  var collapse = card && card.querySelector('.md-comment-collapse');
+  if (!collapse) return;
+
+  var isHidden = collapse.style.display === 'none';
+  collapse.style.display = isHidden ? 'block' : 'none';
+  if (!isHidden) return;  // collapsing — don't reload
+
+  var commentsEl = collapse.querySelector('.md-comments');
+  if (!commentsEl || commentsEl.getAttribute('data-loaded') === '1') {
+    // already loaded — just show
+    setTimeout(function() { var inp = collapse.querySelector('.md-comment-input'); if (inp) inp.focus(); }, 50);
     return;
   }
 
+  if (!sb) return;
   try {
-    if (typeof toast === 'function') toast('กำลัง Boost โพสต์... 🚀');
-    var res = await sb.rpc('boost_post', { p_post_id: postId, p_user_id: uid });
+    var res = await sb.rpc('get_comments', { p_post_id: postId, p_limit: 20 });
+    if (res.error) throw res.error;
+    var comments = Array.isArray(res.data) ? res.data : [];
+    commentsEl.innerHTML = comments.map(function(c) {
+      function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+      var avHtml = c.author_avatar
+        ? '<img src="' + esc(c.author_avatar) + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%">'
+        : '<i class="fas fa-user" style="font-size:11px"></i>';
+      return '<div class="md-comment-item">'
+        + '<div class="md-comment-av">' + avHtml + '</div>'
+        + '<div class="md-comment-bubble"><b>' + esc(c.author_name || c.display_name || 'สมาชิก') + '</b> ' + esc(c.content) + '</div>'
+        + '</div>';
+    }).join('');
+    commentsEl.setAttribute('data-loaded', '1');
+  } catch (e) {
+    console.warn('[v26] get_comments error:', e.message);
+    if (commentsEl) commentsEl.innerHTML = '<div style="color:var(--tx2);font-size:13px;padding:8px">ไม่สามารถโหลดความเห็นได้ ลองใหม่อีกครั้ง</div>';
+  }
+  setTimeout(function() { var inp = collapse.querySelector('.md-comment-input'); if (inp) inp.focus(); }, 50);
+};
+
+window._v26SendComment = async function(postId, input) {
+  if (!input) return;
+  var text = (input.value || '').trim();
+  if (!text) return;
+
+  if (!sb) { typeof toast === 'function' && toast('กรุณาเข้าสู่ระบบก่อน 🔒'); return; }
+  var sess = await sb.auth.getSession();
+  var uid  = sess.data && sess.data.session && sess.data.session.user ? sess.data.session.user.id : null;
+  if (!uid) { typeof openAuthModal === 'function' && openAuthModal(); return; }
+
+  var card = input.closest('.md-post-card');
+  var commentsEl = card && card.querySelector('.md-comments');
+
+  // Optimistic: แสดงทันที
+  if (commentsEl) {
+    function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    var displayName = (typeof user !== 'undefined' && user && user.user_metadata && user.user_metadata.display_name)
+      ? user.user_metadata.display_name : 'คุณ';
+    var div = document.createElement('div');
+    div.className = 'md-comment-item';
+    div.innerHTML = '<div class="md-comment-av"><i class="fas fa-user" style="font-size:11px"></i></div>'
+      + '<div class="md-comment-bubble"><b>' + esc(displayName) + '</b> ' + esc(text) + '</div>';
+    commentsEl.appendChild(div);
+    commentsEl.setAttribute('data-loaded', '1');
+  }
+  // อัปเดต comment count
+  var countEl = card && card.querySelector('.md-reaction-count');
+  if (countEl) {
+    countEl.innerHTML = countEl.innerHTML.replace(/ความคิดเห็น (\d+)/, function(m, n) {
+      return 'ความคิดเห็น ' + (parseInt(n) + 1);
+    });
+  }
+  // อัปเดต comment button label
+  var commentBtn = card && card.querySelector('.md-post-action[onclick*="_v26LoadComments"]');
+  if (commentBtn) {
+    commentBtn.innerHTML = commentBtn.innerHTML.replace(/(\d+) ความเห็น/, function(m, n) {
+      return (parseInt(n) + 1) + ' ความเห็น';
+    });
+  }
+
+  input.value = '';
+  typeof toast === 'function' && toast('โพสต์ความคิดเห็นแล้ว 💬');
+
+  // Persist to DB
+  try {
+    var res = await sb.rpc('add_comment', { p_post_id: postId, p_content: text });
+    if (res.error) throw res.error;
+  } catch (e) {
+    console.warn('[v26] add_comment error:', e.message);
+  }
+};
+
+/* ─────────────────────────────────────────────
+   5. BOOST POST — boost_community_post() (v26)
+───────────────────────────────────────────── */
+window._v24BoostPost = async function(postId) {
+  return window._v26BoostPost(postId);
+};
+
+window._v26BoostPost = async function(postId, btn) {
+  if (!sb) { typeof toast === 'function' && toast('กรุณาเข้าสู่ระบบก่อน Boost 🔒'); return; }
+  var sess = await sb.auth.getSession();
+  var uid  = sess.data && sess.data.session && sess.data.session.user ? sess.data.session.user.id : null;
+  if (!uid) { typeof openAuthModal === 'function' && openAuthModal(); return; }
+
+  try {
+    typeof toast === 'function' && toast('กำลัง Boost โพสต์... 🚀');
+    // ลอง v26 function ก่อน, fallback → v24
+    var res = await sb.rpc('boost_community_post', { p_post_id: postId });
+    if (res.error && res.error.message && res.error.message.indexOf('function') !== -1) {
+      res = await sb.rpc('boost_post', { p_post_id: postId, p_user_id: uid });
+    }
     if (res.error) throw res.error;
     var data = res.data;
     if (data && data.success) {
-      if (typeof toast === 'function') toast('Boost สำเร็จ! 🚀 Token เหลือ ' + data.balance_after);
-      // อัปเดต balance badge ถ้ามี
+      typeof toast === 'function' && toast('Boost สำเร็จ! 🚀 Token เหลือ ' + data.balance_after);
       var balEl = document.getElementById('user-token-balance');
       if (balEl) balEl.textContent = data.balance_after;
+      // ใส่ badge Boosted บนการ์ด
+      if (btn) {
+        var card = btn.closest('.md-post-card');
+        var nameEl = card && card.querySelector('.md-post-name');
+        if (nameEl && !nameEl.querySelector('.boosted-badge')) {
+          nameEl.insertAdjacentHTML('beforeend', '<span class="boosted-badge" style="background:#fff3cd;color:#856404;font-size:10px;padding:1px 6px;border-radius:10px;font-weight:600;margin-left:4px">🚀 Boosted</span>');
+        }
+        btn.remove();
+      }
     } else {
       var errMsg = data && data.error ? data.error : 'ไม่สามารถ Boost ได้';
-      if (errMsg.indexOf('insufficient') !== -1) errMsg = 'Token ไม่เพียงพอ — ซื้อ Token เพิ่มได้ที่หน้าบัญชี';
-      if (typeof toast === 'function') toast('❌ ' + errMsg);
+      if (errMsg.indexOf('insufficient') !== -1) {
+        typeof toast === 'function' && toast('Token ไม่เพียงพอ — กำลังเปิดหน้าซื้อ Token...');
+        setTimeout(function() { typeof openBuyTokenModal === 'function' && openBuyTokenModal(); }, 800);
+      } else {
+        typeof toast === 'function' && toast('❌ ' + errMsg);
+      }
     }
   } catch (e) {
-    console.warn('[v24] boost_post error:', e.message);
-    if (typeof toast === 'function') toast('เกิดข้อผิดพลาด: ' + e.message);
+    console.warn('[v26] boost_community_post error:', e.message);
+    typeof toast === 'function' && toast('เกิดข้อผิดพลาด: ' + e.message);
   }
+};
+
+/* ─────────────────────────────────────────────
+   5c. DELETE POST — delete_post() (v26)
+───────────────────────────────────────────── */
+window._v26DeletePost = async function(postId, btn) {
+  if (!sb) return;
+  var sess = await sb.auth.getSession();
+  var uid  = sess.data && sess.data.session && sess.data.session.user ? sess.data.session.user.id : null;
+  if (!uid) { typeof openAuthModal === 'function' && openAuthModal(); return; }
+
+  // Confirm dialog
+  var existing = document.getElementById('md-delete-confirm-modal-v26');
+  if (existing) existing.remove();
+  var mo = document.createElement('div');
+  mo.id = 'md-delete-confirm-modal-v26';
+  mo.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:9999;padding:16px';
+  mo.innerHTML = '<div style="background:#fff;border-radius:12px;max-width:360px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,.22);overflow:hidden">'
+    + '<div style="padding:20px 20px 16px;border-bottom:1px solid #E4E6EB">'
+      + '<div style="font-size:17px;font-weight:700;color:#1C1E21">ลบโพสต์?</div>'
+      + '<div style="font-size:14px;color:#65676B;margin-top:6px">เมื่อลบแล้วจะไม่สามารถกู้คืนได้</div>'
+    + '</div>'
+    + '<div style="display:flex">'
+      + '<button onclick="document.getElementById(\'md-delete-confirm-modal-v26\').remove()" style="flex:1;padding:14px;font-size:15px;font-weight:600;background:none;border:none;border-right:1px solid #E4E6EB;cursor:pointer;color:#1C1E21">ยกเลิก</button>'
+      + '<button id="md-del-confirm-v26" style="flex:1;padding:14px;font-size:15px;font-weight:700;background:none;border:none;cursor:pointer;color:#e74c3c">ลบ</button>'
+    + '</div>'
+  + '</div>';
+  mo.onclick = function(e) { if (e.target === mo) mo.remove(); };
+  document.body.appendChild(mo);
+
+  document.getElementById('md-del-confirm-v26').onclick = async function() {
+    mo.remove();
+    try {
+      var res = await sb.rpc('delete_post', { p_post_id: postId });
+      if (res.error) throw res.error;
+    } catch (e) {
+      console.warn('[v26] delete_post error:', e.message);
+      typeof toast === 'function' && toast('ไม่สามารถลบโพสต์ได้: ' + (e.message || 'ลองใหม่อีกครั้ง'), true);
+      return;
+    }
+    // ลบออกจาก DOM ทันที
+    var card = btn ? btn.closest('.md-post-card') : document.querySelector('[data-post-id="' + postId + '"]');
+    if (card) {
+      card.style.transition = 'opacity .3s,transform .3s';
+      card.style.opacity = '0';
+      card.style.transform = 'scale(.97)';
+      setTimeout(function() { card.remove(); }, 320);
+    }
+    typeof toast === 'function' && toast('ลบโพสต์แล้ว 🗑️');
+  };
 };
 
 /* ─────────────────────────────────────────────
    6. GET PROPERTIES BY BTS — wrapper สำหรับ
       get_properties_by_bts() DB function
-      (ใช้ใน PDP nearby / SEO pages ในอนาคต)
 ───────────────────────────────────────────── */
 window._v24GetPropertiesByBTS = async function(stationName, limit) {
   if (!sb) return [];
@@ -30672,7 +31240,7 @@ window._v24GetPropertiesByBTS = async function(stationName, limit) {
     var mapped = (res.data || []).map(function(r) {
       return typeof mapProp === 'function' ? mapProp(r) : r;
     });
-    console.log('[v24] get_properties_by_bts("' + stationName + '"): ' + mapped.length + ' results');
+    // v24: get_properties_by_bts results
     return mapped;
   } catch (e) {
     console.warn('[v24] get_properties_by_bts error:', e.message);
@@ -30681,8 +31249,8 @@ window._v24GetPropertiesByBTS = async function(stationName, limit) {
 };
 
 /* ─────────────────────────────────────────────
-   7. REALTIME SUBSCRIPTION — รับโพสต์ใหม่
-      จาก social_posts แบบ real-time
+   7. REALTIME SUBSCRIPTION — community_posts (v26)
+      Fallback: social_posts ถ้า table ไม่มี
 ───────────────────────────────────────────── */
 var _sbRealtimeChannel = null;
 
@@ -30690,24 +31258,21 @@ function _v24SubscribeRealtime() {
   if (!sb || _sbRealtimeChannel) return;
   try {
     _sbRealtimeChannel = sb
-      .channel('v24-social-posts')
+      .channel('v26-community-posts')
       .on('postgres_changes', {
         event:  'INSERT',
         schema: 'public',
-        table:  'social_posts'
+        table:  'community_posts'
       }, function(payload) {
         var newPost = payload.new;
         if (!newPost) return;
         var feedEl = document.getElementById('md-feed-posts');
         if (!feedEl) return;
-
-        // ตรวจว่าหน้า community active อยู่
         var pgSocial = document.getElementById('page-social');
         if (!pgSocial || !pgSocial.classList.contains('active')) return;
 
-        // Prepend การ์ดใหม่พร้อม animation
         var tmp = document.createElement('div');
-        tmp.innerHTML = _buildSBPostCard(newPost);
+        tmp.innerHTML = _buildSBPostCard(_normCommunityPost(newPost));
         var card = tmp.firstChild;
         if (!card) return;
         card.style.transition = 'opacity .4s, transform .4s';
@@ -30720,48 +31285,75 @@ function _v24SubscribeRealtime() {
             card.style.transform = 'translateY(0)';
           });
         });
-        if (typeof toast === 'function') toast('มีโพสต์ใหม่ในชุมชน 🆕');
-        console.log('[v24] realtime: new social_post received');
+        typeof toast === 'function' && toast('มีโพสต์ใหม่ในชุมชน 🆕');
       })
-      .subscribe(function(status) {
-        console.log('[v24] realtime status:', status);
-      });
+      // Also subscribe post_likes for live like counts
+      .on('postgres_changes', {
+        event:  '*',
+        schema: 'public',
+        table:  'post_likes'
+      }, function(payload) {
+        // อัปเดต like count แบบ lightweight ถ้าการ์ดอยู่ใน DOM
+        var postId = payload.new && payload.new.post_id;
+        if (!postId) return;
+        var card = document.querySelector('[data-post-id="' + postId + '"]');
+        if (!card) return;
+        // ไม่ overwrite ถ้า user กำลัง optimistic update — skip
+      })
+      .subscribe();
   } catch (e) {
-    console.warn('[v24] realtime subscribe error:', e.message);
+    console.warn('[v26] realtime subscribe error:', e.message);
   }
 }
 
 /* ─────────────────────────────────────────────
-   8. SUBMIT SOCIAL POST — บันทึกโพสต์ใหม่ลง DB
-      (เรียกจาก Community Feed submit form)
+   8. SUBMIT COMMUNITY POST — create_post() (v26)
+      Fallback → community_posts insert → social_posts
 ───────────────────────────────────────────── */
-window._v24SubmitSocialPost = async function(content, photos, postType) {
-  if (!sb) return { success: false, error: 'Supabase ไม่พร้อม' };
-  postType = postType || 'general';
+window._v24SubmitSocialPost = async function(content, photos, postType, propertyId, userListingId) {
+  return window._v26SubmitPost(content, photos, postType, propertyId, userListingId);
+};
 
-  // ตรวจ session
+window._v26SubmitPost = async function(content, photos, postType, propertyId, userListingId, mediaTypes) {
+  if (!sb) return { success: false, error: 'Supabase ไม่พร้อม' };
+  postType = postType || 'text';
+
   var sess = await sb.auth.getSession();
   var uid  = sess.data && sess.data.session && sess.data.session.user ? sess.data.session.user.id : null;
-
   if (!uid) return { success: false, error: 'กรุณาเข้าสู่ระบบก่อนโพสต์' };
   if (!content || !content.trim()) return { success: false, error: 'กรุณาใส่ข้อความ' };
 
   try {
-    var payload = {
-      user_id:   uid,
-      content:   content.trim(),
-      photos:    Array.isArray(photos) ? photos : [],
-      post_type: postType,
-      created_at: new Date().toISOString()
+    // 1) ลอง create_post() RPC (v26)
+    var rpcPayload = {
+      p_content:    content.trim(),
+      p_post_type:  postType,
+      p_media_urls:  Array.isArray(photos) ? photos : [],
+      p_media_types: Array.isArray(mediaTypes) ? mediaTypes : [],
+      p_tags: []
     };
+    if (propertyId)     rpcPayload.p_property_id      = propertyId;
+    if (userListingId)  rpcPayload.p_user_listing_id   = userListingId;
 
-    var res = await sb.from('social_posts').insert(payload).select().single();
-    if (res.error) throw res.error;
+    var res = await sb.rpc('create_post', rpcPayload);
 
-    console.log('[v24] social_post inserted:', res.data && res.data.id);
+    if (res.error) {
+      // 2) Fallback: insert community_posts ตรง
+      var ins = await sb.from('community_posts').insert({
+        user_id:     uid,
+        content:     content.trim(),
+        post_type:   postType,
+        media_urls:  Array.isArray(photos) ? photos : [],
+        media_types: Array.isArray(mediaTypes) ? mediaTypes : [],
+        created_at:  new Date().toISOString()
+      }).select().single();
+      if (ins.error) throw ins.error;
+      return { success: true, data: ins.data };
+    }
+
     return { success: true, data: res.data };
   } catch (e) {
-    console.warn('[v24] _v24SubmitSocialPost error:', e.message);
+    console.warn('[v26] _v26SubmitPost error:', e.message);
     return { success: false, error: e.message };
   }
 };
@@ -30790,11 +31382,11 @@ function _v24HookSocialSubmit() {
     var text = inp ? (inp.value || inp.textContent || '').trim() : '';
     if (!text) return;
 
-    var result = await window._v24SubmitSocialPost(text, [], 'general');
+    var result = await window._v26SubmitPost(text, [], 'text');
     if (result.success) {
-      console.log('[v24] social_post saved to DB');
+      // เพิ่ม feed cursor reset เพื่อให้โหลดใหม่ถ้ามี prepend
     } else {
-      console.warn('[v24] social_post DB save failed:', result.error);
+      console.warn('[v26] community_post DB save failed:', result.error);
     }
   };
 }
@@ -30823,10 +31415,11 @@ function _v24Init() {
     }, 600);
 
     setTimeout(function() {
-      // โหลด social posts เฉพาะเมื่อหน้า community active
+      // โหลด community posts เฉพาะเมื่อหน้า community active
       var pgSocial = document.getElementById('page-social');
       if (pgSocial && pgSocial.classList.contains('active')) {
-        loadSocialPostsFromDB(false).catch(function(e) { console.warn('[v24] social:', e); });
+        _feedCursorAt = null; _feedCursorId = null; _feedExhausted = false;
+        loadSocialPostsFromDB(false).catch(function(e) { console.warn('[v26] social:', e); });
       }
       // Subscribe realtime
       _v24SubscribeRealtime();
@@ -30834,24 +31427,52 @@ function _v24Init() {
       _v24HookSocialSubmit();
     }, 800);
 
-    console.log('[v24] initialization started');
+    // v26: initialization started
   }, 5000);
 }
 
-// Load social posts เมื่อ user navigate ไปหน้า community
+// Load community posts เมื่อ user navigate ไปหน้า community
 var _origShowPage = window.showPage;
 if (typeof _origShowPage === 'function') {
   window.showPage = function(page) {
     _origShowPage.apply(this, arguments);
     if (page === 'social' || page === 'community') {
       setTimeout(function() {
-        if (!_sbPostsLoaded && typeof sb !== 'undefined' && sb) {
-          loadSocialPostsFromDB(false).catch(function(e) { console.warn('[v24] social on nav:', e); });
+        if (typeof sb !== 'undefined' && sb) {
+          if (!_sbPostsLoaded) {
+            loadSocialPostsFromDB(false).catch(function(e) { console.warn('[v26] social on nav:', e); });
+          }
         }
       }, 300);
     }
   };
 }
+
+// Infinite scroll — โหลดเพิ่มเมื่อ scroll ใกล้ถึงล่างสุด
+(function() {
+  var _scrollTarget = null;
+  function _onScroll() {
+    if (_feedExhausted || _feedLoading) return;
+    var el = _scrollTarget || document.getElementById('md-feed-posts');
+    if (!el) return;
+    var pgSocial = document.getElementById('page-social');
+    if (!pgSocial || !pgSocial.classList.contains('active')) return;
+    var scrollEl = pgSocial.querySelector('.md-feed-col') || pgSocial;
+    var nearBottom = (scrollEl.scrollTop + scrollEl.clientHeight) >= (scrollEl.scrollHeight - 400);
+    if (nearBottom) {
+      loadSocialPostsFromDB(true).catch(function(e) { console.warn('[v26] infinite scroll:', e); });
+    }
+  }
+  // Attach after DOM ready
+  setTimeout(function() {
+    var pgSocial = document.getElementById('page-social');
+    if (pgSocial) {
+      var scrollEl = pgSocial.querySelector('.md-feed-col') || pgSocial;
+      scrollEl.addEventListener('scroll', _onScroll, { passive: true });
+    }
+    window.addEventListener('scroll', _onScroll, { passive: true });
+  }, 1500);
+})();
 
 // เริ่ม init หลัง DOM พร้อม
 if (document.readyState === 'loading') {
@@ -30867,11 +31488,12 @@ window._v24 = {
   loadPopularLocations:  loadPopularLocationsFromDB,
   loadFooterLinks:       loadFooterLinksFromDB,
   getPropertiesByBTS:    window._v24GetPropertiesByBTS,
-  boostPost:             window._v24BoostPost,
-  submitSocialPost:      window._v24SubmitSocialPost
+  boostPost:             window._v26BoostPost,
+  submitSocialPost:      window._v26SubmitPost
 };
+window._v26 = window._v24;  // alias
 
-console.log('[v24] Database v24 integration module loaded');
+// v26: community_posts module loaded
 
 })();
 </script>
