@@ -10743,11 +10743,32 @@ function renderMyAccount(){
   if(typeof window._isAdminUser === 'undefined') window._isAdminUser = false;
   if(user && sb && !window._adminCheckDone){
     window._adminCheckDone = true;
+    // Strategy 1: admin_users table (most reliable)
     sb.from('admin_users').select('user_id').eq('user_id', user.id).maybeSingle()
-      .then(({data}) => {
+      .then(({data, error}) => {
+        if(error && (error.message||'').includes('permission denied')) {
+          // Strategy 2: check profiles.is_admin flag
+          return sb.from('profiles').select('is_admin').eq('id', user.id).maybeSingle()
+            .then(({data: p}) => { window._isAdminUser = !!(p && p.is_admin); })
+            .catch(() => {
+              // Strategy 3: hardcoded admin email check
+              const adminEmails = window.ADMIN_EMAILS || [];
+              window._isAdminUser = adminEmails.includes(user.email || '');
+            });
+        }
         window._isAdminUser = !!data;
-        if(window._isAdminUser) renderMyAccount(); // re-render เพื่อแสดง admin tab
-      }).catch(()=>{});
+      })
+      .catch(() => {
+        // Final fallback: check user email against known admins
+        const adminEmails = window.ADMIN_EMAILS || [];
+        window._isAdminUser = adminEmails.includes(user.email || '');
+      })
+      .finally(() => {
+        if(window._isAdminUser) {
+          window._adminCheckDone = true;
+          renderMyAccount(); // re-render to show admin tab
+        }
+      });
   }
 
   if(!user && !isDevMode){
@@ -10873,8 +10894,7 @@ function renderMyAccount(){
     <button class="ma-tab" data-tab="favs" onclick="_maTab('favs',this)"><i class="fas fa-heart"></i> ${sanitize(t('ma.tab.favs'))} ${favCount?`<span style="background:var(--a);color:#fff;border-radius:20px;padding:1px 6px;font-size:10px">${favCount}</span>`:''}</button>
     <button class="ma-tab" data-tab="requests" onclick="_maTab('requests',this)"><i class="fas fa-file-alt"></i> ${sanitize(t('ma.tab.requests'))}</button>
     <button class="ma-tab" data-tab="history" onclick="_maTab('history',this)"><i class="fas fa-history"></i> ${sanitize(t('ma.tab.history'))}</button>
-    ${window._isAdminUser ? '<button class="ma-tab" data-tab="admin" onclick="_maTab(\'admin\',this);renderAdminListingsPanel()"><i class="fas fa-shield-alt"></i> Admin<span id="ma-admin-badge" style="background:#e74c3c;color:#fff;border-radius:20px;padding:1px 6px;font-size:10px;margin-left:2px"></span></button>' : ''}
-    ${window._isAdminUser ? '<button class="ma-tab" data-tab="admin-users" onclick="_maTab(\'admin-users\',this);renderAdminUsersPanel()"><i class="fas fa-users-cog"></i> จัดการ User</button>' : ''}
+    ${window._isAdminUser ? '<button class="ma-tab" data-tab="admin" onclick="_maTab(\'admin\',this);_admSubTab(\'listings\',document.getElementById(\'adm-tab-listings\'));renderAdminListingsPanel()"><i class="fas fa-shield-alt"></i> Admin<span id="ma-admin-badge" style="background:#e74c3c;color:#fff;border-radius:20px;padding:1px 6px;font-size:10px;margin-left:2px"></span></button>' : ''}
   </div>
   <!-- ═══ Profile panel ═══ -->
   <div class="ma-panel active" id="ma-panel-profile">
@@ -11048,8 +11068,17 @@ function renderMyAccount(){
       ${_maHistoryHtml(t)}
     </div>
   </div>
-  ${window._isAdminUser ? '<div class="ma-panel" id="ma-panel-admin"><div class="ma-section" id="admin-listings-section"><div style="text-align:center;padding:40px 0;color:var(--tx2)"><i class="fas fa-spinner fa-spin" style="font-size:24px"></i><div style="margin-top:8px">กำลังโหลด...</div></div></div></div>' : ''}
-  ${window._isAdminUser ? '<div class="ma-panel" id="ma-panel-admin-users"><div class="ma-section" id="admin-users-section"><div style="text-align:center;padding:40px 0;color:var(--tx2)"><i class="fas fa-spinner fa-spin" style="font-size:24px"></i><div style="margin-top:8px">กำลังโหลดข้อมูล User...</div></div></div></div>' : ''}`;
+  ${window._isAdminUser ? `<div class="ma-panel" id="ma-panel-admin">
+    <!-- Admin sub-tabs -->
+    <div style="display:flex;gap:6px;margin-bottom:16px;border-bottom:2px solid var(--lt);padding-bottom:12px;flex-wrap:wrap">
+      <button id="adm-tab-listings" class="adm-subtab active" onclick="_admSubTab('listings',this)" style="padding:7px 14px;border:1.5px solid var(--p);border-radius:8px;font-size:12px;font-weight:700;background:var(--p);color:#fff;cursor:pointer"><i class="fas fa-list"></i> จัดการประกาศ</button>
+      <button id="adm-tab-users" class="adm-subtab" onclick="_admSubTab('users',this)" style="padding:7px 14px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;font-weight:700;background:transparent;color:var(--tx);cursor:pointer"><i class="fas fa-users"></i> จัดการ Users</button>
+      <button id="adm-tab-tokens" class="adm-subtab" onclick="_admSubTab('tokens',this)" style="padding:7px 14px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;font-weight:700;background:transparent;color:var(--tx);cursor:pointer"><i class="fas fa-coins"></i> Token Orders</button>
+    </div>
+    <div class="ma-section" id="admin-listings-section"><div style="text-align:center;padding:40px 0;color:var(--tx2)"><i class="fas fa-spinner fa-spin" style="font-size:24px"></i><div style="margin-top:8px">กำลังโหลด...</div></div></div>
+    <div class="ma-section" id="admin-users-section" style="display:none"></div>
+    <div class="ma-section" id="admin-tokens-section" style="display:none"></div>
+  </div>` : ''}`;
   // Initialize profile in locked/view mode after render
   setTimeout(_maInitProfileLockState, 50);
   // โหลดสถานะ marketing consent
@@ -11412,6 +11441,7 @@ async function submitUserListing() {
       location:          val('ul-location'),
       near_bts:          val('ul-near-bts'),
       nearby_places:     nearby.length ? nearby : null,
+      map_url:           val('ul-map-url') || null,
       // ── Rent extras ──
       deposit:           isRent ? (num('ul-deposit') || null) : null,
       advance_payment:   isRent ? (num('ul-advance') || null) : null,
@@ -11531,12 +11561,10 @@ async function renderMaListingsPanel() {
               ${ul.status === 'อนุมัติ' && ul.property_id ? `<button onclick="showPage('property','${ul.property_id}')" style="font-size:11px;padding:5px 11px;background:var(--p);color:#fff;border:none;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px"><i class="fas fa-eye"></i> ดูประกาศ</button>` : ''}
               ${ul.status === 'อนุมัติ' && !ul.is_boosted ? `<button onclick="boostMyListing('${ul.id}')" style="font-size:11px;padding:5px 11px;background:linear-gradient(135deg,#f39c12,#e67e22);color:#fff;border:none;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px" title="ใช้ 1 Token เพื่อ Boost ประกาศ 7 วัน"><i class="fas fa-rocket"></i> Boost</button>` : ''}
               ${ul.status === 'อนุมัติ' && ul.is_boosted ? `<span style="font-size:11px;padding:5px 11px;background:#f39c1222;color:#f39c12;border:1px solid #f39c1244;border-radius:8px;display:inline-flex;align-items:center;gap:4px"><i class="fas fa-rocket"></i> กำลัง Boost</span>` : ''}
-              <button onclick="openEditListingModal('${ul.id}')" style="font-size:11px;padding:5px 11px;background:#3498db22;color:#2980b9;border:1px solid #3498db44;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px"><i class="fas fa-edit"></i> แก้ไข</button>
-              ${ul.status === 'อนุมัติ' ? `<button onclick="toggleMyListingVisibility('${ul.id}','อนุมัติ')" style="font-size:11px;padding:5px 11px;background:#95a5a622;color:#7f8c8d;border:1px solid #95a5a644;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px"><i class="fas fa-eye-slash"></i> หยุดแสดง</button>` : ''}
-              ${ul.status === 'ปิด' ? `<button onclick="toggleMyListingVisibility('${ul.id}','ปิด')" style="font-size:11px;padding:5px 11px;background:#2ecc7122;color:#27ae60;border:1px solid #2ecc7144;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px"><i class="fas fa-eye"></i> เปิดแสดง</button>` : ''}
               <button onclick="shareMyListing('${ul.id}','${ul.property_id||''}')" style="font-size:11px;padding:5px 11px;background:#10b98122;color:#10b981;border:1px solid #10b98144;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px"><i class="fas fa-share-alt"></i> แชร์</button>
               <button onclick="openReportListingModal('${ul.id}','${ul.property_id||''}')" style="font-size:11px;padding:5px 11px;background:#f1c40f22;color:#b7950b;border:1px solid #f1c40f44;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px"><i class="fas fa-flag"></i> รายงาน</button>
-              <button onclick="deleteMyListing('${ul.id}')" style="font-size:11px;padding:5px 11px;background:#e74c3c22;color:#e74c3c;border:1px solid #e74c3c44;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px"><i class="fas fa-trash-alt"></i> ลบ</button>
+              <button onclick="editUserListing('${ul.id}')" style="font-size:11px;padding:5px 11px;background:#3498db22;color:#2980b9;border:1px solid #3498db44;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px" title="แก้ไขข้อมูล ไม่หัก Token"><i class="fas fa-edit"></i> แก้ไข</button>
+              <button onclick="deleteMyListing('${ul.id}')" style="font-size:11px;padding:5px 11px;background:#e74c3c22;color:#e74c3c;border:1px solid #e74c3c44;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px" title="ลบประกาศ (ไม่ได้ Token คืน)"><i class="fas fa-trash-alt"></i> ลบ</button>
             </div>
           </div>
         </div>`;
@@ -11677,9 +11705,11 @@ async function renderAdminListingsPanel() {
                 <i class="fas fa-times"></i> Reject
               </button>
               <input id="note-${r.id}" type="text" placeholder="หมายเหตุ (ไม่บังคับ)" style="flex:1;min-width:120px;padding:6px 10px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px">
+              <button onclick="adminEditListing('${r.id}')" style="background:#3498db22;color:#2980b9;border:1px solid #3498db44;border-radius:8px;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:5px"><i class="fas fa-edit"></i> แก้ไข</button>
             </div>` : `
             <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
               ${r.status === 'อนุมัติ' && r.property_id ? `<button onclick="showPage('property','${r.property_id}')" style="background:var(--p);color:#fff;border:none;border-radius:8px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:4px"><i class="fas fa-eye"></i> ดูประกาศ</button>` : ''}
+              <button onclick="adminEditListing('${r.id}')" style="background:#3498db22;color:#2980b9;border:1px solid #3498db44;border-radius:8px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:4px"><i class="fas fa-edit"></i> แก้ไข</button>
               ${r.status !== 'ปฏิเสธ' && r.status !== 'หมดอายุ' ? `<button onclick="adminRejectListingPrompt('${r.id}','${sanitize(r.title||'').replace(/'/g, "\'")}')" style="background:#e74c3c22;color:#e74c3c;border:1px solid #e74c3c44;border-radius:8px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:4px"><i class="fas fa-ban"></i> ปิดประกาศ</button>` : ''}
             </div>`}
           </div>
@@ -11814,185 +11844,347 @@ async function adminRejectListing(listingId, note) {
   }
 }
 
+
 // ══════════════════════════════════════════════════════════════
-//  ADMIN: renderAdminUsersPanel() — จัดการ User profiles
+//  ADMIN: Sub-tab navigation
+// ══════════════════════════════════════════════════════════════
+function _admSubTab(name, el) {
+  document.querySelectorAll('.adm-subtab').forEach(b => {
+    b.style.background = 'transparent';
+    b.style.color = 'var(--tx)';
+    b.style.borderColor = 'var(--bd)';
+  });
+  if(el){ el.style.background='var(--p)'; el.style.color='#fff'; el.style.borderColor='var(--p)'; }
+  document.getElementById('admin-listings-section') && (document.getElementById('admin-listings-section').style.display = name==='listings'?'':'none');
+  document.getElementById('admin-users-section')   && (document.getElementById('admin-users-section').style.display   = name==='users'?'':'none');
+  document.getElementById('admin-tokens-section')  && (document.getElementById('admin-tokens-section').style.display  = name==='tokens'?'':'none');
+  if(name==='users')  renderAdminUsersPanel();
+  if(name==='tokens') renderAdminTokensPanel();
+  if(name==='listings') renderAdminListingsPanel();
+}
+
+// ══════════════════════════════════════════════════════════════
+//  ADMIN: แก้ไขทรัพย์ (edit user_listing ได้จาก admin)
+// ══════════════════════════════════════════════════════════════
+async function adminEditListing(listingId) {
+  if(!sb||!window._isAdminUser) return;
+  try {
+    const { data, error } = await sb.from('user_listings').select('*').eq('id', listingId).single();
+    if(error) throw error;
+
+    // Build a quick edit modal
+    const existing = document.getElementById('admin-edit-modal');
+    if(existing) existing.remove();
+    const m = document.createElement('div');
+    m.id = 'admin-edit-modal';
+    m.className = 'ov';
+    m.onclick = e => { if(e.target===m) m.remove(); };
+    m.innerHTML = `<div class="modal" style="max-width:560px;max-height:90vh;overflow-y:auto;border-radius:18px">
+      <div class="mhd" style="position:sticky;top:0;z-index:10;background:#fff;border-bottom:1.5px solid var(--lt)">
+        <h2><i class="fas fa-edit" style="color:var(--a)"></i> Admin แก้ไขประกาศ</h2>
+        <span class="mclose" onclick="document.getElementById('admin-edit-modal').remove()">×</span>
+      </div>
+      <div class="mbody" style="padding:20px">
+        <div style="background:#fff3cd;border:1px solid #ffc10788;border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:12px;color:#856404">
+          <i class="fas fa-shield-alt"></i> แก้ไขโดย Admin — การเปลี่ยนแปลงจะมีผลทันที
+        </div>
+        ${['title','property_type','transaction','price','province','district','location','near_bts','description','contact_name','contact_phone','contact_line','map_url','admin_note'].map(f => `
+        <div class="ma-field">
+          <label>${f}</label>
+          <input type="text" id="aedit-${f}" value="${_san(String(data[f]||''))}" style="width:100%;padding:9px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;box-sizing:border-box">
+        </div>`).join('')}
+        <div class="ma-field">
+          <label>status</label>
+          <select id="aedit-status" style="width:100%;padding:9px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px">
+            ${['รอตรวจสอบ','อนุมัติ','ปฏิเสธ','ปิด','หมดอายุ'].map(s=>`<option value="${s}" ${data.status===s?'selected':''}>${s}</option>`).join('')}
+          </select>
+        </div>
+        <div id="aedit-err" style="display:none;color:#e74c3c;font-size:13px;padding:8px;background:#fef2f2;border-radius:8px;margin-bottom:8px"></div>
+        <button onclick="_adminSaveEditListing('${listingId}')"
+          style="width:100%;padding:14px;background:linear-gradient(135deg,var(--p),#2a5298);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
+          <i class="fas fa-save"></i> บันทึกการแก้ไข
+        </button>
+      </div>
+    </div>`;
+    document.body.appendChild(m);
+    m.style.display = 'flex';
+  } catch(e) {
+    toast('❌ โหลดข้อมูลไม่สำเร็จ: '+e.message, 'error');
+  }
+}
+
+async function _adminSaveEditListing(listingId) {
+  if(!sb||!window._isAdminUser) return;
+  const f = id => (document.getElementById('aedit-'+id)?.value||'').trim();
+  const btn = document.querySelector('#admin-edit-modal button[onclick^="_adminSave"]');
+  if(btn){ btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> กำลังบันทึก...'; }
+  const errEl = document.getElementById('aedit-err');
+  if(errEl) errEl.style.display='none';
+  try {
+    const updateData = {
+      title:          f('title'),
+      property_type:  f('property_type'),
+      transaction:    f('transaction'),
+      price:          parseFloat(f('price'))||0,
+      province:       f('province'),
+      district:       f('district'),
+      location:       f('location'),
+      near_bts:       f('near_bts'),
+      description:    f('description'),
+      contact_name:   f('contact_name'),
+      contact_phone:  f('contact_phone'),
+      contact_line:   f('contact_line'),
+      map_url:        f('map_url')||null,
+      admin_note:     f('admin_note'),
+      status:         f('status'),
+      updated_at:     new Date().toISOString()
+    };
+    const { error } = await sb.from('user_listings').update(updateData).eq('id', listingId);
+    if(error) throw error;
+    toast('✅ บันทึกการแก้ไขสำเร็จ');
+    document.getElementById('admin-edit-modal')?.remove();
+    renderAdminListingsPanel();
+  } catch(e) {
+    if(errEl){ errEl.textContent='เกิดข้อผิดพลาด: '+e.message; errEl.style.display='block'; }
+    if(btn){ btn.disabled=false; btn.innerHTML='<i class="fas fa-save"></i> บันทึกการแก้ไข'; }
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  ADMIN: จัดการ Users — ใช้ admin_get_users RPC
 // ══════════════════════════════════════════════════════════════
 async function renderAdminUsersPanel() {
   const section = document.getElementById('admin-users-section');
-  if (!section) return;
-  if (!sb || !window._isAdminUser) {
-    section.innerHTML = '<div style="padding:20px;color:#e74c3c;text-align:center"><i class="fas fa-lock"></i> ไม่มีสิทธิ์เข้าถึง</div>';
+  if(!section) return;
+  if(!sb||!window._isAdminUser){
+    section.innerHTML='<div style="padding:20px;color:#e74c3c;text-align:center"><i class="fas fa-lock"></i> ไม่มีสิทธิ์เข้าถึง</div>';
     return;
   }
-  section.innerHTML = '<div style="text-align:center;padding:40px 0;color:var(--tx2)"><i class="fas fa-spinner fa-spin" style="font-size:24px"></i><div style="margin-top:8px;font-size:13px">กำลังโหลดรายชื่อ User...</div></div>';
+  section.innerHTML = '<div style="text-align:center;padding:40px;color:var(--tx2)"><i class="fas fa-spinner fa-spin" style="font-size:24px"></i><div style="margin-top:8px">กำลังโหลด Users...</div></div>';
+
   try {
-    // โหลด user profiles ทั้งหมด
-    const { data: profiles, error } = await sb
-      .from('user_profiles')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(200);
-    if (error) throw error;
-    const all = profiles || [];
+    // ใช้ view v_admin_users (ถ้ามี) หรือ admin_users join profiles
+    let users = [];
+    let loadErr = null;
 
-    // โหลด user listings count per user
-    const { data: listingCounts } = await sb
-      .from('user_listings')
-      .select('user_id, status')
-      .limit(1000);
-    const lcMap = {};
-    (listingCounts || []).forEach(l => {
-      if(!lcMap[l.user_id]) lcMap[l.user_id] = { total:0, approved:0, pending:0 };
-      lcMap[l.user_id].total++;
-      if(l.status==='อนุมัติ') lcMap[l.user_id].approved++;
-      if(l.status==='รอตรวจสอบ') lcMap[l.user_id].pending++;
-    });
-
-    function _renderUserRow(p) {
-      const lc = lcMap[p.user_id] || { total:0, approved:0, pending:0 };
-      const avatarHtml = p.avatar_url
-        ? `<img src="${sanitize(p.avatar_url)}" style="width:44px;height:44px;border-radius:50%;object-fit:cover">`
-        : `<div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--p),#2a5298);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:18px">${(p.display_name||'?')[0].toUpperCase()}</div>`;
-      return `<div id="aur-${p.user_id}" style="border:1.5px solid var(--bd);border-radius:12px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap">
-        ${avatarHtml}
-        <div style="flex:1;min-width:180px">
-          <div style="font-weight:700;font-size:13px;color:var(--p);margin-bottom:2px">${sanitize(p.display_name||'ไม่มีชื่อ')}</div>
-          <div style="font-size:11px;color:var(--gr);margin-bottom:4px">${sanitize(p.user_id||'')}</div>
-          ${p.phone ? `<div style="font-size:12px;color:var(--tx2)"><i class="fas fa-phone" style="color:var(--p);width:14px"></i> ${sanitize(p.phone)}</div>` : ''}
-          ${p.line_id ? `<div style="font-size:12px;color:var(--tx2)"><i class="fab fa-line" style="color:#06C755;width:14px"></i> ${sanitize(p.line_id)}</div>` : ''}
-          ${p.province ? `<div style="font-size:12px;color:var(--tx2)"><i class="fas fa-map-marker-alt" style="color:var(--a);width:14px"></i> ${sanitize(p.province)}</div>` : ''}
-          <div style="font-size:11px;color:var(--tx2);margin-top:6px;display:flex;gap:10px;flex-wrap:wrap">
-            <span style="background:${p.show_on_agents?'#10b98122':'#95a5a622'};color:${p.show_on_agents?'#059669':'#7f8c8d'};padding:2px 8px;border-radius:20px;border:1px solid ${p.show_on_agents?'#10b98144':'#95a5a644'}">
-              <i class="fas ${p.show_on_agents?'fa-id-badge':'fa-user-slash'}"></i> ${p.show_on_agents?'แสดงที่หน้าตัวแทน':'ไม่แสดง'}
-            </span>
-            <span style="background:#1B3A6B22;color:var(--p);padding:2px 8px;border-radius:20px;border:1px solid #1B3A6B44">
-              <i class="fas fa-building"></i> ${lc.total} ประกาศ (${lc.approved} approved, ${lc.pending} pending)
-            </span>
-          </div>
-          ${p.created_at ? `<div style="font-size:11px;color:rgba(0,0,0,.4);margin-top:4px">สมัครวันที่: ${new Date(p.created_at).toLocaleDateString('th-TH')}</div>` : ''}
-        </div>
-        <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
-          ${p.show_on_agents ? `<button onclick="adminToggleUserAgentProfile('${p.user_id}', false)" style="font-size:11px;padding:5px 12px;background:#95a5a622;color:#7f8c8d;border:1px solid #95a5a644;border-radius:8px;cursor:pointer;white-space:nowrap"><i class="fas fa-eye-slash"></i> ซ่อนโปรไฟล์</button>` : `<button onclick="adminToggleUserAgentProfile('${p.user_id}', true)" style="font-size:11px;padding:5px 12px;background:#10b98122;color:#059669;border:1px solid #10b98144;border-radius:8px;cursor:pointer;white-space:nowrap"><i class="fas fa-id-badge"></i> เปิดโปรไฟล์</button>`}
-          <button onclick="adminViewUserListings('${p.user_id}','${sanitize(p.display_name||'User')}')" style="font-size:11px;padding:5px 12px;background:#3498db22;color:#2980b9;border:1px solid #3498db44;border-radius:8px;cursor:pointer;white-space:nowrap"><i class="fas fa-list"></i> ดูประกาศ</button>
-          <button onclick="adminDeleteUserProfile('${p.user_id}','${sanitize(p.display_name||'User')}')" style="font-size:11px;padding:5px 12px;background:#e74c3c22;color:#e74c3c;border:1px solid #e74c3c44;border-radius:8px;cursor:pointer;white-space:nowrap"><i class="fas fa-user-times"></i> ลบโปรไฟล์</button>
-        </div>
-      </div>`;
+    // ลอง 1: RPC admin_get_users
+    try {
+      const r = await sb.rpc('admin_get_users');
+      if(!r.error && Array.isArray(r.data)) { users = r.data; }
+      else throw r.error;
+    } catch(e1) {
+      // ลอง 2: query profiles table directly
+      try {
+        const r2 = await sb.from('profiles').select('id, display_name, email, token_balance, created_at, is_banned').order('created_at',{ascending:false}).limit(200);
+        if(!r2.error) { users = r2.data||[]; }
+        else throw r2.error;
+      } catch(e2) {
+        // ลอง 3: admin_users + user_listings count
+        try {
+          const r3 = await sb.from('admin_users').select('user_id, created_at').order('created_at',{ascending:false}).limit(200);
+          if(!r3.error) { users = (r3.data||[]).map(u=>({id:u.user_id, display_name:'Admin', created_at:u.created_at, is_admin:true})); }
+          else throw r3.error;
+        } catch(e3) {
+          loadErr = e3.message||'ไม่สามารถโหลด Users ได้ — ต้องการ view profiles หรือ RPC admin_get_users';
+        }
+      }
     }
 
-    section.innerHTML = `
-      <!-- Summary -->
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:20px">
-        <div style="background:linear-gradient(135deg,var(--p),#2a5298);color:#fff;border-radius:12px;padding:14px;text-align:center">
-          <div style="font-size:26px;font-weight:900">${all.length}</div>
-          <div style="font-size:11px;opacity:.85">User ทั้งหมด</div>
-        </div>
-        <div style="background:linear-gradient(135deg,#10b981,#059669);color:#fff;border-radius:12px;padding:14px;text-align:center">
-          <div style="font-size:26px;font-weight:900">${all.filter(p=>p.show_on_agents).length}</div>
-          <div style="font-size:11px;opacity:.85">แสดงหน้าตัวแทน</div>
-        </div>
-        <div style="background:linear-gradient(135deg,#f39c12,#e67e22);color:#fff;border-radius:12px;padding:14px;text-align:center">
-          <div style="font-size:26px;font-weight:900">${Object.values(lcMap).reduce((s,v)=>s+v.pending,0)}</div>
-          <div style="font-size:11px;opacity:.85">รอ Approve</div>
-        </div>
-      </div>
-      <!-- Search box -->
-      <div style="margin-bottom:14px">
-        <input type="text" id="admin-user-search" placeholder="🔍 ค้นหาชื่อ, user_id..." oninput="_adminFilterUsers()"
-          style="width:100%;padding:9px 14px;border:1.5px solid var(--bd);border-radius:10px;font-size:13px;background:var(--bg);color:var(--tx);box-sizing:border-box">
-      </div>
-      <!-- User list -->
-      <div id="admin-user-list">
-        ${all.length ? all.map(_renderUserRow).join('') : '<div style="text-align:center;padding:30px;color:var(--tx2)">ไม่มีข้อมูล User</div>'}
+    if(loadErr){
+      section.innerHTML = `<div style="padding:20px;border-radius:12px;background:#fff3cd;color:#856404;font-size:13px">
+        <i class="fas fa-exclamation-triangle"></i> <strong>จำเป็นต้องสร้าง RPC หรือ View:</strong><br><br>
+        ${loadErr}<br><br>
+        <strong>SQL สำหรับสร้าง profiles view ที่ Admin ใช้ได้:</strong><br>
+        <code style="display:block;background:#1a1a2e;color:#c8922a;padding:10px;border-radius:8px;margin-top:8px;font-size:11px;word-break:break-all">
+create or replace view v_admin_users as<br>
+select id, raw_user_meta_data->>'display_name' as display_name, email, created_at from auth.users;<br>
+grant select on v_admin_users to authenticated;
+        </code>
       </div>`;
+      return;
+    }
 
-    // Store for search
-    window._adminUserProfiles = all;
-    window._adminUserListingCounts = lcMap;
-    window._adminUserRenderRowFn = _renderUserRow;
+    const searchId = 'adm-user-search-'+Date.now();
+    section.innerHTML = `
+      <div style="margin-bottom:16px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <input id="${searchId}" type="text" placeholder="🔍 ค้นหา User (ชื่อ, อีเมล, ID)..." oninput="_admFilterUsers(this.value)" style="flex:1;min-width:200px;padding:9px 12px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px">
+        <span style="font-size:12px;color:var(--tx2)">ทั้งหมด ${users.length} คน</span>
+      </div>
+      <div id="adm-users-list">${_renderAdmUserRows(users)}</div>`;
+    window._admAllUsers = users;
+    window._admUserSearchId = searchId;
   } catch(e) {
     section.innerHTML = `<div style="padding:20px;color:#e74c3c;text-align:center"><i class="fas fa-exclamation-circle"></i> เกิดข้อผิดพลาด: ${e.message}</div>`;
   }
 }
 
-function _adminFilterUsers() {
-  const q = (document.getElementById('admin-user-search')?.value||'').toLowerCase();
-  const all = window._adminUserProfiles || [];
-  const fn = window._adminUserRenderRowFn;
-  const list = document.getElementById('admin-user-list');
-  if(!list||!fn) return;
-  const filtered = q ? all.filter(p =>
-    (p.display_name||'').toLowerCase().includes(q) ||
-    (p.user_id||'').toLowerCase().includes(q) ||
-    (p.phone||'').includes(q) ||
-    (p.line_id||'').toLowerCase().includes(q)
+function _admFilterUsers(query) {
+  const all = window._admAllUsers||[];
+  const q = query.toLowerCase();
+  const filtered = q ? all.filter(u =>
+    (u.display_name||'').toLowerCase().includes(q) ||
+    (u.email||'').toLowerCase().includes(q) ||
+    (u.id||'').toLowerCase().includes(q)
   ) : all;
-  list.innerHTML = filtered.length ? filtered.map(fn).join('') : '<div style="text-align:center;padding:20px;color:var(--tx2)">ไม่พบ User</div>';
+  const list = document.getElementById('adm-users-list');
+  if(list) list.innerHTML = _renderAdmUserRows(filtered);
 }
 
-async function adminToggleUserAgentProfile(userId, makeVisible) {
-  if(!sb||!window._isAdminUser) return;
-  try {
-    const { error } = await sb.from('user_profiles')
-      .update({ show_on_agents: makeVisible, updated_at: new Date().toISOString() })
-      .eq('user_id', userId);
-    if(error){ toast(error.message,true); return; }
-    toast(makeVisible ? '✅ เปิดแสดงโปรไฟล์แล้ว' : '✅ ซ่อนโปรไฟล์แล้ว');
-    renderAdminUsersPanel();
-    // อัปเดต agents array ด้วย
-    const idx = agents.findIndex(a => a._userId === userId);
-    if(idx >= 0 && !makeVisible){ agents.splice(idx, 1); if(typeof renderAgents==='function') renderAgents(); }
-  } catch(e){ toast('เกิดข้อผิดพลาด: '+e.message, true); }
-}
-
-async function adminViewUserListings(userId, displayName) {
-  if(!sb||!window._isAdminUser) return;
-  const { data } = await sb.from('user_listings').select('*').eq('user_id', userId).order('created_at',{ascending:false});
-  const listings = data || [];
-  const mo = document.createElement('div');
-  mo.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;overflow-y:auto;padding:16px;display:flex;align-items:flex-start;justify-content:center';
-  mo.onclick = function(e){ if(e.target===this) this.remove(); };
-  mo.innerHTML = `
-    <div style="background:var(--bg);border-radius:16px;padding:24px;width:100%;max-width:580px;margin:auto">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
-        <h3 style="margin:0;font-size:15px;color:var(--p)"><i class="fas fa-list" style="color:var(--a)"></i> ประกาศของ ${sanitize(displayName)} (${listings.length})</h3>
-        <button onclick="this.closest('[style*=fixed]').remove()" style="background:transparent;border:none;font-size:20px;color:var(--tx2);cursor:pointer">×</button>
+function _renderAdmUserRows(users) {
+  if(!users.length) return '<div style="text-align:center;padding:30px;color:var(--tx2)">ไม่พบ User</div>';
+  return users.map(u => {
+    const name   = _san(u.display_name||u.full_name||u.email||u.id||'Unknown');
+    const email  = _san(u.email||'');
+    const token  = u.token_balance!=null ? u.token_balance : '?';
+    const joined = u.created_at ? new Date(u.created_at).toLocaleDateString('th-TH') : '?';
+    const isBanned = u.is_banned;
+    return `<div style="border:1.5px solid var(--bd);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;${isBanned?'opacity:.6':''}">
+      <div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--p),#2a5298);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0">${name.charAt(0).toUpperCase()}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:700;font-size:13px;color:var(--p)">${name} ${isBanned?'<span style="background:#e74c3c;color:#fff;font-size:10px;padding:1px 6px;border-radius:10px">BANNED</span>':''}</div>
+        <div style="font-size:11px;color:var(--tx2)">${email}</div>
+        <div style="font-size:11px;color:var(--tx2)">Token: <strong>${token}</strong> · เข้าร่วม: ${joined}</div>
       </div>
-      ${listings.length ? listings.map(ul => {
-        const sc = {รอตรวจสอบ:'#f39c12',อนุมัติ:'#2ecc71',ปฏิเสธ:'#e74c3c',ปิด:'#95a5a6',หมดอายุ:'#7f8c8d'}[ul.status]||'#bbb';
-        return `<div style="border:1.5px solid var(--bd);border-radius:10px;padding:12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
-          <div>
-            <div style="font-weight:700;font-size:13px;color:var(--tx);margin-bottom:3px">${sanitize(ul.title||'ไม่มีชื่อ')}</div>
-            <div style="font-size:11px;color:var(--tx2)">${ul.property_type||''} · ฿${(ul.price||0).toLocaleString()} · ${sanitize(ul.province||'')} ${sanitize(ul.location||'')}</div>
-            <div style="font-size:11px;color:rgba(0,0,0,.4);margin-top:4px">${new Date(ul.created_at).toLocaleDateString('th-TH')}</div>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:5px;align-items:flex-end">
-            <span style="background:${sc}22;color:${sc};border:1px solid ${sc}44;border-radius:20px;padding:2px 9px;font-size:10px;font-weight:700;white-space:nowrap">${ul.status}</span>
-            ${ul.status==='รอตรวจสอบ' ? `<button onclick="adminApproveListing('${ul.id}');this.closest('[style*=fixed]').remove()" style="font-size:10px;padding:4px 10px;background:#2ecc7122;color:#27ae60;border:1px solid #2ecc7144;border-radius:8px;cursor:pointer">Approve</button>` : ''}
-            <button onclick="if(confirm('ลบประกาศ?'))sb.from('user_listings').delete().eq('id','${ul.id}').then(()=>{toast('ลบแล้ว');this.closest('div[style*=border]').remove();})" style="font-size:10px;padding:4px 10px;background:#e74c3c22;color:#e74c3c;border:1px solid #e74c3c44;border-radius:8px;cursor:pointer">ลบ</button>
-          </div>
-        </div>`;
-      }).join('') : '<div style="text-align:center;padding:30px;color:var(--tx2)">ไม่มีประกาศ</div>'}
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button onclick="_admAdjustToken('${u.id}','${name}')" style="font-size:11px;padding:5px 10px;background:#f39c1222;color:#e67e22;border:1px solid #f39c1244;border-radius:8px;cursor:pointer"><i class="fas fa-coins"></i> Token</button>
+        <button onclick="_admToggleBan('${u.id}','${name}',${!!isBanned})" style="font-size:11px;padding:5px 10px;background:${isBanned?'#2ecc7122':'#e74c3c22'};color:${isBanned?'#27ae60':'#e74c3c'};border:1px solid ${isBanned?'#2ecc7144':'#e74c3c44'};border-radius:8px;cursor:pointer">
+          <i class="fas ${isBanned?'fa-user-check':'fa-user-slash'}"></i> ${isBanned?'Unban':'Ban'}
+        </button>
+      </div>
     </div>`;
-  document.body.appendChild(mo);
+  }).join('');
 }
 
-async function adminDeleteUserProfile(userId, displayName) {
-  if(!sb||!window._isAdminUser) return;
-  const confirmed = confirm(`⚠️ ลบโปรไฟล์ของ "${displayName}"?\n\nข้อมูลโปรไฟล์จะถูกลบ (ประกาศยังคงอยู่)\n\nกด OK เพื่อยืนยัน`);
+async function _admAdjustToken(userId, userName) {
+  const amount = prompt(`ปรับ Token สำหรับ "${userName}"
+
+ใส่จำนวน Token (บวก=เพิ่ม, ลบ=หัก):`, '0');
+  if(amount===null||isNaN(parseInt(amount))) return;
+  const delta = parseInt(amount);
+  if(!delta){ toast('ไม่มีการเปลี่ยนแปลง'); return; }
+  try {
+    // ลอง RPC admin_adjust_token ก่อน
+    let error;
+    try {
+      const r = await sb.rpc('admin_adjust_token', { p_user_id: userId, p_delta: delta });
+      error = r.error;
+    } catch(e) {
+      // fallback: update profiles
+      const r2 = await sb.from('profiles').update({ token_balance: sb.rpc ? undefined : undefined }).eq('id', userId);
+      // ใช้ raw increment
+      const { error: e2 } = await sb.rpc('increment_token', { p_user_id: userId, p_amount: delta }).catch(() =>
+        sb.from('profiles').select('token_balance').eq('id',userId).single().then(({ data }) =>
+          sb.from('profiles').update({ token_balance: Math.max(0,(data?.token_balance||0)+delta), updated_at: new Date().toISOString() }).eq('id',userId)
+        )
+      );
+      error = e2;
+    }
+    if(error) throw error;
+    toast(`✅ ปรับ Token ${delta>0?'+':''}${delta} ให้ "${userName}" แล้ว`);
+    renderAdminUsersPanel();
+  } catch(e) {
+    toast('❌ '+e.message, 'error');
+  }
+}
+
+async function _admToggleBan(userId, userName, isBanned) {
+  const action = isBanned ? 'Unban' : 'Ban';
+  const confirmed = confirm(`${action} user "${userName}"?\n\n${isBanned?'User จะสามารถใช้งานได้ตามปกติ':'User จะไม่สามารถล็อกอินหรือใช้งานได้'}`);
   if(!confirmed) return;
   try {
-    const { error } = await sb.from('user_profiles').delete().eq('user_id', userId);
-    if(error){ toast(error.message,true); return; }
-    // ลบออกจาก agents array ด้วย
-    const idx = agents.findIndex(a => a._userId === userId);
-    if(idx >= 0){ agents.splice(idx, 1); if(typeof renderAgents==='function') renderAgents(); }
-    toast('✅ ลบโปรไฟล์แล้ว');
-    document.getElementById('aur-'+userId)?.remove();
-    window._adminUserProfiles = (window._adminUserProfiles||[]).filter(p => p.user_id !== userId);
-  } catch(e){ toast('เกิดข้อผิดพลาด: '+e.message, true); }
+    const { error } = await sb.from('profiles').update({ is_banned: !isBanned, updated_at: new Date().toISOString() }).eq('id', userId);
+    if(error) throw error;
+    toast(`✅ ${action} "${userName}" เรียบร้อยแล้ว`);
+    renderAdminUsersPanel();
+  } catch(e) {
+    toast('❌ '+e.message, 'error');
+  }
 }
 
+// ══════════════════════════════════════════════════════════════
+//  ADMIN: Token Orders panel
+// ══════════════════════════════════════════════════════════════
+async function renderAdminTokensPanel() {
+  const section = document.getElementById('admin-tokens-section');
+  if(!section) return;
+  if(!sb||!window._isAdminUser){
+    section.innerHTML='<div style="padding:20px;color:#e74c3c;text-align:center"><i class="fas fa-lock"></i> ไม่มีสิทธิ์เข้าถึง</div>';
+    return;
+  }
+  section.innerHTML='<div style="text-align:center;padding:40px;color:var(--tx2)"><i class="fas fa-spinner fa-spin" style="font-size:24px"></i><div style="margin-top:8px">กำลังโหลด...</div></div>';
+  try {
+    const { data, error } = await sb.from('token_orders')
+      .select('*').order('created_at',{ascending:false}).limit(100);
+    if(error) throw error;
+    const orders = data||[];
+    const pending = orders.filter(o=>o.status==='pending'||o.status==='รอตรวจสอบ');
+    section.innerHTML = `
+      <div style="font-size:14px;font-weight:800;color:var(--p);margin-bottom:12px"><i class="fas fa-coins" style="color:#f39c12"></i> Token Orders ทั้งหมด ${orders.length} รายการ · รอตรวจสอบ <span style="background:#f39c12;color:#fff;border-radius:10px;padding:1px 7px">${pending.length}</span></div>
+      ${orders.map(o => {
+        const sc = o.status==='pending'||o.status==='รอตรวจสอบ'?'#f39c12':o.status==='approved'||o.status==='อนุมัติ'?'#2ecc71':'#e74c3c';
+        return `<div style="border:1.5px solid ${o.status==='pending'||o.status==='รอตรวจสอบ'?'#f39c12':'var(--bd)'};border-radius:12px;padding:12px 14px;margin-bottom:8px">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px">
+            <div>
+              <div style="font-weight:700;font-size:13px">${_san(o.package_name||o.package_id||'-')}</div>
+              <div style="font-size:11px;color:var(--tx2)">${_san(o.user_email||o.user_id||'')} · ${new Date(o.created_at).toLocaleDateString('th-TH')}</div>
+            </div>
+            <span style="background:${sc}22;color:${sc};border:1px solid ${sc}44;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;flex-shrink:0">${_san(o.status)}</span>
+          </div>
+          <div style="font-size:12px;color:var(--tx2)">฿${(o.amount||0).toLocaleString()} · ${o.tokens||0} Token · ${_san(o.payment_method||'?')}</div>
+          ${o.status==='pending'||o.status==='รอตรวจสอบ'?`
+          <div style="margin-top:10px;display:flex;gap:8px">
+            <button onclick="adminApproveToken('${o.id}')" style="background:linear-gradient(135deg,#2ecc71,#27ae60);color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer"><i class="fas fa-check"></i> Approve</button>
+            <button onclick="adminRejectToken('${o.id}')" style="background:#e74c3c22;color:#e74c3c;border:1px solid #e74c3c44;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer"><i class="fas fa-times"></i> Reject</button>
+          </div>`:''}
+        </div>`;
+      }).join('')}`;
+  } catch(e) {
+    section.innerHTML=`<div style="padding:20px;color:#e74c3c;text-align:center"><i class="fas fa-exclamation-circle"></i> ${e.message}</div>`;
+  }
+}
 
+async function adminApproveToken(orderId) {
+  if(!sb||!window._isAdminUser) return;
+  try {
+    const r = await sb.rpc('admin_approve_token_order', { p_order_id: orderId });
+    if(r.error) throw r.error;
+    toast('✅ Approve Token Order สำเร็จ');
+    renderAdminTokensPanel();
+  } catch(e) {
+    // Fallback: manual update
+    try {
+      const { data: ord } = await sb.from('token_orders').select('*').eq('id',orderId).single();
+      if(!ord) throw new Error('ไม่พบ order');
+      await sb.from('token_orders').update({status:'อนุมัติ',updated_at:new Date().toISOString()}).eq('id',orderId);
+      // Add tokens to user
+      await sb.from('profiles').select('token_balance').eq('id',ord.user_id).single().then(({data:p}) =>
+        sb.from('profiles').update({token_balance:(p?.token_balance||0)+(ord.tokens||0),updated_at:new Date().toISOString()}).eq('id',ord.user_id)
+      );
+      toast('✅ Approve Token Order สำเร็จ (manual)');
+      renderAdminTokensPanel();
+    } catch(e2) {
+      toast('❌ '+e2.message,'error');
+    }
+  }
+}
+
+async function adminRejectToken(orderId) {
+  if(!sb||!window._isAdminUser) return;
+  const note = prompt('เหตุผลที่ปฏิเสธ:', 'ไม่พบหลักฐานการชำระเงิน');
+  if(note===null) return;
+  try {
+    const { error } = await sb.from('token_orders').update({status:'ปฏิเสธ',admin_note:note,updated_at:new Date().toISOString()}).eq('id',orderId);
+    if(error) throw error;
+    toast('ปฏิเสธ Token Order แล้ว');
+    renderAdminTokensPanel();
+  } catch(e) {
+    toast('❌ '+e.message,'error');
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  MODAL HTML: User Listing Form — Full Version (เชื่อมโยงกับ propCard + openModal)
+// ══════════════════════════════════════════════════════════════
 function _injectUserListingModal() {
   if (document.getElementById('user-listing-modal')) return;
   const m = document.createElement('div');
@@ -12181,6 +12373,16 @@ function _injectUserListingModal() {
             <label>BTS/MRT ที่ใกล้ที่สุด</label>
             <input type="text" id="ul-near-bts" placeholder="BTS อโศก (500ม.)" style="width:100%;padding:10px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;box-sizing:border-box">
           </div>
+        </div>
+
+        <!-- MAP URL -->
+        <div class="ma-field">
+          <label><i class="fas fa-map-pin" style="color:#e74c3c;margin-right:4px"></i>ลิงก์แผนที่ / Google Maps Pin <span style="font-size:11px;color:var(--tx2);font-weight:400">(ไม่บังคับ)</span></label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="url" id="ul-map-url" placeholder="https://maps.app.goo.gl/... หรือ https://www.google.com/maps?q=..." style="flex:1;padding:10px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;box-sizing:border-box">
+            <button type="button" onclick="_ulTestMapUrl()" title="เปิดแผนที่" style="padding:9px 13px;background:#e74c3c;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px;flex-shrink:0"><i class="fas fa-map-marked-alt"></i></button>
+          </div>
+          <div style="font-size:11px;color:var(--tx2);margin-top:5px"><i class="fas fa-info-circle"></i> วางลิงก์จาก Google Maps, Apple Maps หรือ Longdo Map เพื่อให้ผู้ซื้อดูตำแหน่งได้</div>
         </div>
 
         <!-- Nearby places -->
@@ -12381,6 +12583,197 @@ function _ulRenderNearbyChips(){
       <i class="fas fa-map-marker-alt" style="font-size:10px"></i> ${v}
       <button type="button" onclick="_ulRemoveNearby(${i})" style="background:none;border:none;cursor:pointer;color:#999;font-size:11px;padding:0;line-height:1"><i class="fas fa-times"></i></button>
     </span>`).join('');
+}
+
+// ── Map URL test helper ──
+function _ulTestMapUrl(){
+  const url = (document.getElementById('ul-map-url')?.value||'').trim();
+  if(!url){ toast('กรุณาใส่ลิงก์แผนที่ก่อน','error'); return; }
+  window.open(url,'_blank','noopener,noreferrer');
+}
+
+// ── Edit existing user listing (ไม่หัก Token) ──
+async function editUserListing(listingId) {
+  const ul = _myUserListings.find(u => u.id === listingId);
+  if (!ul) { toast('ไม่พบข้อมูลประกาศ', 'error'); return; }
+
+  // open modal (re-inject if removed)
+  if (!document.getElementById('user-listing-modal')) _injectUserListingModal();
+  const m = document.getElementById('user-listing-modal');
+
+  // Change header to edit mode
+  const h2 = m.querySelector('.mhd h2');
+  if (h2) h2.innerHTML = '<i class="fas fa-edit" style="color:var(--a)"></i> แก้ไขประกาศ';
+
+  // Change token notice to edit notice
+  const notice = m.querySelector('.mbody > div:first-child');
+  if (notice) {
+    notice.style.background = 'linear-gradient(135deg,#e8f5e9,#c8e6c9)';
+    notice.style.borderColor = '#4caf5088';
+    notice.innerHTML = '<i class="fas fa-edit" style="color:#2e7d32;font-size:20px;flex-shrink:0"></i><div style="color:#1b5e20"><strong>โหมดแก้ไข</strong> — การแก้ไขข้อมูลประกาศ <strong>ไม่หัก Token</strong> · แต่ต้องรอ Admin อนุมัติใหม่</div>';
+  }
+
+  // Change submit button
+  const btn = document.getElementById('ul-submit-btn');
+  if (btn) {
+    btn.innerHTML = '<i class="fas fa-save"></i> บันทึกการแก้ไข';
+    btn.onclick = () => updateUserListing(listingId);
+  }
+
+  // Hide token footer
+  const foot = m.querySelector('p[style*="text-align:center"]');
+  if (foot) foot.style.display = 'none';
+
+  _openModal('user-listing-modal');
+  await new Promise(r => setTimeout(r, 50));
+
+  // Populate fields
+  const set = (id, v) => { const el = document.getElementById(id); if(el) el.value = v||''; };
+  set('ul-title', ul.title);
+  set('ul-type', ul.property_type);
+  document.getElementById('ul-transaction') && (document.getElementById('ul-transaction').value = ul.transaction||'BUY');
+  set('ul-price', ul.price||'');
+  set('ul-area', ul.area||'');
+  set('ul-land-area', ul.land_area||'');
+  set('ul-bed', ul.bed||'');
+  set('ul-bath', ul.bath||'');
+  set('ul-floors', ul.floors||'');
+  set('ul-floor', ul.floor_no||'');
+  set('ul-parking', ul.parking||'');
+  set('ul-furniture', ul.furniture||'');
+  if(document.getElementById('ul-pets')) document.getElementById('ul-pets').checked = !!ul.pets_allowed;
+  set('ul-description', ul.description||'');
+  set('ul-province', ul.province||'');
+  set('ul-district', ul.district||'');
+  set('ul-location', ul.location||'');
+  set('ul-near-bts', ul.near_bts||'');
+  set('ul-map-url', ul.map_url||'');
+  set('ul-contact-name', ul.contact_name||'');
+  set('ul-contact-phone', ul.contact_phone||ul.phone||'');
+  set('ul-contact-line', ul.contact_line||'');
+
+  // Populate nearby
+  window._ulNearbyList = Array.isArray(ul.nearby_places) ? [...ul.nearby_places] : [];
+  if(typeof _ulRenderNearbyChips==='function') _ulRenderNearbyChips();
+
+  // Populate checkboxes
+  const appliances = ul.appliances||[];
+  document.querySelectorAll('input[name="ul-appliance"]').forEach(cb=>{ cb.checked=appliances.includes(cb.value); cb.dispatchEvent(new Event('change')); });
+  const amenities = ul.amenities||[];
+  document.querySelectorAll('input[name="ul-amenity"]').forEach(cb=>{ cb.checked=amenities.includes(cb.value); cb.dispatchEvent(new Event('change')); });
+
+  // Show/hide rent section
+  if(typeof _ulToggleRentFields==='function') _ulToggleRentFields();
+  if(ul.transaction==='RENT'){
+    set('ul-deposit', ul.deposit||'');
+    set('ul-advance', ul.advance_payment||'');
+    set('ul-svc-fee', ul.service_fee||'');
+    set('ul-elec', ul.electric_rate||'');
+    set('ul-water', ul.water_rate||'');
+    set('ul-min-lease', ul.min_lease_months||'');
+  }
+}
+
+// ── Save edit without token deduction ──
+async function updateUserListing(listingId) {
+  if (!user || !sb) return;
+
+  const get = id => document.getElementById(id);
+  const val = id => (get(id)?.value||'').trim();
+  const num = id => parseFloat(val(id).replace(/,/g,''))||0;
+  const int = id => parseInt(val(id))||0;
+
+  const title = val('ul-title');
+  const type  = val('ul-type');
+  const phone = val('ul-phone')||val('ul-contact-phone');
+  const errEl = get('ul-error');
+  const showErr = msg => { if(errEl){ errEl.textContent=msg; errEl.style.display='block'; errEl.scrollIntoView({behavior:'smooth',block:'nearest'}); } };
+  if(errEl) errEl.style.display='none';
+  if (!title) { showErr('กรุณากรอกชื่อทรัพย์'); return; }
+  if (!type)  { showErr('กรุณาเลือกประเภทอสังหาฯ'); return; }
+  if (!phone) { showErr('กรุณากรอกเบอร์ติดต่อ'); return; }
+
+  const btn = get('ul-submit-btn');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังบันทึก...'; }
+
+  try {
+    const appliances = Array.from(document.querySelectorAll('input[name="ul-appliance"]:checked')).map(c=>c.value);
+    const amenities  = Array.from(document.querySelectorAll('input[name="ul-amenity"]:checked')).map(c=>c.value);
+    const nearby     = window._ulNearbyList ? [...window._ulNearbyList] : [];
+    const tx         = val('ul-transaction') || 'BUY';
+    const isRent     = tx === 'RENT';
+
+    // Upload new photos if any
+    let photoUrls = [];
+    const ul = _myUserListings.find(u => u.id === listingId);
+    const existingPhotos = ul?.photos || [];
+    const photoInput = get('ul-photos');
+    if (photoInput?.files?.length) {
+      for (const file of Array.from(photoInput.files).slice(0, 10)) {
+        const ext  = file.name.split('.').pop().toLowerCase();
+        const path = `listings/${user.id}/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+        const { error: upErr } = await sb.storage.from('matchdoor-assets').upload(path, file, { upsert: true });
+        if (!upErr) {
+          const { data: { publicUrl } } = sb.storage.from('matchdoor-assets').getPublicUrl(path);
+          photoUrls.push(publicUrl);
+        }
+      }
+    }
+    const finalPhotos = photoUrls.length ? photoUrls : existingPhotos;
+
+    const updateData = {
+      title,
+      property_type:     type,
+      transaction:       tx,
+      price:             num('ul-price'),
+      area:              num('ul-area'),
+      land_area:         num('ul-land-area'),
+      bed:               int('ul-bed'),
+      bath:              int('ul-bath'),
+      floors:            int('ul-floors'),
+      floor_no:          int('ul-floor'),
+      parking:           int('ul-parking'),
+      furniture:         val('ul-furniture'),
+      pets_allowed:      get('ul-pets')?.checked||false,
+      appliances,
+      amenities,
+      description:       val('ul-description'),
+      province:          val('ul-province'),
+      district:          val('ul-district'),
+      location:          val('ul-location'),
+      near_bts:          val('ul-near-bts'),
+      nearby_places:     nearby.length ? nearby : null,
+      map_url:           val('ul-map-url')||null,
+      contact_name:      val('ul-contact-name'),
+      contact_phone:     phone,
+      contact_line:      val('ul-contact-line'),
+      photos:            finalPhotos,
+      status:            'รอตรวจสอบ', // รอ admin re-approve
+      updated_at:        new Date().toISOString()
+    };
+    if(isRent){
+      updateData.deposit          = num('ul-deposit')||null;
+      updateData.advance_payment  = num('ul-advance')||null;
+      updateData.service_fee      = num('ul-svc-fee')||null;
+      updateData.electric_rate    = num('ul-elec')||null;
+      updateData.water_rate       = num('ul-water')||null;
+      updateData.min_lease_months = int('ul-min-lease')||null;
+    }
+
+    const { error } = await sb.from('user_listings').update(updateData).eq('id', listingId).eq('user_id', user.id);
+    if (error) throw error;
+
+    window._ulNearbyList = [];
+    _closeModal('user-listing-modal');
+    toast('✅ แก้ไขประกาศสำเร็จ! รอ Admin ตรวจสอบและอนุมัติใหม่ (ไม่หัก Token)', 'success');
+    await loadUserTokenData();
+    renderMaListingsPanel();
+  } catch(e) {
+    if(errEl){ errEl.textContent='เกิดข้อผิดพลาด: '+(e.message||'ไม่ทราบสาเหตุ'); errEl.style.display='block'; }
+    else toast('เกิดข้อผิดพลาด: '+(e.message||'ไม่ทราบสาเหตุ'),'error');
+  } finally {
+    if(btn){ btn.disabled=false; btn.innerHTML='<i class="fas fa-save"></i> บันทึกการแก้ไข'; }
+  }
 }
 
 // inject modal ทันทีที่โหลด script
@@ -12906,9 +13299,10 @@ async function _maRenderProfileListings(){
           ${ul.status==='อนุมัติ'&&ul.property_id?`<button onclick="openModal('${ul.property_id}')" style="font-size:11px;padding:5px 11px;background:var(--p);color:#fff;border:none;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px"><i class="fas fa-eye"></i> ดูประกาศ</button>`:''}
           ${ul.status==='อนุมัติ'&&!ul.is_boosted?`<button onclick="boostMyListing('${ul.id}')" style="font-size:11px;padding:5px 11px;background:linear-gradient(135deg,#f39c12,#e67e22);color:#fff;border:none;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px" title="ใช้ 1 Token"><i class="fas fa-rocket"></i> Boost</button>`:''}
           ${ul.status==='อนุมัติ'&&ul.is_boosted?`<span style="font-size:11px;padding:5px 11px;background:#f39c1222;color:#f39c12;border:1px solid #f39c1244;border-radius:8px;display:inline-flex;align-items:center;gap:4px"><i class="fas fa-rocket"></i> กำลัง Boost</span>`:''}
+          <button onclick="editUserListing('${ul.id}')" style="font-size:11px;padding:5px 11px;background:#3498db22;color:#2980b9;border:1px solid #3498db44;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px" title="แก้ไขข้อมูล ไม่หัก Token"><i class="fas fa-edit"></i> แก้ไข</button>
           <button onclick="shareMyListing('${ul.id}','${ul.property_id||''}')" style="font-size:11px;padding:5px 11px;background:#10b98122;color:#10b981;border:1px solid #10b98144;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px"><i class="fas fa-share-alt"></i> แชร์</button>
           <button onclick="openReportListingModal('${ul.id}','${ul.property_id||''}')" style="font-size:11px;padding:5px 11px;background:#f1c40f22;color:#b7950b;border:1px solid #f1c40f44;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px"><i class="fas fa-flag"></i> รายงาน</button>
-          <button onclick="deleteMyListing('${ul.id}')" style="font-size:11px;padding:5px 11px;background:#e74c3c22;color:#e74c3c;border:1px solid #e74c3c44;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px"><i class="fas fa-trash-alt"></i> ลบ</button>
+          <button onclick="deleteMyListing('${ul.id}')" style="font-size:11px;padding:5px 11px;background:#e74c3c22;color:#e74c3c;border:1px solid #e74c3c44;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px" title="ลบ (ไม่ได้ Token คืน)"><i class="fas fa-trash-alt"></i> ลบ</button>
         </div>
       </div>
     </div>`;
@@ -12955,169 +13349,22 @@ async function boostMyListing(listingId) {
 /* ── Delete ── */
 async function deleteMyListing(listingId) {
   if(!sb||!user){ toast('กรุณาเข้าสู่ระบบก่อน',true); return; }
-  const confirmed = confirm('🗑️ ยืนยันการลบประกาศ?\n\nประกาศจะถูกลบและคุณจะได้รับ Token คืน 1 Token\n\nกด OK เพื่อยืนยัน');
+  const confirmed = confirm('🗑️ ยืนยันการลบประกาศ?\n\n⚠️ การลบประกาศจะไม่ได้รับ Token คืน\n\nกด OK เพื่อยืนยันการลบ');
   if(!confirmed) return;
   toast('กำลังลบประกาศ...');
   try {
-    const { data, error } = await sb.rpc('delete_user_listing', { p_listing_id: listingId });
+    // ลบตรงจาก user_listings (ไม่คืน Token)
+    const { error } = await sb.from('user_listings').delete().eq('id', listingId).eq('user_id', user.id);
     if(error){ toast(error.message||'ลบไม่สำเร็จ',true); return; }
-    if(data && !data.success){ toast(data.error||data.message||'ลบไม่สำเร็จ',true); return; }
-    toast(data?.message || '✅ ลบประกาศสำเร็จ Token ถูกคืนแล้ว');
+    toast('✅ ลบประกาศสำเร็จ (Token ไม่คืน)');
+    // ลบออกจาก local cache
+    const idx = _myUserListings.findIndex(u=>u.id===listingId);
+    if(idx>=0) _myUserListings.splice(idx,1);
     await loadUserTokenData();
     renderMaListingsPanel();
     if(typeof _maRenderProfileListings === 'function') _maRenderProfileListings();
-    // refresh all displays เพื่อลบการ์ดออกจากหน้าต่างๆ
     if(typeof _refreshAllListingDisplays === 'function') _refreshAllListingDisplays();
   } catch(e){ toast('เกิดข้อผิดพลาด: '+e.message,true); }
-}
-
-/* ── Toggle Listing Visibility (หยุด/กลับมาแสดงประกาศ) ── */
-async function toggleMyListingVisibility(listingId, currentStatus) {
-  if(!sb||!user){ toast('กรุณาเข้าสู่ระบบก่อน',true); return; }
-  const isPaused = currentStatus === 'ปิด';
-  const newStatus = isPaused ? 'อนุมัติ' : 'ปิด';
-  const confirmMsg = isPaused
-    ? 'เปิดการแสดงประกาศนี้อีกครั้ง?'
-    : 'หยุดแสดงประกาศนี้? (ทรัพย์จะไม่ปรากฏในหน้าค้นหา)';
-  if(!confirm(confirmMsg)) return;
-  try {
-    const { error } = await sb.from('user_listings')
-      .update({ status: newStatus, updated_at: new Date().toISOString() })
-      .eq('id', listingId).eq('user_id', user.id);
-    if(error){ toast(error.message||'ไม่สำเร็จ',true); return; }
-    // ถ้ามี property_id ให้ sync สถานะไปที่ properties table ด้วย
-    const ul = _myUserListings.find(l => l.id === listingId);
-    if(ul && ul.property_id){
-      await sb.from('properties')
-        .update({ status: newStatus === 'ปิด' ? 'hidden' : 'approved', updated_at: new Date().toISOString() })
-        .eq('id', ul.property_id).catch(()=>{});
-    }
-    toast(isPaused ? '✅ เปิดแสดงประกาศแล้ว' : '✅ หยุดแสดงประกาศแล้ว');
-    // reload my listings
-    const { data } = await sb.from('user_listings').select('*').eq('user_id', user.id).order('created_at',{ascending:false});
-    _myUserListings = data || [];
-    renderMaListingsPanel();
-    if(typeof _refreshAllListingDisplays === 'function') _refreshAllListingDisplays();
-  } catch(e){ toast('เกิดข้อผิดพลาด: '+e.message,true); }
-}
-
-/* ── Edit Listing Modal ── */
-function openEditListingModal(listingId) {
-  if(!sb||!user){ toast('กรุณาเข้าสู่ระบบก่อน',true); return; }
-  const ul = _myUserListings.find(l => l.id === listingId);
-  if(!ul){ toast('ไม่พบข้อมูลประกาศ',true); return; }
-  const existing = document.getElementById('edit-listing-modal');
-  if(existing) existing.remove();
-  const mo = document.createElement('div');
-  mo.id = 'edit-listing-modal';
-  mo.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;overflow-y:auto;padding:16px;display:flex;align-items:flex-start;justify-content:center';
-  mo.onclick = function(e){ if(e.target===this) this.remove(); };
-  mo.innerHTML = `
-    <div style="background:var(--bg);border-radius:16px;padding:24px;width:100%;max-width:560px;margin:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
-        <h3 style="margin:0;font-size:16px;color:var(--p);display:flex;align-items:center;gap:8px"><i class="fas fa-edit" style="color:var(--a)"></i> แก้ไขประกาศ</h3>
-        <button onclick="document.getElementById('edit-listing-modal').remove()" style="background:transparent;border:none;font-size:20px;color:var(--tx2);cursor:pointer">×</button>
-      </div>
-      <div style="display:grid;gap:14px">
-        <div>
-          <label style="font-size:12px;font-weight:600;color:var(--tx2);display:block;margin-bottom:5px">ชื่อประกาศ *</label>
-          <input id="el-title" type="text" value="${sanitize(ul.title||'')}" style="width:100%;padding:9px 12px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;background:var(--bg);color:var(--tx);box-sizing:border-box">
-        </div>
-        <div>
-          <label style="font-size:12px;font-weight:600;color:var(--tx2);display:block;margin-bottom:5px">ราคา (บาท) *</label>
-          <input id="el-price" type="number" value="${ul.price||''}" style="width:100%;padding:9px 12px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;background:var(--bg);color:var(--tx);box-sizing:border-box">
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <div>
-            <label style="font-size:12px;font-weight:600;color:var(--tx2);display:block;margin-bottom:5px">ห้องนอน</label>
-            <input id="el-bed" type="number" value="${ul.bed||''}" placeholder="0" style="width:100%;padding:9px 12px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;background:var(--bg);color:var(--tx);box-sizing:border-box">
-          </div>
-          <div>
-            <label style="font-size:12px;font-weight:600;color:var(--tx2);display:block;margin-bottom:5px">ห้องน้ำ</label>
-            <input id="el-bath" type="number" value="${ul.bath||''}" placeholder="0" style="width:100%;padding:9px 12px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;background:var(--bg);color:var(--tx);box-sizing:border-box">
-          </div>
-        </div>
-        <div>
-          <label style="font-size:12px;font-weight:600;color:var(--tx2);display:block;margin-bottom:5px">พื้นที่ (ตร.ม.)</label>
-          <input id="el-area" type="number" value="${ul.area||ul.size_sqm||''}" placeholder="0" style="width:100%;padding:9px 12px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;background:var(--bg);color:var(--tx);box-sizing:border-box">
-        </div>
-        <div>
-          <label style="font-size:12px;font-weight:600;color:var(--tx2);display:block;margin-bottom:5px">สถานที่ / ที่อยู่</label>
-          <input id="el-location" type="text" value="${sanitize(ul.location||'')}" placeholder="เช่น สุขุมวิท, อโศก" style="width:100%;padding:9px 12px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;background:var(--bg);color:var(--tx);box-sizing:border-box">
-        </div>
-        <div>
-          <label style="font-size:12px;font-weight:600;color:var(--tx2);display:block;margin-bottom:5px">รายละเอียด</label>
-          <textarea id="el-desc" rows="4" placeholder="รายละเอียดทรัพย์..." style="width:100%;padding:9px 12px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;background:var(--bg);color:var(--tx);box-sizing:border-box;resize:vertical;font-family:inherit">${sanitize(ul.description||ul.detail||'')}</textarea>
-        </div>
-        <div>
-          <label style="font-size:12px;font-weight:600;color:var(--tx2);display:block;margin-bottom:5px">เบอร์โทรติดต่อ</label>
-          <input id="el-phone" type="tel" value="${sanitize(ul.contact_phone||ul.phone||'')}" placeholder="081-234-5678" style="width:100%;padding:9px 12px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;background:var(--bg);color:var(--tx);box-sizing:border-box">
-        </div>
-        <div>
-          <label style="font-size:12px;font-weight:600;color:var(--tx2);display:block;margin-bottom:5px">LINE ID</label>
-          <input id="el-line" type="text" value="${sanitize(ul.contact_line||ul.line_id||'')}" placeholder="@your_line" style="width:100%;padding:9px 12px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;background:var(--bg);color:var(--tx);box-sizing:border-box">
-        </div>
-      </div>
-      <div style="display:flex;gap:10px;margin-top:20px">
-        <button onclick="saveEditListing('${listingId}')" style="flex:1;background:linear-gradient(135deg,var(--p),#2a5298);color:#fff;border:none;border-radius:10px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
-          <i class="fas fa-save"></i> บันทึกการแก้ไข
-        </button>
-        <button onclick="document.getElementById('edit-listing-modal').remove()" style="background:var(--lt);color:var(--tx);border:1.5px solid var(--bd);border-radius:10px;padding:11px 18px;font-size:13px;font-weight:600;cursor:pointer">
-          ยกเลิก
-        </button>
-      </div>
-      ${ul.status !== 'อนุมัติ' ? '' : `
-      <div style="margin-top:12px;padding:10px 14px;background:rgba(243,156,18,.08);border:1px solid rgba(243,156,18,.3);border-radius:8px;font-size:12px;color:#b7770d;display:flex;align-items:center;gap:6px">
-        <i class="fas fa-info-circle"></i> การแก้ไขจะรีเซ็ตสถานะเป็น "รอตรวจสอบ" และต้องรอ Admin อนุมัติใหม่
-      </div>`}
-    </div>`;
-  document.body.appendChild(mo);
-}
-
-async function saveEditListing(listingId) {
-  if(!sb||!user){ toast('กรุณาเข้าสู่ระบบก่อน',true); return; }
-  const title    = document.getElementById('el-title')?.value.trim();
-  const price    = Number(document.getElementById('el-price')?.value)||0;
-  const bed      = Number(document.getElementById('el-bed')?.value)||0;
-  const bath     = Number(document.getElementById('el-bath')?.value)||0;
-  const area     = Number(document.getElementById('el-area')?.value)||0;
-  const location = document.getElementById('el-location')?.value.trim()||'';
-  const desc     = document.getElementById('el-desc')?.value.trim()||'';
-  const phone    = document.getElementById('el-phone')?.value.trim()||'';
-  const lineId   = document.getElementById('el-line')?.value.trim()||'';
-  if(!title){ toast('กรุณาระบุชื่อประกาศ',true); return; }
-  if(!price){ toast('กรุณาระบุราคา',true); return; }
-  const btn = document.querySelector('#edit-listing-modal button[onclick^="saveEdit"]');
-  if(btn){ btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> กำลังบันทึก...'; }
-  try {
-    const ul = _myUserListings.find(l => l.id === listingId);
-    const wasApproved = ul && ul.status === 'อนุมัติ';
-    const updateData = {
-      title, price, bed, bath, area, location,
-      description: desc, detail: desc,
-      contact_phone: phone, contact_line: lineId,
-      updated_at: new Date().toISOString(),
-      // แก้ไขหลัง approved → รีเซ็ตเป็น pending
-      ...(wasApproved ? { status: 'รอตรวจสอบ' } : {})
-    };
-    const { error } = await sb.from('user_listings')
-      .update(updateData).eq('id', listingId).eq('user_id', user.id);
-    if(error){ toast(error.message||'บันทึกไม่สำเร็จ',true); if(btn){btn.disabled=false;btn.innerHTML='<i class="fas fa-save"></i> บันทึกการแก้ไข';} return; }
-    // ถ้าเคย approved และมี property_id ให้ update properties table ด้วย
-    if(wasApproved && ul.property_id){
-      await sb.from('properties').update({
-        title, price, bed, bath, size_sqm: area, location,
-        description: desc, status: 'รอตรวจสอบ', updated_at: new Date().toISOString()
-      }).eq('id', ul.property_id).catch(()=>{});
-    }
-    toast(wasApproved ? '✅ บันทึกแล้ว — รอ Admin ตรวจสอบใหม่' : '✅ บันทึกการแก้ไขสำเร็จ');
-    document.getElementById('edit-listing-modal')?.remove();
-    // reload
-    const { data } = await sb.from('user_listings').select('*').eq('user_id', user.id).order('created_at',{ascending:false});
-    _myUserListings = data || [];
-    renderMaListingsPanel();
-    if(typeof _refreshAllListingDisplays === 'function') _refreshAllListingDisplays();
-  } catch(e){ toast('เกิดข้อผิดพลาด: '+e.message,true); if(btn){btn.disabled=false;btn.innerHTML='<i class="fas fa-save"></i> บันทึกการแก้ไข';} }
 }
 
 /* ── Share + log ── */
@@ -13563,7 +13810,6 @@ async function logout(){
   if(!sb) return;
   // Reset cache ก่อน signOut เสมอ
   _cachedUserProfile = null;
-  const _prevUserId = user?.id;
   user = null;
   try { await sb.auth.signOut(); } catch(e){}
   // Clear browser storage กัน session เก่าค้าง
@@ -13571,18 +13817,6 @@ async function logout(){
     const keys = Object.keys(localStorage).filter(k => k.startsWith('sb-'));
     keys.forEach(k => localStorage.removeItem(k));
   } catch(e){}
-  // ── ลบเฉพาะ member agent ของตัวเองออกจาก agents array (ถ้า show_on_agents=false) ──
-  // คนอื่นๆ ยังคงอยู่เพื่อให้หน้าตัวแทนทำงานสมบูรณ์
-  if(_prevUserId){
-    const _myAgIdx = agents.findIndex(a => a._isMember && a._userId === _prevUserId);
-    if(_myAgIdx >= 0){
-      // ถ้าเคย show_on_agents=true ยังคงไว้ เพราะคนอื่นจะเห็น
-      // แต่ล้าง _pendingListings ส่วนตัว
-      agents[_myAgIdx]._pendingListings = [];
-      agents[_myAgIdx]._allMyListings = [];
-    }
-  }
-  window._myAgentProfileShown = false;
   renderAuthUI();
   updateFormBtns();
 }
@@ -13783,7 +14017,8 @@ function mapProp(r){
     transit: r.transit || r.near_transit || '',
     contact_name:r.contact_name||'',
     contact_phone:r.contact_phone||'',
-    contact_line:r.contact_line||''
+    contact_line:r.contact_line||'',
+    map_url:r.map_url||''
   };
 }
 // ── v26: mapUserListing — แปลง v_approved_user_listings row → propCard format ──
@@ -13818,6 +14053,7 @@ function mapUserListing(ul){
     contact_name: ul.contact_name || '',
     contact_phone: ul.contact_phone || '',
     contact_line: ul.contact_line || '',
+    map_url: ul.map_url || '',
     photos: ph,
     isNew: ul.is_new === true,
     isBoosted: ul.is_boosted === true,
@@ -14243,68 +14479,24 @@ function afterLoad(){
   if(typeof mdMapRefreshMarkers === 'function' && _mdMapInitDone) {
     setTimeout(mdMapRefreshMarkers, 100);
   }
-  // ── v26+: โหลด approved user listings + member agents แบบ background ──
+  // ── v26: โหลด approved user listings แบบ background (ไม่บล็อก first render) ──
   setTimeout(async ()=>{
     try {
-      // 1. โหลด approved user listing cards
       const ulCards = await loadApprovedUserListings();
       window._userListingCards = ulCards;
+      if(!ulCards.length) return; // ไม่มี user listings → ไม่ต้อง re-render
 
-      // 2. โหลด member agents จาก v_member_agents (ทุก user รวม guest)
-      if(sb){
-        try{
-          const { data: maData } = await sb.from('v_member_agents').select('*');
-          if(maData && maData.length){
-            maData.forEach(ma => {
-              const maUid   = ma.user_id;
-              const maEmail = ma.display_name || maUid;
-              const existIdx = agents.findIndex(a => a._isMember && (a._userId === maUid || a._uid === maEmail));
-              const maPropIds = Array.isArray(ma.approved_prop_ids) ? ma.approved_prop_ids.filter(Boolean) : [];
-              const maAgent = {
-                id: 'member_' + maUid,
-                _isMember: true,
-                _uid: maEmail,
-                _userId: maUid,
-                name: ma.display_name || 'สมาชิก',
-                title: ma.agent_title  || 'สมาชิก Matchdoor',
-                phone: ma.agent_phone  || ma.phone    || '',
-                lineId: ma.agent_line_id|| ma.line_id  || '',
-                email: maEmail,
-                initials: (ma.display_name||'U')[0].toUpperCase(),
-                color: '#10b981',
-                avatar_url: ma.avatar_url || '',
-                photos: Array.isArray(ma.agent_photos) ? ma.agent_photos : [],
-                rating: Number(ma.agent_rating) || 5.0,
-                propIds: maPropIds,
-                deals: Number(ma.agent_deals)  || 0,
-                bio: ma.agent_bio    || '',
-                _pendingListings: [],
-                _allMyListings: []
-              };
-              if(existIdx >= 0) agents[existIdx] = maAgent;
-              else agents.push(maAgent);
-            });
-          }
-        } catch(eMA){ console.warn('[afterLoad member agents]', eMA); }
-      }
-
-      // 3. re-render home grids ถ้า home page active
+      // re-render home grids ถ้า home page active
       const _homeEl = document.getElementById('page-home');
       if(_homeEl && _homeEl.classList.contains('active') && typeof _renderHomeGrids === 'function'){
         _renderHomeGrids();
       }
-      // 4. ถ้าหน้า listings กำลัง active อยู่ → re-render เพื่อรวม user listings
+      // ถ้าหน้า listings กำลัง active อยู่ → re-render เพื่อรวม user listings
       const _lpEl = document.getElementById('page-listings');
       if(_lpEl && _lpEl.classList.contains('active') && typeof renderListingsPage === 'function'){
-        // รวม user listing cards เข้า _listingsBaseData ด้วย
-        if(ulCards.length && typeof _listingsBaseData !== 'undefined'){
-          const existing = new Set(_listingsBaseData.map(p => String(p.id)));
-          ulCards.forEach(c => { if(!existing.has(String(c.id))) _listingsBaseData.push(c); });
-          _listingsData = typeof sortListings==='function' ? sortListings([..._listingsBaseData],'default') : [..._listingsBaseData];
-        }
         renderListingsPage();
       }
-      // 5. re-render agents
+      // re-render agents
       if(typeof renderAgents === 'function') renderAgents();
     } catch(e){ console.warn('[afterLoad user listings]', e); }
   }, 800);
@@ -16034,12 +16226,8 @@ function renderListingsPage() {
 
   // ── ใช้ทรัพย์ทั้งหมดเป็น base เฉพาะตอนที่ base ยังว่างอยู่ครั้งแรก ──
   if(!_listingsBaseData.length) {
-    _listingsBaseData = [..._allProps];
-    // รวม user listing cards ที่ approved แล้ว (ไม่ซ้ำ)
-    const _ulInit = (window._userListingCards || []);
-    const _idsInit = new Set(_listingsBaseData.map(p => String(p.id)));
-    _ulInit.forEach(c => { if(!_idsInit.has(String(c.id))) _listingsBaseData.push(c); });
-    _listingsData = sortListings([..._listingsBaseData], 'default');
+    _listingsBaseData = _allProps;
+    _listingsData = sortListings([..._allProps], 'default');
     _listingsCurPage = 1;
   }
 
@@ -16147,7 +16335,10 @@ function renderListingsPage() {
       // ── v26: รวม user listings เข้า grid ──
       // boosted user listings → แทรกที่ต้นหน้า 1 เท่านั้น (หน้า 1)
       const _ulCards = (window._userListingCards || []);
-      const _boostedUL = _ulCards.filter(c => c.isBoosted);
+      // Sort boosted by boosted_at desc → newest boost appears first
+      const _boostedUL = _ulCards
+        .filter(c => c.isBoosted)
+        .sort((a,b) => new Date(b._boostExpiresAt||b.boosted_at||0) - new Date(a._boostExpiresAt||a.boosted_at||0));
       const _memberUL  = _ulCards.filter(c => !c.isBoosted);
 
       let finalHtml = '';
@@ -16342,10 +16533,6 @@ function showListingsPage(title, data) {
   const sourceData = (data && data.length) ? [...data] :
                      (props && props.length ? [...props] :
                      (typeof MOCK!=='undefined' ? [...MOCK.props] : []));
-  // ── รวม approved user listing cards เข้า base data (ไม่ซ้ำ) ──
-  const _ulCards2 = (window._userListingCards || []);
-  const _srcIds = new Set(sourceData.map(p => String(p.id)));
-  _ulCards2.forEach(c => { if(!_srcIds.has(String(c.id))) sourceData.push(c); });
   // ── Set data BEFORE showPage so renderListingsPage has it ready ──
   _listingsBaseData = sourceData;
   _listingsData = sortListings([..._listingsBaseData], 'default');
@@ -20172,59 +20359,10 @@ function showAgentDetail(a){
       if(pgProp){ pgProp.classList.remove('active'); pgProp.style.display='none'; }
       var pgAP = document.getElementById('page-agent-profile');
       if(pgAP){ pgAP.style.display=''; pgAP.classList.add('active'); }
-      // Find agent — array first, then DB fallback (รองรับ guest / logout)
+      // Find agent
       var agArr = (typeof agents !== 'undefined' && Array.isArray(agents)) ? agents : [];
       var a = agArr.find(function(ag){ return String(ag.id)===String(id); });
       if(!a && id){ a = _findAgentBySlug(String(id)); }
-      // ── DB fallback: ดึงจาก v_member_agents ถ้าไม่เจอใน array ──
-      if(!a && id && typeof sb !== 'undefined' && sb){
-        var _pgAP2 = document.getElementById('page-agent-profile');
-        if(_pgAP2){
-          _pgAP2.innerHTML = '<div style="text-align:center;padding:80px 20px;color:var(--tx2)"><i class="fas fa-spinner fa-spin" style="font-size:28px"></i><div style="margin-top:12px;font-size:14px">กำลังโหลดข้อมูลตัวแทน...</div></div>';
-        }
-        // ค้นหาจาก DB (by member_XXXX id format or by user_id)
-        var _searchId = String(id).replace(/^member_/, '');
-        sb.from('v_member_agents').select('*').then(function(res){
-          var maArr = res.data || [];
-          var ma = maArr.find(function(m){ return m.user_id===_searchId || 'member_'+m.user_id===String(id); });
-          if(!ma){
-            // ลอง agents table ด้วย
-            sb.from('agents').select('*').eq('id', _searchId).maybeSingle().then(function(r2){
-              if(r2.data){ window.showPage('agent-profile', _searchId); }
-              else { _origShowPage('agents'); }
-            });
-            return;
-          }
-          var maPropIds = Array.isArray(ma.approved_prop_ids) ? ma.approved_prop_ids.filter(Boolean) : [];
-          var builtAgent = {
-            id: 'member_' + ma.user_id,
-            _isMember: true, _uid: ma.display_name || ma.user_id, _userId: ma.user_id,
-            name: ma.display_name || 'สมาชิก', title: ma.agent_title || 'สมาชิก Matchdoor',
-            phone: ma.agent_phone || ma.phone || '', lineId: ma.agent_line_id || ma.line_id || '',
-            email: ma.display_name || '', initials: (ma.display_name||'U')[0].toUpperCase(),
-            color: '#10b981', avatar_url: ma.avatar_url || '',
-            photos: Array.isArray(ma.agent_photos) ? ma.agent_photos : [],
-            rating: Number(ma.agent_rating)||5.0, propIds: maPropIds,
-            deals: Number(ma.agent_deals)||0, bio: ma.agent_bio||'',
-            _pendingListings: [], _allMyListings: []
-          };
-          // push เข้า agents array
-          var existI = agents.findIndex(function(x){ return x._userId === ma.user_id; });
-          if(existI >= 0) agents[existI] = builtAgent; else agents.push(builtAgent);
-          // restore page container
-          if(_pgAP2) _pgAP2.innerHTML = '';
-          // restore visibility
-          document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
-          if(_pgAP2){ _pgAP2.style.display=''; _pgAP2.classList.add('active'); }
-          window._currentAgentProfileId = String(builtAgent.id);
-          if(typeof _routerReady !== 'undefined' && _routerReady){
-            history.pushState({ type:'agent-profile', id:String(builtAgent.id), name:'agent-profile' },'', location.origin + '/agent/'+encodeURIComponent((builtAgent.name||'agent').toLowerCase().replace(/\s+/g,'-')));
-          }
-          window.scrollTo(0,0);
-          window.renderAgentProfilePage(builtAgent);
-        }).catch(function(){ _origShowPage('agents'); });
-        return;
-      }
       if(!a){ _origShowPage('agents'); return; }
       window._currentAgentProfileId = String(a.id);
       // Push URL
@@ -20314,52 +20452,29 @@ function showAgentDetail(a){
     if(!m) return;
     _agRouteChecked = true;
     var slug = m[1];
-
-    function _tryShow(){
-      var found = _findAgentBySlug(slug);
-      if(found){
-        window.showPage('agent-profile', String(found.id));
-        return true;
-      }
-      // ถ้าไม่เจอใน array → ลอง showPage โดยตรงด้วย id จาก slug
-      // showPage จะ DB-fetch ให้เอง ถ้าไม่เจอใน array
-      // slug อาจเป็น "member_XXXX-ชื่อ" หรือ "XXXX-ชื่อ"
-      var idPart = slug.split('-')[0];
-      if(idPart){
-        // ลองค้นหาโดย userId ใน agents array ก่อน
-        var agArr3 = (typeof agents !== 'undefined' && Array.isArray(agents)) ? agents : [];
-        var byUserId = agArr3.find(function(a){ return a._userId === idPart || a.id === idPart || a.id === 'member_'+idPart; });
-        if(byUserId){ window.showPage('agent-profile', String(byUserId.id)); return true; }
-        // ถ้ายังไม่เจอ → ส่ง member_XXXX ไปให้ showPage จัดการ (DB fallback)
-        window.showPage('agent-profile', 'member_' + idPart);
-        return true;
-      }
-      return false;
-    }
-
     var agArr = (typeof agents !== 'undefined' && Array.isArray(agents)) ? agents : [];
     if(!agArr.length){
-      // รอ agents โหลดก่อน (max 5 วินาที)
-      var _attempts = 0;
       var _w = setInterval(function(){
-        _attempts++;
         var agArr2 = (typeof agents !== 'undefined' && Array.isArray(agents)) ? agents : [];
-        if(agArr2.length || _attempts > 25){
+        if(agArr2.length){
           clearInterval(_w);
-          if(!_tryShow() && _attempts > 25){
-            // timeout: ลอง DB fallback
-            var idPart2 = slug.split('-')[0];
-            if(idPart2) window.showPage('agent-profile', 'member_' + idPart2);
-            else if(typeof _silentShowPage==='function') _silentShowPage('agents');
-          }
+          var found = _findAgentBySlug(slug);
+          if(found) window.showPage('agent-profile', String(found.id));
+          else { _silentShowPage && _silentShowPage('agents'); }
         }
       },200);
     } else {
-      if(!_tryShow()){
-        // ไม่เจอแม้ agents มีข้อมูล → DB fallback via showPage
-        var idPart3 = slug.split('-')[0];
-        if(idPart3) window.showPage('agent-profile', 'member_' + idPart3);
-        else if(typeof _silentShowPage==='function') _silentShowPage('agents');
+      var found = _findAgentBySlug(slug);
+      if(found){
+        // Wait for data then show
+        var _wd = setInterval(function(){
+          if(typeof props !== 'undefined'){
+            clearInterval(_wd);
+            window.showPage('agent-profile', String(found.id));
+          }
+        },200);
+      } else {
+        if(typeof _silentShowPage==='function') _silentShowPage('agents');
       }
     }
   }
@@ -20421,6 +20536,7 @@ function showAgentDetail(a){
 /* ── END AGENT PROFILE PAGE SYSTEM ── */
 
 // Sanitize: strip HTML tags to prevent XSS injection
+function _san(s){ return sanitize(s); }
 function sanitize(str) {
   if(!str) return '';
   return String(str)
@@ -28731,6 +28847,18 @@ document.addEventListener('DOMContentLoaded', renderTransitButtons);
     var placeholder = document.getElementById('pdp-map-placeholder');
     var container   = document.getElementById('pdp-map-container');
     if (placeholder) placeholder.style.display = 'none';
+    // If listing has custom map_url, show as button to open
+    if (p.map_url) {
+      if (container) {
+        container.style.display = '';
+        container.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:200px;gap:12px">' +
+          '<a href="' + _san(p.map_url) + '" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#e74c3c,#c0392b);color:#fff;padding:12px 22px;border-radius:12px;font-weight:700;font-size:14px;text-decoration:none">' +
+          '<i class="fas fa-map-marked-alt"></i> เปิดแผนที่ / ดูตำแหน่ง</a>' +
+          '<div style="font-size:12px;color:var(--tx2)"><i class="fas fa-map-pin" style="color:#e74c3c"></i> ลิงก์แผนที่จากผู้ประกาศ</div>' +
+          '</div>';
+      }
+      return;
+    }
     if (container) {
       container.style.display = '';
       /* PERF FIX: clear stale iframe ก่อน (อาจมีจาก property ก่อนหน้า) */
