@@ -11452,7 +11452,20 @@ async function submitUserListing() {
     window._ulNearbyList = [];
     _closeModal('user-listing-modal');
     toast('✅ ลงประกาศสำเร็จ! รอ Admin ตรวจสอบและอนุมัติ (ภายใน 24 ชั่วโมง)', 'success');
+    // โหลดข้อมูลใหม่: token + my listings
     await loadUserTokenData();
+    // Refresh member agent ใน agents array ทันที (แสดง pending บนหน้าตัวแทน)
+    if(typeof _buildMemberAgent === 'function' && typeof agents !== 'undefined'){
+      const uid = (window._currentUser?.email || window._currentMeta?.display_name || '');
+      const existIdx = agents.findIndex(a => a._isMember && a._uid === uid);
+      const freshAgent = _buildMemberAgent();
+      if(freshAgent){
+        if(existIdx >= 0) agents[existIdx] = freshAgent;
+        else agents.unshift(freshAgent);
+      }
+      if(typeof renderAgents === 'function') renderAgents();
+      if(typeof _maRenderAgentPreview === 'function') _maRenderAgentPreview();
+    }
     renderMaListingsPanel();
 
   } catch(e) {
@@ -11733,15 +11746,32 @@ async function adminApproveListing(listingId) {
     if (note) {
       await sb.from('user_listings').update({ admin_note: note, updated_at: new Date().toISOString() }).eq('id', listingId);
     }
-    toast('✅ Approve สำเร็จ — ประกาศแสดงที่หน้าหลักแล้ว');
-    // ── อัปเดต user_listing cards ใน feed ด้วย ──
-    if (typeof loadApprovedUserListings === 'function') {
-      loadApprovedUserListings().then(cards => {
-        window._userListingCards = cards;
-        if (typeof _listingsRenderGen !== 'undefined') _listingsRenderGen++;
-        if (typeof renderCards === 'function') renderCards();
-      }).catch(()=>{});
-    }
+    toast('✅ Approve สำเร็จ — กำลังโหลดข้อมูลใหม่...');
+    // ── Full reload: props + user listings + re-render ทุกหน้า ──
+    try {
+      // Reload full props array จาก Supabase ก่อน (property ใหม่ถูก copy เข้า properties table)
+      if (sb) {
+        const { data: freshProps } = await sb.from('properties')
+          .select('*').eq('status','approved')
+          .order('created_at', { ascending: false }).limit(500);
+        if (freshProps && typeof mapProp === 'function') {
+          const mapped = freshProps.map(mapProp);
+          props.length = 0;
+          mapped.forEach(p => props.push(p));
+          // sync listings base data
+          if(typeof _listingsBaseData !== 'undefined'){
+            _listingsBaseData = [...props];
+            _listingsData = typeof sortListings === 'function' ? sortListings([...props],'default') : [...props];
+          }
+        }
+      }
+      // Central refresh: user listings + re-render all pages
+      if(typeof _refreshAllListingDisplays === 'function'){
+        await _refreshAllListingDisplays();
+      }
+      if (typeof _listingsRenderGen !== 'undefined') _listingsRenderGen++;
+      toast('✅ Approve สำเร็จ — ประกาศแสดงที่หน้าหลักแล้ว');
+    } catch(reloadErr) { console.warn('[adminApproveListing reload]', reloadErr); }
     renderAdminListingsPanel();
   } catch(e) {
     if (row) row.style.opacity = '';
@@ -12735,7 +12765,9 @@ async function boostMyListing(listingId) {
     toast(data?.message || '🚀 Boost สำเร็จ! ประกาศจะขึ้นบนสุด 7 วัน');
     await loadUserTokenData();
     renderMaListingsPanel();
-    _maRenderProfileListings();
+    if(typeof _maRenderProfileListings === 'function') _maRenderProfileListings();
+    // refresh all displays เพื่อให้ boosted card ขึ้นบนสุดทันที
+    if(typeof _refreshAllListingDisplays === 'function') _refreshAllListingDisplays();
   } catch(e){ toast('เกิดข้อผิดพลาด: '+e.message,true); }
 }
 
@@ -12752,7 +12784,9 @@ async function deleteMyListing(listingId) {
     toast(data?.message || '✅ ลบประกาศสำเร็จ Token ถูกคืนแล้ว');
     await loadUserTokenData();
     renderMaListingsPanel();
-    _maRenderProfileListings();
+    if(typeof _maRenderProfileListings === 'function') _maRenderProfileListings();
+    // refresh all displays เพื่อลบการ์ดออกจากหน้าต่างๆ
+    if(typeof _refreshAllListingDisplays === 'function') _refreshAllListingDisplays();
   } catch(e){ toast('เกิดข้อผิดพลาด: '+e.message,true); }
 }
 
@@ -13458,7 +13492,10 @@ function mapUserListing(ul){
     _boostExpiresAt: ul.boost_expires_at || null,
     _viewCount: ul.view_count || 0,
     // raw data สำหรับ mini-detail modal
-    _raw: ul
+    _raw: ul,
+    // alias fields สำหรับ agent matching
+    _userId: ul.user_id || null,
+    _userEmail: ul.user_email || null
   };
 }
 
@@ -13478,6 +13515,44 @@ async function loadApprovedUserListings(){
 
 // ── v26: global store สำหรับ user listing cards ───────────────────
 window._userListingCards = [];
+
+// ── v28: central refresh — เรียกหลัง approve/reject/boost เพื่อ sync ทุกหน้า ──
+async function _refreshAllListingDisplays() {
+  try {
+    // 1. reload approved user listing cards
+    if(typeof loadApprovedUserListings === 'function'){
+      const cards = await loadApprovedUserListings();
+      window._userListingCards = cards;
+    }
+    // 2. re-render home grids (ถ้า home active)
+    const homeEl = document.getElementById('page-home');
+    if(homeEl && homeEl.classList.contains('active') && typeof _renderHomeGrids === 'function'){
+      _renderHomeGrids();
+    }
+    // 3. re-render listings page (ถ้า listings active)
+    const listingsEl = document.getElementById('page-listings');
+    if(listingsEl && listingsEl.classList.contains('active') && typeof renderListingsPage === 'function'){
+      renderListingsPage();
+    }
+    // 4. re-render agents
+    if(typeof renderAgents === 'function') renderAgents();
+    // 5. refresh agent preview ใน my-account
+    if(typeof _maRenderAgentPreview === 'function') _maRenderAgentPreview();
+    // 6. refresh _buildMemberAgent ใน agents array
+    if(typeof _buildMemberAgent === 'function' && typeof agents !== 'undefined' && window._currentUser){
+      const uid = window._currentUser.email || (window._currentMeta && window._currentMeta.display_name) || '';
+      if(uid){
+        const existIdx = agents.findIndex(function(a){ return a._isMember && a._uid === uid; });
+        const fresh = _buildMemberAgent();
+        if(fresh){
+          if(existIdx >= 0) agents[existIdx] = fresh;
+          else agents.unshift(fresh);
+        }
+      }
+    }
+  } catch(e){ console.warn('[_refreshAllListingDisplays]', e); }
+}
+window._refreshAllListingDisplays = _refreshAllListingDisplays;
 
 function mapAgent(r){
   // 🖼️ [IMG-AGENT] แปลง avatar_url และ photos → Supabase Storage URL
@@ -13830,13 +13905,22 @@ function afterLoad(){
     try {
       const ulCards = await loadApprovedUserListings();
       window._userListingCards = ulCards;
+      if(!ulCards.length) return; // ไม่มี user listings → ไม่ต้อง re-render
+
+      // re-render home grids ถ้า home page active
+      const _homeEl = document.getElementById('page-home');
+      if(_homeEl && _homeEl.classList.contains('active') && typeof _renderHomeGrids === 'function'){
+        _renderHomeGrids();
+      }
       // ถ้าหน้า listings กำลัง active อยู่ → re-render เพื่อรวม user listings
       const _lpEl = document.getElementById('page-listings');
       if(_lpEl && _lpEl.classList.contains('active') && typeof renderListingsPage === 'function'){
         renderListingsPage();
       }
+      // re-render agents
+      if(typeof renderAgents === 'function') renderAgents();
     } catch(e){ console.warn('[afterLoad user listings]', e); }
-  }, 600);
+  }, 800);
   // ── render listings ถ้าหน้านั้น active อยู่ ──────────────────────
   window._pendingListingsInit = false;
   window._listingsDataReady = true;
@@ -13931,22 +14015,47 @@ function afterLoad(){
 // ── แสดงการ์ดหน้าแรก โดยตรงจาก props ไม่ผ่าน filter ─────────────
 function _renderHomeGrids(){
   const all = props.length ? [...props] : (typeof MOCK!=='undefined' ? [...MOCK.props] : []);
-  if(!all.length){ console.warn('_renderHomeGrids: ไม่มีข้อมูล'); return; }
 
-  // all-grid: แสดง 16 รายการต่อหน้า พร้อม pagination
-  _renderHomeAllGrid(all);
+  // รวม approved user listing cards เข้ากับ all (แปลงให้ compatible กับ propCard format)
+  const _ulCards = (window._userListingCards || []);
+  // user listing cards ที่ approved และยังไม่ซ้ำกับ props (property_id เดิม)
+  const _ulExtra = _ulCards.filter(ul => {
+    if(ul._propertyId) return !all.some(p => p.id === ul._propertyId); // ถ้า copy เข้า props แล้วไม่ต้อง
+    return true; // ถ้ายังไม่มี property_id ให้รวมไปก่อน
+  });
 
-  // rec-grid: ยอดนิยม (ถ้าไม่มี flag isRec ให้แสดง 8 แรก)
+  // combined = props + user listing cards ที่ยังไม่มีใน props
+  const combined = [...all, ..._ulExtra];
+
+  if(!combined.length){ console.warn('_renderHomeGrids: ไม่มีข้อมูล'); return; }
+
+  // all-grid: แสดง 16 รายการต่อหน้า พร้อม pagination (รวม user listings)
+  _renderHomeAllGrid(combined);
+
+  // rec-grid: ยอดนิยม — รวม boosted user listings และ isRec properties
+  const _boostedUL = _ulExtra.filter(c => c.isBoosted);
   const recList = all.filter(p=>p.isRec);
-  renderGrid('rec-grid', recList.length ? recList.slice(0,8) : all.slice(0,8));
+  const recCombined = [..._boostedUL, ...(recList.length ? recList : all.slice(0,8))];
+  const recRender = recCombined.slice(0,8);
+  const recEl = document.getElementById('rec-grid');
+  if(recEl){
+    const recHtml = recRender.map(p => p._isUserListing
+      ? (typeof propCardUserListing === 'function' ? propCardUserListing(p) : '')
+      : (typeof propCard === 'function' ? propCard(p) : '')
+    ).join('');
+    recEl.innerHTML = recHtml;
+    setTimeout(function(){ if(typeof initAllCardSwipes==='function') initAllCardSwipes(recEl); }, 50);
+  }
 
-  // new-track: มาใหม่ (ถ้าไม่มี flag isNew ให้แสดง 10 แรก)
+  // new-track: มาใหม่ — รวม user listings ที่ isNew หรือ recent
+  const _newUL = _ulExtra.filter(c => c.isNew || !c.isBoosted);
   const newList = all.filter(p=>p.isNew);
-  renderNewGallery(newList.length ? newList : all.slice(0,10));
+  const newCombined = [...(newList.length ? newList : all.slice(0,10)), ..._newUL.slice(0,4)];
+  renderNewGallery(newCombined.length ? newCombined.slice(0,14) : all.slice(0,10));
 
   // update counters
   const rc = document.getElementById('res-count');
-  if(rc) rc.textContent = `พบ ${all.length} รายการ`;
+  if(rc) rc.textContent = `พบ ${combined.length} รายการ`;
 
   // sync filtered/allFiltered ด้วย ป้องกัน stale state
   filtered = [...all];
@@ -14320,7 +14429,14 @@ function _homeAllGoPage(page) {
   const start = (page - 1) * _HOME_ALL_PER;
   const slice = window._homeAllData.slice(start, start + _HOME_ALL_PER);
   const el = $('all-grid');
-  if (el) { el.innerHTML = slice.map(propCard).join(''); setTimeout(initAllCardSwipes, 50); }
+  if (el) {
+    el.innerHTML = slice.map(function(p){
+      return p._isUserListing
+        ? (typeof propCardUserListing==='function' ? propCardUserListing(p) : '')
+        : (typeof propCard==='function' ? propCard(p) : '');
+    }).join('');
+    setTimeout(initAllCardSwipes, 50);
+  }
   _renderHomeAllPagination();
   scrollToEl('all-sec');
 }
@@ -14333,7 +14449,14 @@ function homeAllGridSortChange(sel) {
   window._homeAllPage = 1;
   const slice = sorted.slice(0, _HOME_ALL_PER);
   const el = $('all-grid');
-  if (el) { el.innerHTML = slice.map(propCard).join(''); setTimeout(initAllCardSwipes, 50); }
+  if (el) {
+    el.innerHTML = slice.map(function(p){
+      return p._isUserListing
+        ? (typeof propCardUserListing==='function' ? propCardUserListing(p) : '')
+        : (typeof propCard==='function' ? propCard(p) : '');
+    }).join('');
+    setTimeout(initAllCardSwipes, 50);
+  }
   _renderHomeAllPagination();
 }
 
@@ -14345,7 +14468,12 @@ function _renderHomeAllGrid(list) {
     window._homeAllData = list;
     window._homeAllPage = 1;
     const slice = list.slice(0, _HOME_ALL_PER);
-    el.innerHTML = slice.map(propCard).join('');
+    // render: user listing cards ใช้ propCardUserListing, props ปกติใช้ propCard
+    el.innerHTML = slice.map(function(p){
+      return p._isUserListing
+        ? (typeof propCardUserListing === 'function' ? propCardUserListing(p) : '')
+        : (typeof propCard === 'function' ? propCard(p) : '');
+    }).join('');
     setTimeout(initAllCardSwipes, 50);
     _renderHomeAllPagination();
     return;
@@ -14750,16 +14878,23 @@ function _silentShowPage(name, skipScrollTop) {
   }
   else if (name === 'agents') {
     if(window._dataReady) {
-      renderAgents();
+      // โหลด user listing cards ถ้ายังไม่มี (เพื่อให้ agent cards แสดง prop count ถูก)
+      if(!(window._userListingCards && window._userListingCards.length) && typeof loadApprovedUserListings === 'function'){
+        loadApprovedUserListings().then(function(cards){
+          window._userListingCards = cards;
+          renderAgents();
+        }).catch(function(){ renderAgents(); });
+      } else {
+        renderAgents();
+      }
       setTimeout(() => {
-        // ใช้ข้อมูลเดียวกับ syncAllStats เพื่อให้ตัวเลขสอดคล้องกันทุกหน้า
         const _totalClosed = port.filter(p=>p.status==='SOLD'||p.status==='RENTED').length;
-        animateCounter($('ag-listing-cnt'), props.length);
-        animateCounter($('ag-sale-cnt'),    _totalClosed);  // SOLD+RENTED เท่านั้น (สอดคล้องกับหน้าหลัก/ผลงาน)
+        const _totalProps = props.length + (window._userListingCards||[]).length;
+        animateCounter($('ag-listing-cnt'), _totalProps);
+        animateCounter($('ag-sale-cnt'),    _totalClosed);
         animateCounter($('ag-agent-cnt'),   agents.length);
-      }, 200);
+      }, 400);
     } else {
-      // ข้อมูลยังไม่พร้อม — ตั้ง flag ให้ afterLoad() render แทน
       window._pendingAgentsRender = true;
     }
   }
@@ -15645,12 +15780,26 @@ function renderListingsPage() {
       finalHtml += pageData.map(propCardPDP).join('');
 
       if(_listingsCurPage === 1 && _memberUL.length > 0){
-        finalHtml += `<div style="grid-column:1/-1;margin-top:20px;margin-bottom:4px">
-          <div style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(--tx2);letter-spacing:.4px">
-            <i class="fas fa-users"></i> ประกาศจากสมาชิก
-          </div>
-        </div>`;
-        finalHtml += _memberUL.map(propCardUserListing).join('');
+        // กรอง _memberUL ตาม keyword/tx filter ถ้ามีการค้นหา
+        const _kw = (document.getElementById('ls-kw')?.value||'').toLowerCase().trim();
+        const _tx = _listingsTxFilter || 'ALL';
+        const _filteredUL = _memberUL.filter(function(c){
+          if(_tx !== 'ALL' && c.tx !== _tx) return false;
+          if(_kw){
+            const _searchStr = (c.title+' '+c.location+' '+c.district+' '+c.province+' '+c.type).toLowerCase();
+            if(!_searchStr.includes(_kw)) return false;
+          }
+          return true;
+        });
+        if(_filteredUL.length){
+          finalHtml += `<div style="grid-column:1/-1;margin-top:20px;margin-bottom:8px">
+            <div style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(--p);letter-spacing:.4px;padding:8px 12px;background:var(--lt);border-radius:8px">
+              <i class="fas fa-users"></i> ประกาศจากสมาชิก Matchdoor
+              <span style="background:var(--p);color:#fff;border-radius:20px;padding:1px 8px;font-size:10px">${_filteredUL.length}</span>
+            </div>
+          </div>`;
+          finalHtml += _filteredUL.map(propCardUserListing).join('');
+        }
       }
 
       grid.innerHTML = finalHtml;
@@ -16494,7 +16643,14 @@ function renderGrid(id,list,loading_sk=false){
     </div>`).join('');
     return;
   }
-  el.innerHTML=list.length?list.map(propCard).join(''):'<div class="empty" style="grid-column:1/-1"><i class="fas fa-search"></i><p>ไม่พบรายการ</p><button class="retry-btn" onclick="applyFilters()"><i class="fas fa-redo"></i> ลองใหม่</button></div>';
+  // render: user listing cards ใช้ propCardUserListing
+  el.innerHTML = list.length
+    ? list.map(function(p){
+        return p._isUserListing
+          ? (typeof propCardUserListing==='function' ? propCardUserListing(p) : '')
+          : (typeof propCard==='function' ? propCard(p) : '');
+      }).join('')
+    : '<div class="empty" style="grid-column:1/-1"><i class="fas fa-search"></i><p>ไม่พบรายการ</p><button class="retry-btn" onclick="applyFilters()"><i class="fas fa-redo"></i> ลองใหม่</button></div>';
   // Init card image swipes after render
   setTimeout(initAllCardSwipes, 50);
 }
@@ -18658,9 +18814,12 @@ function _maRenderAgentPreview(){
   const _approvedUL = _allMyUL.filter(ul => ul.status === 'อนุมัติ');
 
   // Approved user listing cards (ดึงจาก window._userListingCards)
-  const _myApprovedCards = (window._userListingCards||[]).filter(c =>
-    c._raw && window._currentUser && c._raw.user_id === window._currentUser.id
-  );
+  const _myApprovedCards = (window._userListingCards||[]).filter(c => {
+    if(!c._raw) return false;
+    if(window._currentUser && c._raw.user_id === window._currentUser.id) return true;
+    if(c._agentName && myAgent.name && c._agentName === myAgent.name) return true;
+    return false;
+  });
 
   // รวม approved cards + pending listings แสดงทั้งหมด
   const _allDisplayListings = [..._myApprovedCards]; // approved ก่อน
@@ -18756,7 +18915,12 @@ function renderAgents(){
     const myProps=props.filter(p=>p.agentId===a.id || a.propIds?.includes(p.id));
     // สำหรับ member agent: รวม approved user listing cards ด้วย
     const _myULCards = a._isMember
-      ? (window._userListingCards||[]).filter(c => c._raw && a._userId && c._raw.user_id === a._userId)
+      ? (window._userListingCards||[]).filter(c => {
+          if(!c._raw) return false;
+          if(a._userId && c._raw.user_id === a._userId) return true;
+          if(a.name && c._agentName === a.name) return true;
+          return false;
+        })
       : [];
     const _pendingCount = a._isMember && Array.isArray(a._pendingListings) ? a._pendingListings.length : 0;
     const totalPropCount = myProps.length + _myULCards.filter(c => !myProps.some(p => p.id === c._propertyId)).length;
@@ -18825,8 +18989,15 @@ function showAgentDetail(a){
   // รวม approved props + approved user listing cards สำหรับ member agent
   const myProps = props.filter(p => a.propIds?.includes(p.id) || p.agentId === a.id);
   // ถ้าเป็น member agent: ดึง user listing cards ที่ approved ด้วย
-  const _agModalULCards = a._isMember && a._userId
-    ? (window._userListingCards||[]).filter(c => c._raw && c._raw.user_id === a._userId)
+  // ใช้ทั้ง _userId (uuid) และ _uid (email/displayName) สำหรับ lookup
+  const _agModalULCards = a._isMember
+    ? (window._userListingCards||[]).filter(c => {
+        if(!c._raw) return false;
+        if(a._userId && c._raw.user_id === a._userId) return true;
+        // fallback: match by agent_name ถ้าไม่มี user_id
+        if(a._agentName && c._agentName === a.name) return true;
+        return false;
+      })
     : [];
   // รวม for display (ป้องกัน dup กับ myProps ที่ map เป็น property แล้ว)
   const _agModalAllCards = [...myProps];
@@ -19210,7 +19381,10 @@ function showAgentDetail(a){
             : [];
           // approved user listing cards (ใช้ propCardUserListing แสดงทันที)
           _agpUserListingCards = (window._userListingCards || []).filter(function(c){
-            return c._raw && c._raw.user_id === (window._currentUser && window._currentUser.id);
+            if(!c._raw) return false;
+            if(window._currentUser && c._raw.user_id === window._currentUser.id) return true;
+            if(a.name && c._agentName === a.name) return true;
+            return false;
           });
         } else if(a._userId && typeof sb !== 'undefined' && sb){
           // ผู้เยี่ยมชม: โหลด approved user listings ของ member agent นี้จาก DB
@@ -22353,7 +22527,12 @@ function renderNewGallery(list) {
     track.innerHTML = '<div style="padding:20px;color:var(--gr)">ไม่พบรายการ</div>';
     return;
   }
-  track.innerHTML = list.map(p => propCard(p)).join('');
+  // render: user listing cards ใช้ propCardUserListing, props ปกติใช้ propCard
+  track.innerHTML = list.map(function(p) {
+    return p._isUserListing
+      ? (typeof propCardUserListing === 'function' ? propCardUserListing(p) : '')
+      : (typeof propCard === 'function' ? propCard(p) : '');
+  }).join('');
   // Init swipe after render: horizontal gallery wrap + individual card image sliders
   setTimeout(() => { initHGallerySwipe('new-track-wrap'); initAllCardSwipes(); }, 100);
 }
