@@ -11963,43 +11963,49 @@ async function renderAdminUsersPanel() {
   section.innerHTML = '<div style="text-align:center;padding:40px;color:var(--tx2)"><i class="fas fa-spinner fa-spin" style="font-size:24px"></i><div style="margin-top:8px">กำลังโหลด Users...</div></div>';
 
   try {
-    // ใช้ view v_admin_users (ถ้ามี) หรือ admin_users join profiles
+    // โหลด users จาก user_profiles (admin policy อนุญาตให้อ่านทั้งหมด — ไม่ต้องแตะ auth.users)
     let users = [];
     let loadErr = null;
 
-    // ลอง 1: RPC admin_get_users
+    // ลอง 1: RPC admin_get_users (ถ้ามี)
     try {
       const r = await sb.rpc('admin_get_users');
       if(!r.error && Array.isArray(r.data)) { users = r.data; }
-      else throw r.error;
+      else throw r.error||new Error('no rpc');
     } catch(e1) {
-      // ลอง 2: query profiles table directly
+      // ลอง 2: user_profiles table — admin_all_user_profiles policy อ่านได้ทั้งหมด
       try {
-        const r2 = await sb.from('profiles').select('id, display_name, email, token_balance, created_at, is_banned').order('created_at',{ascending:false}).limit(200);
-        if(!r2.error) { users = r2.data||[]; }
-        else throw r2.error;
+        const r2 = await sb.from('user_profiles')
+          .select('user_id, display_name, phone, token_balance, created_at, is_banned, role, show_on_agents, avatar_url')
+          .order('created_at',{ascending:false})
+          .limit(500);
+        if(!r2.error){
+          users = (r2.data||[]).map(u=>({
+            id:            u.user_id,
+            display_name:  u.display_name || u.user_id,
+            email:         u.phone || '',
+            token_balance: u.token_balance ?? 0,
+            created_at:    u.created_at,
+            is_banned:     !!u.is_banned,
+            role:          u.role || '',
+            is_admin:      u.role === 'admin'
+          }));
+        } else throw r2.error;
       } catch(e2) {
-        // ลอง 3: admin_users + user_listings count
+        // ลอง 3: admin_users fallback
         try {
           const r3 = await sb.from('admin_users').select('user_id, created_at').order('created_at',{ascending:false}).limit(200);
-          if(!r3.error) { users = (r3.data||[]).map(u=>({id:u.user_id, display_name:'Admin', created_at:u.created_at, is_admin:true})); }
+          if(!r3.error){ users = (r3.data||[]).map(u=>({id:u.user_id, display_name:'Admin', created_at:u.created_at, is_admin:true})); }
           else throw r3.error;
         } catch(e3) {
-          loadErr = e3.message||'ไม่สามารถโหลด Users ได้ — ต้องการ view profiles หรือ RPC admin_get_users';
+          loadErr = e3.message||'ไม่สามารถโหลด Users ได้';
         }
       }
     }
 
     if(loadErr){
       section.innerHTML = `<div style="padding:20px;border-radius:12px;background:#fff3cd;color:#856404;font-size:13px">
-        <i class="fas fa-exclamation-triangle"></i> <strong>จำเป็นต้องสร้าง RPC หรือ View:</strong><br><br>
-        ${loadErr}<br><br>
-        <strong>SQL สำหรับสร้าง profiles view ที่ Admin ใช้ได้:</strong><br>
-        <code style="display:block;background:#1a1a2e;color:#c8922a;padding:10px;border-radius:8px;margin-top:8px;font-size:11px;word-break:break-all">
-create or replace view v_admin_users as<br>
-select id, raw_user_meta_data->>'display_name' as display_name, email, created_at from auth.users;<br>
-grant select on v_admin_users to authenticated;
-        </code>
+        <i class="fas fa-exclamation-triangle"></i> <strong>โหลด Users ไม่สำเร็จ:</strong><br><br>${loadErr}
       </div>`;
       return;
     }
@@ -14500,6 +14506,57 @@ function afterLoad(){
       if(typeof renderAgents === 'function') renderAgents();
     } catch(e){ console.warn('[afterLoad user listings]', e); }
   }, 800);
+
+  // ── v31: โหลด member agents (show_on_agents=TRUE) สำหรับ visitor/logout ──
+  // _restoreAgentProfileVisibility() โหลดเฉพาะตอน login เท่านั้น
+  // ต้องโหลดแยกเพื่อให้ visitor เห็นหน้าตัวแทน + property cards ครบถ้วน
+  setTimeout(async ()=>{
+    if(typeof sb === 'undefined' || !sb) return;
+    // ถ้า login อยู่แล้ว _restoreAgentProfileVisibility จะโหลดเอง → skip
+    try {
+      const { data: { session } } = await sb.auth.getSession();
+      if(session) return; // logged-in: handled by _restoreAgentProfileVisibility
+    } catch(e){ return; }
+    try {
+      const { data: maData } = await sb.from('v_member_agents').select('*');
+      if(!maData || !maData.length) return;
+      maData.forEach(ma => {
+        const maUid = ma.user_id;
+        const maEmail = ma.display_name || maUid;
+        const existIdx = (typeof agents !== 'undefined' && Array.isArray(agents))
+          ? agents.findIndex(a => a._isMember && (a._userId === maUid || a._uid === maEmail))
+          : -1;
+        const maPropIds = Array.isArray(ma.approved_prop_ids)
+          ? ma.approved_prop_ids.filter(Boolean) : [];
+        const maAgent = {
+          id:          'member_' + maUid,
+          _isMember:   true,
+          _uid:        maEmail,
+          _userId:     maUid,
+          name:        ma.display_name || 'สมาชิก',
+          title:       ma.agent_title  || 'สมาชิก Matchdoor',
+          phone:       ma.agent_phone  || ma.phone   || '',
+          lineId:      ma.agent_line_id|| ma.line_id || '',
+          email:       maEmail,
+          initials:    (ma.display_name||'U')[0].toUpperCase(),
+          color:       '#10b981',
+          avatar_url:  ma.avatar_url   || '',
+          photos:      Array.isArray(ma.agent_photos) ? ma.agent_photos : [],
+          rating:      Number(ma.agent_rating) || 5.0,
+          propIds:     maPropIds,
+          deals:       Number(ma.agent_deals)  || 0,
+          bio:         ma.agent_bio    || '',
+          _pendingListings: [],
+          _allMyListings:   []
+        };
+        if(typeof agents !== 'undefined' && Array.isArray(agents)){
+          if(existIdx >= 0) agents[existIdx] = maAgent;
+          else agents.push(maAgent);
+        }
+      });
+      if(typeof renderAgents === 'function') renderAgents();
+    } catch(e){ console.warn('[afterLoad] public member agents:', e); }
+  }, 1200);
   // ── render listings ถ้าหน้านั้น active อยู่ ──────────────────────
   window._pendingListingsInit = false;
   window._listingsDataReady = true;
@@ -19954,7 +20011,11 @@ function showAgentDetail(a){
 
         // ── ตรวจว่าเป็นเจ้าของหรือไม่ ──
         var _myUidAGP = window._currentUser && (window._currentUser.email || (window._currentMeta && window._currentMeta.display_name));
-        var _isOwnerAGP = _myUidAGP && a._uid === _myUidAGP;
+        // ตรวจเจ้าของ: เปรียบเทียบทั้ง UUID (_userId) และ email/displayName (_uid)
+        var _isOwnerAGP = window._currentUser && (
+          (a._userId && a._userId === window._currentUser.id) ||
+          (_myUidAGP && a._uid === _myUidAGP)
+        );
 
         if(_isOwnerAGP){
           // เจ้าของ: ดึง pending listings จาก _myUserListings โดยตรง
