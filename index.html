@@ -11641,25 +11641,15 @@ async function renderAdminListingsPanel() {
   }
 
   try {
-    // ใช้ fallback data ถ้ามี (จาก catch block ด้านล่าง)
-    let viewData, viewError;
-    if (window.__adminListingsFallbackData) {
-      viewData = window.__adminListingsFallbackData;
-      window.__adminListingsFallbackData = null;
-      viewError = null;
-    } else {
-      const res = await sb
-        .from('v_admin_user_listings')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(100);
-      viewData = res.data;
-      viewError = res.error;
-    }
+    const { data, error } = await sb
+      .from('v_admin_user_listings')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(100);
 
-    if (viewError) throw viewError;
+    if (error) throw error;
 
-    const all     = viewData || [];
+    const all     = data || [];
     const pending = all.filter(r => r.status === 'รอตรวจสอบ');
     const rest    = all.filter(r => r.status !== 'รอตรวจสอบ').slice(0, 30);
 
@@ -11775,30 +11765,7 @@ async function renderAdminListingsPanel() {
       ${historyHtml}` : ''}`;
 
   } catch(e) {
-    // Fallback: ถ้า view ล้มเหลว (เช่น permission denied) ลอง query ตรงแทน
-    if (e.message && (e.message.includes('permission denied') || e.message.includes('does not exist'))) {
-      try {
-        const [rList, rProf] = await Promise.all([
-          sb.from('user_listings').select('*').order('created_at', {ascending: false}).limit(100),
-          sb.from('user_profiles').select('user_id, display_name, email, phone, line_id')
-        ]);
-        if (!rList.error) {
-          const profMap = {};
-          (rProf.data || []).forEach(p => { profMap[p.user_id] = p; });
-          const combined = (rList.data || []).map(ul => ({
-            ...ul,
-            user_display_name: profMap[ul.user_id]?.display_name || '',
-            user_email:        profMap[ul.user_id]?.email || '',
-            user_phone:        profMap[ul.user_id]?.phone || '',
-          }));
-          // Re-run ด้วย data ที่ได้มา (เรียก render ซ้ำโดย inject ข้อมูล)
-          window.__adminListingsFallbackData = combined;
-          renderAdminListingsPanel();
-          return;
-        }
-      } catch(e2) { /* ignore fallback error */ }
-    }
-    section.innerHTML = `<div style="padding:20px;color:#e74c3c;text-align:center"><i class="fas fa-exclamation-circle"></i> เกิดข้อผิดพลาด: ${e.message}<br><small style="color:var(--tx2)">กรุณา Reload Schema ใน Supabase หรือรัน Database v33</small></div>`;
+    section.innerHTML = `<div style="padding:20px;color:#e74c3c;text-align:center"><i class="fas fa-exclamation-circle"></i> เกิดข้อผิดพลาด: ${e.message}</div>`;
   }
 }
 
