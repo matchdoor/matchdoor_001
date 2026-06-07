@@ -11973,24 +11973,30 @@ async function renderAdminUsersPanel() {
       if(!r.error && Array.isArray(r.data)) { users = r.data; }
       else throw r.error||new Error('no rpc');
     } catch(e1) {
-      // ลอง 2: user_profiles table — admin_all_user_profiles policy อ่านได้ทั้งหมด
+      // ลอง 2: user_profiles JOIN user_tokens (columns ที่มีจริงใน schema)
       try {
-        const r2 = await sb.from('user_profiles')
-          .select('user_id, display_name, phone, token_balance, created_at, is_banned, role, show_on_agents, avatar_url')
-          .order('created_at',{ascending:false})
-          .limit(500);
-        if(!r2.error){
-          users = (r2.data||[]).map(u=>({
+        const [rProf, rTok] = await Promise.all([
+          sb.from('user_profiles')
+            .select('user_id, display_name, phone, email, created_at, is_banned, role, show_on_agents, avatar_url')
+            .order('created_at',{ascending:false})
+            .limit(500),
+          sb.from('user_tokens')
+            .select('user_id, balance')
+        ]);
+        if(!rProf.error){
+          const tokMap = {};
+          (rTok.data||[]).forEach(t=>{ tokMap[t.user_id]=t.balance||0; });
+          users = (rProf.data||[]).map(u=>({
             id:            u.user_id,
             display_name:  u.display_name || u.user_id,
-            email:         u.phone || '',
-            token_balance: u.token_balance ?? 0,
+            email:         u.email || u.phone || '',
+            token_balance: tokMap[u.user_id] ?? 0,
             created_at:    u.created_at,
             is_banned:     !!u.is_banned,
             role:          u.role || '',
             is_admin:      u.role === 'admin'
           }));
-        } else throw r2.error;
+        } else throw rProf.error;
       } catch(e2) {
         // ลอง 3: admin_users fallback
         try {
@@ -12062,51 +12068,35 @@ function _renderAdmUserRows(users) {
 }
 
 async function _admAdjustToken(userId, userName) {
-  const amount = prompt(`ปรับ Token สำหรับ "${userName}"
-
-ใส่จำนวน Token (บวก=เพิ่ม, ลบ=หัก):`, '0');
+  const amount = prompt(`ปรับ Token สำหรับ "${userName}"\n\nใส่จำนวน Token (บวก=เพิ่ม, ลบ=หัก):`, '0');
   if(amount===null||isNaN(parseInt(amount))) return;
   const delta = parseInt(amount);
   if(!delta){ toast('ไม่มีการเปลี่ยนแปลง'); return; }
   try {
-    // ลอง RPC admin_adjust_token ก่อน
-    let error;
-    try {
-      const r = await sb.rpc('admin_adjust_token', { p_user_id: userId, p_delta: delta });
-      error = r.error;
-    } catch(e) {
-      // fallback: update profiles
-      const r2 = await sb.from('profiles').update({ token_balance: sb.rpc ? undefined : undefined }).eq('id', userId);
-      // ใช้ raw increment
-      const { error: e2 } = await sb.rpc('increment_token', { p_user_id: userId, p_amount: delta }).catch(() =>
-        sb.from('profiles').select('token_balance').eq('id',userId).single().then(({ data }) =>
-          sb.from('profiles').update({ token_balance: Math.max(0,(data?.token_balance||0)+delta), updated_at: new Date().toISOString() }).eq('id',userId)
-        )
-      );
-      error = e2;
-    }
+    const { data: rd, error } = await sb.rpc('admin_adjust_token', { p_user_id: userId, p_delta: delta });
     if(error) throw error;
-    toast(`✅ ปรับ Token ${delta>0?'+':''}${delta} ให้ "${userName}" แล้ว`);
+    if(rd && rd.ok === false) throw new Error(rd.error || 'ไม่สำเร็จ');
+    toast(`✅ ปรับ Token ${delta>0?'+':''}${delta} ให้ "${userName}" แล้ว (คงเหลือ: ${rd?.new_balance ?? '?'})`);
     renderAdminUsersPanel();
   } catch(e) {
     toast('❌ '+e.message, 'error');
   }
 }
-
 async function _admToggleBan(userId, userName, isBanned) {
   const action = isBanned ? 'Unban' : 'Ban';
   const confirmed = confirm(`${action} user "${userName}"?\n\n${isBanned?'User จะสามารถใช้งานได้ตามปกติ':'User จะไม่สามารถล็อกอินหรือใช้งานได้'}`);
   if(!confirmed) return;
   try {
-    const { error } = await sb.from('profiles').update({ is_banned: !isBanned, updated_at: new Date().toISOString() }).eq('id', userId);
+    // ใช้ admin_ban_user RPC (SECURITY DEFINER)
+    const { data: rd, error } = await sb.rpc('admin_ban_user', { p_user_id: userId, p_banned: !isBanned });
     if(error) throw error;
+    if(rd && rd.ok === false) throw new Error(rd.error || 'ไม่สำเร็จ');
     toast(`✅ ${action} "${userName}" เรียบร้อยแล้ว`);
     renderAdminUsersPanel();
   } catch(e) {
     toast('❌ '+e.message, 'error');
   }
 }
-
 // ══════════════════════════════════════════════════════════════
 //  ADMIN: Token Orders panel
 // ══════════════════════════════════════════════════════════════
@@ -12162,10 +12152,17 @@ async function adminApproveToken(orderId) {
       const { data: ord } = await sb.from('token_orders').select('*').eq('id',orderId).single();
       if(!ord) throw new Error('ไม่พบ order');
       await sb.from('token_orders').update({status:'อนุมัติ',updated_at:new Date().toISOString()}).eq('id',orderId);
-      // Add tokens to user
-      await sb.from('profiles').select('token_balance').eq('id',ord.user_id).single().then(({data:p}) =>
-        sb.from('profiles').update({token_balance:(p?.token_balance||0)+(ord.tokens||0),updated_at:new Date().toISOString()}).eq('id',ord.user_id)
-      );
+      // Add tokens to user via user_tokens upsert
+      await sb.from('user_tokens').upsert(
+        { user_id: ord.user_id, balance: (ord.tokens||0), updated_at: new Date().toISOString() },
+        { onConflict: 'user_id', ignoreDuplicates: false }
+      ).then(async () => {
+        // increment existing balance
+        const { data: ut } = await sb.from('user_tokens').select('balance').eq('user_id', ord.user_id).single();
+        if(ut) {
+          await sb.from('user_tokens').update({ balance: (ut.balance||0)+(ord.tokens||0), updated_at: new Date().toISOString() }).eq('user_id', ord.user_id);
+        }
+      }).catch(()=>{});
       toast('✅ Approve Token Order สำเร็จ (manual)');
       renderAdminTokensPanel();
     } catch(e2) {
@@ -14507,54 +14504,47 @@ function afterLoad(){
     } catch(e){ console.warn('[afterLoad user listings]', e); }
   }, 800);
 
-  // ── v31: โหลด member agents (show_on_agents=TRUE) สำหรับ visitor/logout ──
-  // _restoreAgentProfileVisibility() โหลดเฉพาะตอน login เท่านั้น
-  // ต้องโหลดแยกเพื่อให้ visitor เห็นหน้าตัวแทน + property cards ครบถ้วน
+  // ── v31-fix: โหลด member agents (show_on_agents=TRUE) สำหรับทุกคน รวม visitor ──
+  // ทำงานเสมอ — _restoreAgentProfileVisibility จะ upsert ข้อมูลคนที่ login ทีหลัง
+  // requires: SQL patch v31-fix (user_profiles_select_public_agents policy)
   setTimeout(async ()=>{
     if(typeof sb === 'undefined' || !sb) return;
-    // ถ้า login อยู่แล้ว _restoreAgentProfileVisibility จะโหลดเอง → skip
     try {
-      const { data: { session } } = await sb.auth.getSession();
-      if(session) return; // logged-in: handled by _restoreAgentProfileVisibility
-    } catch(e){ return; }
-    try {
-      const { data: maData } = await sb.from('v_member_agents').select('*');
+      const { data: maData, error: maErr } = await sb.from('v_member_agents').select('*');
+      if(maErr){ console.warn('[afterLoad] v_member_agents:', maErr.message); return; }
       if(!maData || !maData.length) return;
+      const agArr = (typeof agents !== 'undefined' && Array.isArray(agents)) ? agents : [];
+      let changed = false;
       maData.forEach(ma => {
-        const maUid = ma.user_id;
+        const maUid   = ma.user_id;
         const maEmail = ma.display_name || maUid;
-        const existIdx = (typeof agents !== 'undefined' && Array.isArray(agents))
-          ? agents.findIndex(a => a._isMember && (a._userId === maUid || a._uid === maEmail))
-          : -1;
-        const maPropIds = Array.isArray(ma.approved_prop_ids)
-          ? ma.approved_prop_ids.filter(Boolean) : [];
+        const existIdx = agArr.findIndex(a => a._isMember && (a._userId === maUid || a._uid === maEmail));
+        const maPropIds = Array.isArray(ma.approved_prop_ids) ? ma.approved_prop_ids.filter(Boolean) : [];
         const maAgent = {
-          id:          'member_' + maUid,
-          _isMember:   true,
-          _uid:        maEmail,
-          _userId:     maUid,
-          name:        ma.display_name || 'สมาชิก',
-          title:       ma.agent_title  || 'สมาชิก Matchdoor',
-          phone:       ma.agent_phone  || ma.phone   || '',
-          lineId:      ma.agent_line_id|| ma.line_id || '',
-          email:       maEmail,
-          initials:    (ma.display_name||'U')[0].toUpperCase(),
-          color:       '#10b981',
-          avatar_url:  ma.avatar_url   || '',
-          photos:      Array.isArray(ma.agent_photos) ? ma.agent_photos : [],
-          rating:      Number(ma.agent_rating) || 5.0,
-          propIds:     maPropIds,
-          deals:       Number(ma.agent_deals)  || 0,
-          bio:         ma.agent_bio    || '',
+          id:               'member_' + maUid,
+          _isMember:        true,
+          _uid:             ma.email || maEmail,
+          _userId:          maUid,
+          name:             ma.display_name || 'สมาชิก',
+          title:            ma.agent_title  || 'สมาชิก Matchdoor',
+          phone:            ma.agent_phone  || ma.phone    || '',
+          lineId:           ma.agent_line_id|| ma.line_id  || '',
+          email:            ma.email        || maEmail,
+          initials:         (ma.display_name||'U')[0].toUpperCase(),
+          color:            '#10b981',
+          avatar_url:       ma.avatar_url   || '',
+          photos:           Array.isArray(ma.agent_photos) ? ma.agent_photos : [],
+          rating:           Number(ma.agent_rating) || 5.0,
+          propIds:          maPropIds,
+          deals:            Number(ma.agent_deals)  || 0,
+          bio:              ma.agent_bio    || '',
           _pendingListings: [],
           _allMyListings:   []
         };
-        if(typeof agents !== 'undefined' && Array.isArray(agents)){
-          if(existIdx >= 0) agents[existIdx] = maAgent;
-          else agents.push(maAgent);
-        }
+        if(existIdx >= 0){ agArr[existIdx] = maAgent; }
+        else { agArr.push(maAgent); changed = true; }
       });
-      if(typeof renderAgents === 'function') renderAgents();
+      if(changed && typeof renderAgents === 'function') renderAgents();
     } catch(e){ console.warn('[afterLoad] public member agents:', e); }
   }, 1200);
   // ── render listings ถ้าหน้านั้น active อยู่ ──────────────────────
@@ -19141,14 +19131,27 @@ function _buildMemberAgent(){
 async function _loadMemberAgentListings(userId){
   if(!sb || !userId) return [];
   try {
-    // ดึง user_listings ที่ approved เท่านั้น (ผู้เยี่ยมชมอื่นๆ ดูได้เฉพาะ approved)
+    // v_approved_user_listings — GRANT SELECT TO authenticated, anon ✓
+    // RLS: user_listings_public_approved FOR SELECT USING (status = 'อนุมัติ') ✓
     const { data, error } = await sb.from('v_approved_user_listings')
       .select('*')
       .eq('user_id', userId)
       .order('is_boosted', { ascending: false })
-      .order('created_at', { ascending: false })
+      .order('created_at',  { ascending: false })
       .limit(50);
-    if(error){ console.warn('[_loadMemberAgentListings]', error); return []; }
+    if(error){
+      console.warn('[_loadMemberAgentListings] view error:', error.message);
+      // fallback: query user_listings โดยตรง (policy user_listings_public_approved)
+      const { data: d2, error: e2 } = await sb.from('user_listings')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('status', 'อนุมัติ')
+        .order('is_boosted', { ascending: false })
+        .order('created_at',  { ascending: false })
+        .limit(50);
+      if(e2){ console.warn('[_loadMemberAgentListings] direct error:', e2.message); return []; }
+      return (d2 || []).map(mapUserListing);
+    }
     return (data || []).map(mapUserListing);
   } catch(e){ console.warn('[_loadMemberAgentListings]', e); return []; }
 }
