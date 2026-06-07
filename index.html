@@ -10077,8 +10077,8 @@ function _popupRefreshMarkersFromData(data){
 // 🔧 จุด CONFIG ทั้งหมด — แก้ไขตรงนี้ที่เดียว
 const C = {
   // --- [1] Supabase Project ---
-  SUPABASE_URL:'https://cgbrmywddaagfsnbavnb.supabase.co', // 🔧 [CONFIG-1] Supabase Project URL
-  SUPABASE_KEY:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNnYnJteXdkZGFhZ2ZzbmJhdm5iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA4NDAyMjYsImV4cCI6MjA5NjQxNjIyNn0.Y9nnGvVw_A6JaK5UXcEmjfUGBei-olrhwLPynKvYRpQ', // 🔧 [CONFIG-2] Supabase Anon/Public Key เท่านั้น!
+  SUPABASE_URL:'https://pxauuemcrqhggelhfqrf.supabase.co', // 🔧 [CONFIG-1] Supabase Project URL
+  SUPABASE_KEY:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB4YXV1ZW1jcnFoZ2dlbGhmcXJmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MzU5ODgsImV4cCI6MjA5NjMxMTk4OH0.zFQQjqiAVbSQHFJnKkfM8N9Cx8oLMZ9CT0OOcqOjX00', // 🔧 [CONFIG-2] Supabase Anon/Public Key เท่านั้น!
 
   // --- [2] Supabase Storage ---
   STORAGE_BUCKET: 'matchdoor-assets', // 🔧 [CONFIG-3] ชื่อ Storage Bucket หลัก
@@ -11471,7 +11471,14 @@ async function submitUserListing() {
     }
 
     // ── Real Supabase insert ──
-    const { error } = await sb.from('user_listings').insert(listingData);
+    let { error } = await sb.from('user_listings').insert(listingData);
+    // Fallback: หาก map_url column ยังไม่ถูก migrate → ลองอีกครั้งโดยไม่ส่ง map_url
+    if (error && error.message && error.message.includes('map_url')) {
+      const safeData = { ...listingData };
+      delete safeData.map_url;
+      const r2 = await sb.from('user_listings').insert(safeData);
+      error = r2.error;
+    }
     if (error) {
       if (error.message.includes('insufficient_tokens')) {
         showErr('Token ไม่เพียงพอ กรุณาซื้อ Token เพิ่ม');
@@ -11967,13 +11974,25 @@ async function renderAdminUsersPanel() {
     let users = [];
     let loadErr = null;
 
-    // ลอง 1: RPC admin_get_users (ถ้ามี)
+    // Strategy: ใช้ user_profiles + user_tokens (ไม่แตะ auth.users เพื่อหลีกเลี่ยง permission denied)
+    // ลอง 1: RPC admin_get_users (ถ้า DB มี function นี้)
+    let rpcOk = false;
     try {
       const r = await sb.rpc('admin_get_users');
-      if(!r.error && Array.isArray(r.data)) { users = r.data; }
-      else throw r.error||new Error('no rpc');
-    } catch(e1) {
-      // ลอง 2: user_profiles JOIN user_tokens (columns ที่มีจริงใน schema)
+      if(!r.error) {
+        // RPC คืน JSON array โดยตรง หรือ JSON object {ok,error}
+        const d = r.data;
+        if(Array.isArray(d)) { users = d; rpcOk = true; }
+        else if(d && d.ok === false) { /* permission denied — ใช้ fallback */ }
+        else if(d && typeof d === 'object') {
+          // อาจเป็น single object ถ้า Supabase wrap — ลองดึง array
+          users = []; rpcOk = false;
+        }
+      }
+    } catch(e1) { /* RPC ไม่มี — ใช้ direct query แทน */ }
+
+    if(!rpcOk) {
+      // ลอง 2: user_profiles + user_tokens (ไม่ต้องแตะ auth.users เลย)
       try {
         const [rProf, rTok] = await Promise.all([
           sb.from('user_profiles')
@@ -11983,12 +12002,12 @@ async function renderAdminUsersPanel() {
           sb.from('user_tokens')
             .select('user_id, balance')
         ]);
-        if(!rProf.error){
+        if(!rProf.error) {
           const tokMap = {};
           (rTok.data||[]).forEach(t=>{ tokMap[t.user_id]=t.balance||0; });
           users = (rProf.data||[]).map(u=>({
             id:            u.user_id,
-            display_name:  u.display_name || u.user_id,
+            display_name:  u.display_name || '(ไม่ระบุ)',
             email:         u.email || u.phone || '',
             token_balance: tokMap[u.user_id] ?? 0,
             created_at:    u.created_at,
@@ -11996,16 +12015,17 @@ async function renderAdminUsersPanel() {
             role:          u.role || '',
             is_admin:      u.role === 'admin'
           }));
-        } else throw rProf.error;
-      } catch(e2) {
-        // ลอง 3: admin_users fallback
-        try {
+        } else {
+          // ลอง 3: admin_users ล้วนๆ (fallback สุดท้าย)
           const r3 = await sb.from('admin_users').select('user_id, created_at').order('created_at',{ascending:false}).limit(200);
-          if(!r3.error){ users = (r3.data||[]).map(u=>({id:u.user_id, display_name:'Admin', created_at:u.created_at, is_admin:true})); }
-          else throw r3.error;
-        } catch(e3) {
-          loadErr = e3.message||'ไม่สามารถโหลด Users ได้';
+          if(!r3.error) {
+            users = (r3.data||[]).map(u=>({id:u.user_id, display_name:'Admin', created_at:u.created_at, is_admin:true}));
+          } else {
+            loadErr = rProf.error.message || 'ไม่สามารถโหลด Users ได้';
+          }
         }
+      } catch(e2) {
+        loadErr = e2.message || 'เกิดข้อผิดพลาดในการโหลด Users';
       }
     }
 
@@ -12073,10 +12093,26 @@ async function _admAdjustToken(userId, userName) {
   const delta = parseInt(amount);
   if(!delta){ toast('ไม่มีการเปลี่ยนแปลง'); return; }
   try {
-    const { data: rd, error } = await sb.rpc('admin_adjust_token', { p_user_id: userId, p_delta: delta });
-    if(error) throw error;
-    if(rd && rd.ok === false) throw new Error(rd.error || 'ไม่สำเร็จ');
-    toast(`✅ ปรับ Token ${delta>0?'+':''}${delta} ให้ "${userName}" แล้ว (คงเหลือ: ${rd?.new_balance ?? '?'})`);
+    // ลองใช้ RPC ก่อน
+    let newBal = null;
+    let rpcErr = null;
+    try {
+      const { data: rd, error } = await sb.rpc('admin_adjust_token', { p_user_id: userId, p_delta: delta });
+      if(error) { rpcErr = error; throw error; }
+      if(rd && rd.ok === false) throw new Error(rd.error || 'RPC ไม่สำเร็จ');
+      newBal = rd?.new_balance;
+    } catch(rpcEx) {
+      // Fallback: manual upsert user_tokens โดยตรง (ถ้า RPC มีปัญหา schema)
+      const { data: cur } = await sb.from('user_tokens').select('balance').eq('user_id', userId).maybeSingle();
+      const curBal = cur?.balance ?? 0;
+      newBal = Math.max(0, curBal + delta);
+      const { error: upErr } = await sb.from('user_tokens').upsert(
+        { user_id: userId, balance: newBal, updated_at: new Date().toISOString() },
+        { onConflict: 'user_id' }
+      );
+      if(upErr) throw upErr;
+    }
+    toast(`✅ ปรับ Token ${delta>0?'+':''}${delta} ให้ "${userName}" แล้ว (คงเหลือ: ${newBal ?? '?'})`);
     renderAdminUsersPanel();
   } catch(e) {
     toast('❌ '+e.message, 'error');
@@ -12113,21 +12149,22 @@ async function renderAdminTokensPanel() {
       .select('*').order('created_at',{ascending:false}).limit(100);
     if(error) throw error;
     const orders = data||[];
-    const pending = orders.filter(o=>o.status==='pending'||o.status==='รอตรวจสอบ');
+    const pending = orders.filter(o=>o.status==='รอยืนยัน'||o.status==='pending'||o.status==='รอตรวจสอบ');
     section.innerHTML = `
       <div style="font-size:14px;font-weight:800;color:var(--p);margin-bottom:12px"><i class="fas fa-coins" style="color:#f39c12"></i> Token Orders ทั้งหมด ${orders.length} รายการ · รอตรวจสอบ <span style="background:#f39c12;color:#fff;border-radius:10px;padding:1px 7px">${pending.length}</span></div>
       ${orders.map(o => {
-        const sc = o.status==='pending'||o.status==='รอตรวจสอบ'?'#f39c12':o.status==='approved'||o.status==='อนุมัติ'?'#2ecc71':'#e74c3c';
-        return `<div style="border:1.5px solid ${o.status==='pending'||o.status==='รอตรวจสอบ'?'#f39c12':'var(--bd)'};border-radius:12px;padding:12px 14px;margin-bottom:8px">
+        const isPending = o.status==='รอยืนยัน'||o.status==='pending'||o.status==='รอตรวจสอบ';
+        const sc = isPending?'#f39c12':o.status==='อนุมัติ'||o.status==='ยืนยันแล้ว'||o.status==='approved'?'#2ecc71':'#e74c3c';
+        return `<div style="border:1.5px solid ${isPending?'#f39c12':'var(--bd)'};border-radius:12px;padding:12px 14px;margin-bottom:8px">
           <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px">
             <div>
-              <div style="font-weight:700;font-size:13px">${_san(o.package_name||o.package_id||'-')}</div>
+              <div style="font-weight:700;font-size:13px">${_san(o.package_id||'-')}</div>
               <div style="font-size:11px;color:var(--tx2)">${_san(o.user_email||o.user_id||'')} · ${new Date(o.created_at).toLocaleDateString('th-TH')}</div>
             </div>
             <span style="background:${sc}22;color:${sc};border:1px solid ${sc}44;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;flex-shrink:0">${_san(o.status)}</span>
           </div>
-          <div style="font-size:12px;color:var(--tx2)">฿${(o.amount||0).toLocaleString()} · ${o.tokens||0} Token · ${_san(o.payment_method||'?')}</div>
-          ${o.status==='pending'||o.status==='รอตรวจสอบ'?`
+          <div style="font-size:12px;color:var(--tx2)">฿${Number(o.price_paid||0).toLocaleString()} · ${o.tokens_requested||0} Token · ${_san(o.payment_method||'?')}</div>
+          ${isPending?`
           <div style="margin-top:10px;display:flex;gap:8px">
             <button onclick="adminApproveToken('${o.id}')" style="background:linear-gradient(135deg,#2ecc71,#27ae60);color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer"><i class="fas fa-check"></i> Approve</button>
             <button onclick="adminRejectToken('${o.id}')" style="background:#e74c3c22;color:#e74c3c;border:1px solid #e74c3c44;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer"><i class="fas fa-times"></i> Reject</button>
@@ -12147,23 +12184,21 @@ async function adminApproveToken(orderId) {
     toast('✅ Approve Token Order สำเร็จ');
     renderAdminTokensPanel();
   } catch(e) {
-    // Fallback: manual update
+    // Fallback: manual update (ถ้า RPC ไม่มี)
     try {
-      const { data: ord } = await sb.from('token_orders').select('*').eq('id',orderId).single();
-      if(!ord) throw new Error('ไม่พบ order');
-      await sb.from('token_orders').update({status:'อนุมัติ',updated_at:new Date().toISOString()}).eq('id',orderId);
-      // Add tokens to user via user_tokens upsert
+      const { data: ord, error: ordErr } = await sb.from('token_orders').select('*').eq('id',orderId).single();
+      if(ordErr || !ord) throw new Error('ไม่พบ order');
+      // อัปเดต status
+      await sb.from('token_orders').update({status:'อนุมัติ', updated_at: new Date().toISOString()}).eq('id', orderId);
+      // increment balance อย่างถูกต้อง
+      const tokensToAdd = ord.tokens_requested || ord.tokens || 0;
+      const { data: cur } = await sb.from('user_tokens').select('balance').eq('user_id', ord.user_id).maybeSingle();
+      const newBal = (cur?.balance ?? 0) + tokensToAdd;
       await sb.from('user_tokens').upsert(
-        { user_id: ord.user_id, balance: (ord.tokens||0), updated_at: new Date().toISOString() },
-        { onConflict: 'user_id', ignoreDuplicates: false }
-      ).then(async () => {
-        // increment existing balance
-        const { data: ut } = await sb.from('user_tokens').select('balance').eq('user_id', ord.user_id).single();
-        if(ut) {
-          await sb.from('user_tokens').update({ balance: (ut.balance||0)+(ord.tokens||0), updated_at: new Date().toISOString() }).eq('user_id', ord.user_id);
-        }
-      }).catch(()=>{});
-      toast('✅ Approve Token Order สำเร็จ (manual)');
+        { user_id: ord.user_id, balance: newBal, updated_at: new Date().toISOString() },
+        { onConflict: 'user_id' }
+      );
+      toast('✅ Approve Token Order สำเร็จ — เพิ่ม ' + tokensToAdd + ' Token');
       renderAdminTokensPanel();
     } catch(e2) {
       toast('❌ '+e2.message,'error');
@@ -12763,7 +12798,14 @@ async function updateUserListing(listingId) {
       updateData.min_lease_months = int('ul-min-lease')||null;
     }
 
-    const { error } = await sb.from('user_listings').update(updateData).eq('id', listingId).eq('user_id', user.id);
+    let { error } = await sb.from('user_listings').update(updateData).eq('id', listingId).eq('user_id', user.id);
+    // Fallback: ถ้า map_url ยังไม่ถูก migrate → ลองอีกครั้งโดยไม่ส่ง map_url
+    if (error && error.message && error.message.includes('map_url')) {
+      const safeData = { ...updateData };
+      delete safeData.map_url;
+      const r2 = await sb.from('user_listings').update(safeData).eq('id', listingId).eq('user_id', user.id);
+      error = r2.error;
+    }
     if (error) throw error;
 
     window._ulNearbyList = [];
