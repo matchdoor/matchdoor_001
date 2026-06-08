@@ -20407,6 +20407,16 @@ function _agUpdateScrollBtns() {
   if (next) next.style.opacity = atEnd   ? '0.3' : '1';
 }
 
+// helpers สำหรับ async-loaded agent modal cards
+window._agModalClickProp = function(pid){
+  if(typeof _closeModal==='function') _closeModal('ag-modal');
+  setTimeout(function(){ if(typeof openModal==='function') openModal(pid); }, 220);
+};
+window._agModalClickListing = function(lid){
+  if(typeof _closeModal==='function') _closeModal('ag-modal');
+  setTimeout(function(){ if(typeof openULDetailModal==='function') openULDetailModal(lid); }, 220);
+};
+
 function showAgentDetail(a){
   // ── ถ้าเป็นโปรไฟล์ตัวเอง → ไปหน้า my-account เลย ──
   const myUid = window._currentUser?.email || window._currentMeta?.display_name;
@@ -20417,14 +20427,16 @@ function showAgentDetail(a){
 
   // รวม approved props + approved user listing cards สำหรับ member agent
   const myProps = props.filter(p => a.propIds?.includes(p.id) || p.agentId === a.id);
-  // ถ้าเป็น member agent: ดึง user listing cards ที่ approved ด้วย
-  // ใช้ทั้ง _userId (uuid) และ _uid (email/displayName) สำหรับ lookup
-  const _agModalULCards = a._isMember
+  // ถ้าเป็น member agent: ดึงจาก _userListingCards (กรณีเจ้าของ) หรือ async DB (กรณีผู้อื่น)
+  // _userListingCards เป็น global ของ user ที่ login อยู่เท่านั้น ไม่ใช่ของ member agent คนอื่น
+  const _isOwnCard = a._isMember && window._currentUser &&
+    (a._userId === window._currentUser.id ||
+     a._uid === (window._currentUser.email || (window._currentMeta && window._currentMeta.display_name)));
+  const _agModalULCards = (a._isMember && _isOwnCard)
     ? (window._userListingCards||[]).filter(c => {
         if(!c._raw) return false;
         if(a._userId && c._raw.user_id === a._userId) return true;
-        // fallback: match by agent_name ถ้าไม่มี user_id
-        if(a._agentName && c._agentName === a.name) return true;
+        if(a.name && c._agentName === a.name) return true;
         return false;
       })
     : [];
@@ -20435,6 +20447,8 @@ function showAgentDetail(a){
       _agModalAllCards.push(c);
     }
   });
+  // ถ้าเป็น member agent คนอื่น: จะ async-load listings จาก DB หลัง modal เปิด
+  const _agNeedsAsyncLoad = a._isMember && !_isOwnCard && a._userId;
   const isMember = !!a._isMember;
 
   // ── Hero section ──
@@ -20466,7 +20480,7 @@ function showAgentDetail(a){
   const statsEl = document.getElementById('ag-modal-stats');
   if(statsEl) statsEl.innerHTML = `
     <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:8px 16px;text-align:center;min-width:70px">
-      <div style="font-size:20px;font-weight:800;color:#fff">${_agModalAllCards.length}</div>
+      <div data-ag-prop-count style="font-size:20px;font-weight:800;color:#fff">${_agModalAllCards.length}</div>
       <div style="font-size:10px;color:rgba(255,255,255,.7)">ทรัพย์</div>
     </div>
     <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:8px 16px;text-align:center;min-width:70px">
@@ -20546,7 +20560,7 @@ function showAgentDetail(a){
           </div>`;
         }).join('')}
       </div>
-    </div>` : `<div style="text-align:center;padding:20px;color:var(--gr);font-size:13px"><i class="fas fa-home" style="font-size:28px;opacity:.3;display:block;margin-bottom:8px"></i>ยังไม่มีทรัพย์ที่ดูแล</div>`;
+    </div>` : `<div data-ag-props-placeholder style="text-align:center;padding:20px;color:var(--gr);font-size:13px"><i class="fas fa-home" style="font-size:28px;opacity:.3;display:block;margin-bottom:8px"></i>ยังไม่มีทรัพย์ที่ดูแล</div>`;
 
   // ── Pending listings addon (สำหรับ owner เท่านั้น) ──
   const _pendingModalHtml = _pendingForModal.length ? `
@@ -20573,6 +20587,81 @@ function showAgentDetail(a){
     </div>` : '';
 
   $('ag-body').innerHTML = bioHtml + contactHtml + propsHtml + (_pendingModalHtml || '');
+
+  // ── Async load listings สำหรับ member agent ที่ไม่ใช่เจ้าของ ──
+  // เรียกหลัง modal render — จะ replace placeholder ด้วย cards จริง
+  if(_agNeedsAsyncLoad && typeof _loadMemberAgentListings === 'function'){
+    _loadMemberAgentListings(a._userId).then(function(cards){
+      var _agBodyEl2 = document.getElementById('ag-body');
+      if(!_agBodyEl2) return; // modal ปิดไปแล้ว
+      // รวม myProps + cards จาก DB (ป้องกัน dup)
+      var allCards2 = myProps.slice();
+      (cards||[]).forEach(function(c){
+        if(!allCards2.some(function(p){ return p.id === c._propertyId || p.id === c.id; }))
+          allCards2.push(c);
+      });
+      // rebuild props grid HTML
+      var _gridHtml = '';
+      if(allCards2.length){
+        _gridHtml = '<div style="margin-bottom:8px">'
+          + '<div style="font-size:12px;font-weight:800;color:var(--p);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;display:flex;align-items:center;gap:6px">'
+          + '<i class="fas fa-home" style="color:var(--a)"></i> ทรัพย์ที่ดูแล '
+          + '<span style="background:var(--p);color:#fff;border-radius:20px;padding:1px 8px;font-size:10px">'+allCards2.length+'</span>'
+          + '</div>'
+          + '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px">'
+          + allCards2.map(function(p){
+              var _ph = p.photos&&p.photos[0] ? p.photos[0] : '';
+              var _pr = typeof fmtPrice==='function' ? fmtPrice(p.price,p.tx) : (p.price||0).toLocaleString()+'฿';
+              var _lo = sanitize(p.location||p.district||'');
+              var _ti = sanitize(p.title||'');
+              var _ty = typeof typeIcon==='function' ? typeIcon(p.type) : '🏠';
+              var _imgHtml = _ph ? ('<img src="'+sanitize(_ph)+'" loading="lazy" style="width:100%;height:100%;object-fit:cover">') : ('<span style="font-size:36px">'+_ty+'</span>');
+              var _cardStyle = 'border:1.5px solid var(--bd);border-radius:12px;overflow:hidden;cursor:pointer;transition:.2s;background:#fff';
+              if(p._isUserListing){
+                var _pid2 = p._propertyId || '';
+                var _lid2 = p._listingId  || '';
+                var _onclick2 = _pid2
+                  ? ('window._agModalClickProp('+JSON.stringify(_pid2)+')')
+                  : ('window._agModalClickListing('+JSON.stringify(_lid2)+')');
+                return '<div onclick="'+_onclick2+'" style="'+_cardStyle+'">'
+                  + '<div style="height:110px;overflow:hidden;background:var(--lt);display:flex;align-items:center;justify-content:center">'+_imgHtml+'</div>'
+                  + '<div style="padding:10px">'
+                  + '<div style="font-size:13px;font-weight:700;color:var(--p);margin-bottom:2px">'+_pr+'</div>'
+                  + '<div style="font-size:12px;font-weight:600;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+_ti+'</div>'
+                  + '<div style="font-size:11px;color:var(--gr);margin-top:3px"><i class="fas fa-map-marker-alt" style="color:var(--a);font-size:9px"></i> '+_lo+'</div>'
+                  + (p.isBoosted ? '<span style="font-size:9px;background:#7c3aed;color:#fff;border-radius:4px;padding:1px 5px"><i class="fas fa-rocket"></i> Boosted</span>' : '')
+                  + '</div></div>';
+              }
+              var _pid3 = p.id || '';
+              var _onclick3 = 'window._agModalClickProp('+JSON.stringify(_pid3)+')';
+              return '<div onclick="'+_onclick3+'" style="'+_cardStyle+'">'
+                + '<div style="height:110px;overflow:hidden;background:var(--lt);display:flex;align-items:center;justify-content:center">'+_imgHtml+'</div>'
+                + '<div style="padding:10px">'
+                + '<div style="font-size:13px;font-weight:700;color:var(--p);margin-bottom:2px">'+_pr+'</div>'
+                + '<div style="font-size:12px;font-weight:600;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+_ti+'</div>'
+                + '<div style="font-size:11px;color:var(--gr);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><i class="fas fa-map-marker-alt" style="color:var(--a);font-size:9px"></i> '+sanitize(p.location||'')+'</div>'
+                + '</div></div>';
+            }).join('')
+          + '</div></div>';
+      } else {
+        _gridHtml = '<div style="text-align:center;padding:20px;color:var(--gr);font-size:13px"><i class="fas fa-home" style="font-size:28px;opacity:.3;display:block;margin-bottom:8px"></i>ยังไม่มีทรัพย์ที่ดูแล</div>';
+      }
+      // replace placeholder
+      var _placeholder = _agBodyEl2.querySelector('[data-ag-props-placeholder]');
+      if(_placeholder){
+        var _newDiv2 = document.createElement('div');
+        _newDiv2.innerHTML = _gridHtml;
+        _placeholder.parentNode.replaceChild(_newDiv2, _placeholder);
+      }
+      // อัปเดต count ใน stats
+      var _statsEl2 = document.getElementById('ag-modal-stats');
+      if(_statsEl2){
+        var _cntEl2 = _statsEl2.querySelector('[data-ag-prop-count]');
+        if(_cntEl2) _cntEl2.textContent = allCards2.length;
+      }
+    }).catch(function(e){ console.warn('[showAgentDetail] async load:', e); });
+  }
+
   // ── Inject Agent Review Section ──
   const agReviewDiv = document.createElement('div');
   agReviewDiv.id = 'ag-rv-section';
