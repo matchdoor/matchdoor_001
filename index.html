@@ -9794,71 +9794,7 @@ function _popupRefreshMarkersFromData(data){
 <!-- Profile Modal -->
 <div class="ov" id="profile-modal" onclick="if(event.target===this)_closeModal('profile-modal')"><div class="modal" style="max-width:400px"><div class="mhd"><h2><i class="fas fa-user-circle" style="color:var(--p)"></i> โปรไฟล์ของฉัน</h2><span class="mclose" onclick="_closeModal('profile-modal')">×</span></div><div class="mbody"><div class="profile-av-wrap"><div class="profile-av-circle" id="profile-av-circle">U</div></div><div style="text-align:center;margin-bottom:16px"><div style="font-size:13px;color:var(--gr)" id="profile-email-display"></div></div><label style="font-size:12px;color:var(--tx2);margin-bottom:4px;display:block">ชื่อที่แสดง</label><input class="login-field" type="text" id="profile-display-name" placeholder="ชื่อของคุณ" style="margin-bottom:16px"><button class="btn-sub" onclick="saveProfile()"><i class="fas fa-save"></i> บันทึก</button></div></div></div>
 
-<!-- ═══ CLOSE DEAL MODAL ═══ -->
-<div class="ov" id="close-deal-modal" onclick="if(event.target===this)_closeModal('close-deal-modal')">
-  <div class="modal" style="max-width:460px">
-    <div class="mhd">
-      <h2><i class="fas fa-handshake" style="color:#10b981"></i> บันทึกการปิดดีล</h2>
-      <span class="mclose" onclick="_closeModal('close-deal-modal')">×</span>
-    </div>
-    <div class="mbody">
-      <p style="font-size:13px;color:var(--tx2);margin-bottom:16px">กรอกข้อมูลเพื่อบันทึกผลงานปิดดีลลงในฐานข้อมูล และแสดงที่หน้าผลงาน</p>
-      <input type="hidden" id="cdm-listing-id">
-      <div style="margin-bottom:12px">
-        <label style="font-size:12px;color:var(--tx2);font-weight:600;display:block;margin-bottom:4px">ชื่อผลงาน *</label>
-        <input class="login-field" id="cdm-title" type="text" placeholder="เช่น คอนโด ลุมพินี สาทร ปิดดีลสำเร็จ" style="margin-bottom:0">
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
-        <div>
-          <label style="font-size:12px;color:var(--tx2);font-weight:600;display:block;margin-bottom:4px">ประเภท *</label>
-          <select class="login-field" id="cdm-type" style="margin-bottom:0">
-            <option value="คอนโด">คอนโด</option>
-            <option value="บ้านเดี่ยว">บ้านเดี่ยว</option>
-            <option value="ทาวน์โฮม">ทาวน์โฮม</option>
-            <option value="วิลล่า">วิลล่า</option>
-            <option value="ที่ดิน">ที่ดิน</option>
-            <option value="อาคารพาณิชย์">อาคารพาณิชย์</option>
-            <option value="อื่นๆ">อื่นๆ</option>
-          </select>
-        </div>
-        <div>
-          <label style="font-size:12px;color:var(--tx2);font-weight:600;display:block;margin-bottom:4px">ประเภทดีล *</label>
-          <select class="login-field" id="cdm-status" style="margin-bottom:0">
-            <option value="SOLD">ขาย (SOLD)</option>
-            <option value="RENTED">เช่า (RENTED)</option>
-          </select>
-        </div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
-        <div>
-          <label style="font-size:12px;color:var(--tx2);font-weight:600;display:block;margin-bottom:4px">ราคา (บาท) *</label>
-          <input class="login-field" id="cdm-price" type="number" placeholder="เช่น 5000000" min="0" style="margin-bottom:0">
-        </div>
-        <div>
-          <label style="font-size:12px;color:var(--tx2);font-weight:600;display:block;margin-bottom:4px">วันที่ปิดดีล</label>
-          <input class="login-field" id="cdm-date" type="text" placeholder="เช่น ม.ค. 2569" style="margin-bottom:0">
-        </div>
-      </div>
-      <div style="margin-bottom:12px">
-        <label style="font-size:12px;color:var(--tx2);font-weight:600;display:block;margin-bottom:4px">ที่ตั้ง</label>
-        <input class="login-field" id="cdm-location" type="text" placeholder="เช่น สาทร กรุงเทพฯ" style="margin-bottom:0">
-      </div>
-      <div style="margin-bottom:16px">
-        <label style="font-size:12px;color:var(--tx2);font-weight:600;display:block;margin-bottom:4px">รีวิวจากลูกค้า (ถ้ามี)</label>
-        <textarea class="login-field" id="cdm-review" rows="3" placeholder="ความประทับใจจากลูกค้า..." style="margin-bottom:0;resize:vertical"></textarea>
-      </div>
-      <div style="background:#10b98111;border:1.5px solid #10b98133;border-radius:10px;padding:12px;margin-bottom:16px;font-size:12px;color:var(--tx2)">
-        <i class="fas fa-info-circle" style="color:#10b981;margin-right:6px"></i>
-        เมื่อบันทึก: ผลงานนี้จะแสดงที่ <strong>หน้าผลงาน</strong> และ <strong>ตัวเลขปิดดีล</strong> ในโปรไฟล์ของคุณจะเพิ่มขึ้น 1
-      </div>
-      <button onclick="submitCloseDeal()" style="width:100%;background:linear-gradient(135deg,#10b981,#059669);color:#fff;border:none;border-radius:10px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
-        <i class="fas fa-handshake"></i> ยืนยันปิดดีล
-      </button>
-    </div>
-  </div>
-</div>
-<!-- ═══ END CLOSE DEAL MODAL ═══ -->
-<div class="ov" id="cookie-modal" onclick="if(event.target===this)_closeModal('cookie-modal')">' <div class="modal" style="max-width:450px"><div class="mhd"><h2><i class="fas fa-cookie-bite" style="color:var(--a)"></i> นโยบายการใช้คุกกี้</h2><span class="mclose" onclick="closeCookieModal()">×</span></div><div class="mbody"><p style="margin-bottom:12px;color:var(--tx2);font-size:14px">เว็บไซต์ของเราใช้คุกกี้เพื่อพัฒนาประสบการณ์การใช้งานของคุณ คุกกี้ช่วยให้เราจดจำการตั้งค่าและวิเคราะห์การเข้าใช้งาน เพื่อนำเสนอเนื้อหาที่ตรงกับความสนใจของคุณ</p><p style="margin-bottom:20px;color:var(--tx2);font-size:14px">คุณสามารถเลือกยอมรับหรือปฏิเสธคุกกี้ที่ไม่จำเป็นได้ โดยการตั้งค่าเบราว์เซอร์ของคุณ</p><div class="cta-row" style="gap:12px"><button class="btn-cta cta-ln" id="cookie-accept" style="background:var(--p);">ยอมรับ</button><button class="btn-cta cta-tel" id="cookie-decline" style="background:var(--gr);">ปฏิเสธ</button></div></div></div></div>
+<div class="ov" id="cookie-modal" onclick="if(event.target===this)_closeModal('cookie-modal')"><div class="modal" style="max-width:450px"><div class="mhd"><h2><i class="fas fa-cookie-bite" style="color:var(--a)"></i> นโยบายการใช้คุกกี้</h2><span class="mclose" onclick="closeCookieModal()">×</span></div><div class="mbody"><p style="margin-bottom:12px;color:var(--tx2);font-size:14px">เว็บไซต์ของเราใช้คุกกี้เพื่อพัฒนาประสบการณ์การใช้งานของคุณ คุกกี้ช่วยให้เราจดจำการตั้งค่าและวิเคราะห์การเข้าใช้งาน เพื่อนำเสนอเนื้อหาที่ตรงกับความสนใจของคุณ</p><p style="margin-bottom:20px;color:var(--tx2);font-size:14px">คุณสามารถเลือกยอมรับหรือปฏิเสธคุกกี้ที่ไม่จำเป็นได้ โดยการตั้งค่าเบราว์เซอร์ของคุณ</p><div class="cta-row" style="gap:12px"><button class="btn-cta cta-ln" id="cookie-accept" style="background:var(--p);">ยอมรับ</button><button class="btn-cta cta-tel" id="cookie-decline" style="background:var(--gr);">ปฏิเสธ</button></div></div></div></div>
 
 <!-- ===== COOKIE BANNER ===== -->
 <div id="cookie-banner" role="dialog" aria-label="นโยบายคุกกี้" aria-live="polite">
@@ -10995,10 +10931,6 @@ function renderMyAccount(){
             <div class="ma-hero-stat-num">${_cachedUserProfile?.review_count ?? 0}</div>
             <div class="ma-hero-stat-lbl"><i class="fas fa-star"></i> รีวิว</div>
           </div>
-          <div class="ma-hero-stat">
-            <div class="ma-hero-stat-num" id="ma-stat-deals">${_cachedUserProfile?.agent_deals ?? 0}</div>
-            <div class="ma-hero-stat-lbl"><i class="fas fa-handshake" style="color:#10b981"></i> ปิดดีล</div>
-          </div>
         </div>
         ${joinDate?`<div style="font-size:11px;opacity:.6;margin-top:8px"><i class="fas fa-calendar-alt" style="margin-right:4px"></i>${sanitize(t('ma.member.since'))} ${joinDate}</div>`:''}
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
@@ -11729,7 +11661,6 @@ async function renderMaListingsPanel() {
               <button onclick="editUserListing('${ul.id}')" style="font-size:11px;padding:5px 11px;background:#3498db22;color:#2980b9;border:1px solid #3498db44;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px" title="แก้ไขข้อมูล ไม่หัก Token"><i class="fas fa-edit"></i> แก้ไข</button>
               ${ul.status === 'อนุมัติ' ? `<button onclick="closeMyListing('${ul.id}')" style="font-size:11px;padding:5px 11px;background:#95a5a622;color:#7f8c8d;border:1px solid #95a5a644;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px" title="ปิดประกาศชั่วคราว"><i class="fas fa-pause-circle"></i> ปิดประกาศ</button>` : ''}
               ${ul.status === 'ปิด' ? `<button onclick="reopenMyListing('${ul.id}')" style="font-size:11px;padding:5px 11px;background:#2ecc7122;color:#27ae60;border:1px solid #2ecc7144;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px" title="เปิดประกาศใหม่อีกครั้ง"><i class="fas fa-play-circle"></i> เปิดอีกครั้ง</button>` : ''}
-              ${ul.status === 'อนุมัติ' ? `<button onclick="openCloseDealModal('${ul.id}')" style="font-size:11px;padding:5px 11px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;border:none;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;font-weight:700" title="บันทึกการปิดดีล → เพิ่มในผลงาน"><i class="fas fa-handshake"></i> ปิดดีล ✓</button>` : ''}
               <button onclick="deleteMyListing('${ul.id}')" style="font-size:11px;padding:5px 11px;background:#e74c3c22;color:#e74c3c;border:1px solid #e74c3c44;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px" title="ลบประกาศ (ไม่ได้ Token คืน)"><i class="fas fa-trash-alt"></i> ลบ</button>
             </div>
           </div>
@@ -13857,7 +13788,6 @@ async function _maRenderProfileListings(){
           <button onclick="editUserListing('${ul.id}')" style="font-size:11px;padding:5px 11px;background:#3498db22;color:#2980b9;border:1px solid #3498db44;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px" title="แก้ไขข้อมูล ไม่หัก Token"><i class="fas fa-edit"></i> แก้ไข</button>
           <button onclick="shareMyListing('${ul.id}','${ul.property_id||''}')" style="font-size:11px;padding:5px 11px;background:#10b98122;color:#10b981;border:1px solid #10b98144;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px"><i class="fas fa-share-alt"></i> แชร์</button>
           <button onclick="openReportListingModal('${ul.id}','${ul.property_id||''}')" style="font-size:11px;padding:5px 11px;background:#f1c40f22;color:#b7950b;border:1px solid #f1c40f44;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px"><i class="fas fa-flag"></i> รายงาน</button>
-          ${ul.status==='อนุมัติ'?`<button onclick="openCloseDealModal('${ul.id}')" style="font-size:11px;padding:5px 11px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;border:none;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;font-weight:700" title="บันทึกการปิดดีล → เพิ่มในผลงาน"><i class="fas fa-handshake"></i> ปิดดีล ✓</button>`:''}
           <button onclick="deleteMyListing('${ul.id}')" style="font-size:11px;padding:5px 11px;background:#e74c3c22;color:#e74c3c;border:1px solid #e74c3c44;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px" title="ลบ (ไม่ได้ Token คืน)"><i class="fas fa-trash-alt"></i> ลบ</button>
         </div>
       </div>
@@ -13966,111 +13896,6 @@ async function reopenMyListing(listingId) {
 }
 
 /* ── Share + log ── */
-/* ══════════════════════════════════════════════
-   ปิดดีล — openCloseDealModal / submitCloseDeal
-   ══════════════════════════════════════════════ */
-
-function openCloseDealModal(listingId) {
-  if (!sb || !user) { toast('กรุณาเข้าสู่ระบบก่อน', true); return; }
-
-  // Pre-fill from listing data
-  const ul = (typeof _myUserListings !== 'undefined' ? _myUserListings : []).find(l => l.id === listingId);
-  document.getElementById('cdm-listing-id').value = listingId;
-  document.getElementById('cdm-title').value = ul ? (ul.title || '') : '';
-  document.getElementById('cdm-price').value = ul ? (ul.price || '') : '';
-  document.getElementById('cdm-location').value = ul ? (ul.province || ul.location || '') : '';
-  document.getElementById('cdm-date').value = new Date().toLocaleDateString('th-TH', { month: 'short', year: 'numeric' });
-
-  // Auto-select status based on transaction
-  if (ul && ul.transaction === 'RENT') {
-    document.getElementById('cdm-status').value = 'RENTED';
-  } else {
-    document.getElementById('cdm-status').value = 'SOLD';
-  }
-
-  // Auto-select property type
-  if (ul && ul.property_type) {
-    const sel = document.getElementById('cdm-type');
-    const opt = Array.from(sel.options).find(o => o.value === ul.property_type);
-    if (opt) sel.value = ul.property_type;
-  }
-
-  document.getElementById('cdm-review').value = '';
-  _openModal('close-deal-modal');
-}
-
-async function submitCloseDeal() {
-  if (!sb || !user) { toast('กรุณาเข้าสู่ระบบก่อน', true); return; }
-
-  const title    = document.getElementById('cdm-title').value.trim();
-  const price    = parseFloat(document.getElementById('cdm-price').value) || 0;
-  const type     = document.getElementById('cdm-type').value;
-  const status   = document.getElementById('cdm-status').value;
-  const location = document.getElementById('cdm-location').value.trim();
-  const date     = document.getElementById('cdm-date').value.trim();
-  const review   = document.getElementById('cdm-review').value.trim();
-  const listingId = document.getElementById('cdm-listing-id').value;
-
-  if (!title) { toast('กรุณากรอกชื่อผลงาน', true); return; }
-  if (!price)  { toast('กรุณากรอกราคา', true); return; }
-
-  // Get photo from listing
-  const ul = (typeof _myUserListings !== 'undefined' ? _myUserListings : []).find(l => l.id === listingId);
-  const photo  = (ul?.photos || [])[0] || ul?.photo || '';
-  const photos = ul?.photos || (photo ? [photo] : []);
-
-  // Generate portfolio id
-  const portId = 'u' + user.id.slice(0, 6) + '_' + Date.now().toString(36);
-
-  toast('กำลังบันทึกผลงาน...');
-
-  try {
-    // 1. Insert into portfolio table
-    const { error: portErr } = await sb.from('portfolio').insert({
-      id:       portId,
-      title:    title,
-      type:     type,
-      price:    price,
-      status:   status,
-      location: location || null,
-      date:     date || null,
-      review:   review || null,
-      photo:    photo || null,
-      photos:   photos
-    });
-
-    if (portErr) { toast('บันทึกผลงานไม่สำเร็จ: ' + portErr.message, true); return; }
-
-    // 2. Increment agent_deals in user_profiles (+1)
-    const currentDeals = _cachedUserProfile?.agent_deals ?? 0;
-    const { error: dealErr } = await sb.from('user_profiles')
-      .update({ agent_deals: currentDeals + 1 })
-      .eq('user_id', user.id);
-
-    if (dealErr) console.warn('agent_deals update warn:', dealErr.message);
-
-    // 3. Update local cache
-    if (_cachedUserProfile) _cachedUserProfile.agent_deals = currentDeals + 1;
-
-    // 4. Update deal counter in UI
-    const dealEl = document.getElementById('ma-stat-deals');
-    if (dealEl) dealEl.textContent = currentDeals + 1;
-
-    // 5. Refresh portfolio data so หน้าผลงาน shows new entry
-    const { data: newPort } = await sb.from('portfolio').select('*').order('created_at', { ascending: false });
-    if (newPort) {
-      port = newPort.map(mapPort);
-      if (document.getElementById('page-portfolio')?.classList.contains('active') && typeof renderPortfolio === 'function') {
-        renderPortfolio('all');
-      }
-    }
-
-    _closeModal('close-deal-modal');
-    toast('🏆 บันทึกผลงานสำเร็จ! ตัวเลขปิดดีลเพิ่มขึ้นแล้ว ✅');
-
-  } catch (e) { toast('เกิดข้อผิดพลาด: ' + e.message, true); }
-}
-
 async function shareMyListing(listingId, propertyId) {
   const url = propertyId
     ? `${location.origin}${location.pathname}?p=${propertyId}`
@@ -14764,7 +14589,7 @@ function mapUserListing(ul){
     district: ul.district || '',
     price: Number(ul.price) || 0,
     tx: (()=>{
-      const v = (ul.tx || '').toString().toUpperCase().trim();
+      const v = (ul.transaction || ul.tx || '').toString().toUpperCase().trim();
       if(v === 'RENT' || v === 'เช่า' || v === 'ให้เช่า') return 'RENT';
       return 'BUY';
     })(),
@@ -20094,28 +19919,42 @@ function _buildMemberAgent(){
 async function _loadMemberAgentListings(userId){
   if(!sb || !userId) return [];
   try {
-    // v_approved_user_listings — GRANT SELECT TO authenticated, anon ✓
-    // RLS: user_listings_public_approved FOR SELECT USING (status = 'อนุมัติ') ✓
+    // v36-fix: ลอง direct query user_listings ก่อน (RLS public_approved ครอบคลุม anon/auth)
+    // แล้วค่อย fallback ไป view ถ้า direct fail
+    const { data: d1, error: e1 } = await sb.from('user_listings')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('status', 'อนุมัติ')
+      .order('is_boosted', { ascending: false })
+      .order('created_at',  { ascending: false })
+      .limit(50);
+
+    if(!e1 && d1 && d1.length > 0){
+      console.log('[_loadMemberAgentListings] direct query OK:', d1.length, 'listings');
+      return d1.map(mapUserListing);
+    }
+
+    // fallback: ลอง view (อาจดีกว่าถ้า view มี SECURITY DEFINER)
     const { data, error } = await sb.from('v_approved_user_listings')
       .select('*')
       .eq('user_id', userId)
       .order('is_boosted', { ascending: false })
       .order('created_at',  { ascending: false })
       .limit(50);
+
     if(error){
-      console.warn('[_loadMemberAgentListings] view error:', error.message);
-      // fallback: query user_listings โดยตรง (policy user_listings_public_approved)
-      const { data: d2, error: e2 } = await sb.from('user_listings')
-        .select('*')
-        .eq('user_id', userId)
-        .eq('status', 'อนุมัติ')
-        .order('is_boosted', { ascending: false })
-        .order('created_at',  { ascending: false })
-        .limit(50);
-      if(e2){ console.warn('[_loadMemberAgentListings] direct error:', e2.message); return []; }
-      return (d2 || []).map(mapUserListing);
+      console.warn('[_loadMemberAgentListings] both queries failed. direct:', e1?.message, 'view:', error.message);
+      return [];
     }
-    return (data || []).map(mapUserListing);
+    if(data && data.length > 0){
+      console.log('[_loadMemberAgentListings] view query OK:', data.length, 'listings');
+      return data.map(mapUserListing);
+    }
+
+    // ถ้า direct ก็ 0 rows (ไม่ใช่ error) แสดงว่าไม่มี listing จริงๆ
+    if(!e1) return [];
+
+    return [];
   } catch(e){ console.warn('[_loadMemberAgentListings]', e); return []; }
 }
 
@@ -20687,8 +20526,9 @@ function showAgentDetail(a){
     ? _myUserListings.filter(function(ul){ return ul.status === 'รอตรวจสอบ'; })
     : [];
 
+  // v36-fix: wrap ทั้ง props section ด้วย id เพื่อให้ async replace หาเจอแน่นอน
   const propsHtml = _agModalAllCards.length ? `
-    <div style="margin-bottom:8px">
+    <div id="ag-modal-props-wrap" style="margin-bottom:8px">
       <div style="font-size:12px;font-weight:800;color:var(--p);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;display:flex;align-items:center;gap:6px">
         <i class="fas fa-home" style="color:var(--a)"></i> ทรัพย์ที่ดูแล <span style="background:var(--p);color:#fff;border-radius:20px;padding:1px 8px;font-size:10px">${_agModalAllCards.length}</span>
       </div>
@@ -20735,7 +20575,7 @@ function showAgentDetail(a){
           </div>`;
         }).join('')}
       </div>
-    </div>` : `<div data-ag-props-placeholder style="text-align:center;padding:20px;color:var(--gr);font-size:13px"><i class="fas fa-home" style="font-size:28px;opacity:.3;display:block;margin-bottom:8px"></i>ยังไม่มีทรัพย์ที่ดูแล</div>`;
+    </div>` : `<div id="ag-modal-props-wrap" data-ag-props-placeholder style="text-align:center;padding:20px;color:var(--gr);font-size:13px"><i class="fas fa-home" style="font-size:28px;opacity:.3;display:block;margin-bottom:8px"></i>${_agNeedsAsyncLoad ? '<i class=\"fas fa-spinner fa-spin\" style=\"font-size:22px;color:var(--p)\"></i><div style=\"margin-top:8px;font-size:12px\">กำลังโหลด...</div>' : 'ยังไม่มีทรัพย์ที่ดูแล'}</div>`;
 
   // ── Pending listings addon (สำหรับ owner เท่านั้น) ──
   const _pendingModalHtml = _pendingForModal.length ? `
@@ -20766,6 +20606,11 @@ function showAgentDetail(a){
   // ── Async load listings สำหรับ member agent ที่ไม่ใช่เจ้าของ ──
   // เรียกหลัง modal render — จะ replace placeholder ด้วย cards จริง
   if(_agNeedsAsyncLoad && typeof _loadMemberAgentListings === 'function'){
+    // v36-fix: ใช้ id-based wrapper แทน data-attribute เพื่อ replace ที่แน่นอน
+    var _agPropsWrap = document.getElementById('ag-modal-props-wrap');
+    if(_agPropsWrap){
+      _agPropsWrap.innerHTML = '<div style="text-align:center;padding:28px;color:var(--gr)"><i class="fas fa-spinner fa-spin" style="font-size:22px"></i><div style="margin-top:8px;font-size:12px">กำลังโหลดทรัพย์...</div></div>';
+    }
     _loadMemberAgentListings(a._userId).then(function(cards){
       var _agBodyEl2 = document.getElementById('ag-body');
       if(!_agBodyEl2) return; // modal ปิดไปแล้ว
@@ -20821,12 +20666,23 @@ function showAgentDetail(a){
       } else {
         _gridHtml = '<div style="text-align:center;padding:20px;color:var(--gr);font-size:13px"><i class="fas fa-home" style="font-size:28px;opacity:.3;display:block;margin-bottom:8px"></i>ยังไม่มีทรัพย์ที่ดูแล</div>';
       }
-      // replace placeholder
-      var _placeholder = _agBodyEl2.querySelector('[data-ag-props-placeholder]');
-      if(_placeholder){
-        var _newDiv2 = document.createElement('div');
-        _newDiv2.innerHTML = _gridHtml;
-        _placeholder.parentNode.replaceChild(_newDiv2, _placeholder);
+      // v36-fix: replace by id wrapper (ชัดเจน ไม่ขึ้นกับ querySelector timing)
+      var _propsWrapEl = document.getElementById('ag-modal-props-wrap');
+      if(_propsWrapEl){
+        _propsWrapEl.innerHTML = _gridHtml;
+      } else {
+        // fallback: ถ้าหา wrapper ไม่เจอ ให้ replace placeholder แบบเก่า
+        var _placeholder = _agBodyEl2.querySelector('[data-ag-props-placeholder]');
+        if(_placeholder){
+          var _newDiv2 = document.createElement('div');
+          _newDiv2.innerHTML = _gridHtml;
+          _placeholder.parentNode.replaceChild(_newDiv2, _placeholder);
+        } else {
+          // last resort: append ที่ท้าย ag-body
+          var _appendDiv = document.createElement('div');
+          _appendDiv.innerHTML = _gridHtml;
+          _agBodyEl2.appendChild(_appendDiv);
+        }
       }
       // อัปเดต count ใน stats
       var _statsEl2 = document.getElementById('ag-modal-stats');
