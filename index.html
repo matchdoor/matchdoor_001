@@ -10931,6 +10931,10 @@ function renderMyAccount(){
             <div class="ma-hero-stat-num">${_cachedUserProfile?.review_count ?? 0}</div>
             <div class="ma-hero-stat-lbl"><i class="fas fa-star"></i> รีวิว</div>
           </div>
+          <div class="ma-hero-stat" id="ma-stat-deals-wrap">
+            <div class="ma-hero-stat-num" id="ma-stat-deals">${_cachedUserProfile?.agent_deals ?? 0}</div>
+            <div class="ma-hero-stat-lbl"><i class="fas fa-handshake"></i> ปิดดีล</div>
+          </div>
         </div>
         ${joinDate?`<div style="font-size:11px;opacity:.6;margin-top:8px"><i class="fas fa-calendar-alt" style="margin-right:4px"></i>${sanitize(t('ma.member.since'))} ${joinDate}</div>`:''}
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
@@ -11660,6 +11664,7 @@ async function renderMaListingsPanel() {
               <button onclick="openReportListingModal('${ul.id}','${ul.property_id||''}')" style="font-size:11px;padding:5px 11px;background:#f1c40f22;color:#b7950b;border:1px solid #f1c40f44;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px"><i class="fas fa-flag"></i> รายงาน</button>
               <button onclick="editUserListing('${ul.id}')" style="font-size:11px;padding:5px 11px;background:#3498db22;color:#2980b9;border:1px solid #3498db44;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px" title="แก้ไขข้อมูล ไม่หัก Token"><i class="fas fa-edit"></i> แก้ไข</button>
               ${ul.status === 'อนุมัติ' ? `<button onclick="closeMyListing('${ul.id}')" style="font-size:11px;padding:5px 11px;background:#95a5a622;color:#7f8c8d;border:1px solid #95a5a644;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px" title="ปิดประกาศชั่วคราว"><i class="fas fa-pause-circle"></i> ปิดประกาศ</button>` : ''}
+              ${ul.status === 'อนุมัติ' ? `<button onclick="openCloseDealModal('${ul.id}')" style="font-size:11px;padding:5px 11px;background:linear-gradient(135deg,#1B3A6B,#2a5298);color:#fff;border:none;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;font-weight:700" title="บันทึกว่าปิดการขาย/เช่าสำเร็จ — จะแสดงในหน้าผลงาน"><i class="fas fa-trophy"></i> ปิดดีล</button>` : ''}
               ${ul.status === 'ปิด' ? `<button onclick="reopenMyListing('${ul.id}')" style="font-size:11px;padding:5px 11px;background:#2ecc7122;color:#27ae60;border:1px solid #2ecc7144;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px" title="เปิดประกาศใหม่อีกครั้ง"><i class="fas fa-play-circle"></i> เปิดอีกครั้ง</button>` : ''}
               <button onclick="deleteMyListing('${ul.id}')" style="font-size:11px;padding:5px 11px;background:#e74c3c22;color:#e74c3c;border:1px solid #e74c3c44;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px" title="ลบประกาศ (ไม่ได้ Token คืน)"><i class="fas fa-trash-alt"></i> ลบ</button>
             </div>
@@ -13911,6 +13916,137 @@ async function shareMyListing(listingId, propertyId) {
     try {
       await sb.rpc('log_share', { p_listing_id: listingId, p_property_id: propertyId||null, p_platform: 'link' });
     } catch(e){ /* silent */ }
+  }
+}
+
+/* ── Close Deal Modal ── */
+function openCloseDealModal(listingId) {
+  const ul = _myUserListings.find(u => u.id === listingId);
+  if(!ul) { toast('ไม่พบข้อมูลประกาศ', true); return; }
+  const existing = document.getElementById('close-deal-modal');
+  if(existing) existing.remove();
+  const mo = document.createElement('div');
+  mo.id = 'close-deal-modal';
+  mo.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px';
+  mo.onclick = function(e){ if(e.target===this) this.remove(); };
+  const photoHtml = (ul.photos||[])[0]
+    ? '<img src="'+(ul.photos[0])+'" style="width:100%;height:120px;object-fit:cover;border-radius:10px;margin-bottom:14px">'
+    : '';
+  mo.innerHTML = '<div style="background:var(--bg);border-radius:18px;padding:26px;width:100%;max-width:440px;box-shadow:0 24px 60px rgba(0,0,0,.35)">'
+    + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">'
+      + '<h3 style="margin:0;font-size:17px;color:var(--tx);display:flex;align-items:center;gap:8px"><i class="fas fa-trophy" style="color:#C8922A"></i> บันทึกปิดดีลสำเร็จ</h3>'
+      + '<button id="close-deal-modal-x" style="background:transparent;border:none;font-size:22px;color:var(--tx2);cursor:pointer;line-height:1">×</button>'
+    + '</div>'
+    + photoHtml
+    + '<div style="font-size:13px;font-weight:700;color:var(--tx);margin-bottom:14px;padding:10px 14px;background:var(--lt);border-radius:10px">'
+      + '<i class="fas fa-home" style="color:var(--p);margin-right:6px"></i>'
+      + (ul.title||'').substring(0,60)
+    + '</div>'
+    + '<div style="margin-bottom:14px">'
+      + '<div style="font-size:12px;font-weight:700;color:var(--tx2);margin-bottom:8px">สถานะดีล *</div>'
+      + '<div style="display:flex;gap:8px">'
+        + '<button id="cdm-btn-sold" style="flex:1;padding:10px;border:2px solid var(--bd);border-radius:10px;background:var(--bg);cursor:pointer;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s"><i class="fas fa-tag"></i> ขายแล้ว</button>'
+        + '<button id="cdm-btn-rented" style="flex:1;padding:10px;border:2px solid var(--bd);border-radius:10px;background:var(--bg);cursor:pointer;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s"><i class="fas fa-key"></i> ให้เช่าแล้ว</button>'
+      + '</div>'
+    + '</div>'
+    + '<div style="margin-bottom:14px">'
+      + '<div style="font-size:12px;font-weight:700;color:var(--tx2);margin-bottom:6px">รีวิวจากลูกค้า <span style="font-weight:400;color:var(--gr)">(ไม่บังคับ)</span></div>'
+      + '<textarea id="cdm-review" rows="3" placeholder="ลูกค้าพอใจมากครับ ปิดดีลได้ไว..." style="width:100%;box-sizing:border-box;padding:10px;border:1.5px solid var(--bd);border-radius:10px;font-size:13px;color:var(--tx);background:var(--bg);resize:vertical;font-family:inherit"></textarea>'
+    + '</div>'
+    + '<div style="display:flex;gap:8px;margin-top:4px">'
+      + '<button id="cdm-cancel-btn" style="flex:1;padding:11px;background:var(--lt);color:var(--tx);border:1.5px solid var(--bd);border-radius:10px;font-size:13px;font-weight:600;cursor:pointer">ยกเลิก</button>'
+      + '<button id="cdm-confirm-btn" disabled style="flex:2;padding:11px;background:linear-gradient(135deg,#1B3A6B,#2a5298);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;opacity:.45;display:flex;align-items:center;justify-content:center;gap:6px"><i class="fas fa-trophy"></i> ยืนยันปิดดีล</button>'
+    + '</div>'
+    + '</div>';
+  document.body.appendChild(mo);
+  document.getElementById('close-deal-modal-x').addEventListener('click', function(){ mo.remove(); });
+  document.getElementById('cdm-cancel-btn').addEventListener('click', function(){ mo.remove(); });
+  document.getElementById('cdm-btn-sold').addEventListener('click', function(){ _cdmSelectStatus('SOLD'); });
+  document.getElementById('cdm-btn-rented').addEventListener('click', function(){ _cdmSelectStatus('RENTED'); });
+  document.getElementById('cdm-confirm-btn').addEventListener('click', function(){ confirmCloseDeal(listingId); });
+  window._cdmStatus = null;
+}
+
+function _cdmSelectStatus(st) {
+  window._cdmStatus = st;
+  var btnSold   = document.getElementById('cdm-btn-sold');
+  var btnRented = document.getElementById('cdm-btn-rented');
+  var confirmBtn = document.getElementById('cdm-confirm-btn');
+  if(btnSold) btnSold.style.cssText = btnSold.style.cssText.replace(/border:[^;]+;/g,'')
+    + (st==='SOLD' ? 'border:2px solid #1B3A6B;background:#1B3A6B11;color:#1B3A6B;' : 'border:2px solid var(--bd);background:var(--bg);color:var(--tx);');
+  if(btnRented) btnRented.style.cssText = btnRented.style.cssText.replace(/border:[^;]+;/g,'')
+    + (st==='RENTED' ? 'border:2px solid #1B3A6B;background:#1B3A6B11;color:#1B3A6B;' : 'border:2px solid var(--bd);background:var(--bg);color:var(--tx);');
+  if(confirmBtn){ confirmBtn.disabled = false; confirmBtn.style.opacity = '1'; }
+}
+
+async function confirmCloseDeal(listingId) {
+  if(!window._cdmStatus){ toast('กรุณาเลือกสถานะดีลก่อน', true); return; }
+  if(!sb || !user){ toast('กรุณาเข้าสู่ระบบก่อน', true); return; }
+  const ul = _myUserListings.find(u => u.id === listingId);
+  if(!ul){ toast('ไม่พบข้อมูลประกาศ', true); return; }
+  const confirmBtn = document.getElementById('cdm-confirm-btn');
+  if(confirmBtn){ confirmBtn.disabled = true; confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังบันทึก...'; }
+  const reviewText = (document.getElementById('cdm-review') || {}).value || '';
+  // สร้าง portfolio record
+  const newPortId = 'u' + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+  const portfolioData = {
+    id: newPortId,
+    title: ul.title || '',
+    type: ul.property_type || ul.type || 'คอนโด',
+    price: Number(ul.price) || 0,
+    status: window._cdmStatus,
+    location: (ul.province || '') + (ul.location ? ' ' + ul.location : ''),
+    date: new Date().toLocaleDateString('th-TH', { month: 'short', year: 'numeric' }),
+    review: reviewText || null,
+    photo: (ul.photos || [])[0] || null,
+    photos: ul.photos || [],
+    source_user_id: user.id,
+    source_listing_id: listingId
+  };
+  try {
+    // INSERT portfolio
+    const { error: portErr } = await sb.from('portfolio').insert(portfolioData);
+    if(portErr && portErr.code !== '23505'){ // ignore duplicate
+      throw new Error(portErr.message || 'บันทึกผลงานไม่สำเร็จ');
+    }
+    // UPDATE agent_deals (+1) ใน user_profiles
+    const currentDeals = (_cachedUserProfile && _cachedUserProfile.agent_deals) ? Number(_cachedUserProfile.agent_deals) : 0;
+    const newDeals = currentDeals + 1;
+    try {
+      await sb.from('user_profiles').update({ agent_deals: newDeals }).eq('user_id', user.id);
+    } catch(e2){ /* silent */ }
+    // อัปเดต cache
+    if(_cachedUserProfile) _cachedUserProfile.agent_deals = newDeals;
+    // เพิ่มเข้า port array local
+    const newPortItem = {
+      id: newPortId,
+      title: portfolioData.title,
+      type: portfolioData.type,
+      price: portfolioData.price,
+      status: window._cdmStatus,
+      location: portfolioData.location,
+      date: portfolioData.date,
+      review: reviewText || '',
+      photo: portfolioData.photo || '',
+      photos: ul.photos || []
+    };
+    port.unshift(newPortItem);
+    // ปิด modal
+    const mo = document.getElementById('close-deal-modal');
+    if(mo) mo.remove();
+    toast('🏆 บันทึกปิดดีลสำเร็จ! แสดงที่หน้าผลงานแล้ว');
+    // อัปเดต deals counter ใน UI
+    var dealsEl = document.getElementById('ma-stat-deals');
+    if(dealsEl) dealsEl.textContent = newDeals;
+    // Reload portfolio page ถ้ากำลังแสดงอยู่
+    if(document.getElementById('page-portfolio') && document.getElementById('page-portfolio').classList.contains('active') && typeof renderPortfolio === 'function'){
+      renderPortfolio('all');
+    }
+    // Refresh listings panel
+    renderMaListingsPanel();
+  } catch(e){
+    toast('เกิดข้อผิดพลาด: ' + (e.message || e), true);
+    if(confirmBtn){ confirmBtn.disabled = false; confirmBtn.innerHTML = '<i class="fas fa-trophy"></i> ยืนยันปิดดีล'; }
   }
 }
 
