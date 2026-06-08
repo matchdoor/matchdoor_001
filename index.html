@@ -406,6 +406,26 @@
   -- เพิ่ม column welcome_bonus ใน user_tokens
   ALTER TABLE user_tokens
     ADD COLUMN IF NOT EXISTS welcome_bonus_given BOOLEAN NOT NULL DEFAULT false;
+
+  -- v33: เพิ่ม column ใหม่ใน user_listings (Virtual Tour + Other Fees)
+  ALTER TABLE user_listings
+    ADD COLUMN IF NOT EXISTS panorama_url       TEXT,
+    ADD COLUMN IF NOT EXISTS transfer_fee       TEXT,
+    ADD COLUMN IF NOT EXISTS ownership_type     TEXT,
+    ADD COLUMN IF NOT EXISTS internet_fee       NUMERIC,
+    ADD COLUMN IF NOT EXISTS parking_fee        NUMERIC,
+    ADD COLUMN IF NOT EXISTS other_monthly_fee  NUMERIC,
+    ADD COLUMN IF NOT EXISTS other_fees_note    TEXT;
+
+  -- v33: เพิ่ม column เดียวกันใน properties (sync จาก admin_approve_user_listing)
+  ALTER TABLE properties
+    ADD COLUMN IF NOT EXISTS panorama_url       TEXT,
+    ADD COLUMN IF NOT EXISTS transfer_fee       TEXT,
+    ADD COLUMN IF NOT EXISTS ownership_type     TEXT,
+    ADD COLUMN IF NOT EXISTS internet_fee       NUMERIC,
+    ADD COLUMN IF NOT EXISTS parking_fee        NUMERIC,
+    ADD COLUMN IF NOT EXISTS other_monthly_fee  NUMERIC,
+    ADD COLUMN IF NOT EXISTS other_fees_note    TEXT;
 ═══════════════════════════════════════════════════════════════════
 -->
 <style>
@@ -8655,10 +8675,30 @@ window.mdBnavCloseMenu = function(){
       <div class="fav-actions">
         <button class="btn-fa" onclick="clearFavs()"><i class="fas fa-trash-alt"></i> <span data-i18n="ph.fav.clear">ล้างทั้งหมด</span></button>
         <button class="btn-fa" onclick="shareFavs()"><i class="fas fa-share-alt"></i> <span data-i18n="ph.fav.share">แชร์รายการ</span></button>
+        <button class="btn-fa" onclick="openComparePanel()" id="fav-compare-btn" style="background:rgba(255,200,0,.18);border-color:rgba(255,200,0,.5)"><i class="fas fa-balance-scale"></i> เปรียบเทียบ <span id="fav-compare-count" style="background:#f1c40f;color:#333;border-radius:20px;padding:0 6px;font-size:10px;margin-left:2px;font-weight:800"></span></button>
       </div>
     </div>
   </div>
-  <div class="wrap"><div class="prop-grid" id="fav-page-grid"></div></div>
+  <div class="wrap">
+    <!-- ── Compare Bar (sticky) ── -->
+    <div id="fav-compare-bar" style="display:none;position:sticky;top:60px;z-index:300;background:linear-gradient(135deg,#1b3a6b,#2a5298);color:#fff;border-radius:14px;padding:14px 18px;margin-bottom:20px;box-shadow:0 4px 20px rgba(27,58,107,.35)">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:10px">
+          <i class="fas fa-balance-scale" style="font-size:20px;opacity:.8"></i>
+          <div>
+            <div style="font-weight:800;font-size:14px">โหมดเปรียบเทียบ</div>
+            <div style="font-size:11px;opacity:.75">เลือกทรัพย์ 2–3 รายการแล้วกด "เปรียบเทียบ"</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div id="fav-compare-pills" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+          <button onclick="startCompare()" id="fav-do-compare-btn" style="background:#f1c40f;color:#333;border:none;border-radius:10px;padding:9px 18px;font-size:13px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:6px" disabled><i class="fas fa-columns"></i> เปรียบเทียบ</button>
+          <button onclick="cancelCompare()" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:10px;padding:9px 12px;font-size:12px;font-weight:600;cursor:pointer"><i class="fas fa-times"></i></button>
+        </div>
+      </div>
+    </div>
+    <div class="prop-grid" id="fav-page-grid"></div>
+  </div>
   <div class="sub-page-footer"></div>
 </div>
 
@@ -8886,6 +8926,27 @@ window.mdBnavCloseMenu = function(){
   </div>
   <div class="wrap"><div class="agent-grid" id="agent-grid"></div></div>
   <div class="sub-page-footer"></div>
+</div>
+
+<!-- ── COMPARE MODAL ── -->
+<div id="compare-modal-ov" style="display:none;position:fixed;inset:0;z-index:4000;background:rgba(0,0,0,.75);overflow-y:auto;padding:20px 10px" onclick="if(event.target===this)closeCompareModal()">
+  <div style="max-width:1100px;margin:0 auto;background:var(--bg);border-radius:20px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.4)">
+    <div style="background:linear-gradient(135deg,#1b3a6b,#2a5298);color:#fff;padding:18px 24px;display:flex;align-items:center;justify-content:space-between">
+      <div style="display:flex;align-items:center;gap:10px">
+        <i class="fas fa-balance-scale" style="font-size:20px"></i>
+        <div>
+          <div style="font-weight:800;font-size:16px">เปรียบเทียบทรัพย์</div>
+          <div style="font-size:11px;opacity:.75" id="compare-subtitle">กำลังโหลด...</div>
+        </div>
+      </div>
+      <button onclick="closeCompareModal()" style="background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:50%;width:36px;height:36px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center"><i class="fas fa-times"></i></button>
+    </div>
+    <div id="compare-modal-body" style="overflow-x:auto;padding:0">
+      <table id="compare-table" style="width:100%;border-collapse:collapse;min-width:600px">
+        <!-- Rendered by renderCompareTable() -->
+      </table>
+    </div>
+  </div>
 </div>
 
 <div class="ov" id="prop-modal" onclick="closeModal(event)"><div class="modal"><div class="mhd" style="justify-content:space-between"><h2 id="m-title" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-right:8px"></h2><div style="display:flex;align-items:center;gap:8px;flex-shrink:0"><button onclick="event.stopPropagation();(function(){const url=location.href;if(navigator.share)navigator.share({title:document.title,url});else navigator.clipboard?.writeText(url).then(()=>toast('คัดลอก URL แล้ว ✅'));})()" style="width:34px;height:34px;border-radius:50%;background:var(--lt);border:1.5px solid var(--bd);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--p);font-size:14px" title="แชร์"><i class="fas fa-share-nodes"></i></button><button id="m-fav-btn" onclick="event.stopPropagation();toggleModalFav()" class="modal-fav-btn" title="เพิ่มรายการโปรด"><i class="far fa-heart"></i></button><span class="mclose" onclick="event.stopPropagation();closeModal()">×</span></div></div><div class="mbody"><div class="mslider-wrap"><div class="mslider"><div class="slides" id="slides"></div></div><button class="sarr prev" onclick="slide(-1)"><i class="fas fa-chevron-left"></i></button><button class="sarr next" onclick="slide(1)"><i class="fas fa-chevron-right"></i></button><div class="sdots" id="sdots"></div></div><div id="m-tags" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px"></div><div class="modal-price" id="m-price"></div><div class="modal-loc" id="m-loc"></div><div class="specs" id="m-specs"></div><div id="m-extras"></div><div class="agent-box" id="m-agent"><div class="ag-av" id="m-ag-av"></div><div><div id="m-ag-name" style="font-weight:700"></div><div id="m-ag-role" style="font-size:12px;color:var(--gr)"></div></div></div><div class="modal-desc" id="m-desc"></div><div id="m-chips" style="margin-bottom:10px"></div><div id="m-map" style="margin-bottom:16px"></div><div id="m-360-wrap" style="margin-bottom:16px"><button id="m-360-toggle-btn" onclick="toggle360()" style="display:flex;align-items:center;gap:8px;width:100%;background:linear-gradient(135deg,#0f1e3a,#1b3a6b);color:#fff;border:none;border-radius:12px;padding:13px 18px;cursor:pointer;font-size:14px;font-weight:700;font-family:inherit;transition:.2s" onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'"><i class="fas fa-street-view" style="font-size:18px;opacity:.9"></i><span id="m-360-label">มุมมอง 360°</span><span class="tour360-badge">Virtual Tour</span><i id="m-360-chevron" class="fas fa-chevron-down" style="margin-left:auto;font-size:12px;opacity:.7;transition:transform .3s"></i></button><div id="m-360-viewer-wrap" style="display:none;margin-top:8px"><div id="m-360-viewer" class="tour360-viewer"><canvas id="tour360-canvas"></canvas><div class="tour360-hint"><i class="fas fa-hand-pointer"></i> <span id="m-drag-hint">ลากเพื่อหมุน</span></div><button class="tour360-close" onclick="toggle360()"><i class="fas fa-times"></i></button></div></div></div><div id="m-nearby" style="margin-bottom:14px"></div><div class="cta-row"><a class="btn-cta cta-ln" id="m-ln" href="#" target="_blank"><i class="fab fa-line"></i> <span id="m-ln-label">แชท Line</span></a><a class="btn-cta cta-tel" id="m-tel" href="#"><i class="fas fa-mobile-alt"></i> <span id="m-tel-label">โทรสอบถาม</span></a></div><div style="margin-top:10px"><button id="m-pdp-btn" onclick="event.stopPropagation();(function(){var id=window._currentModalId;if(id){closeModal();setTimeout(function(){showPage('property',id);},200);}})();" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--lt);border:1.5px solid var(--bd);border-radius:12px;padding:11px 16px;font-size:13px;font-weight:600;color:var(--p);cursor:pointer;font-family:inherit;transition:.15s" onmouseover="this.style.borderColor='var(--p)';this.style.background='rgba(27,58,107,.07)'" onmouseout="this.style.borderColor='var(--bd)';this.style.background='var(--lt)'"><i class="fas fa-expand-alt"></i> ดูรายละเอียดเต็มหน้า</button></div></div></div></div>
@@ -10203,9 +10264,10 @@ function toast(msg,type=false){
   const t=$('toast');
   t.textContent=msg;
   const isErr=type===true||type==='error';
-  const isWarn=type==='warn';
+  const isWarn=type==='warn'||type==='warning';
   const isOk=type==='success';
-  t.style.background=isErr?'rgba(200,50,50,.9)':isWarn?'rgba(180,120,0,.9)':isOk?'rgba(39,174,96,.9)':'rgba(0,0,0,.85)';
+  const isInfo=type==='info';
+  t.style.background=isErr?'rgba(200,50,50,.9)':isWarn?'rgba(180,120,0,.9)':isOk?'rgba(39,174,96,.9)':isInfo?'rgba(27,58,107,.9)':'rgba(0,0,0,.85)';
   t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),3000);
 }
@@ -11074,10 +11136,10 @@ function renderMyAccount(){
     <!-- Admin sub-tabs -->
     <div style="display:flex;gap:6px;margin-bottom:16px;border-bottom:2px solid var(--lt);padding-bottom:12px;flex-wrap:wrap">
       <button id="adm-tab-dashboard" class="adm-subtab" onclick="_admSubTab('dashboard',this);renderAdminDashboard()" style="padding:7px 14px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;font-weight:700;background:transparent;color:var(--tx);cursor:pointer"><i class="fas fa-tachometer-alt"></i> Dashboard</button>
-      <button id="adm-tab-listings" class="adm-subtab active" onclick="_admSubTab('listings',this)" style="padding:7px 14px;border:1.5px solid var(--p);border-radius:8px;font-size:12px;font-weight:700;background:var(--p);color:#fff;cursor:pointer"><i class="fas fa-list"></i> จัดการประกาศ</button>
+      <button id="adm-tab-listings" class="adm-subtab active" onclick="_admSubTab('listings',this);renderAdminListingsPanel()" style="padding:7px 14px;border:1.5px solid var(--p);border-radius:8px;font-size:12px;font-weight:700;background:var(--p);color:#fff;cursor:pointer"><i class="fas fa-list"></i> จัดการประกาศ</button>
       <button id="adm-tab-properties" class="adm-subtab" onclick="_admSubTab('properties',this);renderAdminPropertiesPanel()" style="padding:7px 14px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;font-weight:700;background:transparent;color:var(--tx);cursor:pointer"><i class="fas fa-building"></i> ทรัพย์ทั้งหมด</button>
-      <button id="adm-tab-users" class="adm-subtab" onclick="_admSubTab('users',this)" style="padding:7px 14px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;font-weight:700;background:transparent;color:var(--tx);cursor:pointer"><i class="fas fa-users"></i> จัดการ Users</button>
-      <button id="adm-tab-tokens" class="adm-subtab" onclick="_admSubTab('tokens',this)" style="padding:7px 14px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;font-weight:700;background:transparent;color:var(--tx);cursor:pointer"><i class="fas fa-coins"></i> Token Orders</button>
+      <button id="adm-tab-users" class="adm-subtab" onclick="_admSubTab('users',this);renderAdminUsersPanel()" style="padding:7px 14px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;font-weight:700;background:transparent;color:var(--tx);cursor:pointer"><i class="fas fa-users"></i> จัดการ Users</button>
+      <button id="adm-tab-tokens" class="adm-subtab" onclick="_admSubTab('tokens',this);renderAdminTokensPanel()" style="padding:7px 14px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;font-weight:700;background:transparent;color:var(--tx);cursor:pointer"><i class="fas fa-coins"></i> Token Orders</button>
     </div>
     <div class="ma-section" id="admin-dashboard-section" style="display:none"></div>
     <div class="ma-section" id="admin-listings-section"><div style="text-align:center;padding:40px 0;color:var(--tx2)"><i class="fas fa-spinner fa-spin" style="font-size:24px"></i><div style="margin-top:8px">กำลังโหลด...</div></div></div>
@@ -11460,7 +11522,16 @@ async function submitUserListing() {
       contact_phone:     phone,
       contact_line:      val('ul-contact-line'),
       photos:            photoUrls,
-      status:            'รอตรวจสอบ'
+      status:            'รอตรวจสอบ',
+      // ── Virtual Tour ──
+      panorama_url:      val('ul-panorama-url') || null,
+      // ── Other fees ──
+      transfer_fee:      val('ul-transfer-fee') || null,
+      ownership_type:    val('ul-ownership') || null,
+      internet_fee:      isRent ? (num('ul-internet-fee') || null) : null,
+      parking_fee:       isRent ? (num('ul-parking-fee') || null) : null,
+      other_monthly_fee: isRent ? (num('ul-other-monthly-fee') || null) : null,
+      other_fees_note:   val('ul-other-fees-note') || null,
     };
 
     // ── DEV MODE: จำลองการส่งโดยไม่เขียน DB ──
@@ -12146,13 +12217,22 @@ async function adminEditListing(listingId) {
         <div style="background:#fff3cd;border:1px solid #ffc10788;border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:12px;color:#856404">
           <i class="fas fa-shield-alt"></i> แก้ไขโดย Admin — การเปลี่ยนแปลงจะมีผลทันที
         </div>
-        ${['title','property_type','transaction','price','province','district','location','near_bts','description','contact_name','contact_phone','contact_line','map_url','admin_note'].map(f => `
+        ${['title','property_type','transaction','price','area','land_area','bed','bath','floors','floor_no','parking','province','district','location','near_bts','description','contact_name','contact_phone','contact_line','map_url','panorama_url','transfer_fee','ownership_type','other_fees_note','admin_note'].map(f => `
         <div class="ma-field">
-          <label>${f}</label>
+          <label style="font-size:11px;color:var(--tx2)">${f}</label>
           <input type="text" id="aedit-${f}" value="${_san(String(data[f]||''))}" style="width:100%;padding:9px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;box-sizing:border-box">
         </div>`).join('')}
         <div class="ma-field">
-          <label>status</label>
+          <label style="font-size:11px;color:var(--tx2)">furniture</label>
+          <select id="aedit-furniture" style="width:100%;padding:9px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px">
+            <option value="">ไม่ระบุ</option>
+            <option value="full" ${data.furniture==='full'?'selected':''}>ครบ (Full Furnished)</option>
+            <option value="partial" ${data.furniture==='partial'?'selected':''}>บางส่วน (Partial)</option>
+            <option value="none" ${data.furniture==='none'?'selected':''}>ไม่มีเฟอร์นิเจอร์</option>
+          </select>
+        </div>
+        <div class="ma-field">
+          <label style="font-size:11px;color:var(--tx2)">status</label>
           <select id="aedit-status" style="width:100%;padding:9px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px">
             ${['รอตรวจสอบ','อนุมัติ','ปฏิเสธ','ปิด','หมดอายุ'].map(s=>`<option value="${s}" ${data.status===s?'selected':''}>${s}</option>`).join('')}
           </select>
@@ -12184,6 +12264,13 @@ async function _adminSaveEditListing(listingId) {
       property_type:  f('property_type'),
       transaction:    f('transaction'),
       price:          parseFloat(f('price'))||0,
+      area:           parseFloat(f('area'))||null,
+      land_area:      parseFloat(f('land_area'))||null,
+      bed:            parseInt(f('bed'))||null,
+      bath:           parseInt(f('bath'))||null,
+      floors:         parseInt(f('floors'))||null,
+      floor_no:       parseInt(f('floor_no'))||null,
+      parking:        parseInt(f('parking'))||null,
       province:       f('province'),
       district:       f('district'),
       location:       f('location'),
@@ -12193,8 +12280,13 @@ async function _adminSaveEditListing(listingId) {
       contact_phone:  f('contact_phone'),
       contact_line:   f('contact_line'),
       map_url:        f('map_url')||null,
+      panorama_url:   f('panorama_url')||null,
+      furniture:      f('furniture')||null,
+      transfer_fee:   f('transfer_fee')||null,
+      ownership_type: f('ownership_type')||null,
+      other_fees_note:f('other_fees_note')||null,
       admin_note:     f('admin_note'),
-      status:         f('status'),
+      status:         document.getElementById('aedit-status')?.value || f('status'),
       updated_at:     new Date().toISOString()
     };
     const { error } = await sb.from('user_listings').update(updateData).eq('id', listingId);
@@ -12708,6 +12800,64 @@ function _injectUserListingModal() {
           </div>
         </div>
 
+        <!-- ── Section 3b: Virtual Tour 360° ── -->
+        <div class=\"ul-sec-hd\"><i class=\"fas fa-street-view\"></i> Virtual Tour 360° <span style=\"font-size:11px;font-weight:400;color:var(--tx2);margin-left:4px\">(ไม่บังคับ)</span></div>
+        <div class=\"ma-field\">
+          <label><i class=\"fas fa-vr-cardboard\" style=\"color:#4f46e5;margin-right:4px\"></i>URL มุมมอง 360° / Panorama <span style=\"font-size:11px;color:var(--tx2);font-weight:400\">(รองรับ Matterport, Google Street View, Kuula, คลิป YouTube 360°)</span></label>
+          <div style=\"display:flex;gap:8px;align-items:center\">
+            <input type=\"url\" id=\"ul-panorama-url\" placeholder=\"https://kuula.co/share/... หรือ https://www.matterport.com/...\" style=\"flex:1;padding:10px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;box-sizing:border-box\">
+            <button type=\"button\" onclick=\"if(document.getElementById('ul-panorama-url').value)window.open(document.getElementById('ul-panorama-url').value,'_blank');else alert('กรุณาใส่ URL ก่อน')\" title=\"ทดสอบ URL\" style=\"padding:9px 13px;background:#4f46e5;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px;flex-shrink:0\"><i class=\"fas fa-eye\"></i></button>
+          </div>
+          <div style=\"font-size:11px;color:var(--tx2);margin-top:5px\"><i class=\"fas fa-info-circle\"></i> ผู้ชมจะเห็นปุ่ม \"มุมมอง 360°\" บนหน้ารายละเอียดทรัพย์</div>
+        </div>
+
+        <!-- ── Section 3c: ค่าบริการอื่นๆ (เช่า/ขาย) ── -->
+        <div class=\"ul-sec-hd\"><i class=\"fas fa-file-invoice-dollar\"></i> ค่าใช้จ่ายอื่นๆ <span style=\"font-size:11px;font-weight:400;color:var(--tx2);margin-left:4px\">(ไม่บังคับ)</span></div>
+        <div id=\"ul-other-fees-section\">
+          <div style=\"display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px\">
+            <div class=\"ma-field\" style=\"margin:0\">
+              <label>ค่าโอน (%) <span style=\"font-size:11px;color:var(--tx2);font-weight:400\">— ผู้ขาย/ผู้ซื้อ/แบ่ง</span></label>
+              <select id=\"ul-transfer-fee\" style=\"width:100%;padding:10px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px\">
+                <option value=\"\">ไม่ระบุ</option>
+                <option value=\"ผู้ขายออก\">ผู้ขายออกทั้งหมด</option>
+                <option value=\"ผู้ซื้อออก\">ผู้ซื้อออกทั้งหมด</option>
+                <option value=\"แบ่งครึ่ง\">แบ่งครึ่ง 50/50</option>
+                <option value=\"ตามข้อตกลง\">ตามข้อตกลง</option>
+              </select>
+            </div>
+            <div class=\"ma-field\" style=\"margin:0\">
+              <label>สิทธิ์การถือครอง</label>
+              <select id=\"ul-ownership\" style=\"width:100%;padding:10px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px\">
+                <option value=\"\">ไม่ระบุ</option>
+                <option value=\"โฉนด\">โฉนดที่ดิน (นส.4)</option>
+                <option value=\"นส.3ก\">นส.3ก</option>
+                <option value=\"นส.3\">นส.3</option>
+                <option value=\"ห้องชุด\">หนังสือกรรมสิทธิ์ห้องชุด</option>
+                <option value=\"สปก\">สปก.</option>
+                <option value=\"ตามข้อตกลง\">ตามข้อตกลง</option>
+              </select>
+            </div>
+          </div>
+          <div style=\"display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px\" id=\"ul-rent-other-fees\" style=\"display:none\">
+            <div class=\"ma-field\" style=\"margin:0\">
+              <label>ค่าอินเทอร์เน็ต/เดือน (บาท)</label>
+              <input type=\"number\" id=\"ul-internet-fee\" placeholder=\"500\" min=\"0\" style=\"width:100%;padding:10px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;box-sizing:border-box\">
+            </div>
+            <div class=\"ma-field\" style=\"margin:0\">
+              <label>ค่าที่จอดรถ/เดือน (บาท)</label>
+              <input type=\"number\" id=\"ul-parking-fee\" placeholder=\"1500\" min=\"0\" style=\"width:100%;padding:10px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;box-sizing:border-box\">
+            </div>
+            <div class=\"ma-field\" style=\"margin:0\">
+              <label>ค่าบริการอื่นๆ/เดือน (บาท)</label>
+              <input type=\"number\" id=\"ul-other-monthly-fee\" placeholder=\"0\" min=\"0\" style=\"width:100%;padding:10px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;box-sizing:border-box\">
+            </div>
+          </div>
+          <div class=\"ma-field\">
+            <label>รายละเอียดค่าใช้จ่ายเพิ่มเติม</label>
+            <input type=\"text\" id=\"ul-other-fees-note\" placeholder=\"เช่น รวมค่าอินเทอร์เน็ต, ไม่รวมค่าไฟ, ค่าส่วนกลางอยู่ที่...\" style=\"width:100%;padding:10px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;box-sizing:border-box\">
+          </div>
+        </div>
+
         <!-- ── Section 4: รูปภาพ ── -->
         <div class="ul-sec-hd"><i class="fas fa-images"></i> รูปภาพ (สูงสุด 10 รูป)</div>
 
@@ -12774,8 +12924,11 @@ function _injectUserListingModal() {
 // ── Toggle เช่า/ขาย fields ──
 function _ulToggleRentFields(){
   const tx = document.getElementById('ul-transaction')?.value;
+  const isRent = tx === 'RENT';
   const sec = document.getElementById('ul-rent-section');
-  if(sec) sec.style.display = tx === 'RENT' ? 'block' : 'none';
+  if(sec) sec.style.display = isRent ? 'block' : 'none';
+  const rof = document.getElementById('ul-rent-other-fees');
+  if(rof) rof.style.display = isRent ? 'grid' : 'none';
 }
 
 // ── Photo preview ──
@@ -12940,6 +13093,14 @@ async function editUserListing(listingId) {
   set('ul-contact-name', ul.contact_name||'');
   set('ul-contact-phone', ul.contact_phone||ul.phone||'');
   set('ul-contact-line', ul.contact_line||'');
+  // ── New fields ──
+  set('ul-panorama-url', ul.panorama_url||'');
+  set('ul-transfer-fee', ul.transfer_fee||'');
+  set('ul-ownership', ul.ownership_type||'');
+  set('ul-internet-fee', ul.internet_fee||'');
+  set('ul-parking-fee', ul.parking_fee||'');
+  set('ul-other-monthly-fee', ul.other_monthly_fee||'');
+  set('ul-other-fees-note', ul.other_fees_note||'');
 
   // Populate nearby
   window._ulNearbyList = Array.isArray(ul.nearby_places) ? [...ul.nearby_places] : [];
@@ -13038,7 +13199,16 @@ async function updateUserListing(listingId) {
       contact_line:      val('ul-contact-line'),
       photos:            finalPhotos,
       status:            'รอตรวจสอบ', // รอ admin re-approve
-      updated_at:        new Date().toISOString()
+      updated_at:        new Date().toISOString(),
+      // ── Virtual Tour ──
+      panorama_url:      val('ul-panorama-url') || null,
+      // ── Other fees ──
+      transfer_fee:      val('ul-transfer-fee') || null,
+      ownership_type:    val('ul-ownership') || null,
+      internet_fee:      isRent ? (num('ul-internet-fee') || null) : null,
+      parking_fee:       isRent ? (num('ul-parking-fee') || null) : null,
+      other_monthly_fee: isRent ? (num('ul-other-monthly-fee') || null) : null,
+      other_fees_note:   val('ul-other-fees-note') || null,
     };
     if(isRent){
       updateData.deposit          = num('ul-deposit')||null;
@@ -14377,7 +14547,14 @@ function mapProp(r){
     contact_name:r.contact_name||'',
     contact_phone:r.contact_phone||'',
     contact_line:r.contact_line||'',
-    map_url:r.map_url||''
+    map_url:r.map_url||'',
+    // v33: new listing form fields
+    transfer_fee:r.transfer_fee||'',
+    ownership_type:r.ownership_type||'',
+    internet_fee:r.internet_fee||null,
+    parking_fee:r.parking_fee||null,
+    other_monthly_fee:r.other_monthly_fee||null,
+    other_fees_note:r.other_fees_note||''
   };
 }
 // ── v26: mapUserListing — แปลง v_approved_user_listings row → propCard format ──
@@ -15231,6 +15408,56 @@ function translateKeyword(kw) {
   return kw; // return original if no translation
 }
 
+// ── Fuzzy Search Engine ────────────────────────────────────────────
+// levenshtein distance สำหรับ token matching
+function _levenshtein(a, b) {
+  if (!a.length) return b.length;
+  if (!b.length) return a.length;
+  const m = a.length, n = b.length;
+  const dp = Array.from({length: m+1}, (_, i) => Array.from({length: n+1}, (_, j) => i===0?j:j===0?i:0));
+  for (let i=1;i<=m;i++) for (let j=1;j<=n;j++) dp[i][j]=a[i-1]===b[j-1]?dp[i-1][j-1]:1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);
+  return dp[m][n];
+}
+// คำนวณ fuzzy score (0–1, สูง = ใกล้เคียง)
+function _fuzzyScore(query, target) {
+  if (!query || !target) return 0;
+  const q = query.toLowerCase().trim();
+  const t = target.toLowerCase();
+  if (t.includes(q)) return 1.0; // exact substring = perfect
+  // token-level fuzzy for latin words
+  const tokens = q.split(/\s+/).filter(Boolean);
+  if (!tokens.length) return 0;
+  let totalScore = 0;
+  for (const tok of tokens) {
+    if (tok.length < 2) { totalScore += t.includes(tok) ? 1 : 0; continue; }
+    // sliding window over target
+    let best = 0;
+    for (let i=0; i<=t.length-Math.max(1,tok.length-2); i++) {
+      const win = t.slice(i, i+tok.length+2);
+      const dist = _levenshtein(tok, win.slice(0, tok.length));
+      const sim = 1 - dist / Math.max(tok.length, 1);
+      if (sim > best) best = sim;
+    }
+    totalScore += best;
+  }
+  return totalScore / tokens.length;
+}
+// ตัดสินใจว่า keyword match หรือไม่ (รองรับ fuzzy + ภาษาไทย + ภาษาอังกฤษ)
+function _fuzzyMatch(kw, p) {
+  if (!kw) return true;
+  const kwl = kw.toLowerCase().trim();
+  const kwTrans = translateKeyword(kw).toLowerCase();
+  // Build haystack จากทุก field ที่ค้นหา
+  const hay = [p.title, p.location, p.province, p.district, p.desc, p.near_bts, p.type].filter(Boolean).join(' ').toLowerCase();
+  // 1) ตรงๆ ก่อน (เร็วสุด)
+  if (hay.includes(kwl) || hay.includes(kwTrans)) return true;
+  // 2) token fuzzy (threshold: 0.72 สำหรับข้อผิดพลาด 1-2 ตัว)
+  const FUZZY_THRESHOLD = 0.72;
+  const score = Math.max(_fuzzyScore(kwl, hay), kwl!==kwTrans ? _fuzzyScore(kwTrans, hay) : 0);
+  return score >= FUZZY_THRESHOLD;
+}
+
+
 function doSearch(){ curType=($('s-type')?.value||'').trim(); $$('.cat-card').forEach((c,i)=>c.classList.toggle('active',i===0)); applyFilters().catch(console.error); scrollToEl('all-sec');
   // GA4: search event
   try{ if(typeof trackEvent==='function'){ const _kw=($('s-kw')?.value||'').trim(); const _tx=($('s-tx')?.value||$('tx-tab.active')?.dataset?.tx||''); const _type=($('s-type')?.value||''); const _prov=($('s-prov')?.value||''); if(_kw||_type||_prov) trackEvent('search',{search_term:_kw,tx:_tx,property_type:_type,province:_prov,source:'home'}); } }catch(e){}
@@ -15305,13 +15532,7 @@ async function applyFilters(){
       if(distHay.indexOf(dvL) === -1) return false;
     }
     if(kwlOrig){
-      const titleL = p.title.toLowerCase();
-      const locL = (p.location||'').toLowerCase();
-      const provL = (p.province||'').toLowerCase();
-      const descL = (p.desc||'').toLowerCase();
-      const matchOrig = titleL.includes(kwlOrig)||locL.includes(kwlOrig)||provL.includes(kwlOrig)||descL.includes(kwlOrig);
-      const matchTrans = kwlTrans!==kwlOrig && (titleL.includes(kwlTrans)||locL.includes(kwlTrans)||provL.includes(kwlTrans)||descL.includes(kwlTrans));
-      if(!matchOrig && !matchTrans) return false;
+      if(!_fuzzyMatch(kw, p)) return false;
     }
     if(p.price<min||p.price>max) return false;
     return true;
@@ -17669,13 +17890,180 @@ function animFavCounters(total, buy, rent) {
   animateCounter($('fav-buy'),   buy,   1200);
   animateCounter($('fav-rent'),  rent,  1200);
 }
+// ── Compare state ─────────────────────────────────────────────
+window._compareList = []; // array of property IDs (max 3)
+window._compareMode = false;
+
+function openComparePanel() {
+  window._compareMode = true;
+  window._compareList = [];
+  const bar = document.getElementById('fav-compare-bar');
+  if(bar) bar.style.display = 'block';
+  _updateComparePills();
+  renderFavPage(); // re-render with compare checkboxes
+  toast('เลือกทรัพย์ที่ต้องการเปรียบเทียบ (2–3 รายการ)', 'info');
+}
+
+function cancelCompare() {
+  window._compareMode = false;
+  window._compareList = [];
+  const bar = document.getElementById('fav-compare-bar');
+  if(bar) bar.style.display = 'none';
+  renderFavPage();
+}
+
+function toggleCompareItem(id) {
+  const sid = String(id);
+  const idx = window._compareList.indexOf(sid);
+  if(idx >= 0) {
+    window._compareList.splice(idx, 1);
+  } else {
+    if(window._compareList.length >= 3) { toast('เปรียบเทียบได้สูงสุด 3 รายการ', 'warning'); return; }
+    window._compareList.push(sid);
+  }
+  _updateComparePills();
+  // Update card checkbox UI
+  document.querySelectorAll('.compare-card-cb').forEach(cb => {
+    const cid = cb.dataset.cid;
+    cb.checked = window._compareList.includes(cid);
+    const card = cb.closest('.compare-card-wrap');
+    if(card) card.style.outline = cb.checked ? '3px solid var(--a)' : 'none';
+  });
+  const btn = document.getElementById('fav-do-compare-btn');
+  if(btn) btn.disabled = window._compareList.length < 2;
+}
+
+function _updateComparePills() {
+  const pills = document.getElementById('fav-compare-pills');
+  const countEl = document.getElementById('fav-compare-count');
+  if(!pills) return;
+  if(countEl) countEl.textContent = window._compareList.length || '';
+  pills.innerHTML = window._compareList.map(id => {
+    const p = props.find(x=>String(x.id)===id);
+    if(!p) return '';
+    return `<div style="background:rgba(255,255,255,.2);border-radius:20px;padding:4px 10px;font-size:11px;font-weight:700;display:inline-flex;align-items:center;gap:5px">
+      ${sanitize(p.title.slice(0,20))}${p.title.length>20?'...':''}
+      <button onclick="toggleCompareItem('${id}')" style="background:none;border:none;color:#fff;cursor:pointer;font-size:12px;padding:0;line-height:1"><i class="fas fa-times"></i></button>
+    </div>`;
+  }).join('');
+  const btn = document.getElementById('fav-do-compare-btn');
+  if(btn) btn.disabled = window._compareList.length < 2;
+}
+
+function startCompare() {
+  if(window._compareList.length < 2) { toast('กรุณาเลือกอย่างน้อย 2 รายการ', 'warning'); return; }
+  renderCompareTable();
+  const ov = document.getElementById('compare-modal-ov');
+  if(ov) { ov.style.display = 'block'; document.body.style.overflow = 'hidden'; }
+}
+
+function closeCompareModal() {
+  const ov = document.getElementById('compare-modal-ov');
+  if(ov) ov.style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function renderCompareTable() {
+  const selProps = window._compareList.map(id => props.find(x=>String(x.id)===id)).filter(Boolean);
+  if(!selProps.length) return;
+  const sub = document.getElementById('compare-subtitle');
+  if(sub) sub.textContent = `เปรียบเทียบ ${selProps.length} รายการ`;
+  const fmtNum = (n, suffix='') => (n && n > 0) ? `${n.toLocaleString()}${suffix}` : '<span style="color:var(--tx2)">—</span>';
+  const fmtPrice = p => {
+    if(!p.price) return '<span style="color:var(--tx2)">—</span>';
+    const v = p.price >= 1e6 ? (p.price/1e6).toFixed(2)+' ล้าน' : p.price.toLocaleString();
+    return `<strong style="color:var(--a)">${v}</strong><span style="font-size:11px;color:var(--tx2)"> บาท${p.tx==='RENT'?'/เดือน':''}</span>`;
+  };
+  const furnMap = {full:'ครบ (Full)',partial:'บางส่วน',none:'ไม่มี'};
+  // Best value highlights
+  const prices = selProps.map(p=>p.price||Infinity);
+  const minPrice = Math.min(...prices);
+  const areas = selProps.map(p=>p.area||0);
+  const maxArea = Math.max(...areas);
+  const beds = selProps.map(p=>p.bed||0);
+  const maxBed = Math.max(...beds);
+
+  const rows = [
+    { label: 'รูปภาพ', key: 'photo', render: p => {
+      const img = p.photos?.[0] || '';
+      return img ? `<img src="${sanitize(img)}" style="width:100%;height:130px;object-fit:cover;border-radius:10px;display:block">` : '<div style="width:100%;height:130px;background:var(--lt);border-radius:10px;display:flex;align-items:center;justify-content:center"><i class="fas fa-home" style="font-size:28px;color:var(--tx2)"></i></div>';
+    }},
+    { label: 'ชื่อทรัพย์', key: 'title', render: p => `<strong style="font-size:12px;line-height:1.4">${sanitize(p.title)}</strong>` },
+    { label: 'ประเภท', key: 'type', render: p => sanitize(p.type||'—') },
+    { label: 'ราคา', key: 'price', render: p => fmtPrice(p), highlight: (p,i) => p.price===minPrice },
+    { label: 'พื้นที่ใช้สอย', key: 'area', render: p => fmtNum(p.area,' ตร.ม.'), highlight: (p,i) => p.area===maxArea && maxArea>0 },
+    { label: 'ที่ดิน', key: 'land', render: p => fmtNum(p.land_area,' ตร.วา') },
+    { label: 'ห้องนอน', key: 'bed', render: p => fmtNum(p.bed,' ห้อง'), highlight: (p,i) => p.bed===maxBed && maxBed>0 },
+    { label: 'ห้องน้ำ', key: 'bath', render: p => fmtNum(p.bath,' ห้อง') },
+    { label: 'ที่จอดรถ', key: 'park', render: p => fmtNum(p.parking,' คัน') },
+    { label: 'ชั้น', key: 'floor', render: p => (p.floor_no>0&&p.floors>0)?`${p.floor_no}/${p.floors}`:(p.floors>0?String(p.floors):'—') },
+    { label: 'เฟอร์นิเจอร์', key: 'furn', render: p => furnMap[p.furniture]||p.furniture||'—' },
+    { label: 'เลี้ยงสัตว์', key: 'pets', render: p => p.pets_allowed ? '<span style="color:#059669">✔ ได้</span>' : '<span style="color:#e74c3c">✖ ไม่ได้</span>' },
+    { label: 'ที่ตั้ง', key: 'loc', render: p => sanitize(`${p.location||''}${p.province?' · '+p.province:''}`) || '—' },
+    { label: 'ใกล้ BTS/MRT', key: 'bts', render: p => sanitize(p.near_bts||p.bts||'—') },
+    { label: 'Virtual Tour', key: '360', render: p => p.panorama_url ? '<span style="color:#4f46e5"><i class="fas fa-vr-cardboard"></i> มี</span>' : '<span style="color:var(--tx2)">—</span>' },
+    { label: 'ดูรายละเอียด', key: 'pdp', render: p => `<button onclick="closeCompareModal();setTimeout(()=>showPage('property','${p.id}'),200)" style="background:var(--p);color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;width:100%"><i class="fas fa-expand-alt"></i> ดูเต็มหน้า</button>` },
+  ];
+
+  const colW = selProps.length===2 ? '45%' : '30%';
+  let html = `<thead><tr>
+    <th style="background:var(--lt);padding:12px 14px;font-size:12px;font-weight:700;color:var(--tx2);text-align:left;position:sticky;left:0;z-index:2;min-width:110px;border-right:2px solid var(--bd)">รายละเอียด</th>
+    ${selProps.map((p,i)=>`<th style="background:var(--lt);padding:12px 10px;font-size:11px;font-weight:700;color:var(--p);text-align:center;min-width:180px;max-width:240px">ทรัพย์ที่ ${i+1}</th>`).join('')}
+  </tr></thead><tbody>`;
+  for(const row of rows) {
+    html += `<tr style="border-bottom:1px solid var(--lt)">
+      <td style="padding:10px 14px;font-size:12px;font-weight:700;color:var(--tx2);position:sticky;left:0;background:var(--bg);z-index:1;border-right:2px solid var(--bd);white-space:nowrap">${row.label}</td>
+      ${selProps.map((p,i)=>{
+        const content = row.render(p);
+        const isHighlight = row.highlight ? row.highlight(p,i) : false;
+        return `<td style="padding:10px 12px;font-size:12px;text-align:center;vertical-align:middle;${isHighlight?'background:rgba(241,196,15,.12);':''}">
+          ${isHighlight?'<div style="font-size:9px;color:#c8922a;font-weight:800;margin-bottom:3px">⭐ ดีที่สุด</div>':''}
+          ${content}
+        </td>`;
+      }).join('')}
+    </tr>`;
+  }
+  html += '</tbody>';
+  const tbl = document.getElementById('compare-table');
+  if(tbl) tbl.innerHTML = html;
+}
+
 function renderFavPage(){
   const fp=props.filter(p=>favs.includes(String(p.id)));
   animateCounter($('fav-total'), fp.length, 1200);
   animateCounter($('fav-buy'), fp.filter(p=>p.tx==='BUY').length, 1200);
   animateCounter($('fav-rent'), fp.filter(p=>p.tx==='RENT').length, 1200);
-  renderGrid('fav-page-grid',fp);
+
+  if(window._compareMode) {
+    // Render cards with compare checkboxes
+    const grid = document.getElementById('fav-page-grid');
+    if(!grid) return;
+    if(!fp.length) { grid.innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--tx2)"><i class="fas fa-heart-broken" style="font-size:40px;opacity:.3;display:block;margin-bottom:12px"></i>ยังไม่มีรายการโปรด</div>'; return; }
+    grid.innerHTML = fp.map(p => {
+      const img = p.photos?.[0] || '';
+      const isSelected = window._compareList.includes(String(p.id));
+      const priceStr = p.price >= 1e6 ? (p.price/1e6).toFixed(2)+' ล้าน' : p.price.toLocaleString();
+      return `<div class="compare-card-wrap" style="border-radius:14px;overflow:hidden;border:1.5px solid var(--bd);cursor:pointer;transition:.15s;outline:${isSelected?'3px solid var(--a)':'none'}" onclick="toggleCompareItem('${p.id}')">
+        <div class="compare-card-cb-wrap" style="position:relative">
+          ${img ? `<img src="${sanitize(img)}" style="width:100%;height:160px;object-fit:cover;display:block">` : `<div style="width:100%;height:160px;background:var(--lt);display:flex;align-items:center;justify-content:center"><i class="fas fa-home" style="font-size:32px;color:var(--tx2)"></i></div>`}
+          <div style="position:absolute;top:10px;left:10px;background:${isSelected?'var(--a)':'rgba(255,255,255,.9)'};border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.2)">
+            <input type="checkbox" class="compare-card-cb" data-cid="${p.id}" ${isSelected?'checked':''} onclick="event.stopPropagation();toggleCompareItem('${p.id}')" style="width:16px;height:16px;cursor:pointer;accent-color:var(--p)">
+          </div>
+          ${isSelected?`<div style="position:absolute;top:10px;right:10px;background:var(--a);color:#fff;border-radius:20px;padding:2px 10px;font-size:10px;font-weight:800">ที่ ${window._compareList.indexOf(String(p.id))+1}</div>`:''}
+        </div>
+        <div style="padding:12px">
+          <div style="font-size:12px;font-weight:700;color:var(--p);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${sanitize(p.title)}</div>
+          <div style="font-size:13px;font-weight:800;color:var(--a)">${priceStr} บาท${p.tx==='RENT'?'/เดือน':''}</div>
+          <div style="font-size:11px;color:var(--tx2);margin-top:3px">${p.bed||0} นอน · ${p.bath||0} น้ำ · ${p.area||0} ตร.ม.</div>
+        </div>
+      </div>`;
+    }).join('');
+  } else {
+    renderGrid('fav-page-grid',fp);
+  }
 }
+
+
 function shareFavs(){ const fp=props.filter(p=>favs.includes(String(p.id))); if(!fp.length)return toast('ไม่มีรายการโปรด'); const url = location.origin + '/favorites'; if(navigator.share){ navigator.share({title:'รายการโปรด Matchdoor',text:`อสังหาฯ ที่น่าสนใจ ${fp.length} รายการ`,url}); } else { navigator.clipboard?.writeText(url).then(()=>toast('คัดลอก URL แล้ว ✅')); } }
 
 function openModal(id){
@@ -17839,6 +18227,15 @@ function openModal(id){
       extraHtml+=`<div class="modal-extra-row"><div class="modal-extra-icon" style="background:#eff6ff;color:#2563eb"><i class="fas fa-tint"></i></div><div class="modal-extra-info"><div class="modal-extra-label">${ui('modal.water')}</div><div class="modal-extra-val">${waterVal}</div></div></div>`;
       const svcVal=p.service_fee!=null?(p.service_fee>0?`<b>${p.service_fee.toLocaleString()}</b> ${_perMonthLabel}`:_noneLabel):'—';
       extraHtml+=`<div class="modal-extra-row"><div class="modal-extra-icon" style="background:#f5f3ff;color:#7c3aed"><i class="fas fa-receipt"></i></div><div class="modal-extra-info"><div class="modal-extra-label">${ui('modal.svcfee')}</div><div class="modal-extra-val">${svcVal}</div></div></div>`;
+      // ── v33: Other Fees ──
+      if(p.tx==='RENT'){
+        if(p.internet_fee>0) extraHtml+=`<div class="modal-extra-row"><div class="modal-extra-icon" style="background:#e0f2fe;color:#0284c7"><i class="fas fa-wifi"></i></div><div class="modal-extra-info"><div class="modal-extra-label">ค่าอินเทอร์เน็ต</div><div class="modal-extra-val"><b>${p.internet_fee.toLocaleString()}</b> ${_perMonthLabel}</div></div></div>`;
+        if(p.parking_fee>0) extraHtml+=`<div class="modal-extra-row"><div class="modal-extra-icon" style="background:#ecfdf5;color:#16a34a"><i class="fas fa-parking"></i></div><div class="modal-extra-info"><div class="modal-extra-label">ค่าที่จอดรถ</div><div class="modal-extra-val"><b>${p.parking_fee.toLocaleString()}</b> ${_perMonthLabel}</div></div></div>`;
+        if(p.other_monthly_fee>0) extraHtml+=`<div class="modal-extra-row"><div class="modal-extra-icon" style="background:#fef9c3;color:#ca8a04"><i class="fas fa-plus-circle"></i></div><div class="modal-extra-info"><div class="modal-extra-label">ค่าบริการอื่นๆ</div><div class="modal-extra-val"><b>${p.other_monthly_fee.toLocaleString()}</b> ${_perMonthLabel}</div></div></div>`;
+      }
+      if(p.transfer_fee) extraHtml+=`<div class="modal-extra-row"><div class="modal-extra-icon" style="background:#fce7f3;color:#be185d"><i class="fas fa-file-contract"></i></div><div class="modal-extra-info"><div class="modal-extra-label">ค่าโอน</div><div class="modal-extra-val">${sanitize(p.transfer_fee)}</div></div></div>`;
+      if(p.ownership_type) extraHtml+=`<div class="modal-extra-row"><div class="modal-extra-icon" style="background:#fef3c7;color:#b45309"><i class="fas fa-file-alt"></i></div><div class="modal-extra-info"><div class="modal-extra-label">สิทธิ์การถือครอง</div><div class="modal-extra-val">${sanitize(p.ownership_type)}</div></div></div>`;
+      if(p.other_fees_note) extraHtml+=`<div class="modal-extra-row"><div class="modal-extra-icon" style="background:#f0fdf4;color:#15803d"><i class="fas fa-info-circle"></i></div><div class="modal-extra-info"><div class="modal-extra-label">หมายเหตุค่าใช้จ่าย</div><div class="modal-extra-val">${sanitize(p.other_fees_note)}</div></div></div>`;
       extraHtml+='</div>';
       $('m-extras').innerHTML=extraHtml;
 
