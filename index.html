@@ -2334,13 +2334,13 @@ footer::after{
 /* My Account page */
 .my-account-wrap{max-width:1100px;margin:0 auto;padding:32px 20px 60px}
 /* ─── New Profile Page Layout ─── */
-.ma-profile-grid{display:grid;grid-template-columns:300px 1fr;gap:20px;align-items:start}
-.ma-profile-sidebar{display:flex;flex-direction:column;gap:14px}
-.ma-profile-main{display:flex;flex-direction:column;gap:14px}
+.ma-profile-grid{display:grid;grid-template-columns:260px 1fr;gap:16px;align-items:start}
+.ma-profile-sidebar{display:flex;flex-direction:column;gap:10px}
+.ma-profile-main{display:flex;flex-direction:column;gap:10px}
 /* Sidebar info cards */
-.ma-info-card{background:#fff;border-radius:16px;padding:18px;border:1.5px solid var(--bd);box-shadow:0 2px 10px rgba(27,58,107,.05)}
-.ma-info-card-title{font-size:13px;font-weight:700;color:var(--p);margin-bottom:12px;display:flex;align-items:center;gap:7px;padding-bottom:10px;border-bottom:1.5px solid var(--lt)}
-@media(max-width:600px){.ma-info-card{padding:14px;border-radius:12px}}
+.ma-info-card{background:#fff;border-radius:12px;padding:14px;border:1.5px solid var(--bd);box-shadow:0 2px 8px rgba(27,58,107,.04)}
+.ma-info-card-title{font-size:12px;font-weight:700;color:var(--p);margin-bottom:10px;display:flex;align-items:center;gap:6px;padding-bottom:8px;border-bottom:1.5px solid var(--lt)}
+@media(max-width:600px){.ma-info-card{padding:12px;border-radius:10px}}
 /* About / Bio section */
 .ma-bio-text{font-size:13px;color:var(--tx2);line-height:1.7;white-space:pre-line}
 .ma-read-more-btn{background:none;border:none;color:var(--p);font-size:12px;font-weight:600;cursor:pointer;padding:4px 0;margin-top:4px}
@@ -2354,22 +2354,23 @@ footer::after{
 .ma-review-text{font-size:12px;color:var(--tx2);line-height:1.6}
 .ma-review-author{font-size:11px;color:var(--gr);margin-top:6px}
 /* Right: listings feed */
-.ma-listing-card{background:#fff;border:1.5px solid var(--bd);border-radius:16px;overflow:hidden;margin-bottom:14px;transition:.2s}
-.ma-listing-card:hover{box-shadow:0 6px 20px rgba(27,58,107,.1);border-color:var(--p)}
-.ma-listing-card-img{width:100%;height:180px;object-fit:cover;display:block;background:var(--lt)}
-.ma-listing-card-img-placeholder{height:180px;background:var(--lt);display:flex;align-items:center;justify-content:center;font-size:40px}
-.ma-listing-card-body{padding:14px 16px}
-.ma-listing-card-title{font-size:14px;font-weight:700;color:var(--tx);margin-bottom:6px;line-height:1.4}
-.ma-listing-card-price{font-size:18px;font-weight:800;color:var(--p);margin-bottom:6px}
-.ma-listing-card-meta{display:flex;flex-wrap:wrap;gap:8px;font-size:12px;color:var(--tx2)}
-.ma-listing-card-tag{display:inline-flex;align-items:center;gap:4px;background:var(--lt);border-radius:6px;padding:3px 8px;font-size:11px}
+.ma-listing-card{background:#fff;border:1.5px solid var(--bd);border-radius:12px;overflow:hidden;margin-bottom:10px;transition:.2s;display:grid;grid-template-columns:110px 1fr}
+.ma-listing-card:hover{box-shadow:0 4px 16px rgba(27,58,107,.1);border-color:var(--p)}
+.ma-listing-card-img{width:110px;height:100%;min-height:110px;object-fit:cover;display:block;background:var(--lt)}
+.ma-listing-card-img-placeholder{width:110px;min-height:110px;background:var(--lt);display:flex;align-items:center;justify-content:center;font-size:32px}
+.ma-listing-card-body{padding:10px 12px}
+.ma-listing-card-title{font-size:13px;font-weight:700;color:var(--tx);margin-bottom:4px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ma-listing-card-price{font-size:15px;font-weight:800;color:var(--p);margin-bottom:4px}
+.ma-listing-card-meta{display:flex;flex-wrap:wrap;gap:5px;font-size:12px;color:var(--tx2)}
+.ma-listing-card-tag{display:inline-flex;align-items:center;gap:3px;background:var(--lt);border-radius:5px;padding:2px 6px;font-size:10px}
+@media(max-width:600px){.ma-listing-card{grid-template-columns:90px 1fr}.ma-listing-card-img,.ma-listing-card-img-placeholder{width:90px;min-height:90px}}
 /* Token banner on profile top */
-.ma-token-bar{background:linear-gradient(135deg,#1B3A6B,#2a5298);border-radius:14px;padding:14px 18px;margin-bottom:16px;color:#fff;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
-.ma-token-bar-left{display:flex;align-items:center;gap:12px}
-.ma-token-bar-num{font-size:26px;font-weight:900}
-.ma-token-bar-btn{background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3);border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;transition:.2s}
+.ma-token-bar{background:linear-gradient(135deg,#1B3A6B,#2a5298);border-radius:12px;padding:12px 16px;margin-bottom:12px;color:#fff;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.ma-token-bar-left{display:flex;align-items:center;gap:10px}
+.ma-token-bar-num{font-size:22px;font-weight:900}
+.ma-token-bar-btn{background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3);border-radius:7px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;transition:.2s}
 .ma-token-bar-btn:hover{background:rgba(255,255,255,.25)}
-@media(max-width:600px){.ma-token-bar{padding:11px 14px;margin-bottom:12px}.ma-token-bar-num{font-size:20px}}
+@media(max-width:600px){.ma-token-bar{padding:10px 12px;margin-bottom:10px}.ma-token-bar-num{font-size:18px}}
 .ma-token-bar-btn.gold{background:rgba(241,196,15,.2);border-color:#f1c40f;color:#f1c40f}
 /* Edit modal overlay */
 .ma-edit-modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);z-index:9000;display:flex;align-items:center;justify-content:center;padding:16px}
@@ -2433,6 +2434,8 @@ footer::after{
 .ma-tab:not(.active):hover{background:var(--lt);color:var(--p)}
 .ma-panel{display:none}
 .ma-panel.active{display:block}
+.ma-listing-cards-grid{display:grid;grid-template-columns:1fr;gap:0}
+@media(min-width:900px){.ma-listing-cards-grid{grid-template-columns:1fr 1fr;gap:8px}}
 .ma-section{background:#fff;border-radius:16px;padding:20px;margin-bottom:16px;border:1.5px solid var(--bd);box-shadow:0 2px 10px rgba(27,58,107,.05)}
 .ma-section-title{font-size:14px;font-weight:700;color:var(--p);margin-bottom:16px;display:flex;align-items:center;gap:8px;padding-bottom:10px;border-bottom:1.5px solid var(--lt)}
 .ma-field{margin-bottom:14px}
@@ -2459,6 +2462,14 @@ footer::after{
 .ma-lp-btn-ghost{background:#fff;color:var(--p);border:2px solid var(--p)}
 .ma-lp-btn-ghost:hover{background:var(--lt)}
 .ma-lp-skip{margin-top:8px;font-size:12px;color:var(--gr);background:none;border:none;cursor:pointer;text-decoration:underline}
+@media(max-width:768px){
+  .ma-profile-grid{grid-template-columns:1fr}
+  .my-account-wrap{padding:20px 12px 50px}
+  .ma-token-bar{flex-direction:column;align-items:flex-start;gap:8px}
+}
+@media(min-width:1100px){
+  .ma-profile-main .ma-listing-cards-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+}
 @media(max-width:600px){
   .ma-hero-body{padding:0 16px 16px;gap:10px;margin-top:-40px}
   .ma-av-ring{width:80px;height:80px;font-size:24px}
@@ -12217,7 +12228,7 @@ async function adminEditListing(listingId) {
         <div style="background:#fff3cd;border:1px solid #ffc10788;border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:12px;color:#856404">
           <i class="fas fa-shield-alt"></i> แก้ไขโดย Admin — การเปลี่ยนแปลงจะมีผลทันที
         </div>
-        ${['title','property_type','transaction','price','area','land_area','bed','bath','floors','floor_no','parking','province','district','location','near_bts','description','contact_name','contact_phone','contact_line','map_url','panorama_url','transfer_fee','ownership_type','other_fees_note','admin_note'].map(f => `
+        ${['title','property_type','transaction','price','area','land_area','bed','bath','floors','floor_no','parking','province','district','location','near_bts','description','contact_name','contact_phone','contact_line','map_url','panorama_url','transfer_fee','ownership_type','internet_fee','parking_fee','other_monthly_fee','other_fees_note','admin_note'].map(f => `
         <div class="ma-field">
           <label style="font-size:11px;color:var(--tx2)">${f}</label>
           <input type="text" id="aedit-${f}" value="${_san(String(data[f]||''))}" style="width:100%;padding:9px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;box-sizing:border-box">
@@ -12282,10 +12293,13 @@ async function _adminSaveEditListing(listingId) {
       map_url:        f('map_url')||null,
       panorama_url:   f('panorama_url')||null,
       furniture:      f('furniture')||null,
-      transfer_fee:   f('transfer_fee')||null,
-      ownership_type: f('ownership_type')||null,
-      other_fees_note:f('other_fees_note')||null,
-      admin_note:     f('admin_note'),
+      transfer_fee:      f('transfer_fee')||null,
+      ownership_type:    f('ownership_type')||null,
+      internet_fee:      parseFloat(f('internet_fee'))||null,
+      parking_fee:       parseFloat(f('parking_fee'))||null,
+      other_monthly_fee: parseFloat(f('other_monthly_fee'))||null,
+      other_fees_note:   f('other_fees_note')||null,
+      admin_note:        f('admin_note'),
       status:         document.getElementById('aedit-status')?.value || f('status'),
       updated_at:     new Date().toISOString()
     };
@@ -13781,13 +13795,13 @@ async function _maRenderProfileListings(){
   }).join('');
 
   area.innerHTML=`
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
-      <div style="font-size:16px;font-weight:700;color:var(--tx)"><i class="fas fa-building" style="color:var(--p);margin-right:6px"></i>ประกาศของฉัน <span style="font-size:13px;color:var(--tx2);font-weight:500">(${_myUserListings.length} รายการ)</span></div>
-      <button onclick="openUserListingModal()" ${_tokenBalance<1?'disabled style="opacity:.5;cursor:not-allowed"':''} style="background:var(--p);color:#fff;border:none;border-radius:10px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+      <div style="font-size:15px;font-weight:700;color:var(--tx)"><i class="fas fa-building" style="color:var(--p);margin-right:6px"></i>ประกาศของฉัน <span style="font-size:12px;color:var(--tx2);font-weight:500">(${_myUserListings.length} รายการ)</span></div>
+      <button onclick="openUserListingModal()" ${_tokenBalance<1?'disabled style="opacity:.5;cursor:not-allowed"':''} style="background:var(--p);color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px">
         <i class="fas fa-plus"></i> ลงประกาศใหม่
       </button>
     </div>
-    ${html}`;
+    <div class="ma-listing-cards-grid">${html}</div>`;
 }
 
 
@@ -14558,13 +14572,15 @@ function mapProp(r){
   };
 }
 // ── v26: mapUserListing — แปลง v_approved_user_listings row → propCard format ──
+// v35-fix: รองรับทั้ง listing_id alias (จาก view) และ id (fallback จาก direct query)
 function mapUserListing(ul){
   const rawPhotos = Array.isArray(ul.photos) ? ul.photos : (ul.photos ? [ul.photos] : []);
   const ph = rawPhotos.filter(Boolean).map(p => sbImg(p));
+  const _lid = ul.listing_id || ul.id;   // v35-fix: view ใหม่ส่ง listing_id alias; direct query ส่ง id
   return {
-    id: 'ul-' + ul.listing_id,           // prefix เพื่อแยกจาก properties table
+    id: 'ul-' + _lid,                    // prefix เพื่อแยกจาก properties table
     _isUserListing: true,                  // flag สำหรับ routing ใน click handler
-    _listingId: ul.listing_id,
+    _listingId: _lid,
     _propertyId: ul.property_id || null,  // ถ้ามีให้เปิด openModal ปกติ
     title: ul.title || '',
     type: ul.type || '',
@@ -14590,11 +14606,38 @@ function mapUserListing(ul){
     contact_phone: ul.contact_phone || '',
     contact_line: ul.contact_line || '',
     map_url: ul.map_url || '',
+    panorama_url: ul.panorama_url ? sbImg(ul.panorama_url) : (ul.virtual_tour_url ? sbImg(ul.virtual_tour_url) : null),
     photos: ph,
     isNew: ul.is_new === true,
     isBoosted: ul.is_boosted === true,
     createdAt: ul.created_at,
     status: ul.status || 'approved',
+    // ข้อมูลค่าใช้จ่ายเพิ่มเติม (v34)
+    transfer_fee:      ul.transfer_fee      || '',
+    ownership_type:    ul.ownership_type    || '',
+    internet_fee:      ul.internet_fee      || null,
+    parking_fee:       ul.parking_fee       || null,
+    other_monthly_fee: ul.other_monthly_fee || null,
+    other_fees_note:   ul.other_fees_note   || '',
+    // ข้อมูลการเงิน/เช่า
+    deposit:           ul.deposit           || null,
+    advance_payment:   ul.advance_payment   || null,
+    electric_rate:     ul.electric_rate     || null,
+    water_rate:        ul.water_rate        || null,
+    service_fee:       ul.service_fee       || null,
+    min_lease_months:  ul.min_lease_months  || null,
+    lease_terms:       ul.lease_terms       || null,
+    rent_duration:     ul.rent_duration     || null,
+    // สิ่งอำนวยความสะดวก
+    amenities:      Array.isArray(ul.amenities)      ? ul.amenities      : [],
+    furniture_items:Array.isArray(ul.furniture_items)? ul.furniture_items : [],
+    appliances:     Array.isArray(ul.appliances)     ? ul.appliances     : [],
+    nearby_places:  ul.nearby_places || null,
+    pets_allowed:   ul.pets_allowed  || false,
+    parking:        ul.parking       || 0,
+    floors:         ul.floors        || 0,
+    invest_tag:     ul.invest_tag    || '',
+    yield_pct:      Number(ul.yield_pct) || 0,
     // agent info (จาก view โดยตรง — ไม่ต้อง lookup)
     _agentName: ul.agent_name || '',
     _agentAvatar: ul.agent_avatar ? sbImg(ul.agent_avatar) : '',
@@ -15070,7 +15113,8 @@ function afterLoad(){
           rating:           Number(ma.agent_rating) || 5.0,
           propIds:          maPropIds,
           deals:            Number(ma.agent_deals)  || 0,
-          bio:              ma.agent_bio    || '',
+          bio:              ma.agent_bio    || ma.bio || '',
+          _listingIds:      Array.isArray(ma.listing_ids) ? ma.listing_ids : [],
           _pendingListings: [],
           _allMyListings:   []
         };
@@ -20165,33 +20209,6 @@ function _maRenderAgentPreview(){
     : [];
 
   let propsHtml = '';
-  if(myProps.length){
-    const sliceProps = myProps.slice(0, 6);
-    propsHtml = `
-      <div style="margin-top:16px">
-        <div style="font-size:13px;font-weight:700;color:var(--tx);margin-bottom:10px;display:flex;align-items:center;gap:6px">
-          <i class="fas fa-building" style="color:var(--p)"></i> ทรัพย์ที่ประกาศ
-          <span style="font-size:11px;background:var(--p);color:#fff;border-radius:20px;padding:1px 8px">${myProps.length}</span>
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px">
-          ${sliceProps.map(p => {
-            const thumb = p.photos&&p.photos[0]
-              ? `<img src="${p.photos[0]}" loading="lazy" style="width:100%;height:100%;object-fit:cover">`
-              : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:28px;background:var(--lt)">🏠</div>`;
-            const price = (typeof fmtPrice==='function') ? fmtPrice(p.price, p.tx) : (p.price||0).toLocaleString()+'฿';
-            return `<div onclick="typeof openModal==='function'&&openModal('${p.id}')" style="border:1.5px solid var(--bd);border-radius:10px;overflow:hidden;cursor:pointer;transition:.2s" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 16px rgba(0,0,0,.12)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
-              <div style="height:90px;overflow:hidden">${thumb}</div>
-              <div style="padding:8px">
-                <div style="font-size:12px;font-weight:700;color:var(--p);margin-bottom:2px">${price}</div>
-                <div style="font-size:11px;color:var(--tx);line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.title||''}</div>
-                <div style="font-size:10px;color:var(--tx2);margin-top:3px"><i class="fas fa-map-marker-alt" style="color:var(--a)"></i> ${p.location||p.province||''}</div>
-              </div>
-            </div>`;
-          }).join('')}
-        </div>
-        ${myProps.length > 6 ? `<div style="text-align:center;margin-top:10px"><button onclick="_viewMyAgentProfile()" style="background:var(--p);color:#fff;border:none;border-radius:8px;padding:7px 18px;font-size:12px;font-weight:600;cursor:pointer">ดูทั้งหมด ${myProps.length} รายการ</button></div>` : ''}
-      </div>`;
-  }
   // ── รวม pending + approved user listings แสดงเป็น propCard style ──
   const _allMyUL = (typeof _myUserListings !== 'undefined' && Array.isArray(_myUserListings))
     ? _myUserListings : [];
@@ -20200,8 +20217,12 @@ function _maRenderAgentPreview(){
   const _approvedUL = _allMyUL.filter(ul => ul.status === 'อนุมัติ');
 
   // Approved user listing cards (ดึงจาก window._userListingCards)
+  // กรองออกรายการที่มี property_id ซ้ำกับ myProps แล้ว เพื่อป้องกันแสดงซ้ำ
+  const _myPropIds = new Set(myProps.map(p => p.id));
   const _myApprovedCards = (window._userListingCards||[]).filter(c => {
     if(!c._raw) return false;
+    // ถ้า property_id นี้อยู่ใน myProps แล้ว → ข้าม (ไม่แสดงซ้ำ)
+    if(c._propertyId && _myPropIds.has(c._propertyId)) return false;
     if(window._currentUser && c._raw.user_id === window._currentUser.id) return true;
     if(c._agentName && myAgent.name && c._agentName === myAgent.name) return true;
     return false;
@@ -20216,54 +20237,76 @@ function _maRenderAgentPreview(){
     }
   });
 
-  if(_allDisplayListings.length){
-    const totalUL = _allDisplayListings.length;
-    const sliceUL = _allDisplayListings.slice(0, 6);
-    propsHtml += `
-      <div style="margin-top:${myProps.length ? 16 : 0}px">
-        <div style="font-size:13px;font-weight:700;color:var(--tx);margin-bottom:10px;display:flex;align-items:center;gap:6px">
-          <i class="fas fa-building" style="color:var(--p)"></i> ทรัพย์ที่ลงประกาศ
-          <span style="font-size:11px;background:var(--p);color:#fff;border-radius:20px;padding:1px 8px">${totalUL}</span>
-          ${_pendingListings.length ? `<span style="font-size:10px;background:#f39c12;color:#fff;border-radius:20px;padding:1px 8px"><i class="fas fa-clock" style="font-size:9px"></i> รอตรวจสอบ ${_pendingListings.length}</span>` : ''}
+  // ── รวมทุก listing เป็น section เดียว ป้องกันแสดงซ้ำ ──
+  // myProps = approved จาก properties table (ผ่าน agent propIds)
+  // _allDisplayListings = user_listings (approved card ที่ไม่ซ้ำกับ myProps + pending)
+
+  // สร้าง unified list: myProps cards + _allDisplayListings
+  const _allCombined = [...myProps.map(p => ({_type:'prop', _data:p})),
+                        ..._allDisplayListings.map(x => ({_type:'ul', _data:x}))];
+
+  if(_allCombined.length){
+    const totalAll = _allCombined.length;
+    const sliceAll = _allCombined.slice(0, 8);
+    const pendingCount = _pendingListings.length;
+    propsHtml = `
+      <div style="margin-top:16px">
+        <div style="font-size:13px;font-weight:700;color:var(--tx);margin-bottom:10px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+          <i class="fas fa-building" style="color:var(--p)"></i> ทรัพย์ของฉัน
+          <span style="font-size:11px;background:var(--p);color:#fff;border-radius:20px;padding:1px 8px">${totalAll}</span>
+          ${pendingCount ? `<span style="font-size:10px;background:#f39c12;color:#fff;border-radius:20px;padding:1px 8px"><i class="fas fa-clock" style="font-size:9px"></i> รอตรวจสอบ ${pendingCount}</span>` : ''}
         </div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px">
-          ${sliceUL.map(item => {
-            // ถ้าเป็น user listing card (approved) ที่ map แล้ว
-            if(item._isUserListing){
-              const ph = item.photos&&item.photos[0]?item.photos[0]:'';
-              const price2 = typeof fmtPrice==='function' ? fmtPrice(item.price, item.tx) : (item.price||0).toLocaleString()+'฿';
-              const clickFn = item._propertyId
-                ? `showPage('property','${item._propertyId}')`
-                : `openULDetailModal('${item._listingId}')`;
-              return `<div onclick="${clickFn}" style="border:1.5px solid var(--bd);border-radius:10px;overflow:hidden;cursor:pointer;transition:.2s" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 16px rgba(0,0,0,.12)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
-                <div style="height:90px;overflow:hidden">${ph ? `<img src="${ph}" loading="lazy" style="width:100%;height:100%;object-fit:cover">` : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:28px;background:var(--lt)">🏠</div>'}</div>
-                <div style="padding:8px">
-                  <div style="font-size:12px;font-weight:700;color:var(--p);margin-bottom:2px">${price2}</div>
-                  <div style="font-size:11px;color:var(--tx);line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${item.title||''}</div>
-                  <div style="font-size:10px;color:var(--tx2);margin-top:3px"><i class="fas fa-map-marker-alt" style="color:var(--a)"></i> ${item.location||item.district||''}</div>
-                  ${item.isBoosted ? '<span style="font-size:9px;background:#7c3aed;color:#fff;border-radius:4px;padding:1px 5px;margin-top:2px;display:inline-block"><i class="fas fa-rocket"></i> Boosted</span>' : ''}
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px">
+          ${sliceAll.map(entry => {
+            if(entry._type === 'prop'){
+              const p = entry._data;
+              const thumb = p.photos&&p.photos[0]
+                ? `<img src="${p.photos[0]}" loading="lazy" style="width:100%;height:100%;object-fit:cover">`
+                : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:24px;background:var(--lt)">🏠</div>`;
+              const price = (typeof fmtPrice==='function') ? fmtPrice(p.price, p.tx) : (p.price||0).toLocaleString()+'฿';
+              return `<div onclick="typeof showPage==='function'&&showPage('property','${p.id}')" style="border:1.5px solid var(--bd);border-radius:10px;overflow:hidden;cursor:pointer;transition:.2s;background:#fff" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 14px rgba(0,0,0,.1)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+                <div style="height:80px;overflow:hidden;position:relative">${thumb}<span style="position:absolute;top:4px;left:4px;font-size:9px;background:#10b981;color:#fff;border-radius:4px;padding:1px 5px;font-weight:700">อนุมัติ</span></div>
+                <div style="padding:6px 7px">
+                  <div style="font-size:11px;font-weight:700;color:var(--p);margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${price}</div>
+                  <div style="font-size:10px;color:var(--tx);line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.title||''}</div>
+                  <div style="font-size:9px;color:var(--tx2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><i class="fas fa-map-marker-alt" style="color:var(--a)"></i> ${p.location||p.province||''}</div>
                 </div>
               </div>`;
             }
-            // ถ้าเป็น raw pending listing (รอตรวจสอบ)
+            // user listing card or pending
+            const item = entry._data;
+            if(item._isUserListing){
+              const ph = item.photos&&item.photos[0]?item.photos[0]:'';
+              const price2 = typeof fmtPrice==='function' ? fmtPrice(item.price, item.tx) : (item.price||0).toLocaleString()+'฿';
+              const clickFn = item._propertyId ? `showPage('property','${item._propertyId}')` : `openULDetailModal('${item._listingId}')`;
+              return `<div onclick="${clickFn}" style="border:1.5px solid var(--bd);border-radius:10px;overflow:hidden;cursor:pointer;transition:.2s;background:#fff" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 14px rgba(0,0,0,.1)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+                <div style="height:80px;overflow:hidden;position:relative">${ph ? `<img src="${ph}" loading="lazy" style="width:100%;height:100%;object-fit:cover">` : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:24px;background:var(--lt)">🏠</div>'}<span style="position:absolute;top:4px;left:4px;font-size:9px;background:#10b981;color:#fff;border-radius:4px;padding:1px 5px;font-weight:700">อนุมัติ</span>${item.isBoosted ? '<span style="position:absolute;top:4px;right:4px;font-size:9px;background:#7c3aed;color:#fff;border-radius:4px;padding:1px 5px"><i class="fas fa-rocket"></i></span>' : ''}</div>
+                <div style="padding:6px 7px">
+                  <div style="font-size:11px;font-weight:700;color:var(--p);margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${price2}</div>
+                  <div style="font-size:10px;color:var(--tx);line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${item.title||''}</div>
+                  <div style="font-size:9px;color:var(--tx2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><i class="fas fa-map-marker-alt" style="color:var(--a)"></i> ${item.location||item.district||''}</div>
+                </div>
+              </div>`;
+            }
+            // raw pending listing
             const photo2 = (item.photos||[])[0]||'';
             const price3 = item.price >= 1e6 ? (item.price/1e6).toFixed(1)+'M฿' : (item.price||0).toLocaleString()+'฿';
-            return `<div style="border:1.5px solid #f39c1244;border-radius:10px;overflow:hidden;background:#fffbf0;cursor:default">
-              <div style="height:90px;overflow:hidden;background:#fef3c7;display:flex;align-items:center;justify-content:center">
-                ${photo2 ? `<img src="${photo2}" loading="lazy" style="width:100%;height:100%;object-fit:cover">` : '<span style="font-size:32px">🏠</span>'}
+            return `<div style="border:1.5px solid #f39c1244;border-radius:10px;overflow:hidden;background:#fffbf0">
+              <div style="height:80px;overflow:hidden;background:#fef3c7;display:flex;align-items:center;justify-content:center;position:relative">
+                ${photo2 ? `<img src="${photo2}" loading="lazy" style="width:100%;height:100%;object-fit:cover">` : '<span style="font-size:28px">🏠</span>'}
+                <span style="position:absolute;top:4px;left:4px;font-size:9px;background:#f39c12;color:#fff;border-radius:4px;padding:1px 5px;font-weight:700"><i class="fas fa-clock" style="font-size:8px"></i> รอตรวจสอบ</span>
               </div>
-              <div style="padding:8px">
-                <div style="font-size:12px;font-weight:700;color:var(--p);margin-bottom:2px">${price3}</div>
-                <div style="font-size:11px;color:var(--tx);line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${item.title||'ไม่มีชื่อ'}</div>
-                <div style="margin-top:4px"><span style="font-size:9px;background:#f39c1222;color:#f39c12;border:1px solid #f39c1244;border-radius:4px;padding:1px 5px;font-weight:700"><i class="fas fa-clock" style="font-size:8px"></i> รอตรวจสอบ</span></div>
+              <div style="padding:6px 7px">
+                <div style="font-size:11px;font-weight:700;color:var(--p);margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${price3}</div>
+                <div style="font-size:10px;color:var(--tx);line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${item.title||'ไม่มีชื่อ'}</div>
               </div>
             </div>`;
           }).join('')}
         </div>
-        ${totalUL > 6 ? `<div style="text-align:center;margin-top:10px"><button onclick="_viewMyAgentProfile()" style="background:var(--p);color:#fff;border:none;border-radius:8px;padding:7px 18px;font-size:12px;font-weight:600;cursor:pointer">ดูทั้งหมด ${totalUL} รายการ</button></div>` : ''}
+        ${totalAll > 8 ? `<div style="text-align:center;margin-top:10px"><button onclick="_viewMyAgentProfile()" style="background:var(--p);color:#fff;border:none;border-radius:8px;padding:6px 16px;font-size:12px;font-weight:600;cursor:pointer">ดูทั้งหมด ${totalAll} รายการ</button></div>` : ''}
       </div>`;
   }
-  if(!myProps.length && !_pendingListings.length){
+  if(!_allCombined.length){
     propsHtml = `<div style="text-align:center;padding:16px 0;color:var(--tx2);font-size:13px"><i class="fas fa-building" style="opacity:.3;font-size:24px;display:block;margin-bottom:8px"></i>ยังไม่มีทรัพย์<div style="font-size:11px;margin-top:4px"><a href="#" onclick="event.preventDefault();openUserListingModal()" style="color:var(--p)">+ ลงประกาศ</a> เพื่อแสดงบนหน้าตัวแทน</div></div>`;
   }
 
@@ -20739,51 +20782,38 @@ function showAgentDetail(a){
   window.renderAgentProfilePage = function(a){
     if(!a) return;
 
-    /* -- รวบรวม properties สำหรับหน้า Agent Profile --
-     * member agent (_isMember=true):
-     *   - approved: ดึงจาก props array ตาม propIds (property_id จาก user_listings)
-     *   - pending: ใช้ _myUserListings (ถ้าเป็นเจ้าของ) หรือ fetch จาก v_approved_user_listings
-     * team agent: ใช้ agent_id หรือ propIds ตามเดิม
+    /* -- v35-fix: รวบรวม properties สำหรับหน้า Agent Profile --
+     * member agent: โหลดจาก DB เสมอ (ทั้ง owner+visitor)
+     * team agent:   ใช้ propIds / agent_id ตามเดิม
      */
     var myProps = [];
-    var _agpUserListingCards = []; // user listing cards (approved) สำหรับ member agent
-    var _agpPendingListings  = []; // pending listings (รอตรวจสอบ) สำหรับแสดงเฉพาะเจ้าของ
+    var _agpUserListingCards = [];
+    var _agpPendingListings  = [];
 
     if(typeof props !== 'undefined' && Array.isArray(props)){
       if(a._isMember){
-        // ── approved properties (จาก properties table ผ่าน property_id) ──
-        if(Array.isArray(a.propIds) && a.propIds.length > 0){
-          myProps = props.filter(function(p){ return a.propIds.includes(p.id); });
-        }
-
-        // ── ตรวจว่าเป็นเจ้าของหรือไม่ ──
+        // ตรวจเจ้าของ
         var _myUidAGP = window._currentUser && (window._currentUser.email || (window._currentMeta && window._currentMeta.display_name));
-        // ตรวจเจ้าของ: เปรียบเทียบทั้ง UUID (_userId) และ email/displayName (_uid)
         var _isOwnerAGP = window._currentUser && (
           (a._userId && a._userId === window._currentUser.id) ||
           (_myUidAGP && a._uid === _myUidAGP)
         );
 
         if(_isOwnerAGP){
-          // เจ้าของ: ดึง pending listings จาก _myUserListings โดยตรง
+          // เจ้าของ: pending listings จาก _myUserListings
           _agpPendingListings = (typeof _myUserListings !== 'undefined' && Array.isArray(_myUserListings))
             ? _myUserListings.filter(function(ul){ return ul.status === 'รอตรวจสอบ'; })
             : [];
-          // approved user listing cards (ใช้ propCardUserListing แสดงทันที)
-          _agpUserListingCards = (window._userListingCards || []).filter(function(c){
-            if(!c._raw) return false;
-            if(window._currentUser && c._raw.user_id === window._currentUser.id) return true;
-            if(a.name && c._agentName === a.name) return true;
-            return false;
-          });
-        } else if(a._userId && typeof sb !== 'undefined' && sb){
-          // ผู้เยี่ยมชม: โหลด approved user listings ของ member agent นี้จาก DB
+        }
+
+        // v35-fix: โหลด approved listings จาก DB เสมอ (ทั้ง owner และ visitor)
+        if(a._userId && typeof sb !== 'undefined' && sb){
           var propGridEl2 = document.getElementById('agp-prop-grid');
-          if(propGridEl2 && !myProps.length){
+          if(propGridEl2){
             propGridEl2.innerHTML =
-              '<div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--gr)">' +
-              '<i class="fas fa-spinner fa-spin" style="font-size:24px"></i>' +
-              '<div style="margin-top:8px;font-size:13px">กำลังโหลดทรัพย์...</div></div>';
+              '<div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--gr)">'
+              + '<i class="fas fa-spinner fa-spin" style="font-size:24px"></i>'
+              + '<div style="margin-top:8px;font-size:13px">กำลังโหลดทรัพย์...</div></div>';
           }
           (typeof _loadMemberAgentListings === 'function'
             ? _loadMemberAgentListings(a._userId)
@@ -20791,38 +20821,18 @@ function showAgentDetail(a){
           ).then(function(cards){
             _agpUserListingCards = cards;
             window._agpAllULCards = cards;
-            // นับรวมสำหรับ stat
+            window._agpAllProps   = [];
+            // อัปเดต count ทั้งสอง element
+            var _cnt = cards.length;
             var propCountEl3 = document.getElementById('agp-prop-count');
-            if(propCountEl3){
-              var totalCount = (window._agpAllProps||[]).length + cards.length;
-              propCountEl3.textContent = totalCount;
-            }
-            // re-render grid ด้วย user listing cards
-            if(typeof window._agpGoPageUL === 'function') window._agpGoPageUL(1);
-            else if(typeof window._agpGoPage === 'function') window._agpGoPage(1);
+            if(propCountEl3) propCountEl3.textContent = _cnt;
+            var statCntEl = document.getElementById('agp-stat-prop-count');
+            if(statCntEl) statCntEl.textContent = _cnt;
+            if(typeof window._agpGoPage === 'function') window._agpGoPage(1);
           }).catch(function(e){ console.warn('[agp] load member listings:', e); });
         }
-
-        // ── ถ้า approved props ยังว่าง → ลอง fetch จาก DB ──
-        if(!myProps.length && a.propIds && a.propIds.length && typeof sb !== 'undefined' && sb){
-          sb.from('properties').select('*').in('id', a.propIds).eq('status','approved')
-            .then(function(res){
-              if(res.data && res.data.length){
-                var fetchedProps = res.data.map(function(p){
-                  return (typeof mapProp === 'function') ? mapProp(p) : p;
-                });
-                fetchedProps.forEach(function(fp){
-                  var idx = props.findIndex(function(gp){ return gp.id === fp.id; });
-                  if(idx < 0) props.push(fp); else props[idx] = fp;
-                });
-                window._agpAllProps = fetchedProps;
-                if(typeof window._agpGoPage === 'function') window._agpGoPage(1);
-                var propCountEl2 = document.getElementById('agp-prop-count');
-                if(propCountEl2) propCountEl2.textContent = (fetchedProps.length + _agpUserListingCards.length);
-              }
-            }).catch(function(e){ console.warn('[agp] fetch member props:', e); });
-        }
       } else {
+        // team agent: ใช้ propIds / agent_id ตามเดิม
         myProps = props.filter(function(p){ return (a.propIds && a.propIds.includes(p.id)) || p.agentId === a.id; });
       }
     }
@@ -20855,10 +20865,10 @@ function showAgentDetail(a){
     var starsEl = document.getElementById('agp-stars'); if(starsEl) starsEl.textContent = '★'.repeat(stars)+'☆'.repeat(5-stars);
     var ratingNumEl = document.getElementById('agp-rating-num'); if(ratingNumEl) ratingNumEl.textContent = rating.toFixed(1);
 
-    /* Stats */
+    /* Stats — v35-fix: member agent ใช้ id เพื่อ update หลัง async load */
     var statsEl = document.getElementById('agp-stats');
     if(statsEl) statsEl.innerHTML =
-      '<div class="agp-stat"><div class="agp-stat-val">'+myProps.length+'</div><div class="agp-stat-lbl">ทรัพย์</div></div>'
+      '<div class="agp-stat"><div class="agp-stat-val" id="agp-stat-prop-count">'+(isMember?'...':myProps.length)+'</div><div class="agp-stat-lbl">ทรัพย์</div></div>'
       +'<div class="agp-stat"><div class="agp-stat-val">'+(a.deals||0)+'</div><div class="agp-stat-lbl">ปิดดีล</div></div>'
       +(rating>0?'<div class="agp-stat"><div class="agp-stat-val">'+rating.toFixed(1)+'</div><div class="agp-stat-lbl">คะแนน</div></div>':'');
 
@@ -21012,7 +21022,8 @@ function showAgentDetail(a){
     };
 
     var propCountEl = document.getElementById('agp-prop-count');
-    var _totalAGPCount = myProps.length + _agpUserListingCards.length;
+    // v35-fix: member agent — count จะถูก update หลัง async load เสร็จ
+    var _totalAGPCount = isMember ? _agpUserListingCards.length : (myProps.length + _agpUserListingCards.length);
     if(propCountEl) propCountEl.textContent = _totalAGPCount;
     window._agpGoPage(1);
 
