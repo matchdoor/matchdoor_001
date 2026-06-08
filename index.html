@@ -10293,6 +10293,14 @@ function fmtPrice(p,t){
   return '฿'+p.toLocaleString();
 }
 function typeIcon(t){ const map={'บ้านเดี่ยว':'🏡','ทาวน์โฮม':'🏘️','คอนโด':'🏢','ที่ดิน':'🗺️','อาคารพาณิชย์':'🏪','วิลล่า':'🌅','รีสอร์ท':'🌙','โรงแรม':'⭐'}; return map[t]||'🏠'; }
+// คืนค่า label "Boosted X วัน" โดยคำนวณจาก boostedAt
+function boostDaysLabel(boostedAt) {
+  if (!boostedAt) return 'Boosted';
+  const n = Math.floor((new Date() - new Date(boostedAt)) / 864e5);
+  if (n <= 0) return 'Boosted วันนี้';
+  if (n === 1) return 'Boosted 1 วัน';
+  return 'Boosted ' + n + ' วัน';
+}
 function daysAgo(d){
   if(!d)return'';
   const n=Math.floor((new Date()-new Date(d))/864e5);
@@ -11634,7 +11642,7 @@ async function renderMaListingsPanel() {
         const txLabel = ul.transaction === 'RENT' ? 'ให้เช่า' : 'ขาย';
         const exp = ul.expires_at ? new Date(ul.expires_at).toLocaleDateString('th-TH') : '';
         return `<div style="border:1.5px solid ${ul.is_boosted?'#f39c12':'var(--bd)'};border-radius:14px;overflow:hidden;display:grid;grid-template-columns:110px 1fr;gap:0;margin-bottom:12px;position:relative;${ul.is_boosted?'box-shadow:0 0 0 2px #f39c1233':''}">
-          ${ul.is_boosted ? `<div style="position:absolute;top:8px;left:8px;z-index:2;background:#f39c12;color:#fff;border-radius:20px;padding:3px 9px;font-size:10px;font-weight:800;display:flex;align-items:center;gap:4px"><i class="fas fa-rocket"></i> Boosted${ul.boost_expires_at?' · ถึง '+new Date(ul.boost_expires_at).toLocaleDateString('th-TH'):''}</div>` : ''}
+          ${ul.is_boosted ? `<div style="position:absolute;top:8px;left:8px;z-index:2;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;border-radius:20px;padding:3px 9px;font-size:10px;font-weight:800;display:flex;align-items:center;gap:4px"><i class="fas fa-rocket"></i> ${boostDaysLabel(ul.boosted_at)}</div>` : ''}
           <div style="background:var(--lt);display:flex;align-items:center;justify-content:center;min-height:100px">
             ${photo ? `<img src="${photo}" style="width:110px;height:100%;min-height:100px;object-fit:cover;display:block">` : '<i class="fas fa-home" style="font-size:28px;color:var(--tx2)"></i>'}
           </div>
@@ -13783,7 +13791,7 @@ async function _maRenderProfileListings(){
     const txLabel=ul.transaction==='RENT'?'ให้เช่า':'ขาย';
     const exp=ul.expires_at?new Date(ul.expires_at).toLocaleDateString('th-TH'):'';
     return `<div class="ma-listing-card" style="${ul.is_boosted?'border-color:#f39c12;box-shadow:0 0 0 2px #f39c1222':''}">
-      ${ul.is_boosted ? `<div style="background:#f39c12;color:#fff;font-size:10px;font-weight:800;padding:4px 10px;display:flex;align-items:center;gap:4px"><i class="fas fa-rocket"></i> Boosted${ul.boost_expires_at?' · ถึง '+new Date(ul.boost_expires_at).toLocaleDateString('th-TH'):''}</div>` : ''}
+      ${ul.is_boosted ? `<div style="background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font-size:10px;font-weight:800;padding:4px 10px;display:flex;align-items:center;gap:4px"><i class="fas fa-rocket"></i> ${boostDaysLabel(ul.boosted_at)}</div>` : ''}
       ${photo?`<img class="ma-listing-card-img" src="${photo}" alt="listing" loading="lazy">`:`<div class="ma-listing-card-img-placeholder">🏠</div>`}
       <div class="ma-listing-card-body">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px">
@@ -13844,6 +13852,14 @@ async function boostMyListing(listingId) {
     if(data && !data.success){ toast(data.error||data.message||'Boost ไม่สำเร็จ',true); return; }
     toast(data?.message || '🚀 Boost สำเร็จ! ประกาศจะขึ้นบนสุด 7 วัน');
     await loadUserTokenData();
+    // อัปเดต local cache ด้วย boosted_at ล่าสุด
+    try {
+      const { data: fresh } = await sb.from('user_listings').select('id,is_boosted,boosted_at,boost_expires_at,boost_count').eq('id', listingId).single();
+      if (fresh) {
+        const idx = _myUserListings.findIndex(u => u.id === listingId);
+        if (idx >= 0) Object.assign(_myUserListings[idx], fresh);
+      }
+    } catch(_){}
     renderMaListingsPanel();
     if(typeof _maRenderProfileListings === 'function') _maRenderProfileListings();
     // refresh all displays เพื่อให้ boosted card ขึ้นบนสุดทันที
@@ -14798,6 +14814,7 @@ function mapUserListing(ul){
     // boost info
     _boostCount: ul.boost_count || 0,
     _boostExpiresAt: ul.boost_expires_at || null,
+    _boostedAt: ul.boosted_at || null,
     _viewCount: ul.view_count || 0,
     // raw data สำหรับ mini-detail modal
     _raw: ul,
@@ -14814,6 +14831,7 @@ async function loadApprovedUserListings(){
     const { data, error } = await sb.from('v_approved_user_listings')
       .select('*')
       .order('is_boosted', { ascending: false })
+      .order('boosted_at', { ascending: false, nullsFirst: false })
       .order('created_at', { ascending: false })
       .limit(200);
     if(error){ console.warn('[loadApprovedUserListings]', error); return []; }
@@ -15378,7 +15396,8 @@ function _renderHomeGrids(){
   });
 
   // combined = props + user listing cards ที่ยังไม่มีใน props
-  const combined = [...all, ..._ulExtra];
+  // เรียง boosted ขึ้นบนสุดเสมอ
+  const combined = [..._ulExtra.filter(c=>c.isBoosted), ...all, ..._ulExtra.filter(c=>!c.isBoosted)];
 
   if(!combined.length){ console.warn('_renderHomeGrids: ไม่มีข้อมูล'); return; }
 
@@ -16719,7 +16738,7 @@ function openULDetailModal(listingId){
     ? `<span class="pb pb-rent" style="font-size:12px"><i class="fas fa-key"></i> เช่า</span>`
     : `<span class="pb pb-buy" style="font-size:12px"><i class="fas fa-tag"></i> ขาย</span>`;
   const newBadge = ul.isNew ? `<span class="pb pb-new" style="font-size:12px"><i class="fas fa-star"></i> มาใหม่</span>` : '';
-  const boostBadge = ul.isBoosted ? `<span class="pb" style="background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font-size:12px"><i class="fas fa-rocket"></i> Boosted</span>` : '';
+  const boostBadge = ul.isBoosted ? `<span class="pb" style="background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font-size:12px"><i class="fas fa-rocket"></i> ${boostDaysLabel(ul._boostedAt)}</span>` : '';
 
   const detailRows = [];
   if(ul.bed > 0)  detailRows.push(`<span class="pdi"><i class="fas fa-bed"></i><b>${ul.bed}</b><em>ห้องนอน</em></span>`);
@@ -16795,7 +16814,7 @@ function propCardUserListing(p){
     thumbInner = `<div style="font-size:50px;display:flex;align-items:center;justify-content:center;height:100%">${typeIcon(p.type)}</div>`;
   }
 
-  const boostBadge = p.isBoosted ? `<span class="pb" style="background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff"><i class="fas fa-rocket"></i> Boosted</span>` : '';
+  const boostBadge = p.isBoosted ? `<span class="pb" style="background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff"><i class="fas fa-rocket"></i> ${boostDaysLabel(p._boostedAt)}</span>` : '';
   const newBadge   = p.isNew ? `<span class="pb pb-new"><i class="fas fa-star"></i> มาใหม่</span>` : '';
   const txBadge    = `<span class="pb ${p.tx==='RENT'?'pb-rent':'pb-buy'}">${p.tx==='RENT'?`<i class="fas fa-key"></i> เช่า`:`<i class="fas fa-tag"></i> ขาย`}</span>`;
   const da = daysAgo(p.createdAt);
@@ -16934,6 +16953,7 @@ function propCard(p){
     <div class="prop-thumb">
       ${thumbInner}
       <div class="prop-badges">
+        ${p.isBoosted?`<span class="pb" style="background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff"><i class="fas fa-rocket"></i> ${boostDaysLabel(p.boosted_at||p._boostedAt)}</span>`:''}
         ${p.isNew?`<span class="pb pb-new"><i class="fas fa-star"></i> ${ui('card.new')}</span>`:''}
         ${p.isRec?'<span class="pb pb-hot"><i class="fas fa-fire"></i> Hot</span>':''}
         <span class="pb ${p.tx==='RENT'?'pb-rent':'pb-buy'}">${p.tx==='RENT'?`<i class="fas fa-key"></i> ${ui('card.rent')}`:`<i class="fas fa-tag"></i> ${ui('card.buy')}`}</span>
@@ -17171,7 +17191,7 @@ function renderListingsPage() {
       // แยก boosted (ขึ้นบนสุดเสมอ) และ non-boosted (ผสมกับ pageData)
       const _boostedUL = _filteredUL
         .filter(c => c.isBoosted)
-        .sort((a,b) => new Date(b._boostExpiresAt||b.boosted_at||0) - new Date(a._boostExpiresAt||a.boosted_at||0));
+        .sort((a,b) => new Date(b._boostedAt||b._boostExpiresAt||0) - new Date(a._boostedAt||a._boostExpiresAt||0));
       const _memberUL = _filteredUL.filter(c => !c.isBoosted);
 
       let finalHtml = '';
@@ -20706,7 +20726,7 @@ function showAgentDetail(a){
                 <div style="font-size:13px;font-weight:700;color:var(--p);margin-bottom:2px">${fmtPrice(p.price,p.tx)}</div>
                 <div style="font-size:12px;font-weight:600;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${sanitize(p.title||'')}</div>
                 <div style="font-size:11px;color:var(--gr);margin-top:3px"><i class="fas fa-map-marker-alt" style="color:var(--a);font-size:9px"></i> ${sanitize(p.location||p.district||'')}</div>
-                ${p.isBoosted ? '<span style="font-size:9px;background:#7c3aed;color:#fff;border-radius:4px;padding:1px 5px"><i class="fas fa-rocket"></i> Boosted</span>' : ''}
+                ${p.isBoosted ? `<span style="font-size:9px;background:#7c3aed;color:#fff;border-radius:4px;padding:1px 5px"><i class="fas fa-rocket"></i> ${boostDaysLabel(p._boostedAt)}</span>` : ''}
               </div>
             </div>`;
           }
@@ -20804,7 +20824,7 @@ function showAgentDetail(a){
                   + '<div style="font-size:13px;font-weight:700;color:var(--p);margin-bottom:2px">'+_pr+'</div>'
                   + '<div style="font-size:12px;font-weight:600;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+_ti+'</div>'
                   + '<div style="font-size:11px;color:var(--gr);margin-top:3px"><i class="fas fa-map-marker-alt" style="color:var(--a);font-size:9px"></i> '+_lo+'</div>'
-                  + (p.isBoosted ? '<span style="font-size:9px;background:#7c3aed;color:#fff;border-radius:4px;padding:1px 5px"><i class="fas fa-rocket"></i> Boosted</span>' : '')
+                  + (p.isBoosted ? '<span style="font-size:9px;background:#7c3aed;color:#fff;border-radius:4px;padding:1px 5px"><i class="fas fa-rocket"></i> ' + boostDaysLabel(p._boostedAt) + '</span>' : '')
                   + '</div></div>';
               }
               var _pid3 = p.id || '';
