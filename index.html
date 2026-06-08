@@ -13308,16 +13308,23 @@ function _maFavHtml(t){
   const allProps = (typeof props!=='undefined' ? props : []);
   const favProps = myFavs.map(id=>allProps.find(p=>String(p.id)===String(id))).filter(Boolean);
   if(!favProps.length) return `<div class="ma-empty"><i class="fas fa-heart-broken"></i><p>${sanitize(t('ma.favs.empty'))}</p><button class="ma-empty-btn" onclick="showPage('home');setTimeout(()=>{const sb=document.querySelector('.search-box');if(sb)sb.scrollIntoView({behavior:'smooth',block:'center'});},200)"><i class="fas fa-search"></i> ${sanitize(t('ma.favs.browse'))}</button></div>`;
-  return `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px">${
+  const _favGridStyle = window.innerWidth <= 600
+    ? 'display:grid;grid-template-columns:repeat(2,1fr);gap:10px'
+    : window.innerWidth <= 900
+    ? 'display:grid;grid-template-columns:repeat(2,1fr);gap:12px'
+    : 'display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px';
+  const _favImgH = window.innerWidth <= 600 ? '110px' : '140px';
+  const _favTitleSize = window.innerWidth <= 600 ? '12px' : '13px';
+  return `<div style="${_favGridStyle}">${
     favProps.slice(0,12).map(p=>{
       const photo = (p.photos||[])[0]||'';
       const priceStr = p.price>=1e6?(p.price/1e6).toFixed(1)+'M':p.price?.toLocaleString()||'—';
-      return `<div style="border:1.5px solid var(--bd);border-radius:12px;overflow:hidden;cursor:pointer;transition:.15s" onclick="openModal('${p.id}')">
-        ${photo?`<img src="${photo}" style="width:100%;height:140px;object-fit:cover;display:block" loading="lazy">`:`<div style="height:140px;background:var(--lt);display:flex;align-items:center;justify-content:center;font-size:32px">🏠</div>`}
-        <div style="padding:10px 12px">
-          <div style="font-size:13px;font-weight:600;color:var(--tx);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${sanitize(p.title||'')}</div>
-          <div style="font-size:12px;color:var(--gr)">${sanitize(p.location||'')}</div>
-          <div style="font-size:14px;font-weight:700;color:var(--p);margin-top:4px">${priceStr} ฿</div>
+      return `<div style="border:1.5px solid var(--bd);border-radius:12px;overflow:hidden;cursor:pointer;transition:.15s;min-width:0" onclick="openModal('${p.id}')">
+        ${photo?`<img src="${photo}" style="width:100%;height:${_favImgH};object-fit:cover;display:block" loading="lazy">`:`<div style="height:${_favImgH};background:var(--lt);display:flex;align-items:center;justify-content:center;font-size:28px">🏠</div>`}
+        <div style="padding:8px 10px">
+          <div style="font-size:${_favTitleSize};font-weight:600;color:var(--tx);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${sanitize(p.title||'')}</div>
+          <div style="font-size:11px;color:var(--gr);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${sanitize(p.location||'')}</div>
+          <div style="font-size:13px;font-weight:700;color:var(--p);margin-top:3px">${priceStr} ฿</div>
         </div>
       </div>`;
     }).join('')
@@ -13331,15 +13338,22 @@ function _maHistoryHtml(t){
   const allProps = (typeof props!=='undefined' ? props : []);
   const histProps = hist.slice(0,20).map(id=>allProps.find(p=>String(p.id)===String(id))).filter(Boolean);
   if(!histProps.length) return `<div class="ma-empty"><i class="fas fa-history"></i><p>${sanitize(t('ma.history.empty'))}</p></div>`;
-  return `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px">${
+  const _histGridStyle = window.innerWidth <= 600
+    ? 'display:grid;grid-template-columns:repeat(2,1fr);gap:10px'
+    : window.innerWidth <= 900
+    ? 'display:grid;grid-template-columns:repeat(2,1fr);gap:12px'
+    : 'display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px';
+  const _histImgH = window.innerWidth <= 600 ? '100px' : '120px';
+  const _histTitleSize = window.innerWidth <= 600 ? '12px' : '12px';
+  return `<div style="${_histGridStyle}">${
     histProps.map(p=>{
       const photo = (p.photos||[])[0]||'';
       const priceStr = p.price>=1e6?(p.price/1e6).toFixed(1)+'M':p.price?.toLocaleString()||'—';
-      return `<div style="border:1.5px solid var(--bd);border-radius:12px;overflow:hidden;cursor:pointer" onclick="openModal('${p.id}')">
-        ${photo?`<img src="${photo}" style="width:100%;height:120px;object-fit:cover;display:block" loading="lazy">`:`<div style="height:120px;background:var(--lt);display:flex;align-items:center;justify-content:center;font-size:28px">🏠</div>`}
-        <div style="padding:10px 12px">
-          <div style="font-size:12px;font-weight:600;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${sanitize(p.title||'')}</div>
-          <div style="font-size:13px;font-weight:700;color:var(--p);margin-top:3px">${priceStr} ฿</div>
+      return `<div style="border:1.5px solid var(--bd);border-radius:12px;overflow:hidden;cursor:pointer;min-width:0" onclick="openModal('${p.id}')">
+        ${photo?`<img src="${photo}" style="width:100%;height:${_histImgH};object-fit:cover;display:block" loading="lazy">`:`<div style="height:${_histImgH};background:var(--lt);display:flex;align-items:center;justify-content:center;font-size:26px">🏠</div>`}
+        <div style="padding:8px 10px">
+          <div style="font-size:${_histTitleSize};font-weight:600;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${sanitize(p.title||'')}</div>
+          <div style="font-size:12px;font-weight:700;color:var(--p);margin-top:3px">${priceStr} ฿</div>
         </div>
       </div>`;
     }).join('')
@@ -17140,7 +17154,12 @@ function renderListingsPage() {
       // กรอง user listings ตาม keyword/tx filter ถ้ามีการค้นหา
       const _kw = (document.getElementById('ls-kw')?.value||'').toLowerCase().trim();
       const _tx = _listingsTxFilter || 'ALL';
+      // ── dedup: สร้าง Set ของ property IDs ที่มีอยู่ใน _listingsData แล้ว ──
+      // ป้องกันการ์ดซ้ำกรณี admin approve user_listing แล้วสร้าง record ใน properties ด้วย
+      const _existingPropIds = new Set((_listingsBaseData||[]).map(function(p){ return String(p.id); }));
       const _filteredUL = _ulCards.filter(function(c){
+        // ตัดออกถ้ามี property_id ที่ตรงกับ properties ที่โหลดมาแล้ว (การ์ดซ้ำ)
+        if(c._propertyId && _existingPropIds.has(String(c._propertyId))) return false;
         if(_tx !== 'ALL' && c.tx !== _tx) return false;
         if(_kw){
           const _searchStr = (c.title+' '+c.location+' '+c.district+' '+c.province+' '+c.type).toLowerCase();
