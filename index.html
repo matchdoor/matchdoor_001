@@ -1703,9 +1703,6 @@ footer{background:linear-gradient(135deg,#2d2650 0%,#3d3373 100%);color:rgba(255
 .page.active{display:block}
 
 .hero{background:#080E1D;padding:60px 20px 40px;text-align:center;color:#fff;position:relative;overflow:visible}.hero-banner-img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;object-position:center center;z-index:0;opacity:0;pointer-events:none;filter:blur(0px);}
-/* Hero Slideshow layers — CSS crossfade (mobile + desktop fallback) */
-.hero-slide-layer{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 55%;z-index:0;opacity:0;transition:opacity 1.8s cubic-bezier(.4,0,.2,1);pointer-events:none;will-change:opacity}
-.hero-slide-layer.active{opacity:.82}
 @media(max-width:768px){.hero-banner-img{width:100%;height:100%;object-fit:cover;object-position:center 60%;}}
 .hero-bg-clip{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}
 #hero-canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0}
@@ -6187,11 +6184,7 @@ footer::after{
 <!-- ===== HOME PAGE ===== -->
 <div class="page" id="page-home">
  <section class="hero">
-    <img class="hero-slide-layer" id="hero-slide-0" src="https://raw.githubusercontent.com/alliAI-dev/matchdoor/refs/heads/main/wallpaper_1.jpg" alt="" loading="eager" aria-hidden="true" fetchpriority="high">
-    <img class="hero-slide-layer" id="hero-slide-1" src="https://raw.githubusercontent.com/alliAI-dev/matchdoor/refs/heads/main/wallpaper_2.jpg" alt="" loading="lazy" aria-hidden="true">
-    <img class="hero-slide-layer" id="hero-slide-2" src="https://raw.githubusercontent.com/alliAI-dev/matchdoor/refs/heads/main/wallpaper_3.jpg" alt="" loading="lazy" aria-hidden="true">
-    <img class="hero-slide-layer" id="hero-slide-3" src="https://raw.githubusercontent.com/alliAI-dev/matchdoor/refs/heads/main/wallpaper_4.jpg" alt="" loading="lazy" aria-hidden="true">
-    <img class="hero-slide-layer" id="hero-slide-4" src="https://raw.githubusercontent.com/alliAI-dev/matchdoor/refs/heads/main/wallpaper_5.jpg" alt="" loading="lazy" aria-hidden="true">
+    <img class="hero-banner-img" src="" alt="" loading="lazy" aria-hidden="true" style="display:none">
   <div class="hero-bg-clip"><canvas id="hero-canvas"></canvas></div>
   <div class="hero-content">
   <div class="hero-badge" onclick="showListingsPage()" style="cursor:pointer"><i class="fas fa-door-open"></i> <span data-i18n="hero.badge">แพลตฟอร์มอสังหาฯ ที่คุณไว้วางใจ ✨</span></div>
@@ -10212,15 +10205,47 @@ function sbImg(path) {
   return `${base}/storage/v1/object/public/${C.STORAGE_BUCKET}/${path}`;
 }
 
-// โหลด System Images (logo) จากไฟล์ local ในโฟลเดอร์เดียวกับ index.html
+// โหลด System Images (logo, banner) จาก Supabase Storage
+// โหลด System Images (logo, banner) จากไฟล์ local ในโฟลเดอร์เดียวกับ index.html
 async function loadSystemImages() {
   try {
     // โลโก้ — ใช้ไฟล์ local (absolute path จาก root)
     document.querySelectorAll('.logo-img-base').forEach(el => {
       el.src = '/LogoWeb.webp';
     });
-    // Hero slideshow: จัดการโดย initBangkokHeroCanvas (canvas) และ initMobileHeroSlideshow (mobile CSS)
-    // ไม่ต้อง set .hero-banner-img อีกต่อไป — ใช้ .hero-slide-layer แทน
+    // Banner hero background — ใช้ไฟล์ local
+    document.querySelectorAll('.hero-banner-img').forEach(el => {
+      el.src = '/bannerWeb.webp';
+      // บนมือถือ/tablet: canvas ปิดอยู่ → ใช้ img tag แสดงภาพแทน
+      // บน desktop: canvas วาดภาพเองแล้ว → ซ่อน img tag ไว้ปกติ
+      // แต่ถ้า canvas width = 0 (โหลดครั้งแรก full-screen) → แสดง img เป็น fallback
+      const isMobile = window.innerWidth <= 768 || navigator.maxTouchPoints > 0;
+      const isTablet = !isMobile && window.innerWidth <= 1024;
+      const canvas = document.getElementById('hero-canvas');
+      const canvasReady = canvas && (canvas.offsetWidth > 0 || canvas.width > 0);
+      if(isMobile || isTablet || !canvasReady) {
+        el.style.opacity = '0.72';
+        el.style.display = 'block';
+      } else {
+        el.style.opacity = '0';
+        el.style.display = 'none';
+      }
+      // Desktop: ตรวจสอบอีกครั้งหลัง layout เสร็จ — ถ้า canvas ทำงานแล้วให้ซ่อน img
+      if(!isMobile && !isTablet) {
+        setTimeout(() => {
+          const c = document.getElementById('hero-canvas');
+          if(c && c.width > 0 && c.height > 0) {
+            // Canvas ทำงานได้แล้ว — ซ่อน img
+            el.style.display = 'none';
+            el.style.opacity = '0';
+          } else {
+            // Canvas ยังไม่ทำงาน — แสดง img เป็น fallback
+            el.style.display = 'block';
+            el.style.opacity = '0.72';
+          }
+        }, 500);
+      }
+    });
   } catch(e) {
     console.warn('[loadSystemImages]', e);
   }
@@ -23699,57 +23724,45 @@ async function renderNearbyProps(prop, container) {
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
 
-  // ── Wallpaper images (hosted on GitHub) ──
-  const SLIDE_URLS = [
-    'https://raw.githubusercontent.com/alliAI-dev/matchdoor/refs/heads/main/wallpaper_1.jpg',
-    'https://raw.githubusercontent.com/alliAI-dev/matchdoor/refs/heads/main/wallpaper_2.jpg',
-    'https://raw.githubusercontent.com/alliAI-dev/matchdoor/refs/heads/main/wallpaper_3.jpg',
-    'https://raw.githubusercontent.com/alliAI-dev/matchdoor/refs/heads/main/wallpaper_4.jpg',
-    'https://raw.githubusercontent.com/alliAI-dev/matchdoor/refs/heads/main/wallpaper_5.jpg',
-  ];
-  const SLIDE_DURATION   = 6000;  // ms each slide shows
-  const CROSSFADE_FRAMES = 120;   // ~2s at 60fps for crossfade
-  const KEN_BURNS_SCALE  = 1.08;  // subtle zoom (1.0 = no zoom)
-
-  // Preload all images
-  const bgImgs = SLIDE_URLS.map((src, i) => {
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.src = src;
-    if (i === 0) img.fetchpriority = 'high';
-    return img;
-  });
+  // Preload Bangkok skyline photo
+  const bgImg = new Image();
+  bgImg.src = '/bannerWeb.webp';
 
   function resize() {
+    // offsetWidth อาจเป็น 0 บน desktop full-screen ตอนโหลดครั้งแรก
+    // (canvas เป็น position:absolute ยังไม่ paint) → fallback ด้วย parentElement หรือ window
     const parent = canvas.parentElement;
     const w = canvas.offsetWidth || (parent && parent.offsetWidth) || window.innerWidth || 1280;
     const h = canvas.offsetHeight || (parent && parent.offsetHeight) || 500;
-    if (canvas.width !== w || canvas.height !== h) {
+    // อัพเดตเฉพาะถ้าขนาดเปลี่ยน เพื่อไม่ล้าง canvas โดยไม่จำเป็น
+    if(canvas.width !== w || canvas.height !== h) {
       canvas.width  = w;
       canvas.height = h;
     }
   }
+  // Resize ทันที (อาจได้ 0 ถ้า layout ยังไม่เสร็จ)
   resize();
+  // Resize อีกครั้งหลัง first paint — ได้ขนาดจริงเสมอ
   requestAnimationFrame(() => { resize(); });
-  window.addEventListener('load',   () => { resize(); }, { once: true });
+  // Resize อีกครั้งหลัง load เสร็จ — รองรับกรณี CSS ยังโหลดช้า
+  window.addEventListener('load', () => { resize(); }, {once: true});
   window.addEventListener('resize', () => { resize(); });
 
   function lerp(a, b, t) { return a + (b - a) * t; }
-  function easeInOut(t)  { return t < 0.5 ? 2*t*t : -1+(4-2*t)*t; }
 
-  // ── Stars ──
-  const stars_pos = Array.from({ length: 80 }, () => ({
+  // ── Stars (night only) ──
+  const stars_pos = Array.from({length:80}, () => ({
     x: Math.random(), y: Math.random() * 0.55,
     r: 0.5 + Math.random() * 1.5,
-    twinkle: Math.random() * Math.PI * 2,
+    twinkle: Math.random() * Math.PI * 2
   }));
   function drawStars(alpha) {
-    if (alpha <= 0) return;
+    if(alpha <= 0) return;
     stars_pos.forEach(s => {
       s.twinkle += 0.04;
       const a = alpha * (0.5 + Math.sin(s.twinkle) * 0.4);
       ctx.beginPath();
-      ctx.arc(s.x * canvas.width, s.y * canvas.height, s.r, 0, Math.PI * 2);
+      ctx.arc(s.x * canvas.width, s.y * canvas.height, s.r, 0, Math.PI*2);
       ctx.fillStyle = `rgba(255,255,255,${a})`;
       ctx.fill();
     });
@@ -23759,251 +23772,215 @@ async function renderNearbyProps(prop, container) {
   function drawSunMoon(cyclePos) {
     const isMoon = cyclePos > 0.5;
     const progress = isMoon ? (cyclePos - 0.5) * 2 : cyclePos * 2;
-    const x = canvas.width  * (0.12 + progress * 0.76);
+    const x = canvas.width * (0.12 + progress * 0.76);
     const y = canvas.height * (0.18 - Math.sin(progress * Math.PI) * 0.12);
-    if (isMoon) {
+    if(isMoon) {
       ctx.shadowBlur = 20; ctx.shadowColor = 'rgba(200,220,255,0.5)';
-      ctx.beginPath(); ctx.arc(x, y, 18, 0, Math.PI * 2);
+      ctx.beginPath(); ctx.arc(x, y, 18, 0, Math.PI*2);
       ctx.fillStyle = '#e8f0ff'; ctx.fill();
-      ctx.beginPath(); ctx.arc(x + 8, y - 4, 14, 0, Math.PI * 2);
+      ctx.beginPath(); ctx.arc(x+8, y-4, 14, 0, Math.PI*2);
       const nd = (cyclePos - 0.5) * 2;
       ctx.fillStyle = nd > 0.5 ? '#050e22' : '#0a1830'; ctx.fill();
       ctx.shadowBlur = 0;
     } else {
       ctx.shadowBlur = 50; ctx.shadowColor = 'rgba(255,200,50,.8)';
-      ctx.beginPath(); ctx.arc(x, y, 24, 0, Math.PI * 2);
-      const sg = ctx.createRadialGradient(x, y, 0, x, y, 24);
-      sg.addColorStop(0, '#fff7a0'); sg.addColorStop(0.5, '#ffdd00'); sg.addColorStop(1, '#ffaa00');
+      ctx.beginPath(); ctx.arc(x, y, 24, 0, Math.PI*2);
+      const sg = ctx.createRadialGradient(x,y,0,x,y,24);
+      sg.addColorStop(0,'#fff7a0'); sg.addColorStop(0.5,'#ffdd00'); sg.addColorStop(1,'#ffaa00');
       ctx.fillStyle = sg; ctx.fill(); ctx.shadowBlur = 0;
     }
   }
 
-  // ── Day/Night overlay ──
+  // ── Day/Night overlay on the photo ──
   function drawDayNightOverlay(cyclePos, nightAlpha) {
     const W = canvas.width, H = canvas.height;
     const dayAlpha = 1 - nightAlpha;
-    if (dayAlpha > 0) {
+
+    if(dayAlpha > 0) {
+      // Day: sky-blue gradient — strong at top, fades before buildings
       const skyGrad = ctx.createLinearGradient(0, 0, 0, H * 0.55);
       skyGrad.addColorStop(0,   `rgba(130,195,240,${dayAlpha * 0.62})`);
       skyGrad.addColorStop(0.5, `rgba(150,210,245,${dayAlpha * 0.38})`);
       skyGrad.addColorStop(1,   `rgba(170,225,250,0)`);
-      ctx.fillStyle = skyGrad; ctx.fillRect(0, 0, W, H * 0.55);
+      ctx.fillStyle = skyGrad;
+      ctx.fillRect(0, 0, W, H * 0.55);
     }
-    if (nightAlpha > 0) {
+
+    if(nightAlpha > 0) {
+      // Night: dark blue overlay
       ctx.fillStyle = `rgba(5,10,35,${nightAlpha * 0.72})`;
       ctx.fillRect(0, 0, W, H);
+      // Moon glow
       const moonProgress = (cyclePos > 0.5) ? (cyclePos - 0.5) * 2 : 0;
-      if (moonProgress > 0) {
+      if(moonProgress > 0) {
         const mx = W * (0.12 + moonProgress * 0.76);
         const my = H * (0.18 - Math.sin(moonProgress * Math.PI) * 0.12);
         const moonGlow = ctx.createRadialGradient(mx, my, 0, mx, my, H * 0.45);
         moonGlow.addColorStop(0, `rgba(100,140,255,${nightAlpha * 0.12})`);
         moonGlow.addColorStop(1, 'transparent');
-        ctx.fillStyle = moonGlow; ctx.fillRect(0, 0, W, H);
+        ctx.fillStyle = moonGlow;
+        ctx.fillRect(0, 0, W, H);
       }
+      // City lights shimmer on buildings (bottom portion)
       ctx.fillStyle = `rgba(255,200,80,${nightAlpha * 0.08})`;
       ctx.fillRect(0, H * 0.6, W, H * 0.4);
     }
+
+    // Dusk/dawn: warm orange tint
     const duskProgress = (cyclePos > 0.4 && cyclePos < 0.6)
       ? 1 - Math.abs((cyclePos - 0.5) * 10) : 0;
-    if (duskProgress > 0) {
+    if(duskProgress > 0) {
       const grad = ctx.createLinearGradient(0, 0, 0, H);
-      grad.addColorStop(0,   `rgba(255,120,20,${duskProgress * 0.35})`);
+      grad.addColorStop(0, `rgba(255,120,20,${duskProgress * 0.35})`);
       grad.addColorStop(0.5, `rgba(255,80,20,${duskProgress * 0.2})`);
       grad.addColorStop(1, 'transparent');
-      ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H);
     }
   }
 
   // ── Birds ──
-  const birds = Array.from({ length: 6 }, (_, i) => ({
-    x: Math.random() * 1.5 - 0.3, y: 0.05 + Math.random() * 0.3,
+  const birds = Array.from({length: 6}, (_, i) => ({
+    x: Math.random() * 1.5 - 0.3,   // 0..1 relative to canvas width (can be off-screen)
+    y: 0.05 + Math.random() * 0.3,   // top 35% of canvas
     speed: 0.0006 + Math.random() * 0.0008,
-    wingPhase: Math.random() * Math.PI * 2, wingSpeed: 0.12 + Math.random() * 0.08,
-    size: 4 + Math.random() * 5, waveAmp: 0.008 + Math.random() * 0.01,
-    waveFreq: 0.8 + Math.random() * 0.6, frameOffset: Math.floor(Math.random() * 400),
+    wingPhase: Math.random() * Math.PI * 2,
+    wingSpeed: 0.12 + Math.random() * 0.08,
+    size: 4 + Math.random() * 5,
+    waveAmp: 0.008 + Math.random() * 0.01,   // vertical wave amplitude (relative)
+    waveFreq: 0.8 + Math.random() * 0.6,
+    frameOffset: Math.floor(Math.random() * 400),
   }));
+
   function drawBirds(frame, nightAlpha) {
+    // Birds are visible during day and dusk, fade in night
     const birdAlpha = Math.max(0, 1 - nightAlpha * 1.5);
-    if (birdAlpha <= 0) return;
+    if(birdAlpha <= 0) return;
+
     const W = canvas.width, H = canvas.height;
     ctx.save();
     ctx.strokeStyle = `rgba(20,20,50,${birdAlpha * 0.75})`;
-    ctx.lineWidth = 1.5; ctx.lineCap = 'round';
+    ctx.lineWidth = 1.5;
+    ctx.lineCap = 'round';
+
     birds.forEach(bird => {
       const f = (frame + bird.frameOffset) * bird.speed;
+      // Horizontal position wraps around
       const bx = ((bird.x + f) % 1.3) - 0.15;
+      // Gentle vertical wave
       const by = bird.y + Math.sin(f * bird.waveFreq * Math.PI * 2) * bird.waveAmp;
-      const x = bx * W, y = by * H, s = bird.size;
+
+      const x = bx * W;
+      const y = by * H;
+      const s = bird.size;
+
+      // Wing flap
       bird.wingPhase += bird.wingSpeed;
-      const wingLift = Math.sin(bird.wingPhase) * 0.5;
+      const wingLift = Math.sin(bird.wingPhase) * 0.5; // -0.5 .. 0.5
+
+      // Simple bird: two curved wings as arcs
       ctx.beginPath();
-      ctx.moveTo(x, y); ctx.quadraticCurveTo(x - s * 0.7, y - s * wingLift, x - s * 1.4, y + s * 0.1);
-      ctx.moveTo(x, y); ctx.quadraticCurveTo(x + s * 0.7, y - s * wingLift, x + s * 1.4, y + s * 0.1);
+      // Left wing
+      ctx.moveTo(x, y);
+      ctx.quadraticCurveTo(x - s * 0.7, y - s * wingLift, x - s * 1.4, y + s * 0.1);
+      // Right wing
+      ctx.moveTo(x, y);
+      ctx.quadraticCurveTo(x + s * 0.7, y - s * wingLift, x + s * 1.4, y + s * 0.1);
       ctx.stroke();
     });
     ctx.restore();
   }
 
-  // ── Image drawing with Ken Burns pan-zoom ──
-  function drawImage(img, kbProgress, opacity) {
-    if (!img || !img.complete || !img.naturalWidth) return;
-    if (opacity <= 0) return;
-    const W = canvas.width, H = canvas.height;
-    const imgAspect    = img.naturalWidth / img.naturalHeight;
-    const canvasAspect = W / H;
+  let frame = 0;
+  let cycleDuration = 4800;
+  let nightAlpha = 0;
+  let canvasVisible = true; // tracked by IntersectionObserver
 
-    // Base cover dimensions
-    let bw, bh;
-    if (canvasAspect > imgAspect) { bw = W; bh = W / imgAspect; }
-    else                          { bh = H; bw = H * imgAspect; }
-
-    // Ken Burns: subtle scale + gentle pan
-    const kbEased = easeInOut(kbProgress);
-    const scale   = 1 + (KEN_BURNS_SCALE - 1) * kbEased;
-    const dw      = bw * scale;
-    const dh      = bh * scale;
-    // Pan slowly from center-top → center-bottom
-    const panX = (bw - dw) / 2;
-    const panY = lerp((bh - dh) / 2, (bh - dh) * 0.35, kbEased) + (H - bh) / 2;
-
-    ctx.save();
-    ctx.globalAlpha = opacity;
-    ctx.drawImage(img, panX, panY, dw, dh);
-    ctx.restore();
-  }
-
-  // ── Slide state machine ──
-  let frame          = 0;
-  let cycleDuration  = 4800;
-  let nightAlpha     = 0;
-  let canvasVisible  = true;
-
-  // Slide timing
-  let currentSlide   = 0;
-  let nextSlide      = 1;
-  let slideTimer     = 0;           // frames since last slide change
-  let crossfadeTimer = 0;           // frames into crossfade (0 = not in crossfade)
-  let inCrossfade    = false;
-  const SLIDE_FRAMES = Math.round(SLIDE_DURATION / (1000 / 60));
-
-  // Ken Burns per-slide progress (0→1 over SLIDE_FRAMES)
-  let kbProgress = 0;
-
-  if (window.IntersectionObserver) {
+  // Pause animation when canvas is scrolled out of viewport
+  if(window.IntersectionObserver) {
     new IntersectionObserver(entries => {
       canvasVisible = entries[0].isIntersecting;
     }, { threshold: 0 }).observe(canvas);
   }
 
   function drawFrame() {
-    if (document.hidden || !canvasVisible) { requestAnimationFrame(drawFrame); return; }
+    // Pause when tab is hidden or canvas is off-screen — saves CPU/GPU
+    if(document.hidden || !canvasVisible) {
+      requestAnimationFrame(drawFrame);
+      return;
+    }
     frame++;
-
-    // ── Day/Night cycle ──
     const cyclePos = (frame % cycleDuration) / cycleDuration;
+    // Smooth ease function (sine)
     const ease = t => (1 - Math.cos(t * Math.PI)) / 2;
-    if      (cyclePos < 0.35) nightAlpha = 0;
-    else if (cyclePos < 0.55) nightAlpha = ease((cyclePos - 0.35) / 0.20);
-    else if (cyclePos < 0.85) nightAlpha = 1;
-    else                      nightAlpha = 1 - ease((cyclePos - 0.85) / 0.15);
+    // day: 0.0–0.35 | dawn transition: 0.35–0.55 | night: 0.55–0.85 | dusk transition: 0.85–1.0+0.0–0.0(wrap)
+    if(cyclePos < 0.35) nightAlpha = 0;
+    else if(cyclePos < 0.55) nightAlpha = ease((cyclePos - 0.35) / 0.20);
+    else if(cyclePos < 0.85) nightAlpha = 1;
+    else nightAlpha = 1 - ease((cyclePos - 0.85) / 0.15);
     nightAlpha = Math.max(0, Math.min(1, nightAlpha));
 
     const W = canvas.width, H = canvas.height;
     ctx.clearRect(0, 0, W, H);
 
-    // ── Slide timing ──
-    slideTimer++;
-    kbProgress = Math.min(slideTimer / SLIDE_FRAMES, 1);
-
-    if (!inCrossfade && slideTimer >= SLIDE_FRAMES) {
-      inCrossfade    = true;
-      crossfadeTimer = 0;
-      nextSlide      = (currentSlide + 1) % bgImgs.length;
-    }
-
-    let currentOpacity = 1;
-    let nextOpacity    = 0;
-
-    if (inCrossfade) {
-      crossfadeTimer++;
-      const cfProgress  = Math.min(crossfadeTimer / CROSSFADE_FRAMES, 1);
-      const cfEased     = easeInOut(cfProgress);
-      currentOpacity    = 1 - cfEased;
-      nextOpacity       = cfEased;
-
-      if (crossfadeTimer >= CROSSFADE_FRAMES) {
-        // Crossfade complete — advance slide
-        currentSlide   = nextSlide;
-        inCrossfade    = false;
-        slideTimer     = 0;
-        crossfadeTimer = 0;
-        kbProgress     = 0;
+    // 1. Draw Bangkok skyline photo as background (cover, focus on buildings at 60% vertical)
+    if(bgImg.complete && bgImg.naturalWidth > 0) {
+      const imgAspect = bgImg.naturalWidth / bgImg.naturalHeight;
+      const canvasAspect = W / H;
+      let dw, dh, dx, dy;
+      if(canvasAspect > imgAspect) {
+        // Canvas wider than image → scale by width, center vertically (clamp so no negative offset)
+        dw = W; dh = W / imgAspect; dx = 0;
+        dy = Math.min(0, (H - dh) / 2);
+      } else {
+        // Canvas taller than image → scale by height, center horizontally
+        dh = H; dw = H * imgAspect;
+        dx = (W - dw) / 2; dy = 0;
       }
-    }
-
-    // ── Fallback gradient while images load ──
-    const firstReady = bgImgs[currentSlide].complete && bgImgs[currentSlide].naturalWidth > 0;
-    if (!firstReady) {
+      ctx.drawImage(bgImg, dx, dy, dw, dh);
+    } else {
+      // Fallback sky gradient while image loads
       const grd = ctx.createLinearGradient(0, 0, 0, H);
       grd.addColorStop(0, nightAlpha > 0.5 ? '#040d20' : '#1e6db0');
       grd.addColorStop(1, nightAlpha > 0.5 ? '#0a1828' : '#7ab8dc');
-      ctx.fillStyle = grd; ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = grd;
+      ctx.fillRect(0, 0, W, H);
     }
 
-    // 1. Draw current slide
-    drawImage(bgImgs[currentSlide], kbProgress, currentOpacity);
-
-    // 2. Draw next slide (on top, fading in during crossfade)
-    if (inCrossfade) {
-      drawImage(bgImgs[nextSlide], 0, nextOpacity);
-    }
-
-    // 3. Day/Night overlay
+    // 2. Day/Night overlay
     drawDayNightOverlay(cyclePos, nightAlpha);
 
-    // 4. Stars
+    // 3. Stars (appear at night, above image)
     drawStars(nightAlpha);
 
-    // 5. Sun/Moon
+    // 4. Sun/Moon
     drawSunMoon(cyclePos);
 
-    // 6. Birds (daytime)
+    // 5. Birds (daytime)
     drawBirds(frame, nightAlpha);
 
     requestAnimationFrame(drawFrame);
   }
 
-  // Mobile: ไม่รัน canvas — CSS slideshow จัดการแทน
-  if (window.innerWidth <= 768 || navigator.maxTouchPoints > 0) {
+  // บนมือถือ: ไม่รัน animation — ใช้ CSS background แทน ประหยัด CPU มาก
+  if(window.innerWidth <= 768 || navigator.maxTouchPoints > 0){
     canvas.style.display = 'none';
     return;
   }
 
-  function startDrawing() { resize(); drawFrame(); }
-
-  // Start immediately — images preload in background
-  requestAnimationFrame(startDrawing);
-})();
-
-// ── Mobile/Tablet: CSS Hero Slideshow ──
-(function initMobileHeroSlideshow() {
-  const isMobile = window.innerWidth <= 1024 || navigator.maxTouchPoints > 0;
-  if (!isMobile) return;
-
-  const slides = document.querySelectorAll('.hero-slide-layer');
-  if (!slides.length) return;
-
-  let current = 0;
-  slides[0].classList.add('active');
-
-  const INTERVAL = 6000;
-  const advance  = () => {
-    slides[current].classList.remove('active');
-    current = (current + 1) % slides.length;
-    slides[current].classList.add('active');
-  };
-  setInterval(advance, INTERVAL);
+  // Start when image is ready (or immediately if already loaded)
+  // ใช้ RAF เพื่อให้แน่ใจว่า resize() ได้รับขนาดจริงก่อน drawFrame ครั้งแรก
+  function startDrawing() {
+    resize(); // ensure canvas has correct size before first draw
+    drawFrame();
+  }
+  if(bgImg.complete) {
+    requestAnimationFrame(startDrawing);
+  } else {
+    bgImg.onload = () => requestAnimationFrame(startDrawing);
+    // Also start drawing immediately so night/day still works if img is slow
+    setTimeout(startDrawing, 100);
+  }
 })();
 
 // Weather badge removed — was showing fake/random weather data (misleading UX)
