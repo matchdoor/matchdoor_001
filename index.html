@@ -2004,6 +2004,70 @@ footer{background:linear-gradient(135deg,#2d2650 0%,#3d3373 100%);color:rgba(255
 .why-card p{font-size:12.5px;color:var(--tx2);line-height:1.7;margin:0}
 @media(max-width:900px){.why-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:480px){.why-grid{grid-template-columns:1fr}}
+
+/* ═══════════════════════════════════════════
+   PHASE 4 — Global Polish + New Sections
+═══════════════════════════════════════════ */
+
+/* ── Section title global upgrade ── */
+.sec-title{display:flex;align-items:center;gap:10px;font-size:clamp(17px,2.2vw,21px);font-weight:800;color:var(--p);letter-spacing:-.3px}
+.sec-title::before{content:'';width:4px;height:22px;background:linear-gradient(180deg,var(--a),var(--a2));border-radius:3px;display:block;flex-shrink:0}
+
+/* ── Gallery nav buttons upgrade ── */
+.gallery-nav{display:flex;gap:6px}
+.gallery-nav-btn{width:36px;height:36px;border-radius:10px;border:1.5px solid var(--bd);background:#fff;color:var(--p);font-size:13px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.18s}
+.gallery-nav-btn:hover{background:var(--p);color:#fff;border-color:var(--p)}
+
+/* ── Property card global polish ── */
+.prop-card{border-radius:16px;border:1.5px solid var(--bd);background:#fff;overflow:hidden;position:relative;transition:transform .22s,box-shadow .22s,border-color .22s}
+.prop-card:hover{transform:translateY(-4px);box-shadow:0 16px 40px -16px rgba(27,58,107,.22);border-color:rgba(27,58,107,.25)}
+.prop-body{padding:14px 14px 14px}
+.prop-title{font-size:14px;font-weight:700;color:var(--p);line-height:1.4;margin-bottom:5px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.prop-loc{font-size:12px;color:var(--tx2);margin-bottom:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prop-price{font-size:17px;font-weight:800;color:var(--a)}
+
+/* ── BTS/MRT transit badge on cards ── */
+.prop-transit-badge{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(26,83,176,.1);color:#1A53B0;margin-top:5px;white-space:nowrap}
+.prop-transit-badge.bts{background:rgba(0,158,96,.12);color:#007a47}
+.prop-transit-badge.mrt{background:rgba(26,83,176,.12);color:#1A53B0}
+.prop-transit-badge.arl{background:rgba(139,0,0,.1);color:#8B0000}
+
+/* ── Near Transit section ── */
+.transit-lines-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+.transit-line-card{--tl-col:#1B3A6B;display:flex;flex-direction:column;gap:3px;background:#fff;border:1.5px solid var(--bd);border-left:4px solid var(--tl-col);border-radius:12px;padding:14px 16px;cursor:pointer;transition:.2s}
+.transit-line-card:hover{border-color:var(--tl-col);box-shadow:0 8px 20px -12px var(--tl-col);transform:translateY(-2px)}
+.tl-badge{font-size:11px;font-weight:800;color:#fff;background:var(--tl-col);display:inline-block;padding:2px 8px;border-radius:6px;width:fit-content;letter-spacing:.5px}
+.tl-name{font-size:14px;font-weight:700;color:var(--p);margin-top:4px}
+.tl-sub{font-size:11px;color:var(--tx2);line-height:1.5}
+@media(max-width:640px){.transit-lines-grid{grid-template-columns:repeat(2,1fr)}}
+
+/* ── Newsletter section ── */
+.newsletter-sec{background:linear-gradient(135deg,#0A1628 0%,#1B3A6B 55%,#0F2548 100%);padding:36px 20px;text-align:center}
+.newsletter-inner{max-width:680px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:14px}
+.newsletter-icon{width:56px;height:56px;background:rgba(200,146,42,.2);border:1.5px solid rgba(200,146,42,.4);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--a)}
+.newsletter-copy h3{font-size:20px;font-weight:800;color:#fff;margin-bottom:5px}
+.newsletter-copy p{font-size:13px;color:rgba(255,255,255,.7);line-height:1.7}
+.newsletter-form{display:flex;gap:10px;width:100%;max-width:480px}
+.nl-input{flex:1;padding:12px 16px;border-radius:10px;border:1.5px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff;font-size:14px;font-family:inherit}
+.nl-input::placeholder{color:rgba(255,255,255,.4)}
+.nl-input:focus{outline:none;border-color:var(--a)}
+.nl-btn{padding:12px 22px;border-radius:10px;background:linear-gradient(135deg,var(--a),var(--a2));color:#1A1A2E;font-weight:800;font-size:13px;font-family:inherit;border:none;cursor:pointer;white-space:nowrap;transition:.18s}
+.nl-btn:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(200,146,42,.4)}
+@media(max-width:500px){.newsletter-form{flex-direction:column}}
+
+/* ── Footer inner wider grid to fit new columns ── */
+.footer-inner{
+  max-width:1320px;margin:0 auto;
+  display:grid;
+  grid-template-columns:220px repeat(auto-fill,minmax(130px,1fr));
+  gap:32px 20px;padding:36px 20px 28px
+}
+@media(max-width:900px){.footer-inner{grid-template-columns:1fr 1fr}}
+@media(max-width:500px){.footer-inner{grid-template-columns:1fr;gap:22px 0}}
+
+/* ── View-all link subtle upgrade ── */
+.view-all{color:var(--p);font-size:13px;font-weight:700;cursor:pointer;padding:6px 14px;border-radius:8px;border:1.5px solid var(--bd);transition:.18s;display:inline-flex;align-items:center;gap:4px}
+.view-all:hover{background:var(--p);color:#fff;border-color:var(--p)}
 /* ── Tools Modal (เครื่องมือคำนวณ) ── */
 .tools-tabs{display:flex;gap:6px;margin-bottom:18px;border-bottom:1.5px solid var(--lt);overflow-x:auto;-ms-overflow-style:none;scrollbar-width:none}
 .tools-tabs::-webkit-scrollbar{display:none}
@@ -2081,8 +2145,8 @@ footer{background:linear-gradient(135deg,#2d2650 0%,#3d3373 100%);color:rgba(255
 .rent-dur-label{color:var(--tx2);display:flex;align-items:center;gap:5px}
 .rent-dur-price{font-weight:700;color:var(--p)}
 .rent-dur-price.rent-dur-up{color:var(--a)}
-.prop-thumb{height:190px;background:linear-gradient(135deg,#e8edf5,#d5e0f0);display:flex;align-items:center;justify-content:center;font-size:50px;position:relative;overflow:hidden}
-.prop-thumb>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.prop-thumb{aspect-ratio:16/11;background:linear-gradient(135deg,#e8edf5,#d5e0f0);display:flex;align-items:center;justify-content:center;font-size:50px;position:relative;overflow:hidden}
+.prop-thumb>img,.prop-thumb .card-slides,.prop-thumb .card-slides img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .prop-badges{position:absolute;top:10px;left:10px;display:flex;gap:4px;z-index:5;flex-wrap:wrap;max-width:calc(100% - 50px)}
 .pb{padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;backdrop-filter:blur(6px)}
 .pb-new{background:rgba(0,184,148,.9);color:#fff}
@@ -2563,7 +2627,7 @@ footer::after{
 .mslider{cursor:grab;user-select:none}
 .mslider.dragging{cursor:grabbing}
 
-.prop-thumb{position:relative;overflow:hidden}
+/* prop-thumb: aspect-ratio drives the height; card-slides fills absolutely */
 /* เมื่อ .prop-thumb มี .card-slides ต้องไม่ใช้ flex (เพราะ flex จะทำให้ card-slides ไม่ fill เต็ม height) */
 .prop-thumb:has(.card-slides){display:block}
 .card-slides{display:flex;flex-flow:row nowrap;width:100%;height:100%;transition:transform .35s cubic-bezier(.25,.46,.45,.94);will-change:transform;position:absolute;inset:0}
@@ -2736,7 +2800,6 @@ footer::after{
   .btn-search{padding:8px 16px;height:40px}
   .price-card{padding:14px 16px}
   .price-card h3{font-size:14px}
-  .prop-thumb{height:170px}
   .prop-body{padding:12px}
   .prop-title{font-size:13px}
   .prop-price{font-size:16px}
@@ -6409,22 +6472,35 @@ footer::after{
 
  <!-- ═══ TOOLS SECTION (เครื่องมือคำนวณ) ═══ -->
  <div class="wrap" style="padding-top:24px">
-  <div class="sec-hd"><div class="sec-title"><i class="fas fa-calculator" style="color:var(--a)"></i> <span data-i18n="tools.sec.title">เครื่องมือช่วยตัดสินใจ</span></div></div>
-  <div class="tools-grid">
-    <div class="tools-card" onclick="openToolsModal('mortgage')">
+  <div class="sec-hd">
+    <div class="sec-title"><i class="fas fa-calculator" style="color:var(--a)"></i> <span data-i18n="tools.sec.title">เครื่องมือช่วยตัดสินใจ</span></div>
+    <span class="view-all" onclick="showPage('tools')">ดูทั้งหมด →</span>
+  </div>
+  <p style="color:var(--tx2);font-size:13px;margin-bottom:16px">คำนวณผ่อน ประเมินราคา วิเคราะห์ yield — ใช้ได้ฟรี ไม่ต้องสมัคร</p>
+  <div class="tools-grid" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px">
+    <div class="tools-card" onclick="showPage('tools-valuation')">
+      <div class="tools-card-icon" style="background:linear-gradient(135deg,#7c3aed,#a855f7)"><i class="fas fa-search-dollar"></i></div>
+      <h4>ประเมินราคาทรัพย์</h4>
+      <p>คำนวณราคาตลาดและราคาประเมินกรมธนารักษ์ จากทำเล ขนาด อายุ</p>
+      <div style="margin-top:8px;font-size:11px;color:var(--a);font-weight:700">ใหม่ ✨</div>
+    </div>
+    <div class="tools-card" onclick="showPage('tools-mortgage')">
       <div class="tools-card-icon"><i class="fas fa-home"></i></div>
       <h4 data-i18n="tools.card.mortgage.h">คำนวณผ่อนบ้าน</h4>
       <p data-i18n="tools.card.mortgage.p">ประมาณยอดผ่อนรายเดือนจากราคาทรัพย์ ดอกเบี้ย และระยะเวลากู้</p>
+      <div style="margin-top:8px;font-size:11px;color:var(--tx2)">ตารางผ่อนปีต่อปี &rarr;</div>
     </div>
-    <div class="tools-card" onclick="openToolsModal('yield')">
-      <div class="tools-card-icon"><i class="fas fa-chart-line"></i></div>
+    <div class="tools-card" onclick="showPage('tools-yield')">
+      <div class="tools-card-icon" style="background:linear-gradient(135deg,#1B5E38,#10b981)"><i class="fas fa-chart-line"></i></div>
       <h4 data-i18n="tools.card.yield.h">Rental Yield</h4>
       <p data-i18n="tools.card.yield.p">ประเมินผลตอบแทนจากการปล่อยเช่า เทียบกับราคาซื้อ</p>
+      <div style="margin-top:8px;font-size:11px;color:var(--tx2)">Gross &amp; Net Yield &rarr;</div>
     </div>
-    <div class="tools-card" onclick="openToolsModal('transfer')">
-      <div class="tools-card-icon"><i class="fas fa-file-contract"></i></div>
+    <div class="tools-card" onclick="showPage('tools-transfer')">
+      <div class="tools-card-icon" style="background:linear-gradient(135deg,#C8922A,#f59e0b)"><i class="fas fa-file-contract"></i></div>
       <h4 data-i18n="tools.card.transfer.h">ค่าโอนและภาษี</h4>
       <p data-i18n="tools.card.transfer.p">คำนวณค่าธรรมเนียมโอน อากรแสตมป์ และภาษีธุรกิจเฉพาะโดยประมาณ</p>
+      <div style="margin-top:8px;font-size:11px;color:var(--tx2)">มาตรการ 2568 &rarr;</div>
     </div>
   </div>
  </div>
@@ -6505,6 +6581,63 @@ footer::after{
     </div>
   </div>
 </div>
+
+<!-- ═══ NEAR TRANSIT SECTION ═══ -->
+<section id="transit-sec" style="padding:28px 0 24px;background:var(--bg)">
+  <div style="max-width:1320px;margin:0 auto;padding:0 20px">
+    <div class="sec-hd">
+      <div class="sec-title"><i class="fas fa-subway" style="color:#2A5298"></i> <span data-i18n="sec.transit">อสังหาฯ ใกล้รถไฟฟ้า</span></div>
+    </div>
+    <div class="transit-lines-grid">
+      <div class="transit-line-card" style="--tl-col:#009e60" onclick="quickSearch('BTS สายสุขุมวิท')">
+        <div class="tl-badge">BTS</div><div class="tl-name">สายสุขุมวิท</div><div class="tl-sub">On Nut · Bearing · Bang Na</div>
+      </div>
+      <div class="transit-line-card" style="--tl-col:#F2C200" onclick="quickSearch('BTS สายสีทอง')">
+        <div class="tl-badge" style="color:#333">BTS</div><div class="tl-name">สายสีทอง</div><div class="tl-sub">กรุงธนบุรี – คลองสาน</div>
+      </div>
+      <div class="transit-line-card" style="--tl-col:#1A53B0" onclick="quickSearch('MRT สายสีน้ำเงิน')">
+        <div class="tl-badge">MRT</div><div class="tl-name">สายสีน้ำเงิน</div><div class="tl-sub">หัวลำโพง – บางซื่อ – ท่าพระ</div>
+      </div>
+      <div class="transit-line-card" style="--tl-col:#8B2FC9" onclick="quickSearch('MRT สายสีม่วง')">
+        <div class="tl-badge">MRT</div><div class="tl-name">สายสีม่วง</div><div class="tl-sub">เตาปูน – คลองบางไผ่</div>
+      </div>
+      <div class="transit-line-card" style="--tl-col:#F5C800" onclick="quickSearch('MRT สายสีเหลือง')">
+        <div class="tl-badge" style="color:#333">MRT</div><div class="tl-name">สายสีเหลือง</div><div class="tl-sub">ลาดพร้าว – สำโรง</div>
+      </div>
+      <div class="transit-line-card" style="--tl-col:#E4007F" onclick="quickSearch('MRT สายสีชมพู')">
+        <div class="tl-badge">MRT</div><div class="tl-name">สายสีชมพู</div><div class="tl-sub">แคราย – มีนบุรี</div>
+      </div>
+      <div class="transit-line-card" style="--tl-col:#8B0000" onclick="quickSearch('Airport Rail Link')">
+        <div class="tl-badge">ARL</div><div class="tl-name">Airport Rail Link</div><div class="tl-sub">พญาไท – สุวรรณภูมิ</div>
+      </div>
+      <div class="transit-line-card" style="--tl-col:#C0392B" onclick="quickSearch('SRT Red Line')">
+        <div class="tl-badge">SRT</div><div class="tl-name">สายสีแดง</div><div class="tl-sub">บางซื่อ – รังสิต</div>
+      </div>
+      <div class="transit-line-card" style="--tl-col:#1B5E38" onclick="quickSearch('BRT')">
+        <div class="tl-badge">BRT</div><div class="tl-name">BRT</div><div class="tl-sub">สาทร – ราษฎร์บูรณะ</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ NEAR UNIVERSITIES SECTION ═══ -->
+<section id=\"uni-sec\" style=\"padding:28px 0 24px;background:#fff\">
+  <div style=\"max-width:1320px;margin:0 auto;padding:0 20px\">
+    <div class=\"sec-hd\">
+      <div class=\"sec-title\"><i class=\"fas fa-graduation-cap\" style=\"color:#7c3aed\"></i> อสังหาฯ ใกล้มหาวิทยาลัย</div>
+      <div style=\"display:flex;align-items:center;gap:10px\">
+        <span style=\"font-size:12px;color:var(--tx2)\">ในรัศมี 2 กม.</span>
+        <div class=\"gallery-nav\">
+          <button class=\"gallery-nav-btn\" onclick=\"hGalleryMove('uni-track',-1)\"><i class=\"fas fa-chevron-left\"></i></button>
+          <button class=\"gallery-nav-btn\" onclick=\"hGalleryMove('uni-track',1)\"><i class=\"fas fa-chevron-right\"></i></button>
+        </div>
+      </div>
+    </div>
+    <div class=\"h-gallery-wrap\" id=\"uni-track-wrap\">
+      <div class=\"h-gallery-track\" id=\"uni-track\" style=\"gap:12px\"></div>
+    </div>
+  </div>
+</section>
 
 <!-- ===== ผลงาน SECTION (HOME PAGE) ===== -->
 <section id="home-port-sec" class="blog-sec" style="padding:32px 0 28px;background:#fff">
@@ -6657,6 +6790,21 @@ footer::after{
    <div class="yt-wrap" id="yt-embed"></div>
   </div>
  </section>
+<!-- ═══ NEWSLETTER SECTION ═══ -->
+<section class="newsletter-sec" id="newsletter-sec">
+  <div class="newsletter-inner">
+    <div class="newsletter-icon"><i class="fas fa-envelope-open-text"></i></div>
+    <div class="newsletter-copy">
+      <h3 data-i18n="nl.title">อัปเดตข่าวสารอสังหาฯ รายสัปดาห์</h3>
+      <p data-i18n="nl.sub">รับบทความคัดสรร เทรนด์ทำเล และโปรโมชั่นถึงอีเมลคุณ — ไม่มีสแปม ยกเลิกได้ตลอด</p>
+    </div>
+    <div class="newsletter-form" id="newsletter-form-wrap">
+      <input type="email" id="nl-email" placeholder="example@email.com" data-i18n-placeholder="nl.placeholder" class="nl-input">
+      <button class="nl-btn" onclick="submitNewsletter()" data-i18n="nl.cta">สมัครรับข่าว</button>
+    </div>
+    <div id="newsletter-ok" style="display:none;text-align:center;color:#fff;font-weight:700;font-size:15px"><i class="fas fa-check-circle" style="font-size:22px;margin-bottom:4px;display:block"></i> <span data-i18n="nl.success">สมัครสำเร็จแล้ว ขอบคุณครับ!</span></div>
+  </div>
+</section>
  <div class="flink-sec"><div class="flink-inner">
   <div>
     <h4>🏠 ซื้อ-ขาย กรุงเทพฯ</h4>
@@ -6789,21 +6937,21 @@ footer::after{
     </div>
     <div>
       <h4 data-i18n="ft.col.area">ทำเล</h4>
-      <a href="javascript:void(0)" onclick="quickSearch('สุขุมวิท')" data-i18n="ft.area.sukhumvit">สุขุมวิท</a>
-      <a href="javascript:void(0)" onclick="quickSearch('สาทร')" data-i18n="ft.area.sathorn">สาทร</a>
-      <a href="javascript:void(0)" onclick="quickSearch('รัชดา')" data-i18n="ft.area.rachada">รัชดาภิเษก</a>
-      <a href="javascript:void(0)" onclick="quickSearch('ลาดพร้าว')" data-i18n="ft.area.ladprao">ลาดพร้าว</a>
-      <a href="javascript:void(0)" onclick="quickSearch('พระราม 9')" data-i18n="ft.area.rama9">พระราม 9</a>
-      <a href="javascript:void(0)" onclick="quickSearch('บางนา')" data-i18n="ft.area.bangna">บางนา</a>
+      <a href="/listings?q=สุขุมวิท" onclick="event.preventDefault();quickSearch('สุขุมวิท')" data-i18n="ft.area.sukhumvit">สุขุมวิท</a>
+      <a href="/listings?q=สาทร" onclick="event.preventDefault();quickSearch('สาทร')" data-i18n="ft.area.sathorn">สาทร</a>
+      <a href="/listings?q=รัชดา" onclick="event.preventDefault();quickSearch('รัชดา')" data-i18n="ft.area.rachada">รัชดาภิเษก</a>
+      <a href="/listings?q=ลาดพร้าว" onclick="event.preventDefault();quickSearch('ลาดพร้าว')" data-i18n="ft.area.ladprao">ลาดพร้าว</a>
+      <a href="/listings?q=พระราม+9" onclick="event.preventDefault();quickSearch('พระราม 9')" data-i18n="ft.area.rama9">พระราม 9</a>
+      <a href="/listings?q=บางนา" onclick="event.preventDefault();quickSearch('บางนา')" data-i18n="ft.area.bangna">บางนา</a>
     </div>
     <div>
       <h4 data-i18n="ft.col.province">จังหวัด</h4>
-      <a href="javascript:void(0)" onclick="quickProvSearch('กรุงเทพฯ')" data-i18n="ft.prov.bkk">กรุงเทพฯ</a>
-      <a href="javascript:void(0)" onclick="quickProvSearch('นนทบุรี')" data-i18n="ft.prov.nnt">นนทบุรี</a>
-      <a href="javascript:void(0)" onclick="quickProvSearch('ปทุมธานี')" data-i18n="ft.prov.ptm">ปทุมธานี</a>
-      <a href="javascript:void(0)" onclick="quickProvSearch('สมุทรปราการ')" data-i18n="ft.prov.smk">สมุทรปราการ</a>
-      <a href="javascript:void(0)" onclick="quickProvSearch('ชลบุรี')" data-i18n="ft.prov.cbl">ชลบุรี</a>
-      <a href="javascript:void(0)" onclick="quickProvSearch('ภูเก็ต')" data-i18n="ft.prov.pkt">ภูเก็ต</a>
+      <a href="/listings?province=กรุงเทพฯ" onclick="event.preventDefault();quickProvSearch('กรุงเทพฯ')" data-i18n="ft.prov.bkk">กรุงเทพฯ</a>
+      <a href="/listings?province=นนทบุรี" onclick="event.preventDefault();quickProvSearch('นนทบุรี')" data-i18n="ft.prov.nnt">นนทบุรี</a>
+      <a href="/listings?province=ปทุมธานี" onclick="event.preventDefault();quickProvSearch('ปทุมธานี')" data-i18n="ft.prov.ptm">ปทุมธานี</a>
+      <a href="/listings?province=สมุทรปราการ" onclick="event.preventDefault();quickProvSearch('สมุทรปราการ')" data-i18n="ft.prov.smk">สมุทรปราการ</a>
+      <a href="/listings?province=ชลบุรี" onclick="event.preventDefault();quickProvSearch('ชลบุรี')" data-i18n="ft.prov.cbl">ชลบุรี</a>
+      <a href="/listings?province=ภูเก็ต" onclick="event.preventDefault();quickProvSearch('ภูเก็ต')" data-i18n="ft.prov.pkt">ภูเก็ต</a>
     </div>
     <div>
       <h4 data-i18n="ft.col.info">ข้อมูล</h4>
@@ -6812,6 +6960,41 @@ footer::after{
       <a href="javascript:void(0)" onclick="openPrivacyModal()" data-i18n="ft.legal.privacy">นโยบายความเป็นส่วนตัว</a>
       <a href="javascript:void(0)" onclick="openBuySellModal()" data-i18n="ft.legal.buysell">เงื่อนไขการซื้อ-ขาย</a>
       <a href="javascript:void(0)" onclick="openCookieModal()" data-i18n="ft.legal.cookie">นโยบายคุกกี้</a>
+    </div>
+    <!-- v35 Phase 4: เพิ่มคอลัมน์ footer แบบ AG Property Hub -->
+    <div>
+      <h4 data-i18n="ft.col.buyer">สำหรับผู้ซื้อ</h4>
+      <a href="javascript:void(0)" href="/listings?type=คอนโด" onclick="event.preventDefault();filterTypeDD('คอนโด')" data-i18n="ft.buy.condo">ค้นหาคอนโด</a>
+      <a href="javascript:void(0)" href="/listings?type=บ้านเดี่ยว" onclick="event.preventDefault();filterTypeDD('บ้านเดี่ยว')" data-i18n="ft.buy.house">ค้นหาบ้าน</a>
+      <a href="javascript:void(0)" href="/listings?type=ทาวน์โฮม" onclick="event.preventDefault();filterTypeDD('ทาวน์โฮม')" data-i18n="ft.buy.town">ค้นหาทาวน์โฮม</a>
+      <a href="javascript:void(0)" onclick="gotoNew()" data-i18n="ft.buy.new">โครงการใหม่</a>
+      <a href="javascript:void(0)" onclick="showListingsPage()" data-i18n="ft.buy.all">ประกาศทั้งหมด</a>
+      <a href="javascript:void(0)" onclick="gotoBlog()" data-i18n="ft.buy.articles">บทความน่ารู้</a>
+    </div>
+    <div>
+      <h4 data-i18n="ft.col.seller">สำหรับผู้ขาย/เจ้าของ</h4>
+      <a href="javascript:void(0)" href="/my-account" onclick="event.preventDefault();showPage('my-account');setTimeout(()=>{document.getElementById('tab-listing')?.click()},300)" data-i18n="ft.sell.list">ลงประกาศขาย-ให้เช่า</a>
+      <a href="javascript:void(0)" href="/agents" onclick="event.preventDefault();showPage('agents')" data-i18n="ft.sell.agents">สำหรับเอเจนต์</a>
+      <a href="javascript:void(0)" href="/tools/yield" onclick="event.preventDefault();showPage('tools-yield')" data-i18n="ft.sell.yield">คำนวณ Yield</a>
+      <a href="javascript:void(0)" href="/tools/transfer" onclick="event.preventDefault();showPage('tools-transfer')" data-i18n="ft.sell.transfer">ค่าโอนและภาษี</a>
+      <a href="javascript:void(0)" href="/portfolio" onclick="event.preventDefault();showPage('portfolio')" data-i18n="ft.sell.port">ผลงานปิดดีล</a>
+    </div>
+    <div>
+      <h4 data-i18n="ft.col.tools">เครื่องมือ</h4>
+      <a href="javascript:void(0)" href="/tools/mortgage" onclick="event.preventDefault();showPage('tools-mortgage')" data-i18n="ft.tools.mortgage">คำนวณสินเชื่อบ้าน</a>
+      <a href="javascript:void(0)" href="/tools/yield" onclick="event.preventDefault();showPage('tools-yield')" data-i18n="ft.tools.yield">คำนวณผลตอบแทน</a>
+      <a href="javascript:void(0)" href="/tools/transfer" onclick="event.preventDefault();showPage('tools-transfer')" data-i18n="ft.tools.transfer">คำนวณค่าโอน</a>
+      <a href="javascript:void(0)" href="/favorites" onclick="event.preventDefault();showPage('favorites')" data-i18n="ft.tools.fav">รายการโปรด</a>
+      <a href="javascript:void(0)" href="/social" onclick="event.preventDefault();showPage('social')" data-i18n="ft.tools.community">ชุมชน Matchdoor</a>
+    </div>
+    <div>
+      <h4 data-i18n="ft.col.search">ค้นหายอดนิยม</h4>
+      <a href="javascript:void(0)" onclick="quickSearch('คอนโดใกล้ BTS')" data-i18n="ft.search.condoBTS">คอนโดเช่าใกล้ BTS</a>
+      <a href="javascript:void(0)" onclick="quickSearch('คอนโดใกล้ MRT')" data-i18n="ft.search.condoMRT">คอนโดเช่าใกล้ MRT</a>
+      <a href="javascript:void(0)" onclick="filterRentDD('คอนโด','')" data-i18n="ft.search.condoRent">คอนโดให้เช่า</a>
+      <a href="javascript:void(0)" onclick="filterRentDD('บ้านเดี่ยว','')" data-i18n="ft.search.houseRent">บ้านเดี่ยวให้เช่า</a>
+      <a href="javascript:void(0)" onclick="quickSearch('ใกล้รถไฟฟ้า')" data-i18n="ft.search.transit">อสังหาฯ ใกล้รถไฟฟ้า</a>
+      <a href="javascript:void(0)" onclick="quickSearch('จุฬาลงกรณ์')" data-i18n="ft.search.uni">อสังหาฯ ใกล้มหาวิทยาลัย</a>
     </div>
   </div>
     <div class="footer-legal-bar">
@@ -9818,12 +10001,12 @@ function _popupRefreshMarkersFromData(data){
       </div>
       <div>
         <h4 data-i18n="ft.col.province">จังหวัด</h4>
-        <a href="javascript:void(0)" onclick="quickProvSearch('กรุงเทพฯ')" data-i18n="ft.prov.bkk">กรุงเทพฯ</a>
-        <a href="javascript:void(0)" onclick="quickProvSearch('นนทบุรี')" data-i18n="ft.prov.nnt">นนทบุรี</a>
-        <a href="javascript:void(0)" onclick="quickProvSearch('ปทุมธานี')" data-i18n="ft.prov.ptm">ปทุมธานี</a>
-        <a href="javascript:void(0)" onclick="quickProvSearch('สมุทรปราการ')" data-i18n="ft.prov.smk">สมุทรปราการ</a>
-        <a href="javascript:void(0)" onclick="quickProvSearch('ชลบุรี')" data-i18n="ft.prov.cbl">ชลบุรี</a>
-        <a href="javascript:void(0)" onclick="quickProvSearch('ภูเก็ต')" data-i18n="ft.prov.pkt">ภูเก็ต</a>
+        <a href="/listings?province=กรุงเทพฯ" onclick="event.preventDefault();quickProvSearch('กรุงเทพฯ')" data-i18n="ft.prov.bkk">กรุงเทพฯ</a>
+        <a href="/listings?province=นนทบุรี" onclick="event.preventDefault();quickProvSearch('นนทบุรี')" data-i18n="ft.prov.nnt">นนทบุรี</a>
+        <a href="/listings?province=ปทุมธานี" onclick="event.preventDefault();quickProvSearch('ปทุมธานี')" data-i18n="ft.prov.ptm">ปทุมธานี</a>
+        <a href="/listings?province=สมุทรปราการ" onclick="event.preventDefault();quickProvSearch('สมุทรปราการ')" data-i18n="ft.prov.smk">สมุทรปราการ</a>
+        <a href="/listings?province=ชลบุรี" onclick="event.preventDefault();quickProvSearch('ชลบุรี')" data-i18n="ft.prov.cbl">ชลบุรี</a>
+        <a href="/listings?province=ภูเก็ต" onclick="event.preventDefault();quickProvSearch('ภูเก็ต')" data-i18n="ft.prov.pkt">ภูเก็ต</a>
       </div>
       <div>
         <h4 data-i18n="ft.col.info">ข้อมูล</h4>
@@ -9855,6 +10038,369 @@ function _popupRefreshMarkersFromData(data){
 <div class="ov" id="port-modal" onclick="if(event.target===this)_closeModal('port-modal')"><div class="modal"><div class="mhd"><h2 id="port-title"></h2><span class="mclose" onclick="_closeModal('port-modal')">×</span></div><div class="mbody" id="port-body"></div></div></div>
 
 <!-- ═══ TOOLS MODAL (เครื่องมือคำนวณ) ═══ -->
+<!-- ═══ TOOLS PAGES (หน้าเต็ม — /tools, /tools/mortgage, /tools/yield, /tools/transfer, /tools/valuation) ═══ -->
+<div class="page" id="page-tools" style="display:none">
+  <div style="max-width:900px;margin:0 auto;padding:28px 20px">
+    <!-- Breadcrumb -->
+    <nav style="font-size:12px;color:var(--tx2);margin-bottom:20px">
+      <a href="/" onclick="event.preventDefault();showPage('home')" style="color:var(--p)">หน้าแรก</a>
+      <span style="margin:0 6px">›</span>
+      <span>เครื่องมือ</span>
+    </nav>
+    <h1 style="font-size:clamp(22px,4vw,32px);font-weight:800;color:var(--p);margin-bottom:8px"><i class="fas fa-calculator" style="color:var(--a)"></i> เครื่องมือช่วยตัดสินใจ</h1>
+    <p style="color:var(--tx2);font-size:15px;margin-bottom:28px">คำนวณผ่อน ประเมินราคา วิเคราะห์ yield — ใช้ได้ฟรี ไม่ต้องสมัครสมาชิก</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px">
+      <div class="tools-card" onclick="showPage('tools-valuation')" style="border:2px solid #a855f7">
+        <div class="tools-card-icon" style="background:linear-gradient(135deg,#7c3aed,#a855f7)"><i class="fas fa-search-dollar"></i></div>
+        <h4>ประเมินราคาทรัพย์</h4>
+        <p>คำนวณราคาตลาดและราคากรมธนารักษ์จากทำเล ขนาด อายุ และสภาพทรัพย์</p>
+        <div style="margin-top:10px;font-size:11px;background:#f3e8ff;color:#7c3aed;padding:3px 8px;border-radius:20px;display:inline-block;font-weight:700">ใหม่ ✨</div>
+      </div>
+      <div class="tools-card" onclick="showPage('tools-mortgage')">
+        <div class="tools-card-icon"><i class="fas fa-home"></i></div>
+        <h4>คำนวณผ่อนบ้าน</h4>
+        <p>ยอดผ่อนรายเดือน ดอกเบี้ยรวม ค่าธรรมเนียมโอน และตารางผ่อนปีต่อปี</p>
+      </div>
+      <div class="tools-card" onclick="showPage('tools-yield')" style="border:2px solid #10b981">
+        <div class="tools-card-icon" style="background:linear-gradient(135deg,#1B5E38,#10b981)"><i class="fas fa-chart-line"></i></div>
+        <h4>Rental Yield</h4>
+        <p>คำนวณ Gross/Net Rental Yield เพื่อตัดสินใจลงทุน</p>
+      </div>
+      <div class="tools-card" onclick="showPage('tools-transfer')" style="border:2px solid #f59e0b">
+        <div class="tools-card-icon" style="background:linear-gradient(135deg,#C8922A,#f59e0b)"><i class="fas fa-file-contract"></i></div>
+        <h4>ค่าโอนและภาษี</h4>
+        <p>ค่าธรรมเนียมโอน อากรแสตมป์ ภาษีธุรกิจเฉพาะ มาตรการ 2568</p>
+      </div>
+    </div>
+    <!-- Why section -->
+    <div style="margin-top:40px;padding:24px;background:linear-gradient(135deg,#f0f4ff,#e8f5e9);border-radius:16px">
+      <h3 style="font-size:16px;font-weight:700;color:var(--p);margin-bottom:12px"><i class="fas fa-shield-alt" style="color:var(--a)"></i> ทำไมต้องใช้เครื่องมือของ Matchdoor?</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px">
+        <div style="display:flex;align-items:flex-start;gap:10px"><i class="fas fa-check-circle" style="color:#10b981;margin-top:2px"></i><span style="font-size:13px;color:var(--tx2)">ใช้ฟรี ไม่จำกัดครั้ง</span></div>
+        <div style="display:flex;align-items:flex-start;gap:10px"><i class="fas fa-check-circle" style="color:#10b981;margin-top:2px"></i><span style="font-size:13px;color:var(--tx2)">ข้อมูลอ้างอิงจากตลาดจริง</span></div>
+        <div style="display:flex;align-items:flex-start;gap:10px"><i class="fas fa-check-circle" style="color:#10b981;margin-top:2px"></i><span style="font-size:13px;color:var(--tx2)">รองรับมาตรการกระตุ้น 2568</span></div>
+        <div style="display:flex;align-items:flex-start;gap:10px"><i class="fas fa-check-circle" style="color:#10b981;margin-top:2px"></i><span style="font-size:13px;color:var(--tx2)">ลิงก์ผลลัพธ์ข้ามเครื่องมือได้</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TOOLS PAGE: MORTGAGE ═══ -->
+<div class="page" id="page-tools-mortgage" style="display:none">
+  <div style="max-width:800px;margin:0 auto;padding:28px 20px">
+    <nav style="font-size:12px;color:var(--tx2);margin-bottom:20px">
+      <a href="/" onclick="event.preventDefault();showPage('home')" style="color:var(--p)">หน้าแรก</a>
+      <span style="margin:0 6px">›</span>
+      <a href="/tools" onclick="event.preventDefault();showPage('tools')" style="color:var(--p)">เครื่องมือ</a>
+      <span style="margin:0 6px">›</span>
+      <span>คำนวณสินเชื่อบ้าน</span>
+    </nav>
+    <h1 style="font-size:clamp(20px,4vw,30px);font-weight:800;color:var(--p);margin-bottom:6px"><i class="fas fa-home" style="color:var(--a)"></i> คำนวณสินเชื่อบ้าน</h1>
+    <p style="color:var(--tx2);font-size:14px;margin-bottom:24px">วางแผนผ่อนบ้านแบบเห็นภาพ — ค่างวด ดอกเบี้ย และค่าโอน ก่อนตัดสินใจซื้อ</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <!-- Input -->
+      <div style="background:#fff;border:1.5px solid var(--bd);border-radius:16px;padding:22px">
+        <h3 style="font-size:14px;font-weight:700;color:var(--p);margin-bottom:16px">กรอกข้อมูลบ้าน</h3>
+        <div class="tools-field"><label>ราคาบ้าน (บาท)</label><input type="text" inputmode="numeric" id="pg-tm-price" placeholder="3,500,000" oninput="toolsFormatNum(this);pgCalcMortgage()" style="width:100%;padding:10px 12px;border:1.5px solid var(--bd);border-radius:10px;font-size:14px;font-family:inherit"></div>
+        <div class="tools-field" style="margin-top:12px">
+          <label>เงินดาวน์ <span id="pg-tm-down-pct">10%</span> · <span id="pg-tm-down-amt">฿350,000</span></label>
+          <input type="range" id="pg-tm-down" min="0" max="50" value="10" step="5" oninput="document.getElementById('pg-tm-down-pct').textContent=this.value+'%';pgCalcMortgage()" style="width:100%">
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--tx2)"><span>0%</span><span>10%</span><span>20%</span><span>30%</span><span>50%</span></div>
+        </div>
+        <div class="tools-field" style="margin-top:12px">
+          <label>อัตราดอกเบี้ย (%/ปี) <span style="font-size:11px;color:var(--tx2)">(ตลาด 2569: 2.66–3.05%)</span></label>
+          <input type="number" id="pg-tm-rate" value="2.75" step="0.05" min="0" oninput="pgCalcMortgage()" style="width:100%;padding:10px 12px;border:1.5px solid var(--bd);border-radius:10px;font-size:14px;font-family:inherit">
+        </div>
+        <div class="tools-field" style="margin-top:12px">
+          <label>ระยะเวลาผ่อน: <span id="pg-tm-years-val">30</span> ปี</label>
+          <input type="range" id="pg-tm-years" min="5" max="40" value="30" step="1" oninput="document.getElementById('pg-tm-years-val').textContent=this.value;pgCalcMortgage()" style="width:100%">
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--tx2)"><span>5ปี</span><span>15</span><span>25</span><span>40ปี</span></div>
+        </div>
+        <div class="tools-field" style="margin-top:12px">
+          <label>รายได้ต่อเดือน (ถ้ามี)</label>
+          <input type="text" inputmode="numeric" id="pg-tm-income" placeholder="ไม่ระบุ" oninput="toolsFormatNum(this);pgCalcMortgage()" style="width:100%;padding:10px 12px;border:1.5px solid var(--bd);border-radius:10px;font-size:14px;font-family:inherit">
+          <div style="font-size:11px;color:var(--tx2);margin-top:4px">กรอกเพื่อดูว่าค่างวดเหมาะกับรายได้ไหม</div>
+        </div>
+      </div>
+      <!-- Result -->
+      <div>
+        <div style="background:linear-gradient(135deg,var(--p),#2a5298);border-radius:16px;padding:22px;color:#fff;margin-bottom:16px">
+          <div style="font-size:13px;opacity:.8;margin-bottom:4px">ค่างวดต่อเดือน</div>
+          <div id="pg-tm-monthly" style="font-size:clamp(24px,5vw,36px);font-weight:800;margin-bottom:12px">—</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div style="background:rgba(255,255,255,.12);border-radius:10px;padding:10px">
+              <div style="font-size:11px;opacity:.75">ยอดกู้</div>
+              <div id="pg-tm-loan" style="font-weight:700;font-size:14px">—</div>
+            </div>
+            <div style="background:rgba(255,255,255,.12);border-radius:10px;padding:10px">
+              <div style="font-size:11px;opacity:.75">ดอกเบี้ยรวม</div>
+              <div id="pg-tm-interest" style="font-weight:700;font-size:14px">—</div>
+            </div>
+            <div style="background:rgba(255,255,255,.12);border-radius:10px;padding:10px">
+              <div style="font-size:11px;opacity:.75">ยอดรวมทั้งหมด</div>
+              <div id="pg-tm-total" style="font-weight:700;font-size:14px">—</div>
+            </div>
+            <div id="pg-tm-income-wrap" style="background:rgba(255,255,255,.12);border-radius:10px;padding:10px;display:none">
+              <div style="font-size:11px;opacity:.75">สัดส่วนรายได้</div>
+              <div id="pg-tm-income-pct" style="font-weight:700;font-size:14px">—</div>
+            </div>
+          </div>
+        </div>
+        <!-- Transfer fee -->
+        <div style="background:#fff;border:1.5px solid var(--bd);border-radius:14px;padding:16px;margin-bottom:16px">
+          <div style="font-size:13px;font-weight:700;color:var(--p);margin-bottom:10px"><i class="fas fa-file-contract" style="color:var(--a)"></i> ค่าธรรมเนียมวันโอน <span style="font-size:11px;font-weight:400;color:var(--tx2)">(มาตรการ 2568-2569)</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:1px solid var(--lt)"><span>ค่าธรรมเนียมโอน <span style="color:var(--a);font-weight:700">0.01%</span></span><span id="pg-tm-fee">—</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:1px solid var(--lt)"><span>ค่าจดจำนอง <span style="color:var(--a);font-weight:700">0.01%</span></span><span id="pg-tm-mtg">—</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:700;padding:8px 0;color:var(--p)"><span>รวม</span><span id="pg-tm-fee-total">—</span></div>
+          <div id="pg-tm-saving" style="font-size:11px;color:#10b981;margin-top:4px"></div>
+          <div style="font-size:11px;color:var(--tx2);margin-top:4px">เฉพาะบ้านราคา ≤ 7 ล้านบาท ถึง 30 มิ.ย. 2569</div>
+        </div>
+        <!-- Cross-tool CTA -->
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button onclick="showPage('tools-yield')" style="flex:1;min-width:120px;padding:10px;border:1.5px solid var(--bd);border-radius:10px;background:#fff;cursor:pointer;font-size:12px;font-weight:700;color:var(--p);font-family:inherit"><i class="fas fa-chart-line"></i> คำนวณ Yield</button>
+          <button onclick="showPage('tools-transfer')" style="flex:1;min-width:120px;padding:10px;border:1.5px solid var(--bd);border-radius:10px;background:#fff;cursor:pointer;font-size:12px;font-weight:700;color:var(--p);font-family:inherit"><i class="fas fa-file-contract"></i> ค่าโอนเต็ม</button>
+          <button onclick="showPage('tools-valuation')" style="flex:1;min-width:120px;padding:10px;border:1.5px solid #a855f7;border-radius:10px;background:#f3e8ff;cursor:pointer;font-size:12px;font-weight:700;color:#7c3aed;font-family:inherit"><i class="fas fa-search-dollar"></i> ประเมินราคา</button>
+        </div>
+      </div>
+    </div>
+    <!-- Amortization table -->
+    <div style="margin-top:24px">
+      <details>
+        <summary style="font-size:14px;font-weight:700;color:var(--p);cursor:pointer;padding:12px 0">ตารางผ่อนปีต่อปี <i class="fas fa-chevron-down" style="font-size:11px;margin-left:6px"></i></summary>
+        <div style="overflow-x:auto;margin-top:12px">
+          <table id="pg-amort-table" style="width:100%;border-collapse:collapse;font-size:13px">
+            <thead><tr style="background:var(--p);color:#fff"><th style="padding:8px 10px;text-align:left">ปีที่</th><th style="padding:8px 10px;text-align:right">เงินต้นปีนี้</th><th style="padding:8px 10px;text-align:right">ดอกเบี้ยปีนี้</th><th style="padding:8px 10px;text-align:right">ยอดคงเหลือ</th></tr></thead>
+            <tbody id="pg-amort-body"></tbody>
+          </table>
+        </div>
+      </details>
+    </div>
+    <!-- FAQ -->
+    <div style="margin-top:28px">
+      <h3 style="font-size:15px;font-weight:700;color:var(--p);margin-bottom:12px">คำถามที่พบบ่อย</h3>
+      <details style="border:1px solid var(--bd);border-radius:10px;padding:12px;margin-bottom:8px"><summary style="font-size:13px;font-weight:700;cursor:pointer">กู้สินเชื่อบ้านได้เท่าไร?</summary><p style="font-size:13px;color:var(--tx2);margin-top:8px">ธปท. อนุโลมให้กู้สูงสุด 100% สำหรับบ้านหลังแรกราคา ≤ 10 ล้านบาท (ถึง 30 มิ.ย. 2569) แต่ธนาคารส่วนใหญ่ยังขอดาวน์ 10–20% ในทางปฏิบัติ รายได้ควรไม่น้อยกว่า 3 เท่าของค่างวด</p></details>
+      <details style="border:1px solid var(--bd);border-radius:10px;padding:12px;margin-bottom:8px"><summary style="font-size:13px;font-weight:700;cursor:pointer">ดอกเบี้ยกรอกเท่าไรดี?</summary><p style="font-size:13px;color:var(--tx2);margin-top:8px">ค่าเฉลี่ยโปรโมชั่น 3 ปีแรก ปี 2569 อยู่ที่ 2.66–3.05% หลังหมดโปรคิดจาก MRR ประมาณ 6.145–6.575% แนะนำกรอก 3.5% เพื่อวางแผนระยะยาว</p></details>
+      <details style="border:1px solid var(--bd);border-radius:10px;padding:12px"><summary style="font-size:13px;font-weight:700;cursor:pointer">ค่าธรรมเนียมโอนลด 0.01% ถึงเมื่อไร?</summary><p style="font-size:13px;color:var(--tx2);margin-top:8px">มาตรการลดค่าโอน–จดจำนอง จาก 2%+1% เหลือ 0.01%+0.01% สำหรับที่อยู่อาศัยราคา ≤ 7 ล้านบาท มีผลถึง 30 มิ.ย. 2569 ตามประกาศกรมที่ดิน</p></details>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TOOLS PAGE: RENTAL YIELD ═══ -->
+<div class="page" id="page-tools-yield" style="display:none">
+  <div style="max-width:700px;margin:0 auto;padding:28px 20px">
+    <nav style="font-size:12px;color:var(--tx2);margin-bottom:20px">
+      <a href="/" onclick="event.preventDefault();showPage('home')" style="color:var(--p)">หน้าแรก</a>
+      <span style="margin:0 6px">›</span>
+      <a href="/tools" onclick="event.preventDefault();showPage('tools')" style="color:var(--p)">เครื่องมือ</a>
+      <span style="margin:0 6px">›</span>
+      <span>Rental Yield</span>
+    </nav>
+    <h1 style="font-size:clamp(20px,4vw,30px);font-weight:800;color:var(--p);margin-bottom:6px"><i class="fas fa-chart-line" style="color:#10b981"></i> คำนวณ Rental Yield</h1>
+    <p style="color:var(--tx2);font-size:14px;margin-bottom:24px">ประเมินผลตอบแทนจากการปล่อยเช่าเทียบกับราคาซื้อ — Yield ยิ่งสูง ยิ่งคืนทุนเร็ว</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <div style="background:#fff;border:1.5px solid var(--bd);border-radius:16px;padding:22px">
+        <h3 style="font-size:14px;font-weight:700;color:var(--p);margin-bottom:16px">ข้อมูลทรัพย์</h3>
+        <div class="tools-field"><label>ราคาซื้อทรัพย์ (บาท)</label><input type="text" inputmode="numeric" id="pg-ty-price" placeholder="3,000,000" oninput="toolsFormatNum(this);pgCalcYield()" style="width:100%;padding:10px 12px;border:1.5px solid var(--bd);border-radius:10px;font-size:14px;font-family:inherit"></div>
+        <div class="tools-field" style="margin-top:12px"><label>ค่าเช่าต่อเดือน (บาท)</label><input type="text" inputmode="numeric" id="pg-ty-rent" placeholder="15,000" oninput="toolsFormatNum(this);pgCalcYield()" style="width:100%;padding:10px 12px;border:1.5px solid var(--bd);border-radius:10px;font-size:14px;font-family:inherit"></div>
+        <div class="tools-field" style="margin-top:12px"><label>ค่าใช้จ่ายต่อปี (ค่าส่วนกลาง, ภาษี ฯลฯ)</label><input type="text" inputmode="numeric" id="pg-ty-expense" placeholder="0" oninput="toolsFormatNum(this);pgCalcYield()" style="width:100%;padding:10px 12px;border:1.5px solid var(--bd);border-radius:10px;font-size:14px;font-family:inherit"></div>
+        <div class="tools-field" style="margin-top:12px"><label>อัตราว่าง (เดือน/ปี)</label>
+          <input type="range" id="pg-ty-vacancy" min="0" max="3" value="1" step="0.5" oninput="document.getElementById('pg-ty-vac-val').textContent=this.value;pgCalcYield()" style="width:100%">
+          <div style="text-align:right;font-size:12px;color:var(--tx2)"><span id="pg-ty-vac-val">1</span> เดือน/ปี</div>
+        </div>
+      </div>
+      <div>
+        <div style="background:linear-gradient(135deg,#1B5E38,#10b981);border-radius:16px;padding:22px;color:#fff;margin-bottom:14px">
+          <div style="font-size:13px;opacity:.8;margin-bottom:4px">Gross Rental Yield</div>
+          <div id="pg-ty-gross" style="font-size:40px;font-weight:800;margin-bottom:4px">—</div>
+          <div style="font-size:12px;opacity:.75">ผลตอบแทนก่อนหักค่าใช้จ่าย</div>
+        </div>
+        <div style="background:#fff;border:1.5px solid var(--bd);border-radius:14px;padding:16px">
+          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--lt);font-size:13px"><span>Net Rental Yield</span><b id="pg-ty-net">—</b></div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--lt);font-size:13px"><span>รายได้ค่าเช่าต่อปี</span><b id="pg-ty-annual">—</b></div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--lt);font-size:13px"><span>หักค่าใช้จ่าย+ว่าง</span><b id="pg-ty-deduct" style="color:#e53e3e">—</b></div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px"><span>คืนทุนใน</span><b id="pg-ty-payback">—</b></div>
+        </div>
+        <div style="margin-top:14px;padding:12px;background:#f0fdf4;border-radius:12px;font-size:12px;color:#1B5E38">
+          <i class="fas fa-info-circle"></i> Yield ≥ 5% ถือว่าดีสำหรับคอนโดกรุงเทพ · Yield ≥ 6% สำหรับบ้าน/ทาวน์โฮม
+        </div>
+        <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
+          <button onclick="showPage('tools-mortgage')" style="flex:1;padding:10px;border:1.5px solid var(--bd);border-radius:10px;background:#fff;cursor:pointer;font-size:12px;font-weight:700;color:var(--p);font-family:inherit"><i class="fas fa-home"></i> คำนวณผ่อน</button>
+          <button onclick="showPage('tools-valuation')" style="flex:1;padding:10px;border:1.5px solid #a855f7;border-radius:10px;background:#f3e8ff;cursor:pointer;font-size:12px;font-weight:700;color:#7c3aed;font-family:inherit"><i class="fas fa-search-dollar"></i> ประเมินราคา</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TOOLS PAGE: TRANSFER FEE ═══ -->
+<div class="page" id="page-tools-transfer" style="display:none">
+  <div style="max-width:700px;margin:0 auto;padding:28px 20px">
+    <nav style="font-size:12px;color:var(--tx2);margin-bottom:20px">
+      <a href="/" onclick="event.preventDefault();showPage('home')" style="color:var(--p)">หน้าแรก</a>
+      <span style="margin:0 6px">›</span>
+      <a href="/tools" onclick="event.preventDefault();showPage('tools')" style="color:var(--p)">เครื่องมือ</a>
+      <span style="margin:0 6px">›</span>
+      <span>ค่าโอนและภาษี</span>
+    </nav>
+    <h1 style="font-size:clamp(20px,4vw,30px);font-weight:800;color:var(--p);margin-bottom:6px"><i class="fas fa-file-contract" style="color:#f59e0b"></i> คำนวณค่าโอนและภาษี</h1>
+    <p style="color:var(--tx2);font-size:14px;margin-bottom:24px">ค่าธรรมเนียมโอน อากรแสตมป์ ภาษีธุรกิจเฉพาะ และภาษีเงินได้หัก ณ ที่จ่าย</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <div style="background:#fff;border:1.5px solid var(--bd);border-radius:16px;padding:22px">
+        <h3 style="font-size:14px;font-weight:700;color:var(--p);margin-bottom:16px">ข้อมูลทรัพย์</h3>
+        <div class="tools-field"><label>ราคาซื้อขาย/ประเมิน (บาท)</label><input type="text" inputmode="numeric" id="pg-tt-price" placeholder="3,000,000" oninput="toolsFormatNum(this);pgCalcTransfer()" style="width:100%;padding:10px 12px;border:1.5px solid var(--bd);border-radius:10px;font-size:14px;font-family:inherit"></div>
+        <div class="tools-field" style="margin-top:12px"><label>ถือครองมาแล้ว (ปี)</label><input type="number" id="pg-tt-years" value="5" min="0" max="30" oninput="pgCalcTransfer()" style="width:100%;padding:10px 12px;border:1.5px solid var(--bd);border-radius:10px;font-size:14px;font-family:inherit"></div>
+        <div class="tools-field" style="margin-top:12px">
+          <label>ประเภทผู้ขาย</label>
+          <select id="pg-tt-seller" onchange="pgCalcTransfer()" style="width:100%;padding:10px 12px;border:1.5px solid var(--bd);border-radius:10px;font-size:14px;font-family:inherit">
+            <option value="individual">บุคคลธรรมดา</option>
+            <option value="company">นิติบุคคล</option>
+          </select>
+        </div>
+        <div class="tools-field" style="margin-top:12px">
+          <label>ใช้ที่อยู่อาศัย (ท.ร.14)?</label>
+          <select id="pg-tt-residence" onchange="pgCalcTransfer()" style="width:100%;padding:10px 12px;border:1.5px solid var(--bd);border-radius:10px;font-size:14px;font-family:inherit">
+            <option value="yes">ใช่ (ยกเว้น SBT ถือ>1ปี)</option>
+            <option value="no">ไม่</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <div style="background:#fff;border:1.5px solid var(--bd);border-radius:16px;padding:22px;margin-bottom:14px">
+          <div style="font-size:13px;font-weight:700;color:var(--p);margin-bottom:14px;padding-bottom:8px;border-bottom:1.5px solid var(--lt)">สรุปค่าใช้จ่าย</div>
+          <div id="pg-tt-rows"></div>
+          <div style="border-top:2px solid var(--p);margin-top:10px;padding-top:10px;display:flex;justify-content:space-between;font-size:16px;font-weight:800;color:var(--p)"><span>รวมทั้งหมด</span><span id="pg-tt-total">—</span></div>
+          <div id="pg-tt-saving" style="margin-top:8px;padding:8px 10px;background:#f0fdf4;border-radius:8px;font-size:12px;color:#1B5E38;display:none"></div>
+        </div>
+        <div style="background:#fffbeb;border:1.5px solid #f59e0b;border-radius:14px;padding:14px;margin-bottom:14px;font-size:12px;color:#92400e">
+          <i class="fas fa-info-circle"></i> <strong>หมายเหตุ:</strong> ภาษีธุรกิจเฉพาะ (SBT 3.3%) เรียกเก็บกรณีถือครอง &lt; 5 ปี หรือไม่มีชื่อในทะเบียนบ้าน ≥ 1 ปี ผู้ซื้อ-ขายตกลงแบ่งชำระได้
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button onclick="showPage('tools-mortgage')" style="flex:1;padding:10px;border:1.5px solid var(--bd);border-radius:10px;background:#fff;cursor:pointer;font-size:12px;font-weight:700;color:var(--p);font-family:inherit"><i class="fas fa-home"></i> คำนวณผ่อน</button>
+          <button onclick="showPage('tools-valuation')" style="flex:1;padding:10px;border:1.5px solid #a855f7;border-radius:10px;background:#f3e8ff;cursor:pointer;font-size:12px;font-weight:700;color:#7c3aed;font-family:inherit"><i class="fas fa-search-dollar"></i> ประเมินราคา</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TOOLS PAGE: VALUATION ═══ -->
+<div class="page" id="page-tools-valuation" style="display:none">
+  <div style="max-width:900px;margin:0 auto;padding:28px 20px">
+    <nav style="font-size:12px;color:var(--tx2);margin-bottom:20px">
+      <a href="/" onclick="event.preventDefault();showPage('home')" style="color:var(--p)">หน้าแรก</a>
+      <span style="margin:0 6px">›</span>
+      <a href="/tools" onclick="event.preventDefault();showPage('tools')" style="color:var(--p)">เครื่องมือ</a>
+      <span style="margin:0 6px">›</span>
+      <span>ประเมินราคา</span>
+    </nav>
+    <h1 style="font-size:clamp(20px,4vw,30px);font-weight:800;color:var(--p);margin-bottom:6px"><i class="fas fa-search-dollar" style="color:#7c3aed"></i> ประเมินราคาทรัพย์</h1>
+    <p style="color:var(--tx2);font-size:14px;margin-bottom:24px">คำนวณราคาตลาดและราคาประเมินกรมธนารักษ์ จากทำเล ขนาด อายุ และสภาพทรัพย์</p>
+    <!-- Type selector -->
+    <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
+      <button class="vl-type-btn active" data-vtype="condo" onclick="vlSelectType('condo',this)" style="padding:8px 16px;border-radius:20px;border:1.5px solid var(--bd);background:#f0f4ff;color:var(--p);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">คอนโด</button>
+      <button class="vl-type-btn" data-vtype="house" onclick="vlSelectType('house',this)" style="padding:8px 16px;border-radius:20px;border:1.5px solid var(--bd);background:#fff;color:var(--tx2);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">บ้านเดี่ยว</button>
+      <button class="vl-type-btn" data-vtype="townhouse" onclick="vlSelectType('townhouse',this)" style="padding:8px 16px;border-radius:20px;border:1.5px solid var(--bd);background:#fff;color:var(--tx2);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">ทาวน์โฮม</button>
+      <button class="vl-type-btn" data-vtype="land" onclick="vlSelectType('land',this)" style="padding:8px 16px;border-radius:20px;border:1.5px solid var(--bd);background:#fff;color:var(--tx2);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">ที่ดิน</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <!-- Input -->
+      <div style="background:#fff;border:1.5px solid var(--bd);border-radius:16px;padding:22px">
+        <h3 style="font-size:14px;font-weight:700;color:var(--p);margin-bottom:16px">ข้อมูลทรัพย์</h3>
+        <div class="tools-field">
+          <label>ทำเล</label>
+          <select id="vl-area" onchange="vlCalc()" style="width:100%;padding:10px 12px;border:1.5px solid var(--bd);border-radius:10px;font-size:13px;font-family:inherit">
+            <option value="sukhumvit" data-base="185000">สุขุมวิท</option>
+            <option value="sathorn" data-base="165000">สาทร–สีลม</option>
+            <option value="thonglor" data-base="175000">ทองหล่อ–เอกมัย</option>
+            <option value="asok" data-base="160000">อโศก–พระราม 9</option>
+            <option value="rachada" data-base="100000">รัชดา–ลาดพร้าว</option>
+            <option value="onnut" data-base="85000">อ่อนนุช–พระโขนง</option>
+            <option value="bangna" data-base="70000">บางนา–แบริ่ง</option>
+            <option value="ladprao" data-base="75000">ลาดพร้าว</option>
+            <option value="chatuchak" data-base="90000">จตุจักร–หมอชิต</option>
+            <option value="pinklao" data-base="55000">ปิ่นเกล้า–ตลิ่งชัน</option>
+            <option value="nonthaburi" data-base="45000">นนทบุรี</option>
+            <option value="pathumthani" data-base="35000">ปทุมธานี</option>
+            <option value="chonburi" data-base="60000">ชลบุรี–พัทยา</option>
+            <option value="chiangmai" data-base="50000">เชียงใหม่</option>
+            <option value="phuket" data-base="130000">ภูเก็ต</option>
+          </select>
+          <div id="vl-area-price" style="font-size:11px;color:var(--a);margin-top:4px;font-weight:700"></div>
+        </div>
+        <div class="tools-field" style="margin-top:12px">
+          <label>พื้นที่ใช้สอย (ตร.ม.)</label>
+          <input type="number" id="vl-size" value="32" min="1" max="5000" oninput="vlCalc()" style="width:100%;padding:10px 12px;border:1.5px solid var(--bd);border-radius:10px;font-size:14px;font-family:inherit">
+        </div>
+        <div class="tools-field vl-hide-land" style="margin-top:12px">
+          <label>อายุอาคาร: <span id="vl-age-val">5</span> ปี</label>
+          <input type="range" id="vl-age" min="0" max="40" value="5" step="1" oninput="document.getElementById('vl-age-val').textContent=this.value;vlCalc()" style="width:100%">
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--tx2)"><span>ใหม่</span><span>10ปี</span><span>20ปี</span><span>30ปี+</span></div>
+        </div>
+        <div class="tools-field vl-hide-land" style="margin-top:12px">
+          <label>ชั้น: <span id="vl-floor-val">15</span></label>
+          <input type="range" id="vl-floor" min="1" max="60" value="15" step="1" oninput="document.getElementById('vl-floor-val').textContent=this.value;vlCalc()" style="width:100%">
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--tx2)"><span>1</span><span>15</span><span>30</span><span>60</span></div>
+        </div>
+        <div class="tools-field vl-hide-land" style="margin-top:12px">
+          <label>สภาพทรัพย์</label>
+          <select id="vl-condition" onchange="vlCalc()" style="width:100%;padding:10px 12px;border:1.5px solid var(--bd);border-radius:10px;font-size:13px;font-family:inherit">
+            <option value="1.0">ใหม่ / มือหนึ่ง</option>
+            <option value="0.95">ใช้งานดี ไม่ต้องแต่ง</option>
+            <option value="0.88">พอใช้ ต้องทาสีทั่วไป</option>
+            <option value="0.78">เก่า ต้อง renovate</option>
+          </select>
+        </div>
+        <div class="tools-field" style="margin-top:12px">
+          <label>ระยะจากรถไฟฟ้า: <span id="vl-transit-val">400</span> ม.</label>
+          <input type="range" id="vl-transit" min="0" max="2000" value="400" step="50" oninput="document.getElementById('vl-transit-val').textContent=this.value;vlCalc()" style="width:100%">
+          <div style="font-size:11px;color:var(--tx2);margin-top:4px">≤300ม. +5% · 300–800ม. +2% · เกินกว่า ไม่บวก</div>
+        </div>
+      </div>
+      <!-- Result -->
+      <div>
+        <div style="background:linear-gradient(135deg,#7c3aed,#a855f7);border-radius:16px;padding:22px;color:#fff;margin-bottom:16px">
+          <div style="font-size:13px;opacity:.8;margin-bottom:4px">ราคาตลาดกลาง</div>
+          <div id="vl-market" style="font-size:clamp(22px,4vw,32px);font-weight:800;margin-bottom:4px">—</div>
+          <div id="vl-range" style="font-size:12px;opacity:.8;margin-bottom:8px"></div>
+          <div id="vl-sqm" style="font-size:13px;opacity:.75"></div>
+        </div>
+        <div style="background:#fff;border:1.5px solid var(--bd);border-radius:14px;padding:16px;margin-bottom:14px">
+          <div style="font-size:13px;font-weight:700;color:var(--p);margin-bottom:10px">ราคาประเมินกรมธนารักษ์ <span style="font-size:11px;font-weight:400;color:var(--tx2)">(~70%)</span></div>
+          <div id="vl-treasury" style="font-size:24px;font-weight:800;color:var(--p);margin-bottom:6px">—</div>
+          <div style="font-size:11px;color:var(--tx2)">ใช้คิดค่าโอน/ภาษีที่ดิน · อัปเดตทุก 4 ปี (2566–2569)</div>
+          <a href="https://assessprice.treasury.go.th/" target="_blank" rel="noopener" style="font-size:11px;color:var(--p);margin-top:6px;display:block"><i class="fas fa-external-link-alt"></i> เช็คออฟฟิเชียลที่ assessprice.treasury.go.th →</a>
+        </div>
+        <!-- Breakdown -->
+        <div style="background:#f8faff;border:1.5px solid var(--bd);border-radius:14px;padding:16px;margin-bottom:14px">
+          <div style="font-size:13px;font-weight:700;color:var(--p);margin-bottom:10px">ที่มาของราคา</div>
+          <div id="vl-breakdown" style="font-size:13px"></div>
+        </div>
+        <!-- Cross-tool CTA -->
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button onclick="pgUseValuationPrice('mortgage')" style="flex:1;padding:10px;border:1.5px solid var(--bd);border-radius:10px;background:#fff;cursor:pointer;font-size:12px;font-weight:700;color:var(--p);font-family:inherit"><i class="fas fa-home"></i> คำนวณผ่อน</button>
+          <button onclick="pgUseValuationPrice('transfer')" style="flex:1;padding:10px;border:1.5px solid #f59e0b;border-radius:10px;background:#fffbeb;cursor:pointer;font-size:12px;font-weight:700;color:#92400e;font-family:inherit"><i class="fas fa-file-contract"></i> ค่าโอน</button>
+          <button onclick="pgUseValuationPrice('yield')" style="flex:1;padding:10px;border:1.5px solid #10b981;border-radius:10px;background:#f0fdf4;cursor:pointer;font-size:12px;font-weight:700;color:#1B5E38;font-family:inherit"><i class="fas fa-chart-line"></i> Yield</button>
+        </div>
+        <div id="vl-confidence" style="margin-top:10px;font-size:12px;color:var(--tx2);text-align:right"></div>
+      </div>
+    </div>
+    <!-- Comparable properties from Supabase -->
+    <div style="margin-top:28px">
+      <h3 style="font-size:15px;font-weight:700;color:var(--p);margin-bottom:4px">ทรัพย์ใกล้เคียงในระบบ</h3>
+      <p style="font-size:12px;color:var(--tx2);margin-bottom:14px">ดึงจากทำเลเดียวกัน ใช้เทียบราคา — อัปเดตจาก Supabase แบบ realtime</p>
+      <div id="vl-comps" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px">
+        <div style="color:var(--tx2);font-size:13px;padding:20px;text-align:center;grid-column:1/-1"><i class="fas fa-spinner fa-spin"></i> กำลังดึงข้อมูล...</div>
+      </div>
+    </div>
+    <!-- FAQ -->
+    <div style="margin-top:28px">
+      <h3 style="font-size:15px;font-weight:700;color:var(--p);margin-bottom:12px">เข้าใจการประเมิน</h3>
+      <details style="border:1px solid var(--bd);border-radius:10px;padding:12px;margin-bottom:8px"><summary style="font-size:13px;font-weight:700;cursor:pointer">ราคาประเมิน vs ตลาด ต่างกันอย่างไร?</summary><p style="font-size:13px;color:var(--tx2);margin-top:8px">ราคาประเมินกรมธนารักษ์อัปเดตทุก 4 ปี (รอบ 2566–2569) ใช้คิดค่าโอน/ภาษีที่ดิน มักต่ำกว่าราคาตลาดสด 20–30% ในคอนโดใจกลางเมืองอาจต่างถึง 40–50%</p></details>
+      <details style="border:1px solid var(--bd);border-radius:10px;padding:12px;margin-bottom:8px"><summary style="font-size:13px;font-weight:700;cursor:pointer">ลำดับปัจจัยที่ส่งผลต่อราคา</summary><p style="font-size:13px;color:var(--tx2);margin-top:8px">ทำเล (40%) › ขนาด (25%) › อายุ/สภาพ (20%) › ชั้น/ทิศ (10%) › อื่นๆ (5%) — ทำเลคือปัจจัยสำคัญที่สุด</p></details>
+      <details style="border:1px solid var(--bd);border-radius:10px;padding:12px"><summary style="font-size:13px;font-weight:700;cursor:pointer">ราคาที่ประเมินนี้ใช้ขายได้เลยไหม?</summary><p style="font-size:13px;color:var(--tx2);margin-top:8px">เป็นการประเมินเบื้องต้นจากสูตร CMA ใช้เป็นจุดเริ่มต้นเท่านั้น ก่อนขายจริงควรให้นายหน้าหรือผู้ประเมินที่มีใบอนุญาตดูของจริง เพราะสภาพห้อง ทิศ และเทรนด์ตลาดอาจทำให้ราคาต่างไป ±10–15%</p></details>
+    </div>
+  </div>
+</div>
 <div class="ov" id="tools-modal" onclick="if(event.target===this)_closeModal('tools-modal')">
   <div class="modal" style="max-width:480px">
     <div class="mhd"><h2 id="tools-modal-title"><i class="fas fa-calculator" style="color:var(--a)"></i> <span data-i18n="tools.title">เครื่องมือคำนวณ</span></h2><span class="mclose" onclick="_closeModal('tools-modal')">×</span></div>
@@ -16204,6 +16750,11 @@ const PAGE_ROUTES = {
   'my-account':     { path: '/my-account', title: 'บัญชีของฉัน — Matchdoor',                                 desc: 'จัดการโปรไฟล์ รายการโปรด และประกาศของคุณบน Matchdoor' },
   'social':         { path: '/social',     title: 'ฟีดชุมชน Matchdoor — อสังหาฯ บ้าน คอนโด กรุงเทพ',    desc: 'ชุมชนอสังหาริมทรัพย์ Matchdoor แชร์ทรัพย์ ถามตอบ ติดตามข่าวสารอสังหาฯ กรุงเทพ' },
   'property':       { path: '/property', title: 'ทรัพย์ — Matchdoor', desc: 'รายละเอียดทรัพย์อสังหาริมทรัพย์ กรุงเทพ — Matchdoor' },
+  'tools':          { path: '/tools',             title: 'เครื่องมือคำนวณอสังหาฯ — Matchdoor',           desc: 'คำนวณผ่อนบ้าน ประเมินราคาทรัพย์ คำนวณ Yield และค่าโอน ฟรี ไม่ต้องสมัคร' },
+  'tools-valuation':{ path: '/tools/valuation',  title: 'ประเมินราคาทรัพย์ — Matchdoor',                desc: 'ประเมินราคาตลาดและราคากรมธนารักษ์จากทำเล ขนาด อายุ และสภาพทรัพย์ ฟรี' },
+  'tools-mortgage': { path: '/tools/mortgage',   title: 'คำนวณผ่อนบ้าน สินเชื่อ — Matchdoor',           desc: 'คำนวณยอดผ่อนรายเดือน ดอกเบี้ย ค่าโอน ตารางผ่อนปีต่อปี ฟรี' },
+  'tools-yield':    { path: '/tools/yield',      title: 'คำนวณ Rental Yield ผลตอบแทนเช่า — Matchdoor',  desc: 'คำนวณ Gross/Net Rental Yield เพื่อตัดสินใจลงทุนอสังหาริมทรัพย์ ฟรี' },
+  'tools-transfer': { path: '/tools/transfer',   title: 'คำนวณค่าโอนและภาษี — Matchdoor',               desc: 'คำนวณค่าธรรมเนียมโอน อากรแสตมป์ ภาษีธุรกิจเฉพาะ และภาษีเงินได้หัก ณ ที่จ่าย' },
 };
 
 // Section → filter context for "buy" / "rent" sub-pages
@@ -16878,6 +17429,23 @@ function showPage(name, propId){
   var _ogImgAltEl = document.querySelector('meta[property="og:image:alt"]');
   if (_ogImgAltEl) _ogImgAltEl.content = 'Matchdoor อสังหาริมทรัพย์กรุงเทพ';
   _silentShowPage(name); // _silentShowPage renders listings already
+  // ── Handle tools sub-pages ──
+  var _toolsPages = ['tools','tools-mortgage','tools-yield','tools-transfer','tools-valuation'];
+  if (_toolsPages.indexOf(name) !== -1) {
+    // Show specific tools page div
+    var _pgId = 'page-' + name;
+    var _pgEl = document.getElementById(_pgId);
+    if (_pgEl) {
+      document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); p.style.display = 'none'; });
+      _pgEl.style.display = '';
+      _pgEl.classList.add('active');
+    }
+    // Trigger init
+    if (name === 'tools-mortgage') { pgCalcMortgage(); }
+    else if (name === 'tools-yield') { pgCalcYield(); }
+    else if (name === 'tools-transfer') { pgCalcTransfer(); }
+    else if (name === 'tools-valuation') { vlCalc(); vlLoadComps(); }
+  }
   // seo-toggle-btn: show only on listings page
   const seoBtn = document.getElementById('seo-toggle-btn');
   if(seoBtn) seoBtn.setAttribute('data-page', name === 'listings' ? 'listings' : name === 'home' ? 'home' : 'other');
@@ -17196,7 +17764,19 @@ function propCard(p){
 
   const detailRow=icons.length?`<div class="prop-detail-row">${icons.join('')}</div>`:'';
 
-  // ---- investment tag ----
+  // ---- transit badge (BTS / MRT / ARL) ----
+  const _bts = sanitize(p.bts || '');
+  const _mrt = sanitize(p.mrt || '');
+  const _transit = sanitize(p.transit || '');
+  let transitBadge = '';
+  if(_bts) {
+    transitBadge = `<div class="prop-transit-badge bts"><i class="fas fa-train"></i> BTS ${_bts}</div>`;
+  } else if(_mrt) {
+    transitBadge = `<div class="prop-transit-badge mrt"><i class="fas fa-subway"></i> MRT ${_mrt}</div>`;
+  } else if(_transit) {
+    const isARL = _transit.toLowerCase().includes('arl') || _transit.toLowerCase().includes('airport');
+    transitBadge = `<div class="prop-transit-badge ${isARL?'arl':'mrt'}"><i class="fas fa-train"></i> ${_transit}</div>`;
+  }
   const investTag = (()=>{
     if(p.invest_tag) return p.invest_tag;
     if(p.yield_pct && p.yield_pct >= 6) return `Yield ${p.yield_pct}%`;
@@ -17226,6 +17806,7 @@ function propCard(p){
       <div class="prop-tags"><span class="ptag pt-type">${ui('type.'+p.type)||p.type}</span><span class="ptag ${p.tx==='RENT'?'pt-rent':'pt-buy'}">${p.tx==='RENT'?ui('card.rent'):ui('card.buy')}</span></div>
       <div class="prop-title">${_sTitle}</div>
       <div class="prop-loc"><i class="fas fa-map-marker-alt"></i> ${_sLocation}</div>
+      ${transitBadge}
       ${priceHtml}
       ${detailRow}
     </div>
@@ -24892,6 +25473,44 @@ const I18N_DICT = {
   /* ── v35: Developers / Partners strip ── */
   'dev.title': {th:'พาร์ทเนอร์ที่ร่วมเดินทางกับเรา', en:'Partners Who Travel With Us', cn:'与我们同行的合作伙伴', ja:'パートナー企業'},
   'dev.note': {th:'✦ รายชื่อพาร์ทเนอร์อย่างเป็นทางการจะประกาศเร็วๆ นี้ ✦', en:'✦ Official partner list coming soon ✦', cn:'✦ 官方合作伙伴名单将于近期公布 ✦', ja:'✦ 公式パートナー一覧は近日公開予定 ✦'},
+
+  /* ── v35 Phase 4: Near Transit section ── */
+  'sec.transit': {th:'อสังหาฯ ใกล้รถไฟฟ้า', en:'Near Transit', cn:'近地铁房源', ja:'駅近物件'},
+
+  /* ── v35 Phase 4: Newsletter ── */
+  'nl.title': {th:'อัปเดตข่าวสารอสังหาฯ รายสัปดาห์', en:'Weekly Real Estate Updates', cn:'每周房产资讯', ja:'毎週不動産情報'},
+  'nl.sub': {th:'รับบทความคัดสรร เทรนด์ทำเล และโปรโมชั่นถึงอีเมลคุณ — ไม่มีสแปม ยกเลิกได้ตลอด', en:'Get curated articles, area trends, and promotions — no spam, unsubscribe anytime.', cn:'获取精选文章、区域趋势和优惠信息，无垃圾邮件，随时退订。', ja:'厳選記事・エリアトレンド・キャンペーン情報をお届け。スパムなし、いつでも配信停止可能。'},
+  'nl.placeholder': {th:'example@email.com', en:'example@email.com', cn:'example@email.com', ja:'example@email.com'},
+  'nl.cta': {th:'สมัครรับข่าว', en:'Subscribe', cn:'订阅', ja:'登録する'},
+  'nl.success': {th:'สมัครสำเร็จแล้ว ขอบคุณครับ!', en:'Subscribed! Thank you!', cn:'订阅成功！感谢您！', ja:'登録完了！ありがとうございます！'},
+
+  /* ── v35 Phase 4: Footer new columns ── */
+  'ft.col.buyer': {th:'สำหรับผู้ซื้อ', en:'For Buyers', cn:'买家专区', ja:'購入希望者向け'},
+  'ft.buy.condo': {th:'ค้นหาคอนโด', en:'Find Condos', cn:'查找公寓', ja:'コンドを探す'},
+  'ft.buy.house': {th:'ค้นหาบ้าน', en:'Find Houses', cn:'查找住宅', ja:'一戸建てを探す'},
+  'ft.buy.town': {th:'ค้นหาทาวน์โฮม', en:'Find Townhomes', cn:'查找联排别墅', ja:'タウンホームを探す'},
+  'ft.buy.new': {th:'โครงการใหม่', en:'New Projects', cn:'新楼盘', ja:'新規プロジェクト'},
+  'ft.buy.all': {th:'ประกาศทั้งหมด', en:'All Listings', cn:'全部房源', ja:'すべての物件'},
+  'ft.buy.articles': {th:'บทความน่ารู้', en:'Articles', cn:'文章资讯', ja:'記事'},
+  'ft.col.seller': {th:'สำหรับผู้ขาย/เจ้าของ', en:'For Sellers', cn:'卖家专区', ja:'売主向け'},
+  'ft.sell.list': {th:'ลงประกาศขาย-ให้เช่า', en:'List a Property', cn:'发布房源', ja:'物件を掲載する'},
+  'ft.sell.agents': {th:'สำหรับเอเจนต์', en:'For Agents', cn:'经纪人专区', ja:'エージェント向け'},
+  'ft.sell.yield': {th:'คำนวณ Yield', en:'Calc Yield', cn:'计算收益率', ja:'利回り計算'},
+  'ft.sell.transfer': {th:'ค่าโอนและภาษี', en:'Transfer Fee', cn:'过户费用', ja:'登記費用'},
+  'ft.sell.port': {th:'ผลงานปิดดีล', en:'Closed Deals', cn:'成交案例', ja:'成約実績'},
+  'ft.col.tools': {th:'เครื่องมือ', en:'Tools', cn:'工具', ja:'ツール'},
+  'ft.tools.mortgage': {th:'คำนวณสินเชื่อบ้าน', en:'Mortgage Calc', cn:'房贷计算', ja:'ローン計算'},
+  'ft.tools.yield': {th:'คำนวณผลตอบแทน', en:'Yield Calc', cn:'回报率计算', ja:'利回り計算'},
+  'ft.tools.transfer': {th:'คำนวณค่าโอน', en:'Transfer Fee Calc', cn:'过户费计算', ja:'登記費用計算'},
+  'ft.tools.fav': {th:'รายการโปรด', en:'Favorites', cn:'收藏夹', ja:'お気に入り'},
+  'ft.tools.community': {th:'ชุมชน Matchdoor', en:'Community', cn:'社区', ja:'コミュニティ'},
+  'ft.col.search': {th:'ค้นหายอดนิยม', en:'Popular Searches', cn:'热门搜索', ja:'人気の検索'},
+  'ft.search.condoBTS': {th:'คอนโดเช่าใกล้ BTS', en:'Condos near BTS', cn:'BTS沿线公寓', ja:'BTS沿線コンド'},
+  'ft.search.condoMRT': {th:'คอนโดเช่าใกล้ MRT', en:'Condos near MRT', cn:'MRT沿线公寓', ja:'MRT沿線コンド'},
+  'ft.search.condoRent': {th:'คอนโดให้เช่า', en:'Condos for Rent', cn:'公寓出租', ja:'コンド賃貸'},
+  'ft.search.houseRent': {th:'บ้านเดี่ยวให้เช่า', en:'Houses for Rent', cn:'住宅出租', ja:'一戸建て賃貸'},
+  'ft.search.transit': {th:'อสังหาฯ ใกล้รถไฟฟ้า', en:'Near Transit', cn:'近地铁房源', ja:'駅近物件'},
+  'ft.search.uni': {th:'อสังหาฯ ใกล้มหาวิทยาลัย', en:'Near Universities', cn:'大学周边房源', ja:'大学近くの物件'},
   'sec.pricerange': {th:'ช่วงราคา',      en:'Price Range',   cn:'价格区间',  ja:'価格帯'},
   'sec.blog':       {th:'บทความน่ารู้',  en:'Blog & News',   cn:'博客与资讯', ja:'ブログ・ニュース'},
   'sec.port':       {th:'ผลงาน',          en:'Portfolio',     cn:'案例展示',   ja:'実績'},
@@ -26751,6 +27370,32 @@ function scrollCatScroll(dir){
 function scrollAreaScroll(dir){
   const el = document.getElementById('popular-area-scroll');
   if(el) el.scrollBy({ left: dir * 220, behavior: 'smooth' });
+}
+
+/* v35 Phase 4: Newsletter subscription handler */
+function submitNewsletter(){
+  const inp = document.getElementById('nl-email');
+  const formWrap = document.getElementById('newsletter-form-wrap');
+  const ok = document.getElementById('newsletter-ok');
+  if(!inp) return;
+  const email = inp.value.trim();
+  if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    inp.style.borderColor = 'var(--red)';
+    inp.focus();
+    setTimeout(()=>{ inp.style.borderColor = ''; }, 2000);
+    return;
+  }
+  // ถ้ามี Supabase ให้บันทึก email ลง newsletter_subscribers table (ถ้ายังไม่มี table ก็ toast แทน)
+  if(typeof sb !== 'undefined' && sb){
+    sb.from('newsletter_subscribers').insert([{ email }]).then(function(res){
+      if(res.error && res.error.code !== '23505'){ // 23505 = duplicate key (สมัครซ้ำ)
+        console.warn('[newsletter]', res.error.message);
+      }
+    }).catch(function(){});
+  }
+  if(formWrap) formWrap.style.display = 'none';
+  if(ok) ok.style.display = 'block';
+  if(typeof toast === 'function') toast('สมัครรับข่าวสำเร็จแล้ว ✅');
 }
 
 function quickLoanCalc(price, propId) {
@@ -32031,6 +32676,289 @@ function toolsCalcTransfer(){
   document.getElementById('tt-total').textContent = _toolsFmtBaht(total);
 }
 
+/* ═══════════════════════════════════════════════════════
+   TOOLS PAGE FUNCTIONS (full-page versions)
+   pg prefix = page (vs modal tm/ty/tt prefix)
+═══════════════════════════════════════════════════════ */
+
+// ── Mortgage Page ──
+function pgCalcMortgage(){
+  var price = _pgNum('pg-tm-price');
+  var downPct = parseFloat(document.getElementById('pg-tm-down')?.value||10)/100;
+  var rate = parseFloat(document.getElementById('pg-tm-rate')?.value||2.75)/100/12;
+  var years = parseInt(document.getElementById('pg-tm-years')?.value||30);
+  var income = _pgNum('pg-tm-income');
+  var n = years * 12;
+  if(price <= 0){ return; }
+  var downAmt = price * downPct;
+  var loan = price - downAmt;
+  document.getElementById('pg-tm-down-pct').textContent = (downPct*100)+'%';
+  document.getElementById('pg-tm-down-amt').textContent = '฿'+_pgFmt(downAmt);
+  var monthly = rate > 0 ? loan * rate * Math.pow(1+rate,n) / (Math.pow(1+rate,n)-1) : loan/n;
+  var total = monthly * n;
+  var interest = total - loan;
+  var _el = function(id){ return document.getElementById(id); };
+  if(_el('pg-tm-monthly')) _el('pg-tm-monthly').textContent = '฿'+_pgFmt(monthly)+'/เดือน';
+  if(_el('pg-tm-loan')) _el('pg-tm-loan').textContent = '฿'+_pgFmt(loan);
+  if(_el('pg-tm-interest')) _el('pg-tm-interest').textContent = '฿'+_pgFmt(interest);
+  if(_el('pg-tm-total')) _el('pg-tm-total').textContent = '฿'+_pgFmt(total);
+  // Income ratio
+  if(income > 0 && _el('pg-tm-income-wrap')){
+    _el('pg-tm-income-wrap').style.display='';
+    var pct = (monthly/income*100).toFixed(1);
+    _el('pg-tm-income-pct').textContent = pct+'% ของรายได้';
+    _el('pg-tm-income-pct').style.color = pct > 40 ? '#e53e3e' : pct > 30 ? '#f59e0b' : '#10b981';
+  }
+  // Transfer fee (2568 promotion: 0.01% each for ≤7M)
+  var isPromo = price <= 7000000;
+  var feeRate = isPromo ? 0.0001 : 0.02;
+  var mtgRate = isPromo ? 0.0001 : 0.01;
+  var fee = price * feeRate;
+  var mtg = loan * mtgRate;
+  if(_el('pg-tm-fee')) _el('pg-tm-fee').textContent = '฿'+_pgFmt(fee);
+  if(_el('pg-tm-mtg')) _el('pg-tm-mtg').textContent = '฿'+_pgFmt(mtg);
+  if(_el('pg-tm-fee-total')) _el('pg-tm-fee-total').textContent = '฿'+_pgFmt(fee+mtg);
+  if(_el('pg-tm-saving')){
+    if(isPromo){
+      var saving = price*0.02 + loan*0.01 - (fee+mtg);
+      _el('pg-tm-saving').textContent = 'ประหยัดได้ ฿'+_pgFmt(saving)+' จากอัตราปกติ';
+    } else {
+      _el('pg-tm-saving').textContent = '';
+    }
+  }
+  // Amortization table
+  var tbody = document.getElementById('pg-amort-body');
+  if(tbody){
+    var rows = '';
+    var bal = loan;
+    for(var yr=1; yr<=years; yr++){
+      var prinYear=0, intYear=0;
+      for(var m=0;m<12;m++){
+        var intM = bal*rate; var prinM = monthly-intM;
+        intYear+=intM; prinYear+=prinM; bal-=prinM;
+      }
+      if(bal<0)bal=0;
+      var bg = yr%2===0?'background:#f8faff;':'';
+      rows+='<tr style="'+bg+'"><td style="padding:6px 10px">'+yr+'</td><td style="padding:6px 10px;text-align:right">฿'+_pgFmt(prinYear)+'</td><td style="padding:6px 10px;text-align:right">฿'+_pgFmt(intYear)+'</td><td style="padding:6px 10px;text-align:right">฿'+_pgFmt(bal)+'</td></tr>';
+    }
+    tbody.innerHTML = rows;
+  }
+}
+
+// ── Yield Page ──
+function pgCalcYield(){
+  var price = _pgNum('pg-ty-price');
+  var rent = _pgNum('pg-ty-rent');
+  var expense = _pgNum('pg-ty-expense');
+  var vacancy = parseFloat(document.getElementById('pg-ty-vacancy')?.value||1);
+  var _el = function(id){ return document.getElementById(id); };
+  if(price<=0||rent<=0){ if(_el('pg-ty-gross'))_el('pg-ty-gross').textContent='—'; return; }
+  var annualRent = rent * (12-vacancy);
+  var grossYield = (rent*12/price*100);
+  var netYield = ((annualRent-expense)/price*100);
+  var payback = netYield>0?(100/netYield).toFixed(1):null;
+  if(_el('pg-ty-gross')) _el('pg-ty-gross').textContent = grossYield.toFixed(2)+'%';
+  if(_el('pg-ty-net')) _el('pg-ty-net').textContent = netYield.toFixed(2)+'%';
+  if(_el('pg-ty-annual')) _el('pg-ty-annual').textContent = '฿'+_pgFmt(rent*12)+'/ปี';
+  if(_el('pg-ty-deduct')) _el('pg-ty-deduct').textContent = '−฿'+_pgFmt(expense + rent*vacancy);
+  if(_el('pg-ty-payback')) _el('pg-ty-payback').textContent = payback ? payback+' ปี' : '—';
+}
+
+// ── Transfer Fee Page ──
+function pgCalcTransfer(){
+  var price = _pgNum('pg-tt-price');
+  var years = parseFloat(document.getElementById('pg-tt-years')?.value||5);
+  var seller = document.getElementById('pg-tt-seller')?.value||'individual';
+  var residence = document.getElementById('pg-tt-residence')?.value||'yes';
+  var _el = function(id){ return document.getElementById(id); };
+  if(price<=0){ if(_el('pg-tt-total'))_el('pg-tt-total').textContent='—'; return; }
+  var isPromo = price<=7000000;
+  var transferFee = price * (isPromo?0.0001:0.02);
+  var hasSBT = years<5 && !(residence==='yes' && years>=1);
+  var stampDuty = hasSBT ? 0 : price*0.005;
+  var sbt = hasSBT ? price*0.033 : 0;
+  // Withholding tax (simplified: 1% of assessed price for individual)
+  var wht = seller==='individual' ? price*0.01 : price*0.01;
+  var total = transferFee + (hasSBT ? sbt : stampDuty) + wht;
+  var saving = isPromo ? (price*0.02 + price*0.01) - (transferFee + wht + (hasSBT?sbt:stampDuty)) : 0;
+  var rows = [
+    ['ค่าธรรมเนียมโอน ('+(isPromo?'0.01%':'2%')+')', transferFee],
+    [hasSBT?'ภาษีธุรกิจเฉพาะ (3.3%)':'อากรแสตมป์ (0.5%)', hasSBT?sbt:stampDuty],
+    ['ภาษีเงินได้หัก ณ ที่จ่าย (~1%)', wht],
+  ];
+  var html = rows.map(function(r){ return '<div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--lt)"><span>'+r[0]+'</span><b>฿'+_pgFmt(r[1])+'</b></div>'; }).join('');
+  if(_el('pg-tt-rows')) _el('pg-tt-rows').innerHTML = html;
+  if(_el('pg-tt-total')) _el('pg-tt-total').textContent = '฿'+_pgFmt(total);
+  if(_el('pg-tt-saving')){
+    if(isPromo && saving>0){
+      _el('pg-tt-saving').textContent='ประหยัดได้ ฿'+_pgFmt(saving)+' จากมาตรการกระตุ้น 2568-2569';
+      _el('pg-tt-saving').style.display='';
+    } else {
+      _el('pg-tt-saving').style.display='none';
+    }
+  }
+}
+
+// ── Valuation Page ──
+var _vlType = 'condo';
+var _vlMarketPrice = 0;
+function vlSelectType(type, btn){
+  _vlType = type;
+  document.querySelectorAll('.vl-type-btn').forEach(function(b){
+    b.style.background='#fff'; b.style.color='var(--tx2)'; b.style.borderColor='var(--bd)'; b.style.fontWeight='600';
+  });
+  if(btn){ btn.style.background='#f0f4ff'; btn.style.color='var(--p)'; btn.style.borderColor='var(--p)'; btn.style.fontWeight='700'; }
+  // Show/hide land-only fields
+  var isLand = type==='land';
+  document.querySelectorAll('.vl-hide-land').forEach(function(el){ el.style.display=isLand?'none':''; });
+  vlCalc();
+}
+function vlCalc(){
+  var areaEl = document.getElementById('vl-area');
+  if(!areaEl) return;
+  var basePrice = parseFloat(areaEl.options[areaEl.selectedIndex]?.getAttribute('data-base')||100000);
+  // Type multiplier
+  var typeMult = {condo:1, house:0.9, townhouse:0.75, land:0.55}[_vlType]||1;
+  var size = parseFloat(document.getElementById('vl-size')?.value||32);
+  var age = parseFloat(document.getElementById('vl-age')?.value||5);
+  var floor = parseFloat(document.getElementById('vl-floor')?.value||15);
+  var condition = parseFloat(document.getElementById('vl-condition')?.value||1.0);
+  var transit = parseFloat(document.getElementById('vl-transit')?.value||400);
+  // Price per sqm calculation
+  var sqmPrice = basePrice * typeMult;
+  // Age depreciation (0.5%/year, max 20%)
+  var ageDep = Math.min(age*0.005, 0.20);
+  // Floor premium (3% per 10 floors, max 10%)
+  var floorPrem = _vlType==='land'?0:Math.min(Math.floor(floor/10)*0.03, 0.10);
+  // Transit premium
+  var transitPrem = transit<=300?0.05: transit<=800?0.02:0;
+  // Total
+  var adj = sqmPrice * (1 - ageDep) * condition * (1 + floorPrem + transitPrem);
+  var total = adj * size;
+  _vlMarketPrice = total;
+  var low = total * 0.92;
+  var high = total * 1.08;
+  var treasury = total * 0.70;
+  // Confidence
+  var confidence = transit<=800 && age<=20 && size>=20?'สูง':'ปานกลาง';
+  var _el = function(id){ return document.getElementById(id); };
+  if(_el('vl-market')) _el('vl-market').textContent = '฿'+_pgFmt(total);
+  if(_el('vl-range')) _el('vl-range').textContent = 'ช่วง ฿'+_pgFmt(low)+' – ฿'+_pgFmt(high);
+  if(_el('vl-sqm')) _el('vl-sqm').textContent = '~฿'+_pgFmt(adj)+'/ตร.ม. · '+size+' ตร.ม.';
+  if(_el('vl-treasury')) _el('vl-treasury').textContent = '฿'+_pgFmt(treasury);
+  if(_el('vl-confidence')) _el('vl-confidence').textContent = 'ความน่าเชื่อถือ: '+confidence;
+  if(_el('vl-area-price')) _el('vl-area-price').textContent = '~฿'+_pgFmt(sqmPrice)+'/ตร.ม. (ราคาฐานทำเล)';
+  // Breakdown
+  var breakdownRows = [
+    ['ราคาฐานทำเล', sqmPrice*size, ''],
+    ['เบี้ยชั้น', adj*(floorPrem/(1+floorPrem+transitPrem))*size*(floorPrem>0?1:0), floorPrem>0?'':'hidden'],
+    ['ส่วนลดอายุ', -(sqmPrice*ageDep*size), ageDep>0?'color:#e53e3e':'hidden'],
+    ['ปัจจัยสภาพ', condition<1?(total-sqmPrice*(1-ageDep)*size):0, condition<1?'color:#e53e3e':'hidden'],
+    ['เบี้ยใกล้รถไฟฟ้า', transitPrem>0?total*(transitPrem/(1+floorPrem+transitPrem)):0, transitPrem>0?'color:#10b981':'hidden'],
+    ['ราคาตลาดกลาง', total, 'font-weight:700;border-top:1.5px solid var(--p);margin-top:4px;padding-top:4px'],
+  ];
+  if(_el('vl-breakdown')){
+    _el('vl-breakdown').innerHTML = breakdownRows.filter(function(r){return r[2]!=='hidden';}).map(function(r){
+      return '<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:13px;'+r[2]+'"><span>'+r[0]+'</span><b>'+( Math.abs(r[1])<1?'–':'฿'+_pgFmt(r[1]))+'</b></div>';
+    }).join('');
+  }
+}
+function vlLoadComps(){
+  // Load comparable properties from Supabase based on current area selection
+  var areaEl = document.getElementById('vl-area');
+  if(!areaEl || !sb) return;
+  var areaMap = {
+    sukhumvit:'สุขุมวิท', sathorn:'สาทร', thonglor:'ทองหล่อ', asok:'อโศก',
+    rachada:'รัชดา', onnut:'อ่อนนุช', bangna:'บางนา', ladprao:'ลาดพร้าว',
+    chatuchak:'จตุจักร', pinklao:'ปิ่นเกล้า'
+  };
+  var areaVal = areaEl.value;
+  var kw = areaMap[areaVal] || '';
+  var compsEl = document.getElementById('vl-comps');
+  if(!compsEl) return;
+  compsEl.innerHTML = '<div style="color:var(--tx2);font-size:13px;padding:20px;text-align:center;grid-column:1/-1"><i class="fas fa-spinner fa-spin"></i> กำลังดึงข้อมูล...</div>';
+  sb.from('properties')
+    .select('id,title,price,area,property_type,bedrooms,size_sqm,images,tx_type,slug')
+    .eq('status','อนุมัติ')
+    .ilike('area', '%'+(kw||'')+('%'))
+    .order('created_at',{ascending:false})
+    .limit(6)
+    .then(function(res){
+      if(!res.data||!res.data.length){
+        compsEl.innerHTML='<div style="color:var(--tx2);font-size:13px;padding:20px;text-align:center;grid-column:1/-1">ไม่พบทรัพย์ในทำเลนี้</div>';
+        return;
+      }
+      compsEl.innerHTML = res.data.map(function(p){
+        var img = (p.images&&p.images[0])?sbImg(p.images[0]):'';
+        var sqmPrice = (p.size_sqm&&p.size_sqm>0)?(p.price/p.size_sqm):0;
+        return '<div onclick="showPage(\'property\',\''+p.id+'\')" style="border:1.5px solid var(--bd);border-radius:14px;overflow:hidden;cursor:pointer;background:#fff;transition:.2s" onmouseenter="this.style.borderColor=\'var(--a)\'" onmouseleave="this.style.borderColor=\'var(--bd)\'">'
+          +(img?'<img src="'+img+'" style="width:100%;height:140px;object-fit:cover" loading="lazy" alt="'+p.title+'">':'<div style="width:100%;height:140px;background:var(--lt);display:flex;align-items:center;justify-content:center"><i class="fas fa-home" style="font-size:28px;color:var(--tx2)"></i></div>')
+          +'<div style="padding:12px">'
+          +'<div style="font-size:12px;font-weight:700;color:var(--p);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+p.title+'</div>'
+          +'<div style="font-size:14px;font-weight:800;color:var(--a)">฿'+_pgFmt(p.price)+'</div>'
+          +(sqmPrice>0?'<div style="font-size:11px;color:var(--tx2);margin-top:2px">฿'+_pgFmt(sqmPrice)+'/ตร.ม.</div>':'')
+          +'<div style="font-size:11px;color:var(--tx2);margin-top:4px">'+(p.property_type||'')+' · '+(p.area||'')+'</div>'
+          +'</div></div>';
+      }).join('');
+    })
+    .catch(function(){ compsEl.innerHTML='<div style="color:var(--tx2);font-size:13px;padding:20px;text-align:center;grid-column:1/-1">ไม่สามารถโหลดข้อมูลได้</div>'; });
+}
+function pgUseValuationPrice(tool){
+  var price = _vlMarketPrice;
+  if(tool==='mortgage'){
+    showPage('tools-mortgage');
+    setTimeout(function(){
+      var el = document.getElementById('pg-tm-price');
+      if(el){ el.value = _pgFmt(price); pgCalcMortgage(); }
+    },100);
+  } else if(tool==='transfer'){
+    showPage('tools-transfer');
+    setTimeout(function(){
+      var el = document.getElementById('pg-tt-price');
+      if(el){ el.value = _pgFmt(price); pgCalcTransfer(); }
+    },100);
+  } else if(tool==='yield'){
+    showPage('tools-yield');
+    setTimeout(function(){
+      var el = document.getElementById('pg-ty-price');
+      if(el){ el.value = _pgFmt(price); pgCalcYield(); }
+    },100);
+  }
+}
+
+// ── Shared helpers ──
+function _pgNum(id){ var el=document.getElementById(id); if(!el)return 0; return parseFloat((el.value||'').replace(/[^0-9.]/g,''))||0; }
+function _pgFmt(n){ if(!n||isNaN(n))return'0'; return Math.round(n).toLocaleString('th-TH'); }
+
+// ── Near Universities section ──
+function renderUniSection(){
+  var UNIS = [
+    {name:'จุฬาลงกรณ์', kw:'จุฬา', short:'จุฬาฯ', icon:'🎓'},
+    {name:'ธรรมศาสตร์ ท่าพระจันทร์', kw:'ธรรมศาสตร์', short:'มธ.', icon:'🎓'},
+    {name:'มหิดล', kw:'มหิดล', short:'มหิดล', icon:'🏥'},
+    {name:'เกษตรศาสตร์', kw:'เกษตร', short:'ม.เกษตร', icon:'🌾'},
+    {name:'มศว ประสานมิตร', kw:'ประสานมิตร', short:'มศว', icon:'🎓'},
+    {name:'รังสิต', kw:'รังสิต', short:'ม.รังสิต', icon:'🎓'},
+  ];
+  var track = document.getElementById('uni-track');
+  if(!track) return;
+  track.innerHTML = UNIS.map(function(u){
+    return '<div style="flex:0 0 220px;background:linear-gradient(135deg,#7c3aed15,#f0f4ff);border:1.5px solid #e8e0f8;border-radius:14px;padding:14px;cursor:pointer;transition:.2s" onclick="quickSearch(\''+u.kw+'\')" onmouseenter="this.style.borderColor=\'#7c3aed\'" onmouseleave="this.style.borderColor=\'#e8e0f8\'"><div style="font-size:22px;margin-bottom:6px">'+u.icon+'</div><div style="font-weight:700;font-size:13px;color:var(--p)">ใกล้'+u.short+'</div><div style="font-size:11px;color:var(--tx2);margin-top:2px">'+u.name+'</div><div style="margin-top:8px;font-size:11px;color:#7c3aed;font-weight:700">ดูทรัพย์ →</div></div>';
+  }).join('');
+  // If Supabase, load actual counts
+  if(sb){
+    UNIS.forEach(function(u,i){
+      sb.from('properties').select('id',{count:'exact',head:true}).eq('status','อนุมัติ').ilike('area','%'+u.kw+'%')
+        .then(function(res){
+          var cards = track.children;
+          if(cards[i] && res.count){
+            var sub = cards[i].querySelector('div:nth-child(3)');
+            if(sub) sub.textContent = res.count+' ประกาศ';
+          }
+        });
+    });
+  }
+}
 
 /* ─────────────────────────────────────────────
    3. FOOTER LINKS — โหลดจาก DB แล้ว inject
