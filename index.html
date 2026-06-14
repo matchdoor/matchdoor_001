@@ -2100,6 +2100,34 @@ footer{background:linear-gradient(135deg,#2d2650 0%,#3d3373 100%);color:rgba(255
   .footer-col-links a{padding:3px 0}
 }
 
+
+/* ── Footer action buttons (lang + wish + dep) ── */
+.ft-action-row{display:flex;align-items:center;gap:8px;margin-top:14px;flex-wrap:nowrap}
+.ft-lang-wrap{position:relative;display:inline-block}
+.ft-lang-panel{display:none;position:absolute;bottom:calc(100% + 8px);right:0;background:var(--bg2,#1e1b3a);border:1.5px solid rgba(255,255,255,.15);border-radius:12px;min-width:180px;padding:8px;box-shadow:0 8px 32px rgba(0,0,0,.45);z-index:9999}
+.ft-lang-panel.open{display:block}
+.ft-lang-panel .lang-panel-header{font-size:11px;font-weight:700;color:rgba(255,255,255,.4);padding:4px 8px 8px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:6px}
+.ft-lang-panel .lang-option{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;transition:.15s}
+.ft-lang-panel .lang-option:hover{background:rgba(255,255,255,.08)}
+.ft-lang-panel .lang-option.selected{background:rgba(200,146,42,.12)}
+.ft-lang-panel .opt-flag{font-size:18px;line-height:1}
+.ft-lang-panel .opt-info{display:flex;flex-direction:column;flex:1}
+.ft-lang-panel .opt-name{font-size:13px;font-weight:600;color:rgba(255,255,255,.85)}
+.ft-lang-panel .opt-native{font-size:11px;color:rgba(255,255,255,.4)}
+.ft-lang-panel .opt-check{color:var(--a,#C8922A);font-size:12px;opacity:0}
+.ft-lang-panel .lang-option.selected .opt-check{opacity:1}
+/* ── ประกาศทั้งหมด — always-visible button ── */
+.nav-listings-btn{display:flex!important;align-items:center;gap:6px;font-weight:700;background:linear-gradient(135deg,var(--a),var(--a2));color:#1A1A2E;border-radius:8px;padding:6px 14px;border:none;cursor:pointer;font-size:13px;font-family:inherit;white-space:nowrap;transition:.18s;height:34px;flex-shrink:0}
+/* ซ่อนปุ่มภาษา, ฝากความต้องการ, ฝากทรัพย์ออกจาก Header */
+.nav-right .lang-dd,
+.nav-right .nav-dd:has(.btn-wish),
+.nav-right .nav-dd:has(.btn-dep){display:none!important}
+.ft-lang-btn{display:flex;align-items:center;gap:5px;padding:7px 12px;border:1.5px solid rgba(255,255,255,.2);border-radius:8px;background:rgba(255,255,255,.07);color:rgba(255,255,255,.75);font-size:12px;font-weight:600;cursor:pointer;transition:.18s;font-family:inherit}
+.ft-lang-btn:hover{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.35);color:#fff}
+.ft-wish-btn{display:flex;align-items:center;gap:5px;padding:7px 12px;border:1.5px solid rgba(255,255,255,.2);border-radius:8px;background:rgba(255,255,255,.07);color:rgba(255,255,255,.75);font-size:12px;font-weight:600;cursor:pointer;transition:.18s;font-family:inherit}
+.ft-wish-btn:hover{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.35);color:#fff}
+.ft-dep-btn{display:flex;align-items:center;gap:5px;padding:7px 12px;border:none;border-radius:8px;background:linear-gradient(135deg,var(--a),var(--a2));color:#1A1A2E;font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 2px 10px rgba(200,146,42,.35);transition:.18s;font-family:inherit}
+.ft-dep-btn:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(200,146,42,.5)}
 /* ── View-all link subtle upgrade ── */
 .view-all{color:var(--p);font-size:13px;font-weight:700;cursor:pointer;padding:6px 14px;border-radius:8px;border:1.5px solid var(--bd);transition:.18s;display:inline-flex;align-items:center;gap:4px}
 .view-all:hover{background:var(--p);color:#fff;border-color:var(--p)}
@@ -6029,7 +6057,6 @@ footer::after{
    </div>
   </a>
   <div class="nav-links" id="nav-links">
-   <button class="nav-dd-btn nav-listings-btn" onclick="closeAllDD();showListingsPage()" style="display:flex;align-items:center;gap:6px;font-weight:700;background:linear-gradient(135deg,var(--a),var(--a2));color:#1A1A2E;border-radius:8px;padding:6px 14px;border:none;cursor:pointer;font-size:13px;font-family:inherit;white-space:nowrap;transition:.18s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'"><i class="fas fa-building"></i> <span>ประกาศทั้งหมด</span></button>
    <div class="nav-dd">
     <button class="nav-dd-btn" onclick="toggleDD('dd-prop')"><i class="fas fa-th-large"></i> <span data-i18n="nav.prop">ซื้อขายอสังหาฯ</span> <i class="fas fa-chevron-down" style="font-size:10px"></i></button>
     <div class="dd-panel" id="dd-prop">
@@ -6104,6 +6131,8 @@ footer::after{
    </div>
   </div>
   <div class="nav-right">
+   <!-- ประกาศทั้งหมด — always visible -->
+   <button class="nav-listings-btn" onclick="closeAllDD();showListingsPage()" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'"><i class="fas fa-building"></i> <span>ประกาศทั้งหมด</span></button>
    <!-- 🌐 Language Switcher Dropdown -->
    <div class="lang-dd" id="lang-dd">
     <button class="lang-trigger" id="lang-trigger" onclick="toggleLangDD()" aria-label="เปลี่ยนภาษา">
@@ -6979,6 +7008,23 @@ footer::after{
           <a href="javascript:void(0)" onclick="quickSearch('ใกล้รถไฟฟ้า')" data-i18n="ft.search.transit">อสังหาฯ ใกล้รถไฟฟ้า</a>
           <a href="javascript:void(0)" onclick="showPage('favorites')" data-i18n="ft.tools.fav">รายการโปรด</a>
           <a href="javascript:void(0)" onclick="showPage('community')" data-i18n="ft.tools.community">ชุมชน Matchdoor</a>
+        </div>
+        <!-- ── Footer language button ── -->
+        <div class="ft-action-row">
+          <div class="ft-lang-wrap" id="ft-lang-wrap">
+            <button class="ft-lang-btn" id="ft-lang-trigger" onclick="ftToggleLang(event)" title="เปลี่ยนภาษา">
+              <span id="ft-trigger-flag">🇹🇭</span>
+              <span id="ft-trigger-code">TH</span>
+              <i class="fas fa-chevron-down" id="ft-lang-chevron" style="font-size:9px;opacity:.6;transition:transform .2s"></i>
+            </button>
+            <div class="ft-lang-panel" id="ft-lang-panel">
+              <div class="lang-panel-header">🌐 เลือกภาษา / Language</div>
+              <div class="lang-option" id="ft-lopt-th" onclick="setLang('th');ftCloseLang()"><span class="opt-flag">🇹🇭</span><span class="opt-info"><span class="opt-name">ไทย</span><span class="opt-native">Thai</span></span><i class="fas fa-check opt-check"></i></div>
+              <div class="lang-option" id="ft-lopt-en" onclick="setLang('en');ftCloseLang()"><span class="opt-flag">🇬🇧</span><span class="opt-info"><span class="opt-name">English</span><span class="opt-native">อังกฤษ</span></span><i class="fas fa-check opt-check"></i></div>
+              <div class="lang-option" id="ft-lopt-cn" onclick="setLang('cn');ftCloseLang()"><span class="opt-flag">🇨🇳</span><span class="opt-info"><span class="opt-name">中文</span><span class="opt-native">จีน</span></span><i class="fas fa-check opt-check"></i></div>
+              <div class="lang-option" id="ft-lopt-ja" onclick="setLang('ja');ftCloseLang()"><span class="opt-flag">🇯🇵</span><span class="opt-info"><span class="opt-name">日本語</span><span class="opt-native">ญี่ปุ่น</span></span><i class="fas fa-check opt-check"></i></div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -26046,14 +26092,29 @@ function setLang(lang){
   const meta=LANG_META[lang]||LANG_META.th;
   const flagEl=document.getElementById('trigger-flag');
   const codeEl=document.getElementById('trigger-code');
+  const ftCode=document.getElementById('ft-trigger-code');
+  const ftFlag=document.getElementById('ft-trigger-flag');
   if(flagEl)flagEl.textContent=meta.flag;
   if(codeEl)codeEl.textContent=meta.code;
+  if(ftFlag)ftFlag.textContent=meta.flag;
+  if(ftCode)ftCode.textContent=meta.code;
   Object.keys(LANG_META).forEach(k=>{
     const opt=document.getElementById('lopt-'+k);
     if(opt)opt.classList.toggle('selected',k===lang);
   });
   closeLangDD();
   applyLang();
+  // sync footer lang panel selected state
+  ['th','en','cn','ja'].forEach(k=>{
+    const o=document.getElementById('ft-lopt-'+k);
+    if(o) o.classList.toggle('selected', k===lang);
+  });
+  // sync footer flag/code (in case sync in setLang was not already present)
+  const ftF=document.getElementById('ft-trigger-flag');
+  const ftC=document.getElementById('ft-trigger-code');
+  const _m=LANG_META&&LANG_META[lang]?LANG_META[lang]:(LANG_META&&LANG_META.th?LANG_META.th:{flag:'🇹🇭',code:'TH'});
+  if(ftF)ftF.textContent=_m.flag;
+  if(ftC)ftC.textContent=_m.code;
   // Re-render popup if currently open
   const allModal=document.getElementById('all-modal');
   if(allModal && allModal.classList.contains('open') && window._modalCurrentType){
@@ -33146,6 +33207,33 @@ window._v26 = window._v24;  // alias
 // v26: community_posts module loaded
 
 })();
+
+// ── Footer language panel ──
+function ftToggleLang(e){
+  e.stopPropagation();
+  const panel=document.getElementById('ft-lang-panel');
+  const chev=document.getElementById('ft-lang-chevron');
+  const isOpen=panel.classList.contains('open');
+  closeLangDD(); closeAllDD();
+  panel.classList.toggle('open',!isOpen);
+  if(chev) chev.style.transform=!isOpen?'rotate(180deg)':'';
+}
+function ftCloseLang(){
+  const panel=document.getElementById('ft-lang-panel');
+  const chev=document.getElementById('ft-lang-chevron');
+  if(panel) panel.classList.remove('open');
+  if(chev) chev.style.transform='';
+  // sync selected state
+  ['th','en','cn','ja'].forEach(k=>{
+    const o=document.getElementById('ft-lopt-'+k);
+    if(o) o.classList.toggle('selected', k===(_lang||'th'));
+  });
+}
+document.addEventListener('click',function(e){
+  if(!e.target.closest('#ft-lang-wrap')) ftCloseLang();
+});
+// sync ft flag/code when setLang runs (patch into setLang post-call)
+const _origSetLang = typeof setLang === 'function' ? setLang : null;
 </script>
 </body>
 </html>
