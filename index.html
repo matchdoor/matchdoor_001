@@ -1612,12 +1612,7 @@ body{padding-top:64px}
 @keyframes sparkle{0%,100%{transform:scale(1) rotate(0)}50%{transform:scale(1.2) rotate(10deg)}}
 @keyframes floatUp{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
 .hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);border-radius:20px;padding:5px 14px;font-size:12px;font-weight:600;color:#fff;margin-bottom:16px;backdrop-filter:blur(10px)}
-/* Cat cards pastel */
-.cat-card{flex-shrink:0;background:#fff;border-radius:var(--r);border:2px solid var(--bd);padding:12px 14px;text-align:center;cursor:pointer;min-width:82px;transition:.25s;position:relative;overflow:hidden}
-.cat-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--pastel5),var(--pastel3));opacity:0;transition:.25s}
-.cat-card:hover::before,.cat-card.active::before{opacity:1}
-.cat-card.active,.cat-card:hover{border-color:#c3b7ff;transform:translateY(-2px)}
-.cat-icon,.cat-name{position:relative;z-index:1}
+/* Cat cards: superseded by .cat-card rules near .cat-scroll (icon-grid style) */
 /* Price cards Gen Z */
 .price-card.p0{background:linear-gradient(135deg,#7c6fcd,#5a4fa8)}
 .price-card.p1{background:linear-gradient(135deg,#ff6b9d,#ff8fab)}
@@ -1986,11 +1981,80 @@ footer{background:linear-gradient(135deg,#2d2650 0%,#3d3373 100%);color:rgba(255
 .btn-search:hover{opacity:.9}
 .btn-reset-search{background:#fff;color:var(--tx2);padding:10px 16px;border-radius:10px;font-weight:700;height:44px;white-space:nowrap;display:flex;align-items:center;gap:6px;border:1.5px solid var(--bd);cursor:pointer;font-family:inherit;font-size:14px}
 .btn-reset-search:hover{border-color:var(--p);color:var(--p)}
-.cat-scroll{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;padding-top:2px;-ms-overflow-style:none;scrollbar-width:none}
+.cat-scroll{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;padding-top:2px;-ms-overflow-style:none;scrollbar-width:none}
 .cat-scroll::-webkit-scrollbar{display:none}
-.cat-card{flex-shrink:0;background:#fff;border-radius:var(--r);border:2px solid var(--bd);padding:16px 20px;text-align:center;cursor:pointer;min-width:100px;transition:.2s}
-.cat-card.active,.cat-card:hover{border-color:var(--a);background:var(--lt);box-shadow:0 0 0 0 transparent;}
-.cat-icon{font-size:32px;margin-bottom:7px}
+/* ── Popular Areas (ทำเลยอดนิยม) ── */
+.area-scroll{display:flex;gap:12px;overflow-x:auto;padding-bottom:6px;-ms-overflow-style:none;scrollbar-width:none}
+.area-scroll::-webkit-scrollbar{display:none}
+.area-card{flex-shrink:0;position:relative;width:168px;height:108px;border-radius:16px;overflow:hidden;cursor:pointer;color:#fff;background:linear-gradient(135deg,var(--p),#2A5298);transition:.22s;box-shadow:0 4px 14px -8px rgba(27,58,107,.5)}
+.area-card:hover{transform:translateY(-3px);box-shadow:0 10px 22px -10px rgba(27,58,107,.55)}
+.area-card::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 30%,rgba(0,0,0,.55) 100%)}
+.area-card-body{position:absolute;left:0;right:0;bottom:0;padding:12px 14px;z-index:1}
+.area-card-name{font-size:15px;font-weight:800;margin-bottom:2px;text-shadow:0 1px 4px rgba(0,0,0,.3)}
+.area-card-count{font-size:12px;opacity:.92;font-weight:600}
+.area-card-icon{position:absolute;top:10px;right:12px;font-size:13px;opacity:.85;z-index:1}
+@media(max-width:640px){.area-card{width:142px;height:96px}.area-card-name{font-size:13.5px}.area-card-count{font-size:11px}}
+/* ── Why Choose Us ── */
+.why-sec{padding:32px 0 36px;background:var(--bg)}
+.why-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.why-card{background:#fff;border:1.5px solid var(--bd);border-radius:16px;padding:24px 20px;text-align:left;transition:.22s}
+.why-card:hover{border-color:var(--why-col,var(--a));box-shadow:0 10px 24px -14px var(--why-col,var(--a));transform:translateY(-3px)}
+.why-icon{--why-col:var(--p);width:50px;height:50px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:14px;background:color-mix(in srgb, var(--why-col) 14%, #fff);background:var(--lt,#f2f4fa);background:color-mix(in srgb, var(--why-col) 14%, #fff);color:var(--why-col)}
+.why-card h4{font-size:15px;font-weight:800;color:var(--p);margin-bottom:6px}
+.why-card p{font-size:12.5px;color:var(--tx2);line-height:1.7;margin:0}
+@media(max-width:900px){.why-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){.why-grid{grid-template-columns:1fr}}
+/* ── Tools Modal (เครื่องมือคำนวณ) ── */
+.tools-tabs{display:flex;gap:6px;margin-bottom:18px;border-bottom:1.5px solid var(--lt);overflow-x:auto;-ms-overflow-style:none;scrollbar-width:none}
+.tools-tabs::-webkit-scrollbar{display:none}
+.tools-tab{flex:1;min-width:108px;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px 8px;font-size:13px;font-weight:700;color:var(--tx2);background:transparent;border:none;border-bottom:2.5px solid transparent;cursor:pointer;white-space:nowrap;transition:.18s}
+.tools-tab:hover{color:var(--p)}
+.tools-tab.active{color:var(--p);border-bottom-color:var(--a)}
+.tools-pane{display:none}
+.tools-pane.active{display:block;animation:toolsFadeIn .2s ease}
+@keyframes toolsFadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.tools-field{margin-bottom:14px}
+.tools-field label{display:block;font-size:12px;font-weight:700;color:var(--tx2);margin-bottom:6px}
+.tools-field input[type="text"],.tools-field input[type="number"]{width:100%;padding:11px 14px;border:1.5px solid var(--bd);border-radius:10px;font-size:15px;font-weight:600;color:var(--p);font-family:inherit;box-sizing:border-box}
+.tools-field input[type="text"]:focus,.tools-field input[type="number"]:focus{outline:none;border-color:var(--a)}
+.tools-field input[type="range"]{width:100%;accent-color:var(--a)}
+.tools-field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tools-result{background:linear-gradient(135deg,var(--p),#2A5298);color:#fff;border-radius:14px;padding:18px;margin-top:8px}
+.tools-result-main{display:flex;flex-direction:column;gap:4px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.18)}
+.tools-result-main span{font-size:12px;opacity:.85}
+.tools-result-main strong{font-size:24px;font-weight:800;color:#FFE082}
+.tools-result-rows{display:flex;flex-direction:column;gap:6px;font-size:12.5px}
+.tools-result-rows div{display:flex;justify-content:space-between;gap:10px}
+.tools-result-rows span{opacity:.85}
+.tools-result-rows b{font-weight:700}
+.tools-disclaimer{font-size:11px;color:var(--tx2);line-height:1.6;margin:12px 0 0;opacity:.8}
+/* ── Home: เครื่องมือคำนวณ section cards ── */
+.tools-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.tools-card{background:#fff;border:1.5px solid var(--bd);border-radius:16px;padding:20px;cursor:pointer;transition:.2s;text-align:left}
+.tools-card:hover{border-color:var(--a);box-shadow:0 10px 22px -14px rgba(200,146,42,.5);transform:translateY(-3px)}
+.tools-card-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:10px;background:var(--lt);color:var(--p)}
+.tools-card h4{font-size:14px;font-weight:800;color:var(--p);margin-bottom:4px}
+.tools-card p{font-size:12px;color:var(--tx2);margin:0;line-height:1.6}
+@media(max-width:760px){.tools-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.tools-grid{grid-template-columns:1fr}.tools-field-row{grid-template-columns:1fr 1fr}}
+/* ── Developers logo strip ── */
+.dev-strip-wrap{overflow:hidden;position:relative;-webkit-mask-image:linear-gradient(90deg,transparent,#fff 6%,#fff 94%,transparent);mask-image:linear-gradient(90deg,transparent,#fff 6%,#fff 94%,transparent)}
+.dev-strip-track{display:flex;gap:14px;width:max-content;animation:devScroll 38s linear infinite}
+.dev-strip-wrap:hover .dev-strip-track{animation-play-state:paused}
+.dev-chip{flex-shrink:0;display:flex;align-items:center;gap:10px;background:#fff;border:1.5px solid var(--bd);border-radius:12px;padding:12px 20px;font-size:13px;font-weight:700;color:var(--p);white-space:nowrap}
+.dev-chip i{color:var(--a);font-size:15px}
+@keyframes devScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+/* ── About / Stats section ── */
+.about-sec{padding:36px 0;background:linear-gradient(135deg,#0A1628 0%,#1B3A6B 60%,#0F2548 100%);color:#fff}
+.about-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;text-align:center}
+.about-stat-num{font-size:clamp(26px,4vw,38px);font-weight:800;color:#FFE082;font-family:'Playfair Display','Sarabun',serif;line-height:1.1;margin-bottom:6px}
+.about-stat-label{font-size:12.5px;opacity:.82;font-weight:600}
+.about-blurb{max-width:760px;margin:0 auto 28px;text-align:center;font-size:13.5px;line-height:1.9;opacity:.88}
+@media(max-width:760px){.about-grid{grid-template-columns:repeat(2,1fr);gap:22px 14px}}
+.cat-card{--cat-col:var(--p);flex-shrink:0;background:#fff;border-radius:16px;border:1.5px solid var(--bd);padding:18px 22px;text-align:center;cursor:pointer;min-width:108px;transition:.22s}
+.cat-card.active,.cat-card:hover{border-color:var(--cat-col);background:#fcfcff;background:linear-gradient(160deg,#fff 60%,color-mix(in srgb, var(--cat-col) 10%, #fff));box-shadow:0 6px 18px -8px var(--cat-col);transform:translateY(-3px)}
+.cat-icon{font-size:26px;margin-bottom:9px;width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin-left:auto;margin-right:auto;background:var(--lt,#f2f4fa);background:color-mix(in srgb, var(--cat-col) 14%, #fff);color:var(--cat-col);transition:.22s}
+.cat-card.active .cat-icon,.cat-card:hover .cat-icon{background:var(--cat-col);color:#fff}
 .cat-name{font-size:13px;font-weight:700;color:var(--p)}
 .price-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
 .price-card{border-radius:var(--r);padding:18px 20px;cursor:pointer;color:#fff;position:relative;overflow:hidden;transition:.2s}
@@ -2354,7 +2418,7 @@ footer::after{
 .ma-review-text{font-size:12px;color:var(--tx2);line-height:1.6}
 .ma-review-author{font-size:11px;color:var(--gr);margin-top:6px}
 /* Right: listings feed */
-.ma-listing-card{background:#fff;border:1.5px solid var(--bd);border-radius:12px;overflow:hidden;margin-bottom:10px;transition:.2s;display:grid;grid-template-columns:110px 1fr;position:relative}
+.ma-listing-card{background:#fff;border:1.5px solid var(--bd);border-radius:12px;overflow:hidden;margin-bottom:10px;transition:.2s;display:grid;grid-template-columns:110px 1fr}
 .ma-listing-card:hover{box-shadow:0 4px 16px rgba(27,58,107,.1);border-color:var(--p)}
 .ma-listing-card-img{width:110px;height:100%;min-height:110px;object-fit:cover;display:block;background:var(--lt)}
 .ma-listing-card-img-placeholder{width:110px;min-height:110px;background:var(--lt);display:flex;align-items:center;justify-content:center;font-size:32px}
@@ -6319,6 +6383,10 @@ footer::after{
   </div><!-- end hero-content -->
  </section>
  <div class="wrap" style="padding-bottom:0;position:relative;z-index:1"><div class="sec-hd"><div class="sec-title" data-i18n="sec.proptype">ประเภทอสังหาริมทรัพย์</div><div class="gallery-nav"><button class="gallery-nav-btn" onclick="scrollCatScroll(-1)"><i class="fas fa-chevron-left"></i></button><button class="gallery-nav-btn" onclick="scrollCatScroll(1)"><i class="fas fa-chevron-right"></i></button></div></div><div class="cat-scroll" id="cat-scroll"></div></div>
+ <div class="wrap" id="popular-area-sec" style="padding-bottom:0;position:relative;z-index:1;display:none">
+  <div class="sec-hd"><div class="sec-title"><i class="fas fa-fire" style="color:#ff4d6d"></i> <span data-i18n="sec.popularareas">ทำเลยอดนิยม</span></div><div class="gallery-nav"><button class="gallery-nav-btn" onclick="scrollAreaScroll(-1)"><i class="fas fa-chevron-left"></i></button><button class="gallery-nav-btn" onclick="scrollAreaScroll(1)"><i class="fas fa-chevron-right"></i></button></div></div>
+  <div class="area-scroll" id="popular-area-scroll"></div>
+ </div>
  <div class="wrap" style="padding-top:20px">
   <div class="sec-hd"><div class="sec-title" data-i18n="sec.pricerange">ช่วงราคา</div></div>
   <div id="price-buy-section">
@@ -6336,6 +6404,28 @@ footer::after{
     <div class="price-card" style="background:linear-gradient(135deg,#1B5E38,#3D7A55)" onclick="filterPriceDD(50000,100000,'RENT')"><div class="pc-tag">พรีเมียม</div><h3>50,000 – 100,000 บาท</h3><p>ระดับพรีเมียม</p></div>
     <div class="price-card" style="background:linear-gradient(135deg,#7B4A00,#C8922A)" onclick="filterPriceDD(100000,999e6,'RENT')"><div class="pc-tag">Luxury</div><h3>มากกว่า 100,000 บาท</h3><p>ระดับ Super Luxury</p></div>
    </div>
+  </div>
+ </div>
+
+ <!-- ═══ TOOLS SECTION (เครื่องมือคำนวณ) ═══ -->
+ <div class="wrap" style="padding-top:24px">
+  <div class="sec-hd"><div class="sec-title"><i class="fas fa-calculator" style="color:var(--a)"></i> <span data-i18n="tools.sec.title">เครื่องมือช่วยตัดสินใจ</span></div></div>
+  <div class="tools-grid">
+    <div class="tools-card" onclick="openToolsModal('mortgage')">
+      <div class="tools-card-icon"><i class="fas fa-home"></i></div>
+      <h4 data-i18n="tools.card.mortgage.h">คำนวณผ่อนบ้าน</h4>
+      <p data-i18n="tools.card.mortgage.p">ประมาณยอดผ่อนรายเดือนจากราคาทรัพย์ ดอกเบี้ย และระยะเวลากู้</p>
+    </div>
+    <div class="tools-card" onclick="openToolsModal('yield')">
+      <div class="tools-card-icon"><i class="fas fa-chart-line"></i></div>
+      <h4 data-i18n="tools.card.yield.h">Rental Yield</h4>
+      <p data-i18n="tools.card.yield.p">ประเมินผลตอบแทนจากการปล่อยเช่า เทียบกับราคาซื้อ</p>
+    </div>
+    <div class="tools-card" onclick="openToolsModal('transfer')">
+      <div class="tools-card-icon"><i class="fas fa-file-contract"></i></div>
+      <h4 data-i18n="tools.card.transfer.h">ค่าโอนและภาษี</h4>
+      <p data-i18n="tools.card.transfer.p">คำนวณค่าธรรมเนียมโอน อากรแสตมป์ และภาษีธุรกิจเฉพาะโดยประมาณ</p>
+    </div>
   </div>
  </div>
 
@@ -6489,6 +6579,72 @@ footer::after{
   </div>
 </section>
 </div><!-- end wrap#all-sec -->
+<!-- ═══ WHY CHOOSE US (ทำไมเลือก Matchdoor) ═══ -->
+<section class="why-sec" id="why-sec">
+  <div style="max-width:1320px;margin:0 auto;padding:0 20px">
+    <div class="sec-hd"><div class="sec-title"><i class="fas fa-shield-alt" style="color:var(--a)"></i> <span data-i18n="why.title">ทำไมเลือก Matchdoor</span></div></div>
+    <div class="why-grid">
+      <div class="why-card">
+        <div class="why-icon" style="--why-col:#1B3A6B"><i class="fas fa-user-check"></i></div>
+        <h4 data-i18n="why.verified.h">ตัวแทนที่ผ่านการตรวจสอบ</h4>
+        <p data-i18n="why.verified.p">ตรวจสอบตัวตนและใบอนุญาตตัวแทนก่อนขึ้นแสดงผลทุกราย เพื่อความน่าเชื่อถือ</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon" style="--why-col:#C8922A"><i class="fas fa-lock"></i></div>
+        <h4 data-i18n="why.pdpa.h">ปลอดภัยตาม PDPA</h4>
+        <p data-i18n="why.pdpa.p">ข้อมูลส่วนตัวของคุณถูกเก็บรักษาอย่างปลอดภัยตามกฎหมายคุ้มครองข้อมูลส่วนบุคคล</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon" style="--why-col:#1B5E38"><i class="fas fa-bolt"></i></div>
+        <h4 data-i18n="why.fast.h">ค้นหาและติดต่อได้ทันที</h4>
+        <p data-i18n="why.fast.p">กรองทรัพย์ตามทำเล ราคา และรถไฟฟ้าได้รวดเร็ว พร้อมแชทกับตัวแทนผ่าน LINE โดยตรง</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon" style="--why-col:#7c3aed"><i class="fas fa-comments-dollar"></i></div>
+        <h4 data-i18n="why.free.h">ปรึกษาฟรี ไม่มีค่าใช้จ่าย</h4>
+        <p data-i18n="why.free.p">ทีมงานพร้อมช่วยวิเคราะห์ราคา แนะนำทำเล และดูแลขั้นตอนซื้อ-ขาย-เช่าให้ฟรี</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ ABOUT / STATS SECTION ═══ -->
+<section class="about-sec" id="about-sec">
+  <div style="max-width:1320px;margin:0 auto;padding:0 20px">
+    <div class="sec-hd" style="border:none"><div class="sec-title" style="color:#fff"><i class="fas fa-circle-info" style="color:var(--a)"></i> <span data-i18n="about.title">Matchdoor คืออะไร?</span></div></div>
+    <p class="about-blurb" data-i18n="about.blurb">Matchdoor คือแพลตฟอร์มประกาศซื้อ-ขาย-เช่าอสังหาริมทรัพย์ของคนไทย รวบรวมประกาศคอนโด บ้าน ทาวน์โฮม และที่ดินจากตัวแทนที่ผ่านการตรวจสอบ พร้อมเครื่องมือช่วยตัดสินใจครบครัน ให้คุณค้นหาทรัพย์ที่ใช่ได้ง่ายและมั่นใจยิ่งขึ้น</p>
+    <div class="about-grid">
+      <div>
+        <div class="about-stat-num" id="about-stat-listings">0</div>
+        <div class="about-stat-label" data-i18n="about.stat.listings">ประกาศทั้งหมด</div>
+      </div>
+      <div>
+        <div class="about-stat-num" id="about-stat-provinces">0</div>
+        <div class="about-stat-label" data-i18n="about.stat.provinces">จังหวัดที่ครอบคลุม</div>
+      </div>
+      <div>
+        <div class="about-stat-num" id="about-stat-agents">0</div>
+        <div class="about-stat-label" data-i18n="about.stat.agents">ตัวแทนที่ยืนยันแล้ว</div>
+      </div>
+      <div>
+        <div class="about-stat-num" id="about-stat-rating">—</div>
+        <div class="about-stat-label" data-i18n="about.stat.rating">คะแนนความพึงพอใจ</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ DEVELOPERS / PARTNERS STRIP ═══ -->
+<section class="blog-sec" id="dev-strip-sec" style="padding:28px 0">
+  <div style="max-width:1320px;margin:0 auto;padding:0 20px">
+    <div class="sec-hd"><div class="sec-title"><i class="fas fa-handshake" style="color:var(--a)"></i> <span data-i18n="dev.title">พาร์ทเนอร์ที่ร่วมเดินทางกับเรา</span></div></div>
+    <div class="dev-strip-wrap">
+      <div class="dev-strip-track" id="dev-strip-track"></div>
+    </div>
+    <p style="text-align:center;font-size:12px;color:var(--tx2);margin-top:14px;opacity:.75" data-i18n="dev.note">✦ รายชื่อพาร์ทเนอร์อย่างเป็นทางการจะประกาศเร็วๆ นี้ ✦</p>
+  </div>
+</section>
+
  <section class="srv-sec" id="contact-sec">
   <div class="srv-inner">
    <div>
@@ -9698,6 +9854,73 @@ function _popupRefreshMarkersFromData(data){
 <div class="ov" id="blog-modal" onclick="if(event.target===this)_closeModal('blog-modal')"><div class="modal"><div class="mhd"><h2 id="blog-title"></h2><span class="mclose" onclick="_closeModal('blog-modal')">×</span></div><div class="mbody" id="blog-body"></div></div></div>
 <div class="ov" id="port-modal" onclick="if(event.target===this)_closeModal('port-modal')"><div class="modal"><div class="mhd"><h2 id="port-title"></h2><span class="mclose" onclick="_closeModal('port-modal')">×</span></div><div class="mbody" id="port-body"></div></div></div>
 
+<!-- ═══ TOOLS MODAL (เครื่องมือคำนวณ) ═══ -->
+<div class="ov" id="tools-modal" onclick="if(event.target===this)_closeModal('tools-modal')">
+  <div class="modal" style="max-width:480px">
+    <div class="mhd"><h2 id="tools-modal-title"><i class="fas fa-calculator" style="color:var(--a)"></i> <span data-i18n="tools.title">เครื่องมือคำนวณ</span></h2><span class="mclose" onclick="_closeModal('tools-modal')">×</span></div>
+    <div class="mbody">
+      <div class="tools-tabs" id="tools-tabs">
+        <button class="tools-tab active" data-tool="mortgage" onclick="toolsSwitchTab('mortgage',this)"><i class="fas fa-home"></i> <span data-i18n="tools.tab.mortgage">ผ่อนบ้าน</span></button>
+        <button class="tools-tab" data-tool="yield" onclick="toolsSwitchTab('yield',this)"><i class="fas fa-chart-line"></i> <span data-i18n="tools.tab.yield">Rental Yield</span></button>
+        <button class="tools-tab" data-tool="transfer" onclick="toolsSwitchTab('transfer',this)"><i class="fas fa-file-contract"></i> <span data-i18n="tools.tab.transfer">ค่าโอน</span></button>
+      </div>
+
+      <!-- Mortgage Calculator -->
+      <div class="tools-pane active" id="tools-pane-mortgage">
+        <div class="tools-field"><label data-i18n="tools.mortgage.price">ราคาทรัพย์ (บาท)</label><input type="text" inputmode="numeric" id="tm-price" placeholder="3,000,000" oninput="toolsFormatNum(this);toolsCalcMortgage()"></div>
+        <div class="tools-field-row">
+          <div class="tools-field"><label data-i18n="tools.mortgage.down">เงินดาวน์ (%)</label><input type="number" id="tm-down" value="10" min="0" max="100" oninput="toolsCalcMortgage()"></div>
+          <div class="tools-field"><label data-i18n="tools.mortgage.rate">ดอกเบี้ย (%/ปี)</label><input type="number" id="tm-rate" value="3.5" step="0.05" min="0" oninput="toolsCalcMortgage()"></div>
+        </div>
+        <div class="tools-field"><label data-i18n="tools.mortgage.years">ระยะเวลาผ่อน (ปี)</label>
+          <input type="range" id="tm-years" min="5" max="40" value="30" step="1" oninput="document.getElementById('tm-years-val').textContent=this.value;toolsCalcMortgage()">
+          <div style="text-align:right;font-size:12px;color:var(--tx2);margin-top:2px"><span id="tm-years-val">30</span> <span data-i18n="tools.years">ปี</span></div>
+        </div>
+        <div class="tools-result">
+          <div class="tools-result-main"><span data-i18n="tools.mortgage.monthly">ผ่อนต่อเดือนประมาณ</span><strong id="tm-monthly">—</strong></div>
+          <div class="tools-result-rows">
+            <div><span data-i18n="tools.mortgage.loanAmt">วงเงินกู้</span><b id="tm-loan">—</b></div>
+            <div><span data-i18n="tools.mortgage.downAmt">เงินดาวน์</span><b id="tm-downamt">—</b></div>
+            <div><span data-i18n="tools.mortgage.total">ยอดรวมที่จ่ายทั้งหมด</span><b id="tm-total">—</b></div>
+          </div>
+        </div>
+        <p class="tools-disclaimer" data-i18n="tools.disclaimer">ผลลัพธ์เป็นการประมาณเบื้องต้นเท่านั้น อัตราดอกเบี้ยจริงขึ้นอยู่กับธนาคารและเงื่อนไขผู้กู้</p>
+      </div>
+
+      <!-- Rental Yield -->
+      <div class="tools-pane" id="tools-pane-yield">
+        <div class="tools-field"><label data-i18n="tools.yield.price">ราคาซื้อทรัพย์ (บาท)</label><input type="text" inputmode="numeric" id="ty-price" placeholder="3,000,000" oninput="toolsFormatNum(this);toolsCalcYield()"></div>
+        <div class="tools-field"><label data-i18n="tools.yield.rent">ค่าเช่าต่อเดือน (บาท)</label><input type="text" inputmode="numeric" id="ty-rent" placeholder="15,000" oninput="toolsFormatNum(this);toolsCalcYield()"></div>
+        <div class="tools-field"><label data-i18n="tools.yield.expense">ค่าใช้จ่ายต่อปี (ค่าส่วนกลาง, ภาษี ฯลฯ)</label><input type="text" inputmode="numeric" id="ty-expense" placeholder="0" oninput="toolsFormatNum(this);toolsCalcYield()"></div>
+        <div class="tools-result">
+          <div class="tools-result-main"><span data-i18n="tools.yield.gross">Gross Rental Yield</span><strong id="ty-gross">—</strong></div>
+          <div class="tools-result-rows">
+            <div><span data-i18n="tools.yield.net">Net Rental Yield</span><b id="ty-net">—</b></div>
+            <div><span data-i18n="tools.yield.annual">รายได้ค่าเช่าต่อปี</span><b id="ty-annual">—</b></div>
+          </div>
+        </div>
+        <p class="tools-disclaimer" data-i18n="tools.yield.disclaimer">Yield ยิ่งสูง ยิ่งคืนทุนเร็ว — ใช้เปรียบเทียบทรัพย์หลายรายการเพื่อประเมินความคุ้มค่าในการลงทุน</p>
+      </div>
+
+      <!-- Transfer Fee -->
+      <div class="tools-pane" id="tools-pane-transfer">
+        <div class="tools-field"><label data-i18n="tools.transfer.price">ราคาประเมิน/ซื้อขาย (บาท)</label><input type="text" inputmode="numeric" id="tt-price" placeholder="3,000,000" oninput="toolsFormatNum(this);toolsCalcTransfer()"></div>
+        <div class="tools-field"><label data-i18n="tools.transfer.years">ถือครองมาแล้ว (ปี)</label><input type="number" id="tt-years" value="5" min="0" max="30" oninput="toolsCalcTransfer()"></div>
+        <div class="tools-result">
+          <div class="tools-result-rows" id="tt-rows" style="margin-top:0">
+            <div><span data-i18n="tools.transfer.fee">ค่าธรรมเนียมการโอน (2%)</span><b id="tt-fee">—</b></div>
+            <div><span data-i18n="tools.transfer.stamp">อากรแสตมป์ (0.5%)</span><b id="tt-stamp">—</b></div>
+            <div><span data-i18n="tools.transfer.specific">ภาษีธุรกิจเฉพาะ (3.3%)*</span><b id="tt-specific">—</b></div>
+          </div>
+          <div class="tools-result-main" style="margin-top:10px"><span data-i18n="tools.transfer.total">รวมประมาณ</span><strong id="tt-total">—</strong></div>
+        </div>
+        <p class="tools-disclaimer" data-i18n="tools.transfer.disclaimer">*ภาษีธุรกิจเฉพาะเรียกเก็บเฉพาะกรณีถือครองไม่เกิน 5 ปี (ไม่นับรวมหากเข้าเงื่อนไขยกเว้น) ค่าธรรมเนียมจริงอาจต่างกันตามดุลยพินิจของกรมที่ดิน โดยทั่วไปผู้ซื้อและผู้ขายจะตกลงแบ่งชำระกันเอง</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <!-- Reviews All Modal -->
 <div class="ov" id="reviews-all-modal" onclick="if(event.target===this)_closeModal('reviews-all-modal')">
   <div class="modal" style="max-width:780px;width:95vw;max-height:92vh;display:flex;flex-direction:column;padding:0;overflow:hidden">
@@ -11641,17 +11864,14 @@ async function renderMaListingsPanel() {
         const priceStr = ul.price >= 1e6 ? (ul.price/1e6).toFixed(1)+'M' : (ul.price||0).toLocaleString();
         const txLabel = ul.transaction === 'RENT' ? 'ให้เช่า' : 'ขาย';
         const exp = ul.expires_at ? new Date(ul.expires_at).toLocaleDateString('th-TH') : '';
-        return `<div style="border:1.5px solid ${ul.is_boosted?'#7c3aed':'var(--bd)'};border-radius:14px;overflow:hidden;display:grid;grid-template-columns:110px 1fr;gap:0;margin-bottom:12px;position:relative;${ul.is_boosted?'box-shadow:0 0 0 2px #7c3aed33':''}">
-          ${ul.is_boosted ? `<div style="position:absolute;top:8px;left:8px;z-index:3;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;border-radius:20px;padding:3px 9px;font-size:10px;font-weight:800;display:flex;align-items:center;gap:4px;pointer-events:none"><i class="fas fa-rocket"></i> ${boostDaysLabel(ul.boosted_at)}</div>` : ''}
+        return `<div style="border:1.5px solid ${ul.is_boosted?'#f39c12':'var(--bd)'};border-radius:14px;overflow:hidden;display:grid;grid-template-columns:110px 1fr;gap:0;margin-bottom:12px;position:relative;${ul.is_boosted?'box-shadow:0 0 0 2px #f39c1233':''}">
+          ${ul.is_boosted ? `<div style="position:absolute;top:8px;left:8px;z-index:2;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;border-radius:20px;padding:3px 9px;font-size:10px;font-weight:800;display:flex;align-items:center;gap:4px"><i class="fas fa-rocket"></i> ${boostDaysLabel(ul.boosted_at)}</div>` : ''}
           <div style="background:var(--lt);display:flex;align-items:center;justify-content:center;min-height:100px">
             ${photo ? `<img src="${photo}" style="width:110px;height:100%;min-height:100px;object-fit:cover;display:block">` : '<i class="fas fa-home" style="font-size:28px;color:var(--tx2)"></i>'}
           </div>
           <div style="padding:14px">
             <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px">
-              <div style="font-weight:700;color:var(--p);font-size:14px;line-height:1.3">
-                ${sanitize(ul.title)}
-                ${ul.is_boosted?`<span style="display:inline-flex;align-items:center;gap:3px;background:#7c3aed22;color:#7c3aed;border:1px solid #7c3aed44;border-radius:12px;padding:1px 7px;font-size:9px;font-weight:800;margin-left:4px;vertical-align:middle"><i class="fas fa-rocket" style="font-size:8px"></i>Boosted</span>`:''}
-              </div>
+              <div style="font-weight:700;color:var(--p);font-size:14px;line-height:1.3">${sanitize(ul.title)}</div>
               ${statusBadge(ul.status)}
             </div>
             <div style="font-size:12px;color:var(--tx2);margin-bottom:4px">
@@ -11670,7 +11890,7 @@ async function renderMaListingsPanel() {
             <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px">
               ${ul.status === 'อนุมัติ' && ul.property_id ? `<button onclick="showPage('property','${ul.property_id}')" style="font-size:11px;padding:5px 11px;background:var(--p);color:#fff;border:none;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px"><i class="fas fa-eye"></i> ดูประกาศ</button>` : ''}
               ${ul.status === 'อนุมัติ' && !ul.is_boosted ? `<button onclick="boostMyListing('${ul.id}')" style="font-size:11px;padding:5px 11px;background:linear-gradient(135deg,#f39c12,#e67e22);color:#fff;border:none;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px" title="ใช้ 1 Token เพื่อ Boost ประกาศ 7 วัน"><i class="fas fa-rocket"></i> Boost</button>` : ''}
-              ${ul.status === 'อนุมัติ' && ul.is_boosted ? `<span style="font-size:11px;padding:5px 11px;background:#7c3aed22;color:#7c3aed;border:1px solid #7c3aed44;border-radius:8px;display:inline-flex;align-items:center;gap:4px"><i class="fas fa-rocket"></i> กำลัง Boost</span>` : ''}
+              ${ul.status === 'อนุมัติ' && ul.is_boosted ? `<span style="font-size:11px;padding:5px 11px;background:#f39c1222;color:#f39c12;border:1px solid #f39c1244;border-radius:8px;display:inline-flex;align-items:center;gap:4px"><i class="fas fa-rocket"></i> กำลัง Boost</span>` : ''}
               <button onclick="shareMyListing('${ul.id}','${ul.property_id||''}')" style="font-size:11px;padding:5px 11px;background:#10b98122;color:#10b981;border:1px solid #10b98144;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px"><i class="fas fa-share-alt"></i> แชร์</button>
               <button onclick="openReportListingModal('${ul.id}','${ul.property_id||''}')" style="font-size:11px;padding:5px 11px;background:#f1c40f22;color:#b7950b;border:1px solid #f1c40f44;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px"><i class="fas fa-flag"></i> รายงาน</button>
               <button onclick="editUserListing('${ul.id}')" style="font-size:11px;padding:5px 11px;background:#3498db22;color:#2980b9;border:1px solid #3498db44;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px" title="แก้ไขข้อมูล ไม่หัก Token"><i class="fas fa-edit"></i> แก้ไข</button>
@@ -13793,15 +14013,12 @@ async function _maRenderProfileListings(){
     const priceStr=ul.price>=1e6?(ul.price/1e6).toFixed(1)+'M':(ul.price||0).toLocaleString();
     const txLabel=ul.transaction==='RENT'?'ให้เช่า':'ขาย';
     const exp=ul.expires_at?new Date(ul.expires_at).toLocaleDateString('th-TH'):'';
-    return `<div class="ma-listing-card" style="position:relative;${ul.is_boosted?'border-color:#f39c12;box-shadow:0 0 0 2px #f39c1222':''}">
-      ${ul.is_boosted ? `<div style="position:absolute;top:8px;left:8px;z-index:3;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;border-radius:20px;padding:3px 9px;font-size:10px;font-weight:800;display:flex;align-items:center;gap:4px;pointer-events:none"><i class="fas fa-rocket"></i> ${boostDaysLabel(ul.boosted_at)}</div>` : ''}
+    return `<div class="ma-listing-card" style="${ul.is_boosted?'border-color:#f39c12;box-shadow:0 0 0 2px #f39c1222':''}">
+      ${ul.is_boosted ? `<div style="background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font-size:10px;font-weight:800;padding:4px 10px;display:flex;align-items:center;gap:4px"><i class="fas fa-rocket"></i> ${boostDaysLabel(ul.boosted_at)}</div>` : ''}
       ${photo?`<img class="ma-listing-card-img" src="${photo}" alt="listing" loading="lazy">`:`<div class="ma-listing-card-img-placeholder">🏠</div>`}
       <div class="ma-listing-card-body">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px">
-          <div class="ma-listing-card-title" style="${ul.is_boosted?'padding-left:0;':''}">
-            ${sanitize(ul.title)}
-            ${ul.is_boosted?`<span style="display:inline-flex;align-items:center;gap:3px;background:#7c3aed22;color:#7c3aed;border:1px solid #7c3aed44;border-radius:12px;padding:1px 7px;font-size:9px;font-weight:800;margin-left:4px;vertical-align:middle"><i class="fas fa-rocket" style="font-size:8px"></i>Boosted</span>`:''}
-          </div>
+          <div class="ma-listing-card-title">${sanitize(ul.title)}</div>
           ${statusBadge(ul.status)}
         </div>
         <div class="ma-listing-card-price">฿${priceStr} ${txLabel==='ให้เช่า'?'<span style="font-size:12px;font-weight:500;color:var(--tx2)">/เดือน</span>':''}</div>
@@ -13813,11 +14030,11 @@ async function _maRenderProfileListings(){
         </div>
         ${ul.view_count||ul.share_count ? `<div style="font-size:11px;color:var(--tx2);margin-top:4px;display:flex;gap:8px"><span><i class="fas fa-eye" style="color:var(--p)"></i> ${ul.view_count||0}</span><span><i class="fas fa-share" style="color:#10b981"></i> ${ul.share_count||0}</span></div>` : ''}
         ${ul.admin_note?`<div style="font-size:11px;color:#e74c3c;margin-top:8px;padding:6px 10px;background:#e74c3c11;border-radius:6px"><i class="fas fa-comment"></i> ${sanitize(ul.admin_note)}</div>`:''}
-        <!-- Action Buttons -->
+        <!-- Action Buttons [v26] -->
         <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px">
           ${ul.status==='อนุมัติ'&&ul.property_id?`<button onclick="openModal('${ul.property_id}')" style="font-size:11px;padding:5px 11px;background:var(--p);color:#fff;border:none;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px"><i class="fas fa-eye"></i> ดูประกาศ</button>`:''}
           ${ul.status==='อนุมัติ'&&!ul.is_boosted?`<button onclick="boostMyListing('${ul.id}')" style="font-size:11px;padding:5px 11px;background:linear-gradient(135deg,#f39c12,#e67e22);color:#fff;border:none;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px" title="ใช้ 1 Token"><i class="fas fa-rocket"></i> Boost</button>`:''}
-          ${ul.status==='อนุมัติ'&&ul.is_boosted?`<span style="font-size:11px;padding:5px 11px;background:#7c3aed22;color:#7c3aed;border:1px solid #7c3aed44;border-radius:8px;display:inline-flex;align-items:center;gap:4px"><i class="fas fa-rocket"></i> กำลัง Boost</span>`:''}
+          ${ul.status==='อนุมัติ'&&ul.is_boosted?`<span style="font-size:11px;padding:5px 11px;background:#f39c1222;color:#f39c12;border:1px solid #f39c1244;border-radius:8px;display:inline-flex;align-items:center;gap:4px"><i class="fas fa-rocket"></i> กำลัง Boost</span>`:''}
           <button onclick="editUserListing('${ul.id}')" style="font-size:11px;padding:5px 11px;background:#3498db22;color:#2980b9;border:1px solid #3498db44;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px" title="แก้ไขข้อมูล ไม่หัก Token"><i class="fas fa-edit"></i> แก้ไข</button>
           <button onclick="shareMyListing('${ul.id}','${ul.property_id||''}')" style="font-size:11px;padding:5px 11px;background:#10b98122;color:#10b981;border:1px solid #10b98144;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px"><i class="fas fa-share-alt"></i> แชร์</button>
           <button onclick="openReportListingModal('${ul.id}','${ul.property_id||''}')" style="font-size:11px;padding:5px 11px;background:#f1c40f22;color:#b7950b;border:1px solid #f1c40f44;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px"><i class="fas fa-flag"></i> รายงาน</button>
@@ -15171,6 +15388,18 @@ function syncAllStats(forceAnimate){
   if(agAgentEl) animateCounter(agAgentEl, agentCount,  900);
 
   // stats synced
+
+  // ── v35: About/Stats section (ประกาศทั้งหมด / จังหวัด / ตัวแทน / คะแนน) ──
+  var aboutListEl = document.getElementById('about-stat-listings');
+  var aboutProvEl = document.getElementById('about-stat-provinces');
+  var aboutAgEl   = document.getElementById('about-stat-agents');
+  if(aboutListEl) animateCounter(aboutListEl, propCount, 1000);
+  if(aboutProvEl){
+    var _provSet = new Set();
+    props.forEach(function(p){ if(p.province) _provSet.add(String(p.province).trim()); });
+    animateCounter(aboutProvEl, _provSet.size, 1000);
+  }
+  if(aboutAgEl) animateCounter(aboutAgEl, agentCount, 1000);
 }
 function afterLoad(){
   // ── Safety: ถ้า props ว่างให้ใช้ MOCK ทันที ──────────────────────
@@ -15184,6 +15413,11 @@ function afterLoad(){
   window._dataReady = true;
   filtered = [...props];
   allFiltered = [...props];
+
+  // v35: props พร้อมแล้ว — re-render ทำเลยอดนิยม ให้นับจำนวนประกาศถูกต้อง
+  if (window._popularLocationsDB && typeof renderPopularAreaCards === 'function') {
+    renderPopularAreaCards(window._popularLocationsDB);
+  }
 
   // ── sync hero stat counters ─────────────────────────────────────
   syncAllStats();
@@ -16714,8 +16948,26 @@ const CAT_LABELS={
   'dd.all':'ทั้งหมด','dd.house':'บ้านเดี่ยว','dd.town':'ทาวน์โฮม','dd.condo':'คอนโด',
   'dd.comm':'อาคารพาณิชย์','dd.land':'ที่ดิน','dd.villa':'วิลล่า','dd.resort':'รีสอร์ท','dd.hotel':'โรงแรม'
 };
-const CAT_DEF=[{v:'',icon:'fa-home',key:'dd.all'},{v:'บ้านเดี่ยว',icon:'fa-house-user',key:'dd.house'},{v:'ทาวน์โฮม',icon:'fa-building',key:'dd.town'},{v:'คอนโด',icon:'fa-city',key:'dd.condo'},{v:'อาคารพาณิชย์',icon:'fa-store',key:'dd.comm'},{v:'ที่ดิน',icon:'fa-map',key:'dd.land'},{v:'วิลล่า',icon:'fa-umbrella-beach',key:'dd.villa'},{v:'รีสอร์ท',icon:'fa-hotel',key:'dd.resort'},{v:'โรงแรม',icon:'fa-bed',key:'dd.hotel'}];
-function renderCats(){ $('cat-scroll').innerHTML=CAT_DEF.map((c,i)=>`<div class="cat-card ${i===0?'active':''}" onclick="setCat('${c.v}',this)"><div class="cat-icon"><i class="fas ${c.icon}"></i></div><div class="cat-name">${(typeof ui==='function'?ui(c.key):null)||CAT_LABELS[c.key]||c.key}</div></div>`).join(''); }
+const CAT_DEF=[
+  {v:'',icon:'fa-th-large',key:'dd.all',col:'#1B3A6B'},
+  {v:'คอนโด',icon:'fa-city',key:'dd.condo',col:'#2A5298'},
+  {v:'บ้านเดี่ยว',icon:'fa-house-user',key:'dd.house',col:'#1B5E38'},
+  {v:'ทาวน์โฮม',icon:'fa-building',key:'dd.town',col:'#7c3aed'},
+  {v:'วิลล่า',icon:'fa-umbrella-beach',key:'dd.villa',col:'#0ea5a4'},
+  {v:'ที่ดิน',icon:'fa-map',key:'dd.land',col:'#6b8e23'},
+  {v:'อาคารพาณิชย์',icon:'fa-store',key:'dd.comm',col:'#c8922a'},
+  {v:'รีสอร์ท',icon:'fa-hotel',key:'dd.resort',col:'#ff6b9d'},
+  {v:'โรงแรม',icon:'fa-bed',key:'dd.hotel',col:'#7B4A00'}
+];
+function renderCats(){
+  $('cat-scroll').innerHTML=CAT_DEF.map((c,i)=>{
+    const label=(typeof ui==='function'?ui(c.key):null)||CAT_LABELS[c.key]||c.key;
+    return `<div class="cat-card ${i===0?'active':''}" style="--cat-col:${c.col}" onclick="setCat('${c.v}',this)">
+      <div class="cat-icon"><i class="fas ${c.icon}"></i></div>
+      <div class="cat-name">${label}</div>
+    </div>`;
+  }).join('');
+}
 
 // ── v26: เปิด mini-detail modal สำหรับ user listing ที่ไม่มี property_id ──
 function openULDetailModal(listingId){
@@ -24581,6 +24833,65 @@ const I18N_DICT = {
   'stat.closed':    {th:'ปิดการขายแล้ว',  en:'Deals Closed', cn:'成交案例',  ja:'成約件数'},
   /* ── SECTIONS ── */
   'sec.proptype':   {th:'ประเภทอสังหาริมทรัพย์', en:'Property Types', cn:'房产类型', ja:'物件タイプ'},
+  'sec.popularareas': {th:'ทำเลยอดนิยม', en:'Popular Areas', cn:'热门地区', ja:'人気エリア'},
+  'why.title': {th:'ทำไมเลือก Matchdoor', en:'Why Choose Matchdoor', cn:'为什么选择 Matchdoor', ja:'Matchdoorが選ばれる理由'},
+  'why.verified.h': {th:'ตัวแทนที่ผ่านการตรวจสอบ', en:'Verified Agents', cn:'经过审核的经纪人', ja:'認証済みエージェント'},
+  'why.verified.p': {th:'ตรวจสอบตัวตนและใบอนุญาตตัวแทนก่อนขึ้นแสดงผลทุกราย เพื่อความน่าเชื่อถือ', en:'Identity and license verified before listing — for your trust and safety.', cn:'所有经纪人均经过身份与执照审核，确保可信赖。', ja:'すべてのエージェントは掲載前に本人確認とライセンス確認を実施しています。'},
+  'why.pdpa.h': {th:'ปลอดภัยตาม PDPA', en:'PDPA Compliant', cn:'符合PDPA个人数据保护法', ja:'PDPA準拠'},
+  'why.pdpa.p': {th:'ข้อมูลส่วนตัวของคุณถูกเก็บรักษาอย่างปลอดภัยตามกฎหมายคุ้มครองข้อมูลส่วนบุคคล', en:"Your personal data is securely protected under Thailand's PDPA law.", cn:'您的个人信息根据泰国个人数据保护法（PDPA）安全保存。', ja:'お客様の個人情報はタイのPDPA法に基づき安全に保護されています。'},
+  'why.fast.h': {th:'ค้นหาและติดต่อได้ทันที', en:'Search & Connect Instantly', cn:'即时搜索与联系', ja:'すぐに検索・連絡できる'},
+  'why.fast.p': {th:'กรองทรัพย์ตามทำเล ราคา และรถไฟฟ้าได้รวดเร็ว พร้อมแชทกับตัวแทนผ่าน LINE โดยตรง', en:'Filter by location, price, and transit instantly — chat with agents directly on LINE.', cn:'按地区、价格和交通线路快速筛选，并可直接通过LINE与经纪人聊天。', ja:'エリア・価格・交通アクセスですぐに絞り込み、LINEでエージェントに直接連絡できます。'},
+  'why.free.h': {th:'ปรึกษาฟรี ไม่มีค่าใช้จ่าย', en:'Free Consultation', cn:'免费咨询', ja:'無料相談'},
+  'why.free.p': {th:'ทีมงานพร้อมช่วยวิเคราะห์ราคา แนะนำทำเล และดูแลขั้นตอนซื้อ-ขาย-เช่าให้ฟรี', en:'Our team helps with pricing analysis, area recommendations, and guides you through buying, selling, or renting — at no cost.', cn:'我们的团队免费提供价格分析、区域推荐，并协助您完成买卖租赁流程。', ja:'価格分析やエリアのご提案、購入・売却・賃貸の手続きサポートを無料で行います。'},
+
+  /* ── v35: Tools section + modal ── */
+  'tools.sec.title': {th:'เครื่องมือช่วยตัดสินใจ', en:'Decision Tools', cn:'决策工具', ja:'意思決定ツール'},
+  'tools.title': {th:'เครื่องมือคำนวณ', en:'Calculators', cn:'计算工具', ja:'計算ツール'},
+  'tools.card.mortgage.h': {th:'คำนวณผ่อนบ้าน', en:'Mortgage Calculator', cn:'房贷计算器', ja:'ローン計算'},
+  'tools.card.mortgage.p': {th:'ประมาณยอดผ่อนรายเดือนจากราคาทรัพย์ ดอกเบี้ย และระยะเวลากู้', en:'Estimate your monthly payment from price, interest rate, and loan term.', cn:'根据房价、利率和贷款期限估算每月还款额。', ja:'価格・金利・期間から月々の返済額を見積もります。'},
+  'tools.card.yield.h': {th:'Rental Yield', en:'Rental Yield', cn:'租金回报率', ja:'賃貸利回り'},
+  'tools.card.yield.p': {th:'ประเมินผลตอบแทนจากการปล่อยเช่า เทียบกับราคาซื้อ', en:'Estimate rental returns relative to the purchase price.', cn:'评估相对于购买价格的租金回报。', ja:'購入価格に対する賃貸収益を評価します。'},
+  'tools.card.transfer.h': {th:'ค่าโอนและภาษี', en:'Transfer Fee & Tax', cn:'过户费与税费', ja:'登記費用・税金'},
+  'tools.card.transfer.p': {th:'คำนวณค่าธรรมเนียมโอน อากรแสตมป์ และภาษีธุรกิจเฉพาะโดยประมาณ', en:'Estimate transfer fee, stamp duty, and specific business tax.', cn:'估算过户费、印花税及特别营业税。', ja:'登記費用・印紙税・特定事業税の見積りができます。'},
+  'tools.tab.mortgage': {th:'ผ่อนบ้าน', en:'Mortgage', cn:'房贷', ja:'ローン'},
+  'tools.tab.yield': {th:'Rental Yield', en:'Rental Yield', cn:'租金回报', ja:'利回り'},
+  'tools.tab.transfer': {th:'ค่าโอน', en:'Transfer Fee', cn:'过户费', ja:'登記費用'},
+  'tools.years': {th:'ปี', en:'years', cn:'年', ja:'年'},
+  'tools.mortgage.price': {th:'ราคาทรัพย์ (บาท)', en:'Property price (THB)', cn:'房产价格（泰铢）', ja:'物件価格（バーツ）'},
+  'tools.mortgage.down': {th:'เงินดาวน์ (%)', en:'Down payment (%)', cn:'首付比例（%）', ja:'頭金（%）'},
+  'tools.mortgage.rate': {th:'ดอกเบี้ย (%/ปี)', en:'Interest rate (%/yr)', cn:'年利率（%）', ja:'金利（年率%）'},
+  'tools.mortgage.years': {th:'ระยะเวลาผ่อน (ปี)', en:'Loan term (years)', cn:'贷款期限（年）', ja:'返済期間（年）'},
+  'tools.mortgage.monthly': {th:'ผ่อนต่อเดือนประมาณ', en:'Estimated monthly payment', cn:'预计每月还款', ja:'月々の返済予定額'},
+  'tools.mortgage.loanAmt': {th:'วงเงินกู้', en:'Loan amount', cn:'贷款金额', ja:'融資額'},
+  'tools.mortgage.downAmt': {th:'เงินดาวน์', en:'Down payment', cn:'首付金额', ja:'頭金'},
+  'tools.mortgage.total': {th:'ยอดรวมที่จ่ายทั้งหมด', en:'Total amount paid', cn:'总支付金额', ja:'総支払額'},
+  'tools.disclaimer': {th:'ผลลัพธ์เป็นการประมาณเบื้องต้นเท่านั้น อัตราดอกเบี้ยจริงขึ้นอยู่กับธนาคารและเงื่อนไขผู้กู้', en:'Results are estimates only. Actual rates depend on the bank and borrower conditions.', cn:'结果仅供参考。实际利率取决于银行及借款人条件。', ja:'結果はあくまで概算です。実際の金利は銀行と借入条件によって異なります。'},
+  'tools.yield.price': {th:'ราคาซื้อทรัพย์ (บาท)', en:'Purchase price (THB)', cn:'购买价格（泰铢）', ja:'購入価格（バーツ）'},
+  'tools.yield.rent': {th:'ค่าเช่าต่อเดือน (บาท)', en:'Monthly rent (THB)', cn:'每月租金（泰铢）', ja:'月額賃料（バーツ）'},
+  'tools.yield.expense': {th:'ค่าใช้จ่ายต่อปี (ค่าส่วนกลาง, ภาษี ฯลฯ)', en:'Annual expenses (fees, tax, etc.)', cn:'年支出（管理费、税费等）', ja:'年間費用（管理費・税金等）'},
+  'tools.yield.gross': {th:'Gross Rental Yield', en:'Gross Rental Yield', cn:'毛租金回报率', ja:'グロス利回り'},
+  'tools.yield.net': {th:'Net Rental Yield', en:'Net Rental Yield', cn:'净租金回报率', ja:'ネット利回り'},
+  'tools.yield.annual': {th:'รายได้ค่าเช่าต่อปี', en:'Annual rental income', cn:'年租金收入', ja:'年間賃料収入'},
+  'tools.yield.disclaimer': {th:'Yield ยิ่งสูง ยิ่งคืนทุนเร็ว — ใช้เปรียบเทียบทรัพย์หลายรายการเพื่อประเมินความคุ้มค่าในการลงทุน', en:'A higher yield means faster payback — compare multiple properties to assess investment value.', cn:'回报率越高，回本越快——可对比多个房产以评估投资价值。', ja:'利回りが高いほど投資回収が早くなります。複数物件を比較して投資価値を評価しましょう。'},
+  'tools.transfer.price': {th:'ราคาประเมิน/ซื้อขาย (บาท)', en:'Appraised/sale price (THB)', cn:'评估/成交价格（泰铢）', ja:'評価額・売買価格（バーツ）'},
+  'tools.transfer.years': {th:'ถือครองมาแล้ว (ปี)', en:'Years owned', cn:'持有年限', ja:'所有年数'},
+  'tools.transfer.fee': {th:'ค่าธรรมเนียมการโอน (2%)', en:'Transfer fee (2%)', cn:'过户费（2%）', ja:'登記費用（2%）'},
+  'tools.transfer.stamp': {th:'อากรแสตมป์ (0.5%)', en:'Stamp duty (0.5%)', cn:'印花税（0.5%）', ja:'印紙税（0.5%）'},
+  'tools.transfer.specific': {th:'ภาษีธุรกิจเฉพาะ (3.3%)*', en:'Specific business tax (3.3%)*', cn:'特别营业税（3.3%）*', ja:'特定事業税（3.3%）*'},
+  'tools.transfer.total': {th:'รวมประมาณ', en:'Estimated total', cn:'预计总额', ja:'合計（概算）'},
+  'tools.transfer.disclaimer': {th:'*ภาษีธุรกิจเฉพาะเรียกเก็บเฉพาะกรณีถือครองไม่เกิน 5 ปี (ไม่นับรวมหากเข้าเงื่อนไขยกเว้น) ค่าธรรมเนียมจริงอาจต่างกันตามดุลยพินิจของกรมที่ดิน โดยทั่วไปผู้ซื้อและผู้ขายจะตกลงแบ่งชำระกันเอง', en:'*Specific business tax applies only if owned for under 5 years (exemptions may apply). Actual fees vary by Land Department discretion; buyer and seller typically split costs by agreement.', cn:'*特别营业税仅适用于持有不满5年的情况（可能有豁免）。实际费用以土地厅核定为准，买卖双方通常协议分摊。', ja:'*特定事業税は所有期間5年未満の場合に適用されます（免除条件あり）。実際の費用は土地局の判断により異なり、通常は買主・売主で分担します。'},
+
+  /* ── v35: About/Stats section ── */
+  'about.title': {th:'Matchdoor คืออะไร?', en:'What is Matchdoor?', cn:'什么是 Matchdoor？', ja:'Matchdoorとは？'},
+  'about.blurb': {th:'Matchdoor คือแพลตฟอร์มประกาศซื้อ-ขาย-เช่าอสังหาริมทรัพย์ของคนไทย รวบรวมประกาศคอนโด บ้าน ทาวน์โฮม และที่ดินจากตัวแทนที่ผ่านการตรวจสอบ พร้อมเครื่องมือช่วยตัดสินใจครบครัน ให้คุณค้นหาทรัพย์ที่ใช่ได้ง่ายและมั่นใจยิ่งขึ้น', en:'Matchdoor is a Thai real estate platform for buying, selling, and renting condos, houses, townhomes, and land — listed by verified agents, with full decision-making tools to help you find the right property with confidence.', cn:'Matchdoor 是泰国房地产买卖租赁平台，汇集经过审核的经纪人发布的公寓、住宅、联排别墅及土地信息，并提供完善的决策工具，助您更轻松、更自信地找到合适的房产。', ja:'Matchdoorは、タイのコンドミニアム・住宅・タウンハウス・土地の売買・賃貸プラットフォームです。認証済みエージェントによる掲載と充実した意思決定ツールで、安心して理想の物件を見つけられます。'},
+  'about.stat.listings': {th:'ประกาศทั้งหมด', en:'Total Listings', cn:'全部房源', ja:'掲載件数'},
+  'about.stat.provinces': {th:'จังหวัดที่ครอบคลุม', en:'Provinces Covered', ja:'対応エリア', cn:'覆盖省份'},
+  'about.stat.agents': {th:'ตัวแทนที่ยืนยันแล้ว', en:'Verified Agents', cn:'已认证经纪人', ja:'認証済みエージェント'},
+  'about.stat.rating': {th:'คะแนนความพึงพอใจ', en:'Satisfaction Rating', cn:'满意度评分', ja:'満足度評価'},
+
+  /* ── v35: Developers / Partners strip ── */
+  'dev.title': {th:'พาร์ทเนอร์ที่ร่วมเดินทางกับเรา', en:'Partners Who Travel With Us', cn:'与我们同行的合作伙伴', ja:'パートナー企業'},
+  'dev.note': {th:'✦ รายชื่อพาร์ทเนอร์อย่างเป็นทางการจะประกาศเร็วๆ นี้ ✦', en:'✦ Official partner list coming soon ✦', cn:'✦ 官方合作伙伴名单将于近期公布 ✦', ja:'✦ 公式パートナー一覧は近日公開予定 ✦'},
   'sec.pricerange': {th:'ช่วงราคา',      en:'Price Range',   cn:'价格区间',  ja:'価格帯'},
   'sec.blog':       {th:'บทความน่ารู้',  en:'Blog & News',   cn:'博客与资讯', ja:'ブログ・ニュース'},
   'sec.port':       {th:'ผลงาน',          en:'Portfolio',     cn:'案例展示',   ja:'実績'},
@@ -26434,6 +26745,11 @@ function renderHomePortfolio(){
 }
 function scrollCatScroll(dir){
   const el = document.getElementById('cat-scroll');
+  if(el) el.scrollBy({ left: dir * 220, behavior: 'smooth' });
+}
+
+function scrollAreaScroll(dir){
+  const el = document.getElementById('popular-area-scroll');
   if(el) el.scrollBy({ left: dir * 220, behavior: 'smooth' });
 }
 
@@ -31152,6 +31468,14 @@ function _rvUpdateHomeStats(all){
     : '—';
   if(propEl) propEl.textContent = all.filter(function(r){ return r.type==='property'; }).length;
   if(agentEl) agentEl.textContent = all.filter(function(r){ return r.type==='agent'; }).length;
+
+  // v35: About/Stats section rating
+  var aboutRatingEl = document.getElementById('about-stat-rating');
+  if(aboutRatingEl){
+    aboutRatingEl.textContent = all.length
+      ? (all.reduce(function(s,r){ return s+r.rating; },0) / all.length).toFixed(1) + ' / 5'
+      : '—';
+  }
 }
 
 /* ── "ดูทั้งหมด" modal ── */
@@ -31514,10 +31838,199 @@ async function loadPopularLocationsFromDB() {
     }
 
     // v24: popular_locations loaded
+    // v35: render visual "ทำเลยอดนิยม" cards section on home page
+    renderPopularAreaCards(res.data);
   } catch (e) {
     console.warn('[v24] loadPopularLocationsFromDB error:', e.message);
   }
 }
+
+/* v35: render Popular Areas (ทำเลยอดนิยม) cards on home page,
+   with listing counts computed from currently loaded props[] */
+var POPULAR_AREA_ICONS = ['fa-building','fa-store','fa-tree','fa-water','fa-city',
+  'fa-landmark','fa-subway','fa-bridge','fa-hotel','fa-university'];
+function renderPopularAreaCards(locations) {
+  var sec = document.getElementById('popular-area-sec');
+  var track = document.getElementById('popular-area-scroll');
+  if (!sec || !track || !locations || !locations.length) return;
+
+  var html = locations.map(function(loc, i) {
+    var name = loc.name_th || loc.name_en || '';
+    if (!name) return '';
+    var kw = (loc.keywords_th || name).toLowerCase();
+    var count = 0;
+    if (Array.isArray(props) && props.length) {
+      count = props.filter(function(p) {
+        var hay = ((p.location||'') + (p.title||'') + (p.transit||'') + (p.bts||'') + (p.mrt||'')).toLowerCase();
+        return hay.indexOf(kw) !== -1 || hay.indexOf(name.toLowerCase()) !== -1;
+      }).length;
+    }
+    var icon = POPULAR_AREA_ICONS[i % POPULAR_AREA_ICONS.length];
+    var countLabel = count > 0 ? count.toLocaleString('th-TH') + ' ประกาศ' : 'ดูประกาศ';
+    var safeName = (name||'').replace(/'/g,"\\'");
+    return '<div class="area-card" onclick="quickSearch(\'' + safeName + '\')">' +
+      '<i class="fas ' + icon + ' area-card-icon"></i>' +
+      '<div class="area-card-body">' +
+        '<div class="area-card-name">' + name + '</div>' +
+        '<div class="area-card-count">' + countLabel + '</div>' +
+      '</div></div>';
+  }).join('');
+
+  if (html) {
+    track.innerHTML = html;
+    sec.style.display = 'block';
+  }
+}
+
+/* ─────────────────────────────────────────────
+   v35: DEVELOPERS / PARTNERS STRIP — auto-scroll
+   placeholder chips จนกว่าจะมีรายชื่อพาร์ทเนอร์จริง
+───────────────────────────────────────────── */
+var DEV_PARTNER_CHIPS = [
+  {icon:'fa-city', label:'ผู้พัฒนาโครงการ A'},
+  {icon:'fa-university', label:'ธนาคารพันธมิตร B'},
+  {icon:'fa-building', label:'ผู้พัฒนาโครงการ C'},
+  {icon:'fa-landmark', label:'สถาบันการเงิน D'},
+  {icon:'fa-house-user', label:'ผู้พัฒนาโครงการ E'},
+  {icon:'fa-shield-alt', label:'พันธมิตรประกันภัย F'},
+  {icon:'fa-city', label:'ผู้พัฒนาโครงการ G'},
+  {icon:'fa-handshake', label:'สมาคมวิชาชีพ H'}
+];
+function renderDevStrip(){
+  var track = document.getElementById('dev-strip-track');
+  if(!track) return;
+  var chips = DEV_PARTNER_CHIPS.map(function(d){
+    return '<div class="dev-chip"><i class="fas ' + d.icon + '"></i> ' + d.label + '</div>';
+  }).join('');
+  // duplicate ชุดเดียวกันสองครั้งเพื่อให้ลูปแบบไม่มีรอยต่อ (translateX -50%)
+  track.innerHTML = chips + chips;
+}
+document.addEventListener('DOMContentLoaded', function(){ setTimeout(renderDevStrip, 300); });
+
+/* ─────────────────────────────────────────────
+   v35: TOOLS MODAL — เครื่องมือคำนวณ
+   (ผ่อนบ้าน / Rental Yield / ค่าโอนและภาษี)
+───────────────────────────────────────────── */
+function openToolsModal(tool){
+  _openModal('tools-modal');
+  if(tool){
+    var btn = document.querySelector('.tools-tab[data-tool="' + tool + '"]');
+    if(btn) toolsSwitchTab(tool, btn);
+  }
+}
+function toolsSwitchTab(tool, btnEl){
+  document.querySelectorAll('.tools-tab').forEach(function(b){ b.classList.remove('active'); });
+  document.querySelectorAll('.tools-pane').forEach(function(p){ p.classList.remove('active'); });
+  if(btnEl) btnEl.classList.add('active');
+  var pane = document.getElementById('tools-pane-' + tool);
+  if(pane) pane.classList.add('active');
+}
+
+// ── format number input with thousand separators (เก็บค่าตัวเลขจริงไว้ใน data-raw) ──
+function toolsFormatNum(input){
+  var raw = input.value.replace(/[^0-9.]/g, '');
+  input.dataset.raw = raw;
+  if(raw === '') { input.value = ''; return; }
+  var parts = raw.split('.');
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  input.value = parts.join('.');
+}
+function _toolsNum(id){
+  var el = document.getElementById(id);
+  if(!el) return 0;
+  var v = (el.dataset.raw !== undefined ? el.dataset.raw : el.value).toString().replace(/,/g, '');
+  return parseFloat(v) || 0;
+}
+function _toolsFmtBaht(n){
+  return Math.round(n).toLocaleString('th-TH') + ' บาท';
+}
+
+// ── Mortgage calculator ──
+function toolsCalcMortgage(){
+  var price = _toolsNum('tm-price');
+  var downPct = parseFloat(document.getElementById('tm-down').value) || 0;
+  var ratePct = parseFloat(document.getElementById('tm-rate').value) || 0;
+  var years = parseFloat(document.getElementById('tm-years').value) || 30;
+
+  if(price <= 0){
+    document.getElementById('tm-monthly').textContent = '—';
+    document.getElementById('tm-loan').textContent = '—';
+    document.getElementById('tm-downamt').textContent = '—';
+    document.getElementById('tm-total').textContent = '—';
+    return;
+  }
+
+  var downAmt = price * (downPct / 100);
+  var loanAmt = Math.max(0, price - downAmt);
+  var monthlyRate = (ratePct / 100) / 12;
+  var n = years * 12;
+
+  var monthly;
+  if(monthlyRate === 0){
+    monthly = n > 0 ? loanAmt / n : 0;
+  } else {
+    var factor = Math.pow(1 + monthlyRate, n);
+    monthly = loanAmt * (monthlyRate * factor) / (factor - 1);
+  }
+  var totalPay = monthly * n + downAmt;
+
+  document.getElementById('tm-monthly').textContent = _toolsFmtBaht(monthly) + ' / เดือน';
+  document.getElementById('tm-loan').textContent = _toolsFmtBaht(loanAmt);
+  document.getElementById('tm-downamt').textContent = _toolsFmtBaht(downAmt);
+  document.getElementById('tm-total').textContent = _toolsFmtBaht(totalPay);
+}
+
+// ── Rental yield calculator ──
+function toolsCalcYield(){
+  var price = _toolsNum('ty-price');
+  var rent = _toolsNum('ty-rent');
+  var expense = _toolsNum('ty-expense');
+
+  if(price <= 0 || rent <= 0){
+    document.getElementById('ty-gross').textContent = '—';
+    document.getElementById('ty-net').textContent = '—';
+    document.getElementById('ty-annual').textContent = '—';
+    return;
+  }
+
+  var annualRent = rent * 12;
+  var grossYield = (annualRent / price) * 100;
+  var netYield = ((annualRent - expense) / price) * 100;
+
+  document.getElementById('ty-gross').textContent = grossYield.toFixed(2) + ' %';
+  document.getElementById('ty-net').textContent = netYield.toFixed(2) + ' % / ปี';
+  document.getElementById('ty-annual').textContent = _toolsFmtBaht(annualRent);
+}
+
+// ── Transfer fee & tax calculator ──
+function toolsCalcTransfer(){
+  var price = _toolsNum('tt-price');
+  var years = parseFloat(document.getElementById('tt-years').value) || 0;
+
+  if(price <= 0){
+    document.getElementById('tt-fee').textContent = '—';
+    document.getElementById('tt-stamp').textContent = '—';
+    document.getElementById('tt-specific').textContent = '—';
+    document.getElementById('tt-total').textContent = '—';
+    return;
+  }
+
+  var transferFee = price * 0.02;
+  var stampDuty = price * 0.005;
+  // ภาษีธุรกิจเฉพาะ 3.3% เฉพาะถือครอง < 5 ปี — ถ้า >= 5 ปี ใช้อากรแสตมป์แทน (ไม่บวกซ้ำ)
+  var specificTax = years < 5 ? price * 0.033 : 0;
+  var total = transferFee + (years < 5 ? specificTax : stampDuty);
+
+  document.getElementById('tt-fee').textContent = _toolsFmtBaht(transferFee);
+  document.getElementById('tt-stamp').textContent = years < 5
+    ? 'ไม่เสีย (เสียภาษีธุรกิจเฉพาะแทน)'
+    : _toolsFmtBaht(stampDuty);
+  document.getElementById('tt-specific').textContent = years < 5
+    ? _toolsFmtBaht(specificTax)
+    : 'ไม่เสีย (ถือครอง ≥ 5 ปี)';
+  document.getElementById('tt-total').textContent = _toolsFmtBaht(total);
+}
+
 
 /* ─────────────────────────────────────────────
    3. FOOTER LINKS — โหลดจาก DB แล้ว inject
