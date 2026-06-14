@@ -1056,10 +1056,12 @@ body{padding-top:64px}
   position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:3200;
   /* display:none — ไม่มี layout box → ไม่ block touch บน iOS/Android */
   display:none;
-  align-items:center;justify-content:center;padding:16px;
+  align-items:flex-start;justify-content:center;
+  padding:16px;
   padding-bottom:max(16px, calc(16px + var(--bnav-h,0px)));
   -webkit-tap-highlight-color:transparent;
-  /* iOS safe scroll */
+  /* ── FIX: overflow-y:auto ให้ scroll ทั้ง backdrop และ modal ได้บนหน้าจอเล็ก ── */
+  overflow-y:auto;
   -webkit-overflow-scrolling:touch;
   overscroll-behavior:contain;
   overscroll-behavior-y:contain;
@@ -1081,7 +1083,13 @@ body{padding-top:64px}
 .modal{
   background:#fff;border-radius:var(--rl);
   max-width:550px;width:100%;
-  max-height:90vh;overflow-y:auto;
+  /* ── FIX: ใช้ dvh (Dynamic Viewport Height) แทน vh บน mobile/small screens
+     dvh คิดจาก viewport จริง หัก browser chrome ออก → modal ไม่เกิน visible area
+     margin:auto ทำให้ modal อยู่กึ่งกลาง ถ้า viewport สูงพอ
+     ถ้า content สั้นกว่า 90dvh → จะ center อยู่ใน .ov อัตโนมัติ ── */
+  max-height:min(90vh, calc(100dvh - 32px));
+  overflow-y:auto;
+  margin:auto;
   -webkit-overflow-scrolling:touch;
   overscroll-behavior:contain;
   overscroll-behavior-y:contain;
@@ -1090,6 +1098,14 @@ body{padding-top:64px}
 }
 /* modal wide ยังคงไว้สำหรับ all-modal และอื่นๆ ที่ต้องการกว้าง */
 .modal.wide{max-width:1000px;width:95vw;max-height:92vh}
+/* ── FIX: หน้าจอเล็กมากๆ (height < 600px เช่น landscape phone, small laptop) ──
+   ลด padding ของ .ov ให้ modal มีพื้นที่มากขึ้น ── */
+@media(max-height:600px){
+  .ov{padding:8px;padding-bottom:max(8px,calc(8px + var(--bnav-h,0px)));}
+  .modal{max-height:calc(100dvh - 16px);}
+  #prop-modal .mslider{height:160px!important;}
+  #prop-modal .slides>*{height:160px!important;}
+}
 
 /* ══ ALL-MODAL: sticky filter bar layout ══ */
 #all-modal .modal.wide{
@@ -1557,6 +1573,9 @@ body{padding-top:64px}
 }
 
 .mhd{padding:14px 16px;border-bottom:1.5px solid var(--lt);display:flex;justify-content:space-between;align-items:center;gap:8px;position:sticky;top:0;background:#fff;z-index:10}
+/* ── FIX: ตอน .ov เป็น scroll container แทน body, sticky top ของ .mhd ต้องทำงาน
+   sticky ต้องการ overflow ancestor — ถ้า .modal มี overflow-y:auto และ .ov มี overflow-y:auto
+   sticky จะ stick ภายใน .modal (scroll container ของมัน) ซึ่งถูกต้องแล้ว ── */
 .mhd h2{font-size:16px;font-weight:700;flex-shrink:0}
 .mclose{font-size:22px;cursor:pointer;color:var(--gr);line-height:1}
 .mbody{padding:20px;overflow-y:auto}
@@ -2545,7 +2564,7 @@ footer::after{
 .ma-review-text{font-size:12px;color:var(--tx2);line-height:1.6}
 .ma-review-author{font-size:11px;color:var(--gr);margin-top:6px}
 /* Right: listings feed */
-.ma-listing-card{background:#fff;border:1.5px solid var(--bd);border-radius:12px;overflow:hidden;margin-bottom:10px;transition:.2s;display:grid;grid-template-columns:110px 1fr}
+.ma-listing-card{background:#fff;border:1.5px solid var(--bd);border-radius:12px;overflow:hidden;margin-bottom:10px;transition:.2s;display:grid;grid-template-columns:110px 1fr;position:relative}
 .ma-listing-card:hover{box-shadow:0 4px 16px rgba(27,58,107,.1);border-color:var(--p)}
 .ma-listing-card-img{width:110px;height:100%;min-height:110px;object-fit:cover;display:block;background:var(--lt)}
 .ma-listing-card-img-placeholder{width:110px;min-height:110px;background:var(--lt);display:flex;align-items:center;justify-content:center;font-size:32px}
@@ -2625,8 +2644,9 @@ footer::after{
 .ma-tab:not(.active):hover{background:var(--lt);color:var(--p)}
 .ma-panel{display:none}
 .ma-panel.active{display:block}
-.ma-listing-cards-grid{display:grid;grid-template-columns:1fr;gap:0}
-@media(min-width:900px){.ma-listing-cards-grid{grid-template-columns:1fr 1fr;gap:8px}}
+.ma-listing-cards-grid{display:grid;grid-template-columns:1fr;gap:8px}
+@media(min-width:700px){.ma-listing-cards-grid{grid-template-columns:1fr 1fr;gap:10px}}
+@media(min-width:1100px){.ma-listing-cards-grid{grid-template-columns:1fr 1fr 1fr;gap:10px}}
 .ma-section{background:#fff;border-radius:16px;padding:20px;margin-bottom:16px;border:1.5px solid var(--bd);box-shadow:0 2px 10px rgba(27,58,107,.05)}
 .ma-section-title{font-size:14px;font-weight:700;color:var(--p);margin-bottom:16px;display:flex;align-items:center;gap:8px;padding-bottom:10px;border-bottom:1.5px solid var(--lt)}
 .ma-field{margin-bottom:14px}
@@ -2659,7 +2679,7 @@ footer::after{
   .ma-token-bar{flex-direction:column;align-items:flex-start;gap:8px}
 }
 @media(min-width:1100px){
-  .ma-profile-main .ma-listing-cards-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .ma-profile-main .ma-listing-cards-grid{grid-template-columns:1fr 1fr 1fr;gap:10px}
 }
 @media(max-width:600px){
   .ma-hero-body{padding:0 16px 16px;gap:10px;margin-top:-40px}
@@ -11353,6 +11373,16 @@ function renderMyAccount(){
   // Expose globally for _showMyProfileOnAgentsPage
   window._currentUser = _u;
   window._currentMeta = _meta;
+  // ── อัปเดต URL เป็น /u/:username เมื่อ user profile โหลดเสร็จ ──
+  if (document.getElementById('page-my-account')?.classList.contains('active')) {
+    const _dispName = _meta.display_name || _u.email?.split('@')[0] || '';
+    if (_dispName && typeof _routerReady !== 'undefined' && _routerReady) {
+      const _slug = _dispName.toLowerCase().replace(/[^ก-๙a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60) || 'me';
+      if (!location.pathname.startsWith('/u/')) {
+        history.replaceState({ type: 'page', name: 'my-account', username: _slug }, '', location.origin + '/u/' + _slug);
+      }
+    }
+  }
   // Logged in (or dev bypass) — render full dashboard
   const init = (_u.email||'U')[0].toUpperCase();
   const dispName = sanitize(_meta.display_name || _u.email?.split('@')[0] || 'User');
@@ -12542,7 +12572,10 @@ async function renderAdminListingsPanel() {
       <div style="font-size:14px;font-weight:800;color:var(--p);margin:20px 0 12px;display:flex;align-items:center;gap:8px">
         <i class="fas fa-history" style="color:var(--gr)"></i> ประวัติล่าสุด
       </div>
-      ${historyHtml}` : ''}`;
+      <div style="display:grid;grid-template-columns:1fr;gap:0">
+        <style>.adm-hist-grid{display:grid;grid-template-columns:1fr;gap:0}@media(min-width:700px){.adm-hist-grid{grid-template-columns:1fr 1fr;gap:10px}}@media(min-width:1100px){.adm-hist-grid{grid-template-columns:1fr 1fr 1fr;gap:10px}}</style>
+        <div class="adm-hist-grid">${historyHtml}</div>
+      </div>` : ''}`;
 
   } catch(e) {
     // Fallback: ถ้า view ล้มเหลว (เช่น permission denied) ลอง query ตรงแทน
@@ -14256,8 +14289,10 @@ async function _maRenderProfileListings(){
     const txLabel=ul.transaction==='RENT'?'ให้เช่า':'ขาย';
     const exp=ul.expires_at?new Date(ul.expires_at).toLocaleDateString('th-TH'):'';
     return `<div class="ma-listing-card" style="${ul.is_boosted?'border-color:#f39c12;box-shadow:0 0 0 2px #f39c1222':''}">
-      ${ul.is_boosted ? `<div style="background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font-size:10px;font-weight:800;padding:4px 10px;display:flex;align-items:center;gap:4px"><i class="fas fa-rocket"></i> ${boostDaysLabel(ul.boosted_at)}</div>` : ''}
-      ${photo?`<img class="ma-listing-card-img" src="${photo}" alt="listing" loading="lazy">`:`<div class="ma-listing-card-img-placeholder">🏠</div>`}
+      <div style="position:relative;overflow:hidden;min-height:110px">
+        ${photo?`<img class="ma-listing-card-img" src="${photo}" alt="listing" loading="lazy">`:`<div class="ma-listing-card-img-placeholder">🏠</div>`}
+        ${ul.is_boosted ? `<div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font-size:9px;font-weight:800;padding:3px 6px;display:flex;align-items:center;justify-content:center;gap:3px"><i class="fas fa-rocket"></i> ${boostDaysLabel(ul.boosted_at)}</div>` : ''}
+      </div>
       <div class="ma-listing-card-body">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px">
           <div class="ma-listing-card-title">${sanitize(ul.title)}</div>
@@ -16444,6 +16479,7 @@ const PAGE_ROUTES = {
   'favorites':      { path: '/favorites',  title: 'รายการโปรดอสังหาฯ — Matchdoor',                                       desc: 'อสังหาริมทรัพย์กรุงเทพที่คุณบันทึกไว้ใน Matchdoor บ้าน คอนโด ที่ดิน ใกล้ BTS MRT' },
   'careers':        { path: '/careers',    title: 'สมัครงานตัวแทนอสังหาฯ กรุงเทพ — Matchdoor',                desc: 'เปิดรับสมัครตัวแทนอสังหาริมทรัพย์กรุงเทพ รายได้ดี ทำงานอิสระ ร่วมทีม Matchdoor' },
   'my-account':     { path: '/my-account', title: 'บัญชีของฉัน — Matchdoor',                                 desc: 'จัดการโปรไฟล์ รายการโปรด และประกาศของคุณบน Matchdoor' },
+  'user-profile':   { path: '/u/',         title: 'โปรไฟล์ผู้ใช้ — Matchdoor',                               desc: 'โปรไฟล์ผู้ใช้งาน Matchdoor' },
   'social':         { path: '/social',     title: 'ฟีดชุมชน Matchdoor — อสังหาฯ บ้าน คอนโด กรุงเทพ',    desc: 'ชุมชนอสังหาริมทรัพย์ Matchdoor แชร์ทรัพย์ ถามตอบ ติดตามข่าวสารอสังหาฯ กรุงเทพ' },
   'property':       { path: '/property', title: 'ทรัพย์ — Matchdoor', desc: 'รายละเอียดทรัพย์อสังหาริมทรัพย์ กรุงเทพ — Matchdoor' },
 };
@@ -16706,10 +16742,14 @@ function _silentShowPage(name, skipScrollTop) {
   if(typeof close360 === 'function') close360();
   // ── FIX: ปิด overlay/sheet ทุกตัวที่อาจค้างเปิดอยู่ (z-index สูงทำให้กดอะไรไม่ได้) ──
   ['apply-agent-overlay','apply-other-overlay','adv-desktop-overlay',
-   'adv-sheet-overlay','adv-sheet','adv-filter-panel','seo-drawer','seo-drawer-overlay'].forEach(function(id){
+   'adv-sheet-overlay','adv-sheet','adv-filter-panel','seo-drawer','seo-drawer-overlay',
+   'listings-map-overlay'].forEach(function(id){
     const ov = document.getElementById(id);
-    if(ov) ov.classList.remove('open');
+    if(ov){ ov.classList.remove('open'); ov.style.display='none'; }
   });
+  // ── FIX: ปิด map panel (listings) ถ้าเปิดอยู่ ──
+  const _mapPanel = document.getElementById('md-map-panel');
+  if(_mapPanel){ _mapPanel.classList.remove('open','peek'); _mapPanel.style.transform=''; }
   // ── FIX: ปิด all-modal / ov อื่นๆ ที่อาจค้างเปิดอยู่เมื่อ navigate ──
   document.querySelectorAll('.ov.open').forEach(function(el){
     if(el.id !== 'prop-modal') el.classList.remove('open');
@@ -16837,6 +16877,13 @@ function _initRouteFromUrl() {
   // 404.html = index.html ดังนั้น GitHub Pages serve ไฟล์เดียวกัน
   // browser ยัง URL ถูกต้องอยู่ เช่น /listings — อ่านตรงๆ ได้เลย
   const path = location.pathname;
+  // ── /u/:username — โปรไฟล์ user ──
+  const userMatch = path.match(/^\/u\/([^\/]+)/);
+  if (userMatch) {
+    window._pendingProfileUsername = decodeURIComponent(userMatch[1]);
+    _silentShowPage('my-account');
+    return;
+  }
   const match = path.match(/^\/property\/([^\/\-]+)/);
   if (match) {
     const propId = match[1];
@@ -16913,6 +16960,7 @@ function _initRouteFromUrl() {
     '/buy': 'home', '/rent': 'home',
     '/listings': 'listings',
     '/my-account': 'my-account',
+    '/u': 'my-account',
     '/social': 'social',
   };
   // /property/* and /agent/* are handled by match blocks above — not in sectionMap
@@ -17123,6 +17171,21 @@ function showPage(name, propId){
   // seo-toggle-btn: show only on listings page
   const seoBtn = document.getElementById('seo-toggle-btn');
   if(seoBtn) seoBtn.setAttribute('data-page', name === 'listings' ? 'listings' : name === 'home' ? 'home' : 'other');
+  // ── my-account: push /u/:username ──
+  if (name === 'my-account') {
+    const _u = window._currentUser;
+    const _meta = (window._currentMeta) || (_u && _u.user_metadata) || {};
+    const _dispName = _meta.display_name || (_u && _u.email && _u.email.split('@')[0]) || '';
+    if (_dispName && _routerReady) {
+      const _slug = _dispName.toLowerCase().replace(/[^ก-๙a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60) || 'me';
+      _pushRoute('/u/' + _slug, { type: 'page', name: 'my-account', username: _slug });
+    } else {
+      const route = PAGE_ROUTES[name];
+      const path = route ? route.path : '/';
+      _pushRoute(path, { type: 'page', name });
+    }
+    return;
+  }
   const route = PAGE_ROUTES[name];
   const path = route ? route.path : '/';
   _pushRoute(path, { type: 'page', name });
@@ -18913,6 +18976,9 @@ function openModal(id){
 
   // init swipe หลัง modal เปิด
   initModalSwipe();
+  // ── FIX: redirect wheel events from .ov backdrop → .modal scroll ──
+  // เมื่อเมาส์อยู่บน backdrop (ไม่ได้อยู่บน .modal) และ scroll → ให้ .modal scroll แทน
+  _initPropModalWheelRedirect();
 
   // ── Defer heavy NON-VISIBLE content ไปยัง idle ──
   // extras/nearby/map ไม่ต้องการสำหรับ first paint — defer หลัง modal render แล้ว
@@ -23524,6 +23590,27 @@ function initSwipe(sliderEl, prevFn, nextFn) {
   });
 }
 
+// ── FIX: redirect wheel/scroll from .ov backdrop → .modal ──
+// ปัญหา: เมาส์อยู่บน backdrop ของ .ov แล้ว scroll → .ov scroll ขึ้นลง (ไม่มี content) → ไม่ตอบสนอง
+// แก้: ดักจับ wheel event ที่ .ov แล้ว forward ไปยัง .modal แทน
+(function() {
+  let _propModalWheelInit = false;
+  window._initPropModalWheelRedirect = function() {
+    const ov = document.getElementById('prop-modal');
+    if(!ov || _propModalWheelInit) return;
+    _propModalWheelInit = true;
+    ov.addEventListener('wheel', function(e) {
+      // ถ้า event เกิดภายใน .modal → ปล่อยผ่านตามปกติ (modal scroll เอง)
+      const modal = ov.querySelector('.modal');
+      if(!modal) return;
+      if(modal.contains(e.target)) return;
+      // event เกิดบน backdrop → forward ไปยัง .modal
+      e.preventDefault();
+      modal.scrollTop += e.deltaY;
+    }, {passive:false});
+  };
+})();
+
 function initModalSwipe() {
   const ms = document.querySelector('#prop-modal .mslider');
   if(ms && !ms._swipeInit) {
@@ -23806,6 +23893,15 @@ window.addEventListener('scroll', closeQsDDs, {passive:true});
         placeholder.appendChild(flink);
       }
       placeholder.appendChild(footer);
+      // ── Re-bind collapsible accordion for cloned footer (mobile ≤900px) ──
+      footer.querySelectorAll('.footer-col-section').forEach(sec => {
+        const h4 = sec.querySelector('.footer-col-h4');
+        if (!h4) return;
+        h4.addEventListener('click', function(e) {
+          if (window.innerWidth > 900) return;
+          sec.classList.toggle('open');
+        });
+      });
     });
   }
   // Run after loadData populates footer fields
