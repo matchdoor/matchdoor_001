@@ -3720,6 +3720,7 @@ footer::after{
   .h-gallery-track .blog-card{width:220px}
 }
 
+/* ── ยอดนิยม Infinite Scroll Carousel ── */
 .gallery-carousel-sec{
   padding:32px 0 28px;
   background:linear-gradient(180deg,var(--bg) 0%,rgba(245,240,232,.5) 100%);
@@ -3727,7 +3728,7 @@ footer::after{
 }
 .gallery-carousel-inner{max-width:1320px;margin:0 auto;padding:0 20px;}
 .gallery-carousel-hd{
-  display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;
+  display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;
 }
 .gallery-nav{display:flex;gap:8px;}
 .gallery-nav-btn{
@@ -3737,62 +3738,85 @@ footer::after{
   cursor:pointer;transition:.2s;font-size:14px;
 }
 .gallery-nav-btn:hover{background:var(--p);color:#fff;border-color:var(--p);}
-.gallery-track-wrap{
-  overflow:visible;
-  cursor:grab;user-select:none;
-  perspective:1200px;
-  padding:24px 0 32px;
+
+/* Viewport strip with fade edges */
+.gc-viewport{
   position:relative;
+  overflow:hidden;
+  padding:20px 0 28px;
+  -webkit-mask-image:linear-gradient(to right,transparent 0%,#000 8%,#000 92%,transparent 100%);
+  mask-image:linear-gradient(to right,transparent 0%,#000 8%,#000 92%,transparent 100%);
+  cursor:grab;
+  touch-action:pan-y;
+  user-select:none;
 }
-.gallery-track-wrap.dragging{cursor:grabbing;}
-.gallery-track{
-  display:flex;gap:16px;
+.gc-viewport.is-dragging{ cursor:grabbing; }
+
+/* The scrolling belt */
+.gc-belt{
+  display:flex;
+  gap:16px;
+  width:max-content;
   will-change:transform;
-  transition:transform .5s cubic-bezier(.25,.46,.45,.94);
-  align-items:center;
 }
+
+/* Individual card */
 .gc-card{
   flex-shrink:0;
-  width:var(--gc-w,260px);
+  width:240px;
   background:#fff;
-  border-radius:20px;
+  border-radius:18px;
   overflow:hidden;
-  border:2px solid var(--bd);
+  border:2px solid var(--bd,#e8e8e8);
   cursor:pointer;
-  transition:transform .4s cubic-bezier(.25,.46,.45,.94), box-shadow .4s, opacity .4s, border-color .3s;
-  transform:scale(0.85);
-  opacity:0.6;
+  transition:box-shadow .3s, border-color .3s, transform .3s;
   position:relative;
 }
-.gc-card.gc-active{
-  transform:scale(1.08);
-  opacity:1;
-  box-shadow:0 20px 60px rgba(124,111,205,.35),0 8px 24px rgba(0,0,0,.15);
-  border-color:var(--a);
-  z-index:10;
-}
-.gc-card.gc-adjacent{
-  transform:scale(0.93);
-  opacity:0.82;
+.gc-card:hover{
+  transform:translateY(-4px);
+  box-shadow:0 16px 40px rgba(10,22,48,.14);
+  border-color:var(--a,#c8922a);
 }
 .gc-card-img{
-  height:175px;position:relative;overflow:hidden;
+  height:165px;position:relative;overflow:hidden;
   background:linear-gradient(135deg,#e8edf5,#d5e0f0);
   display:flex;align-items:center;justify-content:center;font-size:40px;
 }
-.gc-card-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .3s;}
-.gc-card.gc-active .gc-card-img img{transform:scale(1.04);}
+.gc-card-img img{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  transition:transform .4s ease;
+}
+.gc-card:hover .gc-card-img img{ transform:scale(1.06); }
 .gc-card-badges{position:absolute;top:8px;left:8px;display:flex;gap:4px;z-index:5;flex-wrap:wrap;}
-.gc-card-body{padding:13px 15px 15px;}
-.gc-card-price{font-size:17px;font-weight:800;color:var(--a);margin-bottom:4px;}
-.gc-card-title{font-size:13px;font-weight:700;line-height:1.35;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.gc-card-loc{font-size:11px;color:var(--gr);}
-.gallery-dots{display:flex;justify-content:center;gap:6px;margin-top:16px;}
-.gc-dot{width:7px;height:7px;border-radius:50%;background:rgba(10,22,48,.18);transition:.3s;cursor:pointer;}
-.gc-dot.active{width:22px;border-radius:4px;background:var(--a);}
-@media(max-width:600px){
-  .gc-card{width:220px;}
-  .gc-card.gc-active{transform:scale(1.06);}
+.gc-card-body{padding:12px 14px 14px;}
+.gc-card-price{font-size:16px;font-weight:800;color:var(--a,#c8922a);margin-bottom:3px;}
+.gc-card-title{
+  font-size:12.5px;font-weight:700;line-height:1.35;margin-bottom:3px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.gc-card-loc{font-size:11px;color:var(--gr,#888);}
+
+/* Dot indicators */
+.gallery-dots{display:flex;justify-content:center;gap:6px;margin-top:14px;}
+.gc-dot{
+  width:7px;height:7px;border-radius:50%;
+  background:rgba(10,22,48,.18);transition:.3s;cursor:pointer;
+  border:none;padding:0;
+}
+.gc-dot.active{width:22px;border-radius:4px;background:var(--a,#c8922a);}
+
+@media(max-width:768px){
+  .gc-card{ width:200px; }
+  .gc-card-img{ height:140px; }
+  .gc-card-price{ font-size:14px; }
+}
+@media(max-width:480px){
+  .gc-card{ width:175px; }
+  .gc-card-img{ height:125px; }
+}
+/* Pause auto-play for users who prefer reduced motion */
+@media(prefers-reduced-motion:reduce){
+  .gc-belt{ transition:none!important; }
 }
 
 .modal-fav-btn{
@@ -6586,17 +6610,18 @@ footer::after{
       <div style="display:flex;align-items:center;gap:10px">
         <span class="view-all" onclick="openAllModal('rec')">ดูทั้งหมด →</span>
         <div class="gallery-nav">
-          <button class="gallery-nav-btn" id="gc-prev" onclick="gcMove(-1)"><i class="fas fa-chevron-left"></i></button>
-          <button class="gallery-nav-btn" id="gc-next" onclick="gcMove(1)"><i class="fas fa-chevron-right"></i></button>
+          <button class="gallery-nav-btn" id="gc-prev" onclick="gcStep(-1)"><i class="fas fa-chevron-left"></i></button>
+          <button class="gallery-nav-btn" id="gc-next" onclick="gcStep(1)"><i class="fas fa-chevron-right"></i></button>
         </div>
       </div>
     </div>
-    <div class="gallery-track-wrap" id="gc-wrap">
-      <div class="gallery-track" id="gc-track"></div>
-    </div>
-    <div class="gallery-dots" id="gc-dots"></div>
   </div>
-    <div id="rec-grid" style="display:none"></div>
+  <!-- full-width viewport -->
+  <div class="gc-viewport" id="gc-viewport">
+    <div class="gc-belt" id="gc-belt"></div>
+  </div>
+  <div class="gallery-dots" id="gc-dots"></div>
+  <div id="rec-grid" style="display:none"></div>
 </section>
  <section id="new-sec" style="padding:28px 0 22px;background:var(--bg)">
   <div style="max-width:1320px;margin:0 auto;padding:0 20px">
@@ -23985,7 +24010,7 @@ var _cardObserver = new MutationObserver(function(mutations){
   });
 });
 ['all-grid','rec-grid','new-grid','new-track','fav-page-grid',
- 'blog-track','blog-grid','port-grid','agent-grid','osrv-track','gc-track',
+ 'blog-track','blog-grid','port-grid','agent-grid','osrv-track','gc-belt',
  'listings-grid'
 ].forEach(function(gid) {
   var el = document.getElementById(gid);
@@ -24529,39 +24554,82 @@ function initCounterObserver() {
   document.querySelectorAll('.stat-counter-card, .hcounter').forEach(c => obs.observe(c));
 }
 
-let gcItems = [];
-let gcIdx = 0;
-let gcDragging = false;
-let gcStartX = 0;
-let gcDragDelta = 0;
-let gcAutoTimer = null;
+/* ═══════════════════════════════════════════════════════════
+   ยอดนิยม Infinite Scroll Carousel  — v2 (smooth & reliable)
+   ════════════════════════════════════════════════════════════
+   Strategy:
+   • Clone cards 3× (before + original + after) so there's always
+     content on both sides.
+   • Use requestAnimationFrame + a running `px` offset for the
+     auto-play; snap to card boundaries on release.
+   • Touch & mouse drag both supported with velocity flick.
+   • On reaching a clone region we instantly jump (no transition)
+     back to the matching real card — seamless infinite loop.
+================================================================*/
+
+let gcItems   = [];       // source props
+let gcN       = 0;        // number of real cards
+let gcCardW   = 0;        // card width + gap (recalculated on resize)
+let gcOffset  = 0;        // current translateX in px (positive = shifted right)
+let gcTarget  = 0;        // target translateX (we lerp toward it)
+let gcRafId   = null;
+let gcAutoDir = 1;        // +1 = scroll left (forward)
+let gcPaused  = false;
+let gcDotIdx  = 0;        // which real card is "active" for dots
+
+const GC_GAP      = 16;   // px gap between cards
+const GC_SPEED    = 0.6;  // px per ms for auto-play
+const GC_LERP     = 0.10; // easing factor (higher = snappier)
+const GC_SNAP_MS  = 380;  // snap animation duration
+
+function _gcCardWidth() {
+  const vp = document.getElementById('gc-viewport');
+  if (!vp) return 240;
+  const vw = vp.offsetWidth;
+  if (vw < 480)  return 175;
+  if (vw < 768)  return 200;
+  return 240;
+}
+
+function _gcBeltOffset(cardIdx) {
+  // cardIdx is index within the *original* set; belt has 3 copies so
+  // "real" cards start at index gcN (after the first clone block)
+  return -((gcN + cardIdx) * (gcCardW + GC_GAP));
+}
 
 function renderGalleryCarousel() {
-  const track = document.getElementById('gc-track');
+  const belt   = document.getElementById('gc-belt');
   const recGrid = document.getElementById('rec-grid');
-  if(!track) return;
+  if (!belt) return;
 
-  const recProps = [...props].sort((a,b) => {
-    if(a.isRec && !b.isRec) return -1;
-    if(!a.isRec && b.isRec) return 1;
-    if(a.isNew && !b.isNew) return -1;
+  // Sort: isRec first, then isNew, rest by order
+  const recProps = [...props].sort((a, b) => {
+    if (a.isRec && !b.isRec) return -1;
+    if (!a.isRec && b.isRec)  return 1;
+    if (a.isNew && !b.isNew)  return -1;
     return 0;
-  }).slice(0, 12);
+  }).slice(0, 14);
 
   gcItems = recProps;
-  if(recGrid) recGrid.innerHTML = '<div class="prop-grid">' + recProps.map(propCard).join('') + '</div>';
+  gcN     = recProps.length;
+  if (!gcN) return;
 
-  track.innerHTML = recProps.map((p, i) => {
-    const img = p.photos?.[0];
-    const badge = p.isRec ? '<span class="rec-badge rec-badge-rec">🔥 Hot</span>' :
-                  (p.isNew ? '<span class="rec-badge rec-badge-new">✨ ใหม่</span>' : '');
-    const txBadge = p.tx==='RENT'
-      ? '<span class="rec-badge rec-badge-rent">เช่า</span>'
-      : '<span class="rec-badge rec-badge-buy">ขาย</span>';
-    return `<div class="gc-card${i===0?' gc-active':''}" data-idx="${i}" onclick="if(Math.abs(gcDragDelta)<8)openModal('${p.id}')">
+  if (recGrid) {
+    recGrid.innerHTML = '<div class="prop-grid">' + recProps.map(propCard).join('') + '</div>';
+  }
+
+  // Build card HTML once, clone 3× for seamless loop
+  function cardHTML(p) {
+    const img      = p.photos?.[0];
+    const hotBadge = p.isRec ? '<span class="rec-badge rec-badge-rec">🔥 Hot</span>'
+                   : (p.isNew ? '<span class="rec-badge rec-badge-new">✨ ใหม่</span>' : '');
+    const txBadge  = p.tx === 'RENT'
+                   ? '<span class="rec-badge rec-badge-rent">เช่า</span>'
+                   : '<span class="rec-badge rec-badge-buy">ขาย</span>';
+    return `<div class="gc-card" data-id="${p.id}">
       <div class="gc-card-img">
-        ${img ? `<img src="${img}" loading="lazy" alt="${p.title}">` : typeIcon(p.type)}
-        <div class="gc-card-badges">${badge}${txBadge}</div>
+        ${img ? `<img src="${img}" loading="lazy" alt="${sanitize(p.title||'')}">` : typeIcon(p.type)}
+        <div class="gc-card-badges">${hotBadge}${txBadge}</div>
       </div>
       <div class="gc-card-body">
         <div class="gc-card-price">${fmtPrice(p.price, p.tx)}</div>
@@ -24569,140 +24637,264 @@ function renderGalleryCarousel() {
         <div class="gc-card-loc"><i class="fas fa-map-marker-alt"></i> ${sanitize(p.location||p.province||'')}</div>
       </div>
     </div>`;
-  }).join('');
+  }
 
-  gcRenderDots();
-  gcApply(false);
-  gcInitDrag();
-  gcStartAuto();
-}
+  const single = recProps.map(cardHTML).join('');
+  // 3 copies: [clone-before] [real] [clone-after]
+  belt.innerHTML = single + single + single;
 
-function gcCardW() {
-  const wrap = document.getElementById('gc-wrap');
-  if(!wrap) return 280;
-  const ww = wrap.offsetWidth;
-  if(ww < 600) return Math.round(ww * 0.82);
-  if(ww < 900) return Math.round(ww * 0.68);
-  return Math.min(280, ww * 0.75);
-}
-
-function gcApply(animate=true) {
-  const track = document.getElementById('gc-track');
-  if(!track) return;
-  const cw = gcCardW();
-  const wrap = document.getElementById('gc-wrap');
-  const ww = wrap ? wrap.offsetWidth : 800;
-  const gap = 16;
-  const offset = ww / 2 - cw / 2 - gcIdx * (cw + gap);
-  track.style.transition = animate ? 'transform .45s cubic-bezier(.25,.46,.45,.94)' : 'none';
-  track.style.transform = `translateX(${offset}px)`;
-  // Set card width as CSS variable so all cards resize correctly
-  const wrap2 = wrap || document.getElementById('gc-wrap');
-  if(wrap2) wrap2.style.setProperty('--gc-w', cw + 'px');
-  // Update card classes
-  track.querySelectorAll('.gc-card').forEach((c, i) => {
-    c.classList.remove('gc-active','gc-adjacent');
-    if(i === gcIdx) c.classList.add('gc-active');
-    else if(Math.abs(i - gcIdx) === 1) c.classList.add('gc-adjacent');
+  // Click handler — only fire if not dragging
+  belt.querySelectorAll('.gc-card').forEach((card, absIdx) => {
+    const realIdx = absIdx % gcN;
+    card.addEventListener('click', () => {
+      if (_gcIsDragging) return;
+      openModal(gcItems[realIdx].id);
+    });
   });
-  gcRenderDots();
+
+  gcCardW  = _gcCardWidth() + GC_GAP;
+  gcOffset = _gcBeltOffset(0);   // start at real card 0
+  gcTarget = gcOffset;
+  gcDotIdx = 0;
+
+  belt.style.transition = 'none';
+  belt.style.transform  = `translateX(${gcOffset}px)`;
+
+  _gcBuildDots();
+  _gcInitDrag();
+  _gcStartAuto();
+  _gcRaf();          // start the render loop
 }
 
-function gcMove(dir) {
-  gcStopAuto();
-  gcIdx = Math.max(0, Math.min(gcItems.length - 1, gcIdx + dir));
-  gcApply(true);
-  gcStartAuto();
+/* ── Render loop (RAF) ── */
+function _gcRaf() {
+  gcRafId = requestAnimationFrame(_gcRaf);
+  if (!gcPaused) {
+    // Auto-scroll: advance target continuously
+    gcTarget += gcAutoDir * GC_SPEED * (1000 / 60) * 0.016; // ~0.6px/frame @60fps
+    // Actually let's use a simpler per-frame nudge:
+    gcTarget -= 0.55; // scroll left at ~0.55px/frame  (≈33px/s @60fps)
+  }
+  // Lerp offset toward target
+  gcOffset += (gcTarget - gcOffset) * GC_LERP;
+
+  // Infinite jump: belt is 3× wide; real section is gcN cards starting at index gcN
+  const loopW = gcN * gcCardW;
+  const startOfReal = -gcN * gcCardW;           // translateX when showing real card 0
+  const endOfReal   = startOfReal - loopW;      // translateX when showing last real card
+
+  if (gcOffset < endOfReal - gcCardW) {
+    // Gone past the end clone → jump back to real start
+    gcOffset += loopW;
+    gcTarget  += loopW;
+  } else if (gcOffset > startOfReal + gcCardW) {
+    // Gone before real start → jump forward to end of real
+    gcOffset -= loopW;
+    gcTarget  -= loopW;
+  }
+
+  const belt = document.getElementById('gc-belt');
+  if (belt) belt.style.transform = `translateX(${gcOffset}px)`;
+
+  // Update dot based on nearest real card
+  const nearestReal = Math.round((-gcOffset - startOfReal) / gcCardW);
+  const dotIdx = ((nearestReal % gcN) + gcN) % gcN;
+  if (dotIdx !== gcDotIdx) {
+    gcDotIdx = dotIdx;
+    _gcUpdateDots();
+  }
 }
 
-function gcGoTo(i) {
-  gcStopAuto();
-  gcIdx = i;
-  gcApply(true);
-  gcStartAuto();
+/* ── Step (arrow buttons) ── */
+function gcStep(dir) {
+  // Snap to next/prev card boundary
+  const startOfReal = -gcN * gcCardW;
+  const relOffset   = gcOffset - startOfReal;   // how many px from real[0]
+  const currentCard = Math.round(-relOffset / gcCardW);
+  const nextCard    = currentCard - dir;         // dir=+1 → scroll left → nextCard++
+  const snapTarget  = startOfReal - nextCard * gcCardW;
+
+  gcPaused = true;
+  // Animate via lerp by setting target far ahead briefly, then do a proper snap
+  _gcSnapTo(snapTarget, GC_SNAP_MS, () => { gcPaused = false; });
 }
 
-function gcRenderDots() {
-  const dots = document.getElementById('gc-dots');
-  if(!dots || gcItems.length === 0) return;
-  dots.innerHTML = gcItems.map((_, i) =>
-    `<div class="gc-dot${i===gcIdx?' active':''}" onclick="gcGoTo(${i})"></div>`
-  ).join('');
-}
+function _gcSnapTo(targetX, durationMs, onDone) {
+  const belt    = document.getElementById('gc-belt');
+  if (!belt) return;
+  const startX  = gcOffset;
+  const startT  = performance.now();
+  cancelAnimationFrame(gcRafId);
 
-function gcInitDrag() {
-  const wrap = document.getElementById('gc-wrap');
-  if(!wrap) return;
-  let _startY = 0, _isVert = false, _lastX = 0, _lastTime = 0, _vel = 0;
-  const onDown = e => {
-    gcStopAuto();
-    gcDragging = false;
-    gcStartX = e.touches ? e.touches[0].clientX : e.clientX;
-    _startY = e.touches ? e.touches[0].clientY : 0;
-    _isVert = false;
-    gcDragDelta = 0;
-    _lastX = gcStartX; _lastTime = Date.now(); _vel = 0;
-    wrap.classList.add('dragging');
-    document.addEventListener('mousemove', onMove);
-    document.addEventListener('mouseup', onUp);
-    document.addEventListener('touchmove', onMove, {passive:true});
-    document.addEventListener('touchend', onUp);
-  };
-  const onMove = e => {
-    const x = e.touches ? e.touches[0].clientX : e.clientX;
-    const y = e.touches ? e.touches[0].clientY : 0;
-    const dx = x - gcStartX;
-    const dy = y - _startY;
-    const now = Date.now(); const dt = now - _lastTime || 1;
-    _vel = (x - _lastX) / dt; _lastX = x; _lastTime = now;
-    if(!gcDragging && e.touches) {
-      if(Math.abs(dx) > 6 || Math.abs(dy) > 6) {
-        _isVert = Math.abs(dy) > Math.abs(dx);
-        if(!_isVert) gcDragging = true;
-      }
-    } else if(!e.touches) {
-      gcDragDelta = dx;
-      if(Math.abs(gcDragDelta) > 8) gcDragging = true;
+  function step(now) {
+    const t = Math.min((now - startT) / durationMs, 1);
+    const ease = t < 0.5 ? 2*t*t : -1+(4-2*t)*t; // easeInOut
+    gcOffset = startX + (targetX - startX) * ease;
+    gcTarget = gcOffset;
+
+    // wrap check
+    const loopW       = gcN * gcCardW;
+    const startOfReal = -gcN * gcCardW;
+    if (gcOffset < startOfReal - loopW) { gcOffset += loopW; gcTarget += loopW; }
+    if (gcOffset > startOfReal + loopW) { gcOffset -= loopW; gcTarget -= loopW; }
+
+    belt.style.transform = `translateX(${gcOffset}px)`;
+
+    // dot update
+    const nearestReal = Math.round((-gcOffset - startOfReal) / gcCardW);
+    const dotIdx = ((nearestReal % gcN) + gcN) % gcN;
+    if (dotIdx !== gcDotIdx) { gcDotIdx = dotIdx; _gcUpdateDots(); }
+
+    if (t < 1) {
+      gcRafId = requestAnimationFrame(step);
+    } else {
+      gcRafId = requestAnimationFrame(_gcRaf);
+      if (onDone) onDone();
     }
-    if(!_isVert) gcDragDelta = dx;
-  };
-  const onUp = () => {
-    wrap.classList.remove('dragging');
-    document.removeEventListener('mousemove', onMove);
-    document.removeEventListener('mouseup', onUp);
-    document.removeEventListener('touchmove', onMove);
-    document.removeEventListener('touchend', onUp);
-    // velocity-based: small flick still triggers move
-    const effectiveDelta = Math.abs(gcDragDelta) < 30 && Math.abs(_vel) > 0.4
-      ? (_vel > 0 ? -60 : 60) : gcDragDelta;
-    if(!_isVert && (Math.abs(gcDragDelta) > 40 || Math.abs(_vel) > 0.4)) gcMove(effectiveDelta < 0 ? 1 : -1);
-    setTimeout(() => { gcDragging = false; }, 50);
-    _isVert = false;
-    gcStartAuto();
-  };
-  wrap.addEventListener('mousedown', onDown);
-  wrap.addEventListener('touchstart', onDown, {passive:true});
+  }
+  gcRafId = requestAnimationFrame(step);
 }
 
-function gcStartAuto() {
-  gcStopAuto();
-  gcAutoTimer = setInterval(() => {
-    gcIdx = gcIdx >= gcItems.length - 1 ? 0 : gcIdx + 1;
-    gcApply(true);
-  }, 4000);
-}
-function gcStopAuto() {
-  if(gcAutoTimer) { clearInterval(gcAutoTimer); gcAutoTimer = null; }
+/* ── Dots ── */
+function _gcBuildDots() {
+  const dots = document.getElementById('gc-dots');
+  if (!dots || !gcN) return;
+  dots.innerHTML = gcItems.map((_, i) =>
+    `<button class="gc-dot${i===0?' active':''}" data-i="${i}" aria-label="ไปยังรายการ ${i+1}"></button>`
+  ).join('');
+  dots.addEventListener('click', e => {
+    const btn = e.target.closest('.gc-dot');
+    if (!btn) return;
+    const i = parseInt(btn.dataset.i, 10);
+    const startOfReal = -gcN * gcCardW;
+    _gcSnapTo(startOfReal - i * gcCardW, GC_SNAP_MS, null);
+  });
 }
 
-// Re-apply carousel layout on resize / orientation change
-let _gcResizeTimer = null;
+function _gcUpdateDots() {
+  const dots = document.getElementById('gc-dots');
+  if (!dots) return;
+  dots.querySelectorAll('.gc-dot').forEach((d, i) => {
+    d.classList.toggle('active', i === gcDotIdx);
+  });
+}
+
+/* ── Drag (touch + mouse) ── */
+let _gcIsDragging = false;
+let _gcDragStartX = 0;
+let _gcDragOffsetAtStart = 0;
+let _gcDragLastX  = 0;
+let _gcDragLastT  = 0;
+let _gcDragVel    = 0;
+let _gcTouchStartY = 0;
+let _gcIsVert     = false;
+
+function _gcInitDrag() {
+  const vp = document.getElementById('gc-viewport');
+  if (!vp || vp._gcDragInited) return;
+  vp._gcDragInited = true;
+
+  function start(clientX, clientY) {
+    gcPaused       = true;
+    _gcIsDragging  = false;
+    _gcDragStartX  = clientX;
+    _gcTouchStartY = clientY || 0;
+    _gcDragOffsetAtStart = gcOffset;
+    _gcDragLastX   = clientX;
+    _gcDragLastT   = performance.now();
+    _gcDragVel     = 0;
+    _gcIsVert      = false;
+    vp.classList.add('is-dragging');
+  }
+  function move(clientX, clientY) {
+    const dx = clientX - _gcDragStartX;
+    const dy = (clientY || 0) - _gcTouchStartY;
+    // Detect scroll direction on first move
+    if (!_gcIsDragging && (Math.abs(dx) > 5 || Math.abs(dy) > 5)) {
+      _gcIsVert = Math.abs(dy) > Math.abs(dx);
+      if (!_gcIsVert) _gcIsDragging = true;
+    }
+    if (_gcIsVert) return;
+
+    const now = performance.now();
+    const dt  = now - _gcDragLastT || 1;
+    _gcDragVel  = (clientX - _gcDragLastX) / dt;
+    _gcDragLastX = clientX; _gcDragLastT = now;
+
+    gcOffset = _gcDragOffsetAtStart + dx;
+    gcTarget = gcOffset;
+    // immediate render
+    const belt = document.getElementById('gc-belt');
+    if (belt) belt.style.transform = `translateX(${gcOffset}px)`;
+  }
+  function end() {
+    vp.classList.remove('is-dragging');
+    if (!_gcIsVert) {
+      // Fling with velocity
+      const flick     = _gcDragVel * 180;           // momentum
+      const dragTotal = gcOffset - _gcDragOffsetAtStart + flick;
+      const startOfReal = -gcN * gcCardW;
+      const relOffset   = gcOffset - startOfReal;
+      const nearestCard = Math.round(-relOffset / gcCardW);
+      const flickCards  = Math.sign(dragTotal) * (Math.abs(dragTotal) > gcCardW * 0.4 ? 1 : 0);
+      const snapCard    = nearestCard - Math.round(flick / gcCardW);
+      const snapX       = startOfReal - snapCard * gcCardW;
+      _gcSnapTo(snapX, GC_SNAP_MS, () => { gcPaused = false; });
+    } else {
+      gcPaused = false;
+    }
+    setTimeout(() => { _gcIsDragging = false; }, 60);
+  }
+
+  // Touch
+  vp.addEventListener('touchstart', e => {
+    start(e.touches[0].clientX, e.touches[0].clientY);
+  }, { passive: true });
+  vp.addEventListener('touchmove', e => {
+    if (!_gcIsVert) e.preventDefault();  // prevent page scroll while swiping
+    move(e.touches[0].clientX, e.touches[0].clientY);
+  }, { passive: false });
+  vp.addEventListener('touchend', end);
+  vp.addEventListener('touchcancel', end);
+
+  // Mouse
+  vp.addEventListener('mousedown', e => { start(e.clientX, 0); });
+  window.addEventListener('mousemove', e => { if (gcPaused && _gcDragStartX) move(e.clientX, 0); });
+  window.addEventListener('mouseup', () => { if (gcPaused && _gcDragStartX) { end(); _gcDragStartX = 0; } });
+
+  // Pause on hover
+  vp.addEventListener('mouseenter', () => { gcPaused = true; });
+  vp.addEventListener('mouseleave', () => {
+    if (!_gcIsDragging) { gcPaused = false; gcTarget = gcOffset; }
+  });
+}
+
+/* ── Auto play ── */
+function _gcStartAuto() { gcPaused = false; }
+function _gcStopAuto()  { gcPaused = true;  }
+
+/* ── Resize / orientation ── */
+let _gcResizeT = null;
 window.addEventListener('resize', () => {
-  clearTimeout(_gcResizeTimer);
-  _gcResizeTimer = setTimeout(() => { if(gcItems.length) gcApply(false); }, 120);
+  clearTimeout(_gcResizeT);
+  _gcResizeT = setTimeout(() => {
+    if (!gcN) return;
+    const newCardW = _gcCardWidth() + GC_GAP;
+    // Recalculate offset proportionally
+    const startOfReal = -gcN * gcCardW;
+    const relCard = (-gcOffset - startOfReal) / gcCardW;
+    gcCardW  = newCardW;
+    gcOffset = -gcN * gcCardW - relCard * gcCardW;
+    gcTarget = gcOffset;
+  }, 120);
 });
 window.addEventListener('orientationchange', () => {
-  setTimeout(() => { if(gcItems.length) gcApply(false); }, 300);
+  setTimeout(() => {
+    if (!gcN) return;
+    gcCardW  = _gcCardWidth() + GC_GAP;
+    gcOffset = _gcBeltOffset(gcDotIdx);
+    gcTarget = gcOffset;
+  }, 300);
 });
 
 // Footer collapsible sections (mobile only - toggle on h4 click, not on link click)
