@@ -6470,27 +6470,6 @@ footer::after{
   </div>
  </div>
 
- <!-- ═══ TOOLS SECTION (เครื่องมือคำนวณ) ═══ -->
- <div class="wrap" style="padding-top:24px">
-  <div class="sec-hd"><div class="sec-title"><i class="fas fa-calculator" style="color:var(--a)"></i> <span data-i18n="tools.sec.title">เครื่องมือช่วยตัดสินใจ</span></div></div>
-  <div class="tools-grid">
-    <div class="tools-card" onclick="openToolsModal('mortgage')">
-      <div class="tools-card-icon"><i class="fas fa-home"></i></div>
-      <h4 data-i18n="tools.card.mortgage.h">คำนวณผ่อนบ้าน</h4>
-      <p data-i18n="tools.card.mortgage.p">ประมาณยอดผ่อนรายเดือนจากราคาทรัพย์ ดอกเบี้ย และระยะเวลากู้</p>
-    </div>
-    <div class="tools-card" onclick="openToolsModal('yield')">
-      <div class="tools-card-icon"><i class="fas fa-chart-line"></i></div>
-      <h4 data-i18n="tools.card.yield.h">Rental Yield</h4>
-      <p data-i18n="tools.card.yield.p">ประเมินผลตอบแทนจากการปล่อยเช่า เทียบกับราคาซื้อ</p>
-    </div>
-    <div class="tools-card" onclick="openToolsModal('transfer')">
-      <div class="tools-card-icon"><i class="fas fa-file-contract"></i></div>
-      <h4 data-i18n="tools.card.transfer.h">ค่าโอนและภาษี</h4>
-      <p data-i18n="tools.card.transfer.p">คำนวณค่าธรรมเนียมโอน อากรแสตมป์ และภาษีธุรกิจเฉพาะโดยประมาณ</p>
-    </div>
-  </div>
- </div>
 
 <section id="rec-sec" class="gallery-carousel-sec">
   <div class="gallery-carousel-inner">
@@ -6531,7 +6510,7 @@ footer::after{
  <div class="wrap" id="all-sec">
   <!-- Row 1: title (left) + count + view-all + sort (right) -->
   <div class="sec-hd all-sec-row1" style="flex-wrap:nowrap;gap:8px;margin-bottom:16px">
-    <div class="sec-title" id="all-title" style="min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1">ประกาศทั้งหมด</div>
+    <div class="sec-title" id="all-title" style="min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1"><button onclick="openAllModal('all')" style="background:none;border:none;padding:0;margin:0;font:inherit;font-size:inherit;font-weight:inherit;color:inherit;cursor:pointer;text-align:left">ประกาศทั้งหมด</button></div>
     <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
       <span id="res-count" class="res-count-home" style="font-size:13px;color:var(--gr);white-space:nowrap"></span>
       <span class="view-all" onclick="openAllModal('all')">ดูทั้งหมด →</span>
@@ -6574,34 +6553,40 @@ footer::after{
   <div style="max-width:1320px;margin:0 auto;padding:0 20px">
     <div class="sec-hd">
       <div class="sec-title"><i class="fas fa-subway" style="color:#2A5298"></i> <span data-i18n="sec.transit">อสังหาฯ ใกล้รถไฟฟ้า</span></div>
+      <div class="gallery-nav">
+        <button class="gallery-nav-btn" onclick="hGalleryMove('transit-track',-1)"><i class="fas fa-chevron-left"></i></button>
+        <button class="gallery-nav-btn" onclick="hGalleryMove('transit-track',1)"><i class="fas fa-chevron-right"></i></button>
+      </div>
     </div>
-    <div class="transit-lines-grid">
-      <div class="transit-line-card" style="--tl-col:#009e60" onclick="quickSearch('BTS สายสุขุมวิท')">
-        <div class="tl-badge">BTS</div><div class="tl-name">สายสุขุมวิท</div><div class="tl-sub">On Nut · Bearing · Bang Na</div>
-      </div>
-      <div class="transit-line-card" style="--tl-col:#F2C200" onclick="quickSearch('BTS สายสีทอง')">
-        <div class="tl-badge" style="color:#333">BTS</div><div class="tl-name">สายสีทอง</div><div class="tl-sub">กรุงธนบุรี – คลองสาน</div>
-      </div>
-      <div class="transit-line-card" style="--tl-col:#1A53B0" onclick="quickSearch('MRT สายสีน้ำเงิน')">
-        <div class="tl-badge">MRT</div><div class="tl-name">สายสีน้ำเงิน</div><div class="tl-sub">หัวลำโพง – บางซื่อ – ท่าพระ</div>
-      </div>
-      <div class="transit-line-card" style="--tl-col:#8B2FC9" onclick="quickSearch('MRT สายสีม่วง')">
-        <div class="tl-badge">MRT</div><div class="tl-name">สายสีม่วง</div><div class="tl-sub">เตาปูน – คลองบางไผ่</div>
-      </div>
-      <div class="transit-line-card" style="--tl-col:#F5C800" onclick="quickSearch('MRT สายสีเหลือง')">
-        <div class="tl-badge" style="color:#333">MRT</div><div class="tl-name">สายสีเหลือง</div><div class="tl-sub">ลาดพร้าว – สำโรง</div>
-      </div>
-      <div class="transit-line-card" style="--tl-col:#E4007F" onclick="quickSearch('MRT สายสีชมพู')">
-        <div class="tl-badge">MRT</div><div class="tl-name">สายสีชมพู</div><div class="tl-sub">แคราย – มีนบุรี</div>
-      </div>
-      <div class="transit-line-card" style="--tl-col:#8B0000" onclick="quickSearch('Airport Rail Link')">
-        <div class="tl-badge">ARL</div><div class="tl-name">Airport Rail Link</div><div class="tl-sub">พญาไท – สุวรรณภูมิ</div>
-      </div>
-      <div class="transit-line-card" style="--tl-col:#C0392B" onclick="quickSearch('SRT Red Line')">
-        <div class="tl-badge">SRT</div><div class="tl-name">สายสีแดง</div><div class="tl-sub">บางซื่อ – รังสิต</div>
-      </div>
-      <div class="transit-line-card" style="--tl-col:#1B5E38" onclick="quickSearch('BRT')">
-        <div class="tl-badge">BRT</div><div class="tl-name">BRT</div><div class="tl-sub">สาทร – ราษฎร์บูรณะ</div>
+    <div class="h-gallery-wrap" id="transit-track-wrap">
+      <div class="h-gallery-track" id="transit-track" style="gap:12px">
+        <div class="transit-line-card" style="--tl-col:#009e60;flex-shrink:0;width:200px" onclick="quickSearch('BTS สายสุขุมวิท')">
+          <div class="tl-badge">BTS</div><div class="tl-name">สายสุขุมวิท</div><div class="tl-sub">On Nut · Bearing · Bang Na</div>
+        </div>
+        <div class="transit-line-card" style="--tl-col:#F2C200;flex-shrink:0;width:200px" onclick="quickSearch('BTS สายสีทอง')">
+          <div class="tl-badge" style="color:#333">BTS</div><div class="tl-name">สายสีทอง</div><div class="tl-sub">กรุงธนบุรี – คลองสาน</div>
+        </div>
+        <div class="transit-line-card" style="--tl-col:#1A53B0;flex-shrink:0;width:200px" onclick="quickSearch('MRT สายสีน้ำเงิน')">
+          <div class="tl-badge">MRT</div><div class="tl-name">สายสีน้ำเงิน</div><div class="tl-sub">หัวลำโพง – บางซื่อ – ท่าพระ</div>
+        </div>
+        <div class="transit-line-card" style="--tl-col:#8B2FC9;flex-shrink:0;width:200px" onclick="quickSearch('MRT สายสีม่วง')">
+          <div class="tl-badge">MRT</div><div class="tl-name">สายสีม่วง</div><div class="tl-sub">เตาปูน – คลองบางไผ่</div>
+        </div>
+        <div class="transit-line-card" style="--tl-col:#F5C800;flex-shrink:0;width:200px" onclick="quickSearch('MRT สายสีเหลือง')">
+          <div class="tl-badge" style="color:#333">MRT</div><div class="tl-name">สายสีเหลือง</div><div class="tl-sub">ลาดพร้าว – สำโรง</div>
+        </div>
+        <div class="transit-line-card" style="--tl-col:#E4007F;flex-shrink:0;width:200px" onclick="quickSearch('MRT สายสีชมพู')">
+          <div class="tl-badge">MRT</div><div class="tl-name">สายสีชมพู</div><div class="tl-sub">แคราย – มีนบุรี</div>
+        </div>
+        <div class="transit-line-card" style="--tl-col:#8B0000;flex-shrink:0;width:200px" onclick="quickSearch('Airport Rail Link')">
+          <div class="tl-badge">ARL</div><div class="tl-name">Airport Rail Link</div><div class="tl-sub">พญาไท – สุวรรณภูมิ</div>
+        </div>
+        <div class="transit-line-card" style="--tl-col:#C0392B;flex-shrink:0;width:200px" onclick="quickSearch('SRT Red Line')">
+          <div class="tl-badge">SRT</div><div class="tl-name">สายสีแดง</div><div class="tl-sub">บางซื่อ – รังสิต</div>
+        </div>
+        <div class="transit-line-card" style="--tl-col:#1B5E38;flex-shrink:0;width:200px" onclick="quickSearch('BRT')">
+          <div class="tl-badge">BRT</div><div class="tl-name">BRT</div><div class="tl-sub">สาทร – ราษฎร์บูรณะ</div>
+        </div>
       </div>
     </div>
   </div>
@@ -15597,7 +15582,7 @@ function afterLoad(){
     renderBlogs();
     renderGalleryCarousel();
     renderHomePortfolio();
-    setTimeout(()=>{ initHGallerySwipe('new-track-wrap'); initHGallerySwipe('osrv-track-wrap'); }, 200);
+    setTimeout(()=>{ initHGallerySwipe('new-track-wrap'); initHGallerySwipe('osrv-track-wrap'); initHGallerySwipe('transit-track-wrap'); }, 200);
   });
 
   // ── listings page init ───────────────────────────────────────────
@@ -24561,7 +24546,7 @@ function gcRenderDots() {
 function gcInitDrag() {
   const wrap = document.getElementById('gc-wrap');
   if(!wrap) return;
-  let _startY = 0, _isVert = false;
+  let _startY = 0, _isVert = false, _lastX = 0, _lastTime = 0, _vel = 0;
   const onDown = e => {
     gcStopAuto();
     gcDragging = false;
@@ -24569,6 +24554,7 @@ function gcInitDrag() {
     _startY = e.touches ? e.touches[0].clientY : 0;
     _isVert = false;
     gcDragDelta = 0;
+    _lastX = gcStartX; _lastTime = Date.now(); _vel = 0;
     wrap.classList.add('dragging');
     document.addEventListener('mousemove', onMove);
     document.addEventListener('mouseup', onUp);
@@ -24580,6 +24566,8 @@ function gcInitDrag() {
     const y = e.touches ? e.touches[0].clientY : 0;
     const dx = x - gcStartX;
     const dy = y - _startY;
+    const now = Date.now(); const dt = now - _lastTime || 1;
+    _vel = (x - _lastX) / dt; _lastX = x; _lastTime = now;
     if(!gcDragging && e.touches) {
       if(Math.abs(dx) > 6 || Math.abs(dy) > 6) {
         _isVert = Math.abs(dy) > Math.abs(dx);
@@ -24597,7 +24585,10 @@ function gcInitDrag() {
     document.removeEventListener('mouseup', onUp);
     document.removeEventListener('touchmove', onMove);
     document.removeEventListener('touchend', onUp);
-    if(!_isVert && Math.abs(gcDragDelta) > 50) gcMove(gcDragDelta < 0 ? 1 : -1);
+    // velocity-based: small flick still triggers move
+    const effectiveDelta = Math.abs(gcDragDelta) < 30 && Math.abs(_vel) > 0.4
+      ? (_vel > 0 ? -60 : 60) : gcDragDelta;
+    if(!_isVert && (Math.abs(gcDragDelta) > 40 || Math.abs(_vel) > 0.4)) gcMove(effectiveDelta < 0 ? 1 : -1);
     setTimeout(() => { gcDragging = false; }, 50);
     _isVert = false;
     gcStartAuto();
@@ -24669,46 +24660,68 @@ function initHGallerySwipe(wrapId) {
   const wrap = document.getElementById(wrapId);
   if(!wrap) return;
   let startX = 0, startY = 0, startScroll = 0, isDragging = false, moved = 0, isVertical = false;
+  let lastX = 0, lastTime = 0, velocity = 0;
   // Touch: only hijack horizontal swipes, let vertical pass to page scroll
   wrap.addEventListener('touchstart', e => {
     startX = e.touches[0].clientX;
     startY = e.touches[0].clientY;
     startScroll = wrap.scrollLeft;
     isDragging = false; moved = 0; isVertical = false;
+    lastX = startX; lastTime = Date.now(); velocity = 0;
   }, {passive:true});
   wrap.addEventListener('touchmove', e => {
     const dx = startX - e.touches[0].clientX;
     const dy = startY - e.touches[0].clientY;
     if(!isDragging) {
-      // Determine direction on first significant move
       if(Math.abs(dx) > 4 || Math.abs(dy) > 4) {
         isVertical = Math.abs(dy) > Math.abs(dx);
         isDragging = true;
       }
     }
     if(isDragging && !isVertical) {
+      const now = Date.now();
+      const dt = now - lastTime || 1;
+      velocity = (lastX - e.touches[0].clientX) / dt;
+      lastX = e.touches[0].clientX;
+      lastTime = now;
       moved = Math.abs(dx);
       wrap.scrollLeft = startScroll + dx;
     }
-    // If vertical, do nothing — browser handles page scroll
   }, {passive:true});
-  wrap.addEventListener('touchend', () => { isDragging = false; moved = 0; isVertical = false; });
+  wrap.addEventListener('touchend', () => {
+    if(isDragging && !isVertical && Math.abs(velocity) > 0.3) {
+      // momentum glide
+      let momentum = velocity * 180;
+      const start = wrap.scrollLeft;
+      const target = start + momentum;
+      wrap.scrollTo({left: target, behavior: 'smooth'});
+    }
+    isDragging = false; moved = 0; isVertical = false; velocity = 0;
+  });
   // Mouse drag (desktop)
   wrap.addEventListener('mousedown', e => {
     startX = e.clientX;
     startScroll = wrap.scrollLeft;
     isDragging = true;
-    moved = 0;
+    moved = 0; velocity = 0; lastX = e.clientX; lastTime = Date.now();
     wrap.classList.add('dragging');
   });
   window.addEventListener('mousemove', e => {
     if(!isDragging) return;
     const dx = startX - e.clientX;
+    const now = Date.now();
+    const dt = now - lastTime || 1;
+    velocity = (lastX - e.clientX) / dt;
+    lastX = e.clientX; lastTime = now;
     moved = Math.abs(dx);
     wrap.scrollLeft = startScroll + dx;
   });
   window.addEventListener('mouseup', () => {
     if(!isDragging) return;
+    if(Math.abs(velocity) > 0.3) {
+      const momentum = velocity * 180;
+      wrap.scrollTo({left: wrap.scrollLeft + momentum, behavior: 'smooth'});
+    }
     isDragging = false;
     wrap.classList.remove('dragging');
   });
