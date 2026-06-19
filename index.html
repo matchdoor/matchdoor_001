@@ -1010,6 +1010,167 @@ body{padding-top:64px}
 .hamburger.active span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
 .hamburger span{transition:transform .2s,opacity .2s}
 
+/* ══ MOBILE SIDE DRAWER ══════════════════════════════════════════ */
+#mob-overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.52);
+  backdrop-filter:blur(2px);
+  z-index:4500;
+  transition:opacity .28s;
+  opacity:0;
+}
+#mob-overlay.open{display:block;opacity:1}
+
+#mob-drawer{
+  position:fixed;top:0;right:0;bottom:0;
+  width:min(300px,88vw);
+  background:#fff;
+  z-index:4501;
+  transform:translateX(100%);
+  transition:transform .3s cubic-bezier(.32,1,.56,1);
+  display:flex;flex-direction:column;
+  overflow:hidden;
+  box-shadow:-6px 0 32px rgba(0,0,0,.22);
+}
+#mob-drawer.open{transform:translateX(0)}
+
+/* Drawer header */
+.mdr-hd{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 18px 14px;
+  background:var(--p2);
+  flex-shrink:0;
+  border-bottom:1px solid rgba(255,255,255,.1);
+}
+.mdr-logo{display:flex;align-items:center;gap:9px}
+.mdr-logo-icon{width:32px;height:32px;background:rgba(255,255,255,.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;color:#fff}
+.mdr-logo-text{color:#fff;font-size:14px;font-weight:800;letter-spacing:.3px}
+.mdr-logo-sub{color:rgba(255,255,255,.6);font-size:9px;font-weight:500;letter-spacing:.8px;text-transform:uppercase;display:block;line-height:1}
+.mdr-close{
+  width:32px;height:32px;border-radius:50%;
+  background:rgba(255,255,255,.15);border:none;
+  color:#fff;font-size:16px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:.15s;
+}
+.mdr-close:hover{background:rgba(255,255,255,.28)}
+
+/* Drawer body scroll area */
+.mdr-body{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:8px 0 12px}
+
+/* Plain nav item */
+.mdr-item{
+  display:flex;align-items:center;gap:11px;
+  padding:13px 20px;
+  font-size:14px;font-weight:600;color:var(--tx);
+  cursor:pointer;
+  border:none;background:none;width:100%;text-align:left;
+  transition:background .12s;
+  text-decoration:none;
+}
+.mdr-item:hover{background:var(--lt)}
+.mdr-item i.mdr-icon{width:20px;text-align:center;color:var(--p);font-size:15px;flex-shrink:0}
+.mdr-item .mdr-badge{
+  margin-left:auto;font-size:10px;font-weight:700;
+  background:var(--a);color:#fff;
+  padding:2px 7px;border-radius:20px;
+}
+
+/* Accordion toggle item */
+.mdr-acc-hd{
+  display:flex;align-items:center;gap:11px;
+  padding:13px 20px;
+  font-size:14px;font-weight:600;color:var(--tx);
+  cursor:pointer;
+  border:none;background:none;width:100%;text-align:left;
+  transition:background .12s;
+  user-select:none;
+}
+.mdr-acc-hd:hover{background:var(--lt)}
+.mdr-acc-hd i.mdr-icon{width:20px;text-align:center;color:var(--p);font-size:15px;flex-shrink:0}
+.mdr-acc-hd .mdr-chev{
+  margin-left:auto;color:#bbb;font-size:11px;
+  transition:transform .22s;flex-shrink:0;
+}
+.mdr-acc-hd.open .mdr-chev{transform:rotate(180deg)}
+.mdr-acc-hd.open{color:var(--p)}
+.mdr-acc-hd.open i.mdr-icon{color:var(--a)}
+
+/* Accordion body */
+.mdr-acc-body{
+  max-height:0;overflow:hidden;
+  transition:max-height .28s cubic-bezier(.4,0,.2,1);
+  background:var(--lt);
+}
+.mdr-acc-body.open{max-height:600px}
+
+/* Section title inside accordion */
+.mdr-sec-title{
+  font-size:10px;font-weight:700;
+  color:var(--gr);letter-spacing:.8px;text-transform:uppercase;
+  padding:12px 20px 6px;
+}
+
+/* Grid inside accordion */
+.mdr-grid{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:2px 0;
+  padding:0 12px 8px;
+}
+.mdr-grid-item{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 10px;
+  font-size:13px;font-weight:500;color:var(--tx);
+  cursor:pointer;border-radius:8px;
+  transition:background .12s;
+  border:none;background:none;text-align:left;width:100%;
+}
+.mdr-grid-item:hover{background:rgba(27,58,107,.08)}
+.mdr-grid-item i{width:16px;text-align:center;color:var(--p);font-size:13px;flex-shrink:0}
+
+/* Row items inside accordion (price rows) */
+.mdr-row-item{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 20px;
+  font-size:13px;color:var(--tx);
+  cursor:pointer;
+  border:none;background:none;width:100%;text-align:left;
+  transition:background .12s;
+}
+.mdr-row-item:hover{background:rgba(27,58,107,.06)}
+.mdr-row-item span:last-child{font-size:11px;color:var(--gr);font-weight:500}
+.mdr-row-item i{color:var(--a);margin-right:7px;font-size:12px}
+
+/* Divider */
+.mdr-divider{height:1px;background:var(--bd);margin:6px 0}
+
+/* Footer area */
+.mdr-footer{
+  flex-shrink:0;
+  padding:12px 16px 20px;
+  border-top:1px solid var(--bd);
+  display:flex;flex-direction:column;gap:8px;
+}
+.mdr-btn-login{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:11px 16px;border-radius:10px;
+  background:linear-gradient(135deg,#c03,#9b59b6);
+  color:#fff;font-size:14px;font-weight:700;
+  border:none;cursor:pointer;width:100%;
+  transition:.15s;
+}
+.mdr-btn-login:hover{opacity:.9}
+.mdr-btn-line{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:11px 16px;border-radius:10px;
+  background:var(--ln);color:#fff;
+  font-size:14px;font-weight:700;
+  border:none;cursor:pointer;width:100%;
+  text-decoration:none;transition:.15s;
+}
+.mdr-btn-line:hover{opacity:.9}
+/* ══ END MOBILE SIDE DRAWER ══ */
+
 .fav-header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid var(--bd)}
 .fav-header h3{font-size:14px;font-weight:700;display:flex;align-items:center;gap:6px}
 .fav-count-pill{background:var(--red);color:#fff;font-size:10px;padding:2px 8px;border-radius:20px}
@@ -1973,7 +2134,41 @@ footer{background:linear-gradient(135deg,#2d2650 0%,#3d3373 100%);color:rgba(255
 .tx-tabs{display:flex;margin-bottom:18px;border-radius:10px;overflow:hidden;border:1.5px solid var(--bd)}
 .tx-tab{flex:1;padding:10px;text-align:center;cursor:pointer;font-size:14px;font-weight:600;background:#F5F0E8;color:var(--tx2);transition:.2s}
 .tx-tab.active{background:var(--p);color:#F0ECE3}
-.sf{display:grid;grid-template-columns:1.6fr 0.9fr 0.9fr 0.9fr 0.9fr auto auto;gap:10px;align-items:end}
+.sf{display:grid;grid-template-columns:1.6fr 0.9fr 0.9fr 1.1fr auto auto;gap:10px;align-items:end}
+/* ── Price Range Picker ── */
+.price-picker-wrap{position:relative}
+.price-picker-btn{width:100%;padding:10px 12px;border:1.5px solid rgba(200,146,42,.4);border-radius:10px;font-size:13px;color:#1a2744;background:rgba(255,255,255,0.95);font-weight:600;height:44px;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:6px;white-space:nowrap;overflow:hidden;text-align:left;font-family:inherit}
+.price-picker-btn:hover{border-color:var(--p)}
+.price-picker-btn.active{border-color:var(--p);box-shadow:0 0 0 3px rgba(26,39,68,.12)}
+.price-picker-btn .ppb-text{flex:1;overflow:hidden;text-overflow:ellipsis;font-size:13px}
+.price-picker-btn .ppb-icon{color:rgba(26,39,68,.4);font-size:11px;flex-shrink:0;transition:.2s}
+.price-picker-btn.active .ppb-icon{transform:rotate(180deg);color:var(--p)}
+.price-picker-panel{position:fixed;z-index:99999;background:#fff;border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,.22);border:1.5px solid var(--bd);padding:16px;min-width:380px;display:none;box-sizing:border-box}
+.price-picker-panel.open{display:block;animation:ppSlide .15s ease}
+.price-picker-panel.drop-up{animation:ppSlideUp .15s ease}
+@keyframes ppSlide{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes ppSlideUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.pp-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pp-col-label{font-size:11px;font-weight:800;color:var(--p);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;display:flex;align-items:center;gap:5px}
+.pp-col-label i{font-size:10px}
+.pp-list{max-height:240px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(200,146,42,.4) transparent}
+.pp-list::-webkit-scrollbar{width:4px}
+.pp-list::-webkit-scrollbar-thumb{background:rgba(200,146,42,.4);border-radius:4px}
+.pp-opt{padding:7px 10px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:500;color:var(--tx);transition:.12s;white-space:nowrap}
+.pp-opt:hover{background:rgba(200,146,42,.12);color:var(--p);font-weight:600}
+.pp-opt.selected{background:var(--p);color:#F0ECE3;font-weight:700}
+.pp-divider{border:none;border-top:1.5px solid var(--bd);margin:12px 0}
+.pp-footer{display:flex;gap:8px}
+.pp-clear{flex:1;padding:8px;border:1.5px solid var(--bd);border-radius:8px;background:#fff;color:var(--tx2);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
+.pp-clear:hover{border-color:var(--p);color:var(--p)}
+.pp-apply{flex:2;padding:8px;border:none;border-radius:8px;background:var(--p);color:#F0ECE3;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
+.pp-apply:hover{opacity:.9}
+/* hidden selects kept for logic compat */
+.price-picker-wrap select{display:none!important}
+@media(max-width:600px){
+  .price-picker-panel{min-width:calc(100vw - 32px)!important;max-width:calc(100vw - 32px)!important}
+  .price-picker-panel.open{animation:none}
+}
 .sf label{display:block;font-size:13px;font-weight:800;color:#1a2744;margin-bottom:5px;text-shadow:none;letter-spacing:.2px}
 .sf select,.sf input{width:100%;padding:10px 12px;border:1.5px solid rgba(200,146,42,.4);border-radius:10px;font-size:14px;color:#1a2744;background:rgba(255,255,255,0.95);font-weight:600;height:44px;box-sizing:border-box}
 .sf select:focus,.sf input:focus{outline:none;border-color:var(--p)}
@@ -2784,8 +2979,7 @@ footer::after{
 .loc-opt{padding:5px 12px;border-radius:20px;border:1.5px solid var(--bd);background:#fff;cursor:pointer;font-size:12px;color:var(--tx2);transition:.2s}
 .loc-opt:hover{border-color:var(--p);color:var(--p);background:var(--lt)}
 @media(max-width:950px){
-  .nav-links{display:none!important;flex-direction:column;position:fixed;top:64px;left:0;right:0;background:var(--p2);padding:12px;z-index:1300;overflow:visible}
-  .nav-links.mob-open{display:flex!important;overflow:visible}
+  .nav-links{display:none!important}
   .hamburger{display:flex}
   .sf{grid-template-columns:1fr 1fr}
   .sf .ac-wrap{grid-column:1/-1}
@@ -2905,10 +3099,8 @@ footer::after{
    และ tablet ต่างๆ ที่กว้างกว่า 950px แต่ไม่ถึง desktop
    ═══════════════════════════════════════════════════════════════ */
 @media(max-width:1200px){
-  /* ซ่อน nav-links แล้วให้ hamburger เปิด */
-  /* z-index:1300 — ใช้ position:fixed เพื่อหลุดจาก nav stacking context และอยู่เหนือ breadcrumb (990) */
-  .nav-links{display:none!important;flex-direction:column;position:fixed;top:64px;left:0;right:0;background:var(--p2);padding:12px;z-index:1300;overflow:visible}
-  .nav-links.mob-open{display:flex!important;overflow:visible}
+  /* nav-links hidden on mobile/tablet — side drawer replaces it */
+  .nav-links{display:none!important}
   /* แสดง hamburger */
   .hamburger{display:flex}
   /* ซ่อน Add LINE ใน navbar */
@@ -2918,8 +3110,6 @@ footer::after{
   .btn-dep{gap:0}
   /* ลด gap ใน nav-right */
   .nav-right{gap:4px}
-  /* dd-panel ใน hamburger mode: fixed ลอยเหนือ nav-links */
-  .dd-panel{z-index:1100!important}
 }
 
 /* ══ DESKTOP (>1200px): full navbar ════════════════════════════ */
@@ -6376,6 +6566,140 @@ footer::after{
  </div>
 </nav>
 
+<!-- ══ MOBILE SIDE DRAWER ══════════════════════════════════════════ -->
+<div id="mob-overlay" onclick="closeMobDrawer()"></div>
+<div id="mob-drawer" role="dialog" aria-modal="true" aria-label="เมนูหลัก">
+
+  <!-- Header -->
+  <div class="mdr-hd">
+    <div class="mdr-logo">
+      <div class="mdr-logo-icon"><i class="fas fa-door-open"></i></div>
+      <div>
+        <div class="mdr-logo-text">Matchdoor</div>
+        <span class="mdr-logo-sub">Real Estate App</span>
+      </div>
+    </div>
+    <button class="mdr-close" onclick="closeMobDrawer()" aria-label="ปิด"><i class="fas fa-times"></i></button>
+  </div>
+
+  <!-- Body -->
+  <div class="mdr-body">
+
+    <!-- ซื้อขายอสังหาฯ accordion -->
+    <button class="mdr-acc-hd" onclick="mdrToggle('mdr-prop')" id="mdr-prop-hd">
+      <i class="mdr-icon fas fa-th-large"></i>
+      <span>ซื้อขายอสังหาฯ</span>
+      <i class="mdr-chev fas fa-chevron-down"></i>
+    </button>
+    <div class="mdr-acc-body" id="mdr-prop">
+      <div class="mdr-sec-title">ประเภทอสังหาริมทรัพย์</div>
+      <div class="mdr-grid">
+        <button class="mdr-grid-item" onclick="closeMobDrawer();showListingsPage('ประกาศทั้งหมด')"><i class="fas fa-home"></i> ทั้งหมด</button>
+        <button class="mdr-grid-item" onclick="closeMobDrawer();filterTypeDD('บ้านเดี่ยว')"><i class="fas fa-house-user"></i> บ้านเดี่ยว</button>
+        <button class="mdr-grid-item" onclick="closeMobDrawer();filterTypeDD('ทาวน์โฮม')"><i class="fas fa-building"></i> ทาวน์โฮม</button>
+        <button class="mdr-grid-item" onclick="closeMobDrawer();filterTypeDD('คอนโด')"><i class="fas fa-city"></i> คอนโด</button>
+        <button class="mdr-grid-item" onclick="closeMobDrawer();filterTypeDD('อาคารพาณิชย์')"><i class="fas fa-store"></i> อาคารพาณิชย์</button>
+        <button class="mdr-grid-item" onclick="closeMobDrawer();filterTypeDD('ที่ดิน')"><i class="fas fa-map"></i> ที่ดิน</button>
+        <button class="mdr-grid-item" onclick="closeMobDrawer();filterTypeDD('วิลล่า')"><i class="fas fa-umbrella-beach"></i> วิลล่า</button>
+        <button class="mdr-grid-item" onclick="closeMobDrawer();filterTypeDD('รีสอร์ท')"><i class="fas fa-hotel"></i> รีสอร์ท</button>
+      </div>
+      <div class="mdr-sec-title">ช่วงราคา</div>
+      <button class="mdr-row-item" onclick="closeMobDrawer();filterPriceDD(0,999e6,'BUY')"><span><i class="fas fa-tags"></i>ทุกช่วงราคา</span><span>ไม่จำกัด</span></button>
+      <button class="mdr-row-item" onclick="closeMobDrawer();filterPriceDD(0,3e6,'BUY')"><span><i class="fas fa-tag"></i>1 – 3 ล้านบาท</span><span>เริ่มต้น</span></button>
+      <button class="mdr-row-item" onclick="closeMobDrawer();filterPriceDD(3e6,5e6,'BUY')"><span><i class="fas fa-tag"></i>3 – 5 ล้านบาท</span><span>ยอดนิยม</span></button>
+      <button class="mdr-row-item" onclick="closeMobDrawer();filterPriceDD(5e6,999e6,'BUY')"><span><i class="fas fa-gem"></i>5 ล้านบาท+</span><span>Luxury</span></button>
+    </div>
+
+    <!-- อสังหาฯเช่า accordion -->
+    <button class="mdr-acc-hd" onclick="mdrToggle('mdr-rent')" id="mdr-rent-hd">
+      <i class="mdr-icon fas fa-key"></i>
+      <span>อสังหาฯเช่า</span>
+      <i class="mdr-chev fas fa-chevron-down"></i>
+    </button>
+    <div class="mdr-acc-body" id="mdr-rent">
+      <div class="mdr-sec-title">ประเภทอสังหาแบบเช่า</div>
+      <div class="mdr-grid">
+        <button class="mdr-grid-item" onclick="closeMobDrawer();(function(){var lp=document.getElementById('ls-tx');if(lp)lp.value='RENT';showListingsPage('ประกาศเช่าทั้งหมด');})()"><i class="fas fa-home"></i> ทั้งหมด</button>
+        <button class="mdr-grid-item" onclick="closeMobDrawer();filterRentDD('บ้านเดี่ยว','')"><i class="fas fa-house-user"></i> บ้านเดี่ยว</button>
+        <button class="mdr-grid-item" onclick="closeMobDrawer();filterRentDD('ทาวน์โฮม','')"><i class="fas fa-building"></i> ทาวน์โฮม</button>
+        <button class="mdr-grid-item" onclick="closeMobDrawer();filterRentDD('คอนโด','')"><i class="fas fa-city"></i> คอนโด</button>
+        <button class="mdr-grid-item" onclick="closeMobDrawer();filterRentDD('อาคารพาณิชย์','')"><i class="fas fa-store"></i> อาคารพาณิชย์</button>
+        <button class="mdr-grid-item" onclick="closeMobDrawer();filterRentDD('ที่ดิน','')"><i class="fas fa-map"></i> ที่ดิน</button>
+        <button class="mdr-grid-item" onclick="closeMobDrawer();filterRentDD('วิลล่า','')"><i class="fas fa-umbrella-beach"></i> วิลล่า</button>
+        <button class="mdr-grid-item" onclick="closeMobDrawer();filterRentDD('อพาร์ตเมนต์','')"><i class="fas fa-door-open"></i> อพาร์ตเมนต์</button>
+      </div>
+      <div class="mdr-sec-title">ช่วงราคาเช่า (บาท/เดือน)</div>
+      <button class="mdr-row-item" onclick="closeMobDrawer();filterRentDD('',0,999999)"><span><i class="fas fa-tags"></i>ทุกราคาเช่า</span><span>ไม่จำกัด</span></button>
+      <button class="mdr-row-item" onclick="closeMobDrawer();filterRentDD('',0,10000)"><span><i class="fas fa-tag"></i>ต่ำกว่า 10,000 บาท</span><span>ประหยัด</span></button>
+      <button class="mdr-row-item" onclick="closeMobDrawer();filterRentDD('',10000,50000)"><span><i class="fas fa-tag"></i>10,000 – 50,000 บาท</span><span>ยอดนิยม</span></button>
+      <button class="mdr-row-item" onclick="closeMobDrawer();filterRentDD('',50000,100000)"><span><i class="fas fa-gem"></i>50,000 – 100,000 บาท</span><span>พรีเมียม</span></button>
+      <button class="mdr-row-item" onclick="closeMobDrawer();filterRentDD('',100000,999999)"><span><i class="fas fa-crown"></i>มากกว่า 100,000 บาท</span><span>Luxury</span></button>
+    </div>
+
+    <div class="mdr-divider"></div>
+
+    <!-- มาใหม่ -->
+    <button class="mdr-item" onclick="closeMobDrawer();gotoNew()">
+      <i class="mdr-icon fas fa-star" style="color:#f0c040"></i>
+      <span>มาใหม่</span>
+      <span class="mdr-badge">NEW</span>
+    </button>
+
+    <!-- Hot -->
+    <button class="mdr-item" onclick="closeMobDrawer();gotoRec()">
+      <i class="mdr-icon fas fa-fire" style="color:#ff6b9d"></i>
+      <span>Hot</span>
+    </button>
+
+    <div class="mdr-divider"></div>
+
+    <!-- บริการอื่นๆ accordion -->
+    <button class="mdr-acc-hd" onclick="mdrToggle('mdr-srv')" id="mdr-srv-hd">
+      <i class="mdr-icon fas fa-wrench"></i>
+      <span>บริการอื่นๆ</span>
+      <i class="mdr-chev fas fa-chevron-down"></i>
+    </button>
+    <div class="mdr-acc-body" id="mdr-srv">
+      <div class="mdr-sec-title">บริการซ่อมแซม & ดูแลบ้าน</div>
+      <div class="mdr-grid" id="mdr-srv-grid"><!-- populated by JS --></div>
+      <button class="mdr-row-item" onclick="closeMobDrawer();_silentShowPage('home',true);setTimeout(()=>{openAllModal('services');scrollToEl('osrv-sec');},80)">
+        <span><i class="fas fa-th-large"></i> ดูบริการทั้งหมด</span><span></span>
+      </button>
+    </div>
+
+    <div class="mdr-divider"></div>
+
+    <!-- ผลงาน -->
+    <a class="mdr-item" href="/portfolio" onclick="event.preventDefault();closeMobDrawer();showPage('portfolio')">
+      <i class="mdr-icon fas fa-briefcase"></i>
+      <span>ผลงาน</span>
+    </a>
+
+    <!-- บทความ -->
+    <button class="mdr-item" onclick="closeMobDrawer();gotoBlog()">
+      <i class="mdr-icon fas fa-newspaper"></i>
+      <span>บทความ</span>
+    </button>
+
+    <!-- ตัวแทน -->
+    <a class="mdr-item" href="/agents" onclick="event.preventDefault();closeMobDrawer();showPage('agents')">
+      <i class="mdr-icon fas fa-user-tie"></i>
+      <span>ตัวแทน</span>
+    </a>
+
+  </div><!-- end .mdr-body -->
+
+  <!-- Footer: Login + LINE -->
+  <div class="mdr-footer">
+    <div id="mdr-auth-ui"></div>
+    <a class="mdr-btn-line" href="https://line.me/ti/p/@matchdoor" target="_blank" rel="noopener" onclick="closeMobDrawer()">
+      <i class="fab fa-line"></i> Add LINE — ติดต่อเรา
+    </a>
+  </div>
+
+</div>
+<!-- ══ END MOBILE SIDE DRAWER ══ -->
+
 <div class="float-wrap">
  <button class="float-top" id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="เลื่อนขึ้นบนสุด"><i class="fas fa-arrow-up"></i></button>
  <button class="profile-fab-btn" id="profile-fab-btn" onclick="onProfileFabClick()" title="บัญชีของฉัน" data-i18n-title="fab.profile.title"><i class="fas fa-user-circle"></i></button>
@@ -6443,8 +6767,31 @@ footer::after{
         </div>
       </div>
     </div>
-    <div><select id="s-min" onchange="updatePriceMax()" style="width:100%;padding:10px 12px;border:1.5px solid rgba(200,146,42,.4);border-radius:10px;font-size:13px;color:#1a2744;background:rgba(255,255,255,0.95);font-weight:600"></select></div>
-    <div><select id="s-max" style="width:100%;padding:10px 12px;border:1.5px solid rgba(200,146,42,.4);border-radius:10px;font-size:13px;color:#1a2744;background:rgba(255,255,255,0.95);font-weight:600"></select></div>
+    <div class="price-picker-wrap" id="home-pp-wrap">
+      <select id="s-min" style="display:none"></select>
+      <select id="s-max" style="display:none"></select>
+      <button type="button" class="price-picker-btn" id="home-pp-btn" onclick="togglePricePicker('home')">
+        <span class="ppb-text" id="home-pp-label">ช่วงราคา</span>
+        <i class="fas fa-chevron-down ppb-icon"></i>
+      </button>
+      <div class="price-picker-panel" id="home-pp-panel">
+        <div class="pp-cols">
+          <div>
+            <div class="pp-col-label"><i class="fas fa-arrow-down"></i> ราคาต่ำสุด</div>
+            <div class="pp-list" id="home-pp-min-list"></div>
+          </div>
+          <div>
+            <div class="pp-col-label"><i class="fas fa-arrow-up"></i> ราคาสูงสุด</div>
+            <div class="pp-list" id="home-pp-max-list"></div>
+          </div>
+        </div>
+        <hr class="pp-divider">
+        <div class="pp-footer">
+          <button class="pp-clear" onclick="clearPricePicker('home')"><i class="fas fa-undo"></i> ล้าง</button>
+          <button class="pp-apply" onclick="applyPricePicker('home')"><i class="fas fa-check"></i> ตกลง</button>
+        </div>
+      </div>
+    </div>
     <button class="btn-search" onclick="doSearch()"><i class="fas fa-search"></i> ค้นหา</button>
     <button class="btn-reset-search" onclick="resetSearch()"><i class="fas fa-undo"></i> รีเซ็ต</button>
    </div>
@@ -9831,6 +10178,7 @@ function modalAdvReset(type){
     if(typeof locDrillClose==='function') locDrillClose();
     var _smn = document.getElementById('s-min'); if(_smn) _smn.selectedIndex=0;
     var _smx = document.getElementById('s-max'); if(_smx) _smx.selectedIndex=0;
+    if(typeof _ppSyncLabel==='function'){_ppSyncLabel('home');}
     // reset tx tabs
     if(typeof tx !== 'undefined') tx = 'ALL';
     var _bt = document.querySelectorAll('.tx-tab');
@@ -10804,6 +11152,7 @@ function resetSearch(){
   locDrillClear(); locDrillClose();
   const smn=$('s-min');if(smn)smn.selectedIndex=0;
   const smx=$('s-max');if(smx)smx.selectedIndex=0;
+  if(typeof _ppSyncLabel==='function'){_ppSyncLabel('home');}
   const pr=$('s-price-range');if(pr)pr.value='0|0';
   // ── reset tx tabs ──
   tx='ALL';
@@ -15993,7 +16342,218 @@ function renderPriceOpts(){
   $('s-min').innerHTML = _buildPriceOpts(PRICE_UNIFIED_OPTS, false);
   $('s-max').innerHTML = _buildPriceOpts(PRICE_UNIFIED_OPTS, true);
   $('s-max').value = '999000000';
+  // init price pickers after options built
+  if(typeof initPricePickers === 'function') initPricePickers();
 }
+
+// ══════════════════════════════════════════════════════════
+// PRICE RANGE PICKER — unified component for home + listings
+// ══════════════════════════════════════════════════════════
+const _PP = {
+  home: { minVal: 0, maxVal: 999000000, tmpMin: 0, tmpMax: 999000000 },
+  ls:   { minVal: 0, maxVal: 999000000, tmpMin: 0, tmpMax: 999000000 }
+};
+
+const PP_OPTS = [
+  {v:0,       label:'ราคาต่ำสุด', minOnly:true},
+  {v:5000,    label:'5,000'},
+  {v:10000,   label:'10,000'},
+  {v:20000,   label:'20,000'},
+  {v:30000,   label:'30,000'},
+  {v:40000,   label:'40,000'},
+  {v:50000,   label:'50,000'},
+  {v:80000,   label:'80,000'},
+  {v:100000,  label:'100K'},
+  {v:150000,  label:'150K'},
+  {v:200000,  label:'200K'},
+  {v:300000,  label:'300K'},
+  {v:500000,  label:'500K'},
+  {v:1000000, label:'1M'},
+  {v:2000000, label:'2M'},
+  {v:3000000, label:'3M'},
+  {v:5000000, label:'5M'},
+  {v:7000000, label:'7M'},
+  {v:10000000,label:'10M'},
+  {v:15000000,label:'15M'},
+  {v:20000000,label:'20M'},
+  {v:30000000,label:'30M'},
+  {v:50000000,label:'50M'},
+  {v:80000000,label:'80M'},
+  {v:100000000,label:'100M'},
+  {v:999000000,label:'ไม่จำกัด', maxOnly:true}
+];
+
+function _ppLabel(min, max) {
+  if(min === 0 && max >= 999000000) return 'ช่วงราคา';
+  const fmtV = v => v >= 1000000 ? (v/1000000).toFixed(v%1000000===0?0:1)+'M' : v >= 1000 ? (v/1000).toFixed(0)+'K' : v.toLocaleString();
+  if(min > 0 && max >= 999000000) return fmtV(min) + ' ขึ้นไป';
+  if(min === 0) return 'ไม่เกิน ' + fmtV(max);
+  return fmtV(min) + ' – ' + fmtV(max);
+}
+
+function _ppRenderList(ns, side) {
+  const listEl = document.getElementById(ns+'-pp-'+side+'-list');
+  if(!listEl) return;
+  const st = _PP[ns];
+  const isMin = side === 'min';
+  const opts = isMin ? PP_OPTS.filter(o=>!o.maxOnly) : PP_OPTS.filter(o=>!o.minOnly);
+  listEl.innerHTML = opts.map(o => {
+    const sel = isMin ? (st.tmpMin === o.v) : (st.tmpMax === o.v);
+    // disable max options lower than chosen min (but allow equal)
+    const disabled = !isMin && o.v > 0 && o.v < st.tmpMin;
+    return `<div class="pp-opt${sel?' selected':''}${disabled?' disabled':''}" 
+      style="${disabled?'opacity:.35;cursor:default;':''}"
+      onclick="${disabled?'':'_ppSelect(\''+ns+'\',\''+side+'\','+o.v+')'}">${o.label}</div>`;
+  }).join('');
+}
+
+function _ppSelect(ns, side, val) {
+  const st = _PP[ns];
+  if(side === 'min') {
+    st.tmpMin = val;
+    // auto-adjust max if needed
+    if(st.tmpMax > 0 && st.tmpMax < val && st.tmpMax < 999000000) st.tmpMax = 999000000;
+  } else {
+    st.tmpMax = val;
+  }
+  _ppRenderList(ns, 'min');
+  _ppRenderList(ns, 'max');
+}
+
+function togglePricePicker(ns) {
+  const panel = document.getElementById(ns+'-pp-panel');
+  const btn   = document.getElementById(ns+'-pp-btn');
+  if(!panel) return;
+  const isOpen = panel.classList.contains('open');
+  // close all pickers first
+  document.querySelectorAll('.price-picker-panel.open').forEach(p=>{ p.classList.remove('open'); p.classList.remove('drop-up'); });
+  document.querySelectorAll('.price-picker-btn.active').forEach(b=>b.classList.remove('active'));
+  if(!isOpen) {
+    // sync tmp from hidden selects
+    const st = _PP[ns];
+    const minEl = document.getElementById(ns==='home'?'s-min':'ls-min');
+    const maxEl = document.getElementById(ns==='home'?'s-max':'ls-max');
+    if(minEl) st.tmpMin = parseInt(minEl.value)||0;
+    if(maxEl) st.tmpMax = parseInt(maxEl.value)||999000000;
+    _ppRenderList(ns,'min');
+    _ppRenderList(ns,'max');
+    // ── Smart positioning: drop-down or drop-up ──
+    panel.style.cssText = 'display:block;visibility:hidden;left:-9999px;top:0';
+    const panelH = panel.offsetHeight || 320;
+    const panelW = panel.offsetWidth  || 380;
+    panel.style.cssText = '';
+    const btnRect  = btn.getBoundingClientRect();
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const spaceBelow = vh - btnRect.bottom - 8;
+    const spaceAbove = btnRect.top - 8;
+    const goUp = spaceBelow < panelH && spaceAbove > spaceBelow;
+    // horizontal: prefer left-align, shift left if overflows right
+    let left = btnRect.left;
+    if(left + panelW > vw - 8) left = Math.max(8, vw - panelW - 8);
+    panel.style.left = left + 'px';
+    panel.style.minWidth = Math.min(panelW, vw - 16) + 'px';
+    if(goUp) {
+      panel.style.bottom = (vh - btnRect.top + 6) + 'px';
+      panel.style.top = 'auto';
+      panel.classList.add('drop-up');
+    } else {
+      panel.style.top  = (btnRect.bottom + 6) + 'px';
+      panel.style.bottom = 'auto';
+      panel.classList.remove('drop-up');
+    }
+    panel.classList.add('open');
+    btn.classList.add('active');
+  }
+}
+
+function applyPricePicker(ns) {
+  const st = _PP[ns];
+  st.minVal = st.tmpMin;
+  st.maxVal = st.tmpMax;
+  // sync to hidden selects
+  const minId = ns==='home'?'s-min':'ls-min';
+  const maxId = ns==='home'?'s-max':'ls-max';
+  const minEl = document.getElementById(minId);
+  const maxEl = document.getElementById(maxId);
+  if(minEl) minEl.value = String(st.minVal);
+  if(maxEl) maxEl.value = String(st.maxVal);
+  // update button label
+  const lbl = document.getElementById(ns+'-pp-label');
+  if(lbl) lbl.textContent = _ppLabel(st.minVal, st.maxVal);
+  const btn = document.getElementById(ns+'-pp-btn');
+  if(btn) { btn.style.borderColor = (st.minVal>0||st.maxVal<999000000)?'var(--p)':''; }
+  // close panel
+  const panel = document.getElementById(ns+'-pp-panel');
+  if(panel){panel.classList.remove('open');panel.classList.remove('drop-up');}
+  if(btn) btn.classList.remove('active');
+  // trigger search
+  if(ns==='home') { if(typeof applyFilters==='function') applyFilters().catch(console.error); }
+  if(ns==='ls')   { if(typeof listingsInlineSearch==='function') listingsInlineSearch(); }
+}
+
+function clearPricePicker(ns) {
+  const st = _PP[ns];
+  st.tmpMin = 0; st.tmpMax = 999000000;
+  _ppRenderList(ns,'min'); _ppRenderList(ns,'max');
+}
+
+function _ppSyncLabel(ns) {
+  const minId = ns==='home'?'s-min':'ls-min';
+  const maxId = ns==='home'?'s-max':'ls-max';
+  const minEl = document.getElementById(minId);
+  const maxEl = document.getElementById(maxId);
+  const min = parseInt(minEl?.value||'0')||0;
+  const max = parseInt(maxEl?.value||'999000000')||999000000;
+  const lbl = document.getElementById(ns+'-pp-label');
+  if(lbl) lbl.textContent = _ppLabel(min, max);
+  const btn = document.getElementById(ns+'-pp-btn');
+  if(btn) btn.style.borderColor = (min>0||max<999000000)?'var(--p)':'';
+  _PP[ns].minVal = min; _PP[ns].maxVal = max;
+  _PP[ns].tmpMin = min; _PP[ns].tmpMax = max;
+}
+
+function initPricePickers() {
+  _ppSyncLabel('home');
+  _ppSyncLabel('ls');
+}
+
+// close pickers when clicking outside
+document.addEventListener('click', function(e){
+  if(!e.target.closest('.price-picker-wrap')){
+    document.querySelectorAll('.price-picker-panel.open').forEach(p=>{p.classList.remove('open');p.classList.remove('drop-up');});
+    document.querySelectorAll('.price-picker-btn.active').forEach(b=>b.classList.remove('active'));
+  }
+});
+// reposition on scroll/resize to keep panel aligned with button
+function _ppReposition(){
+  document.querySelectorAll('.price-picker-panel.open').forEach(function(panel){
+    const ns = panel.id.replace('-pp-panel','');
+    const btn = document.getElementById(ns+'-pp-btn');
+    if(!btn) return;
+    const btnRect = btn.getBoundingClientRect();
+    const vw = window.innerWidth, vh = window.innerHeight;
+    const panelW = panel.offsetWidth;
+    const panelH = panel.offsetHeight;
+    let left = btnRect.left;
+    if(left + panelW > vw - 8) left = Math.max(8, vw - panelW - 8);
+    panel.style.left = left + 'px';
+    const spaceBelow = vh - btnRect.bottom - 8;
+    const spaceAbove = btnRect.top - 8;
+    const goUp = spaceBelow < panelH && spaceAbove > spaceBelow;
+    if(goUp){
+      panel.style.bottom = (vh - btnRect.top + 6) + 'px';
+      panel.style.top = 'auto';
+      panel.classList.add('drop-up');
+    } else {
+      panel.style.top = (btnRect.bottom + 6) + 'px';
+      panel.style.bottom = 'auto';
+      panel.classList.remove('drop-up');
+    }
+  });
+}
+window.addEventListener('scroll', _ppReposition, {passive:true});
+window.addEventListener('resize', _ppReposition, {passive:true});
 function _refreshPriceOpts(){
   // เรียกเมื่อ tx เปลี่ยน เพื่อ swap ชุดราคา
   const minEl = $('s-min'), maxEl = $('s-max');
@@ -16003,8 +16563,9 @@ function _refreshPriceOpts(){
   // คืนค่าเดิมถ้ายังมีใน list
   if([...minEl.options].some(o=>o.value===prevMin)) minEl.value = prevMin;
   if([...maxEl.options].some(o=>o.value===prevMax)) maxEl.value = prevMax;
+  if(typeof _ppSyncLabel==='function')_ppSyncLabel('home');
 }
-function setPriceRange(val){ const parts=(val||'0|0').split('|'); const mn=parseInt(parts[0])||0; const mx=parseInt(parts[1])||999000000; $('s-min').value=String(mn); $('s-max').value=String(mx||999000000); }
+function setPriceRange(val){ const parts=(val||'0|0').split('|'); const mn=parseInt(parts[0])||0; const mx=parseInt(parts[1])||999000000; $('s-min').value=String(mn); $('s-max').value=String(mx||999000000); if(typeof _ppSyncLabel==='function')_ppSyncLabel('home'); }
 function updatePriceMax(){const min=+$('s-min').value;$$('#s-max option').forEach(o=>{o.disabled=+o.value>0&&+o.value<min;});}
 
 function setTx(t,el){ tx=t; $$('.tx-tab').forEach(b=>b.classList.remove('active')); el.classList.add('active'); const pb=$('price-buy-section'),pr=$('price-rent-section'); if(pb&&pr){ pb.style.display=t==='RENT'?'none':'block'; pr.style.display=t==='RENT'?'block':'none'; } if(typeof _refreshPriceOpts==='function') _refreshPriceOpts(); applyFilters().catch(console.error); const _heroStats=document.getElementById('hero-stat-counters'); if(_heroStats){ if(window._dataReady && typeof syncAllStats==='function'){ syncAllStats(true); } else if(typeof animateStatCounters==='function'){ animateStatCounters(_heroStats.closest('.page')||document); } } }
@@ -16026,6 +16587,7 @@ function _resetFilterState(){
   var kw=$('s-kw'); if(kw){kw.value=''; var al=$('ac-list');if(al)al.style.display='none';}
   // reset price to full range
   $('s-min').value=0; $('s-max').value=999000000;
+  if(typeof _ppSyncLabel==='function')_ppSyncLabel('home');
   // reset province
   var sp=$('s-prov'); if(sp) sp.value='';
   // reset type select
@@ -16053,6 +16615,7 @@ function filterPriceDD(min,max,forceTx){
   // reset type + keyword ก่อน แล้วค่อย set ราคาที่เลือก
   _resetFilterState();
   $('s-min').value=min; $('s-max').value=max;
+  if(typeof _ppSyncLabel==='function')_ppSyncLabel('home');
   applyFilters().catch(console.error);
   scrollToEl('all-sec');
 }
@@ -16683,7 +17246,7 @@ window.addEventListener('popstate', function(e) {
 });
 
 // Show page WITHOUT pushing another history entry (used by popstate)
-function _closeHamburger(){ const nav=$('nav-links'),hb=$('hamburger'); if(nav)nav.classList.remove('mob-open'); if(hb)hb.classList.remove('active'); }
+function _closeHamburger(){ closeMobDrawer(); const nav=$('nav-links'),hb=$('hamburger'); if(nav)nav.classList.remove('mob-open'); if(hb)hb.classList.remove('active'); }
 function _silentShowPage(name, skipScrollTop) {
   // คืน body scroll เสมอ — ปลอดภัยสำหรับทุก device
   document.body.style.removeProperty('overflow');
@@ -17897,6 +18460,7 @@ function showListingsPage(title, data) {
   const lsType = document.getElementById('ls-type'); if(lsType) lsType.value = '';
   const lsMinEl = document.getElementById('ls-min'); if(lsMinEl) lsMinEl.value = '0';
   const lsMaxEl = document.getElementById('ls-max'); if(lsMaxEl) lsMaxEl.value = '999000000';
+  if(typeof _ppSyncLabel==='function'){_ppSyncLabel('ls');}
   const lsTxEl = document.getElementById('ls-tx'); if(lsTxEl) lsTxEl.value = '';
   _populateListingsProvince();
   _updateListingsTxTabs('ALL');
@@ -18018,6 +18582,7 @@ function listingsResetSearch() {
   const lsPopular = document.getElementById('ls-popular'); if(lsPopular) lsPopular.selectedIndex = 0;
   const lsMin = document.getElementById('ls-min'); if(lsMin) lsMin.selectedIndex = 0;
   const lsMax = document.getElementById('ls-max'); if(lsMax) lsMax.selectedIndex = 0;
+  if(typeof _ppSyncLabel==='function')_ppSyncLabel('ls');
   const lsTransit = document.getElementById('ls-transit'); if(lsTransit) lsTransit.selectedIndex = 0;
   _listingsTxFilter = 'ALL';
   _updateListingsTxTabs('ALL');
@@ -22836,85 +23401,85 @@ function showLocLayer() { /* disabled */ }
 function selectLocCat(key) { /* disabled */ }
 function applyLocOpt(val) { /* disabled */ }
 
-// ── ข้อมูลอำเภอครบ 77 จังหวัด ─────────────────────────────────────
+// ── ข้อมูลจังหวัด 77 จังหวัด (ลบอำเภอออกแล้ว — เลือกเฉพาะจังหวัด) ──
 const PROVINCE_DISTRICTS = {
-  'กรุงเทพฯ':['พระนคร','ดุสิต','หนองจอก','บางรัก','บางเขน','บางกะปิ','ปทุมวัน','ป้อมปราบศัตรูพ่าย','พระโขนง','มีนบุรี','ลาดกระบัง','ยานนาวา','สัมพันธวงศ์','พญาไท','ธนบุรี','บางกอกใหญ่','ห้วยขวาง','คลองสาน','ตลิ่งชัน','บางกอกน้อย','บางขุนเทียน','ภาษีเจริญ','หนองแขม','ราษฎร์บูรณะ','บางพลัด','ดินแดง','บึงกุ่ม','สาทร','บางซื่อ','จตุจักร','บางคอแหลม','ประเวศ','คลองเตย','สวนหลวง','จอมทอง','ดอนเมือง','ราชเทวี','ลาดพร้าว','วัฒนา','บางแค','หลักสี่','สายไหม','คันนายาว','สะพานสูง','วังทองหลาง','คลองสามวา','บางนา','ทวีวัฒนา','ทุ่งครุ','บางบอน'],
-  'กระบี่':['เมืองกระบี่','เขาพนม','เกาะลันตา','คลองท่อม','อ่าวลึก','ปลายพระยา','ลำทับ','เหนือคลอง'],
-  'กาญจนบุรี':['เมืองกาญจนบุรี','ไทรโยค','บ่อพลอย','ศรีสวัสดิ์','ท่ามะกา','ท่าม่วง','ทองผาภูมิ','สังขละบุรี','พนมทวน','เลาขวัญ','ด่านมะขามเตี้ย','หนองปรือ','ห้วยกระเจา'],
-  'กาฬสินธุ์':['เมืองกาฬสินธุ์','นามน','กมลาไสย','ร่องคำ','กุฉินารายณ์','เขาวง','ยางตลาด','ห้วยเม็ก','สหัสขันธ์','คำม่วง','ท่าคันโท','หนองกุงศรี','สมเด็จ','ห้วยผึ้ง','สามชัย','นาคู','ดอนจาน','ฆ้องชัย'],
-  'กำแพงเพชร':['เมืองกำแพงเพชร','ไทรงาม','คลองลาน','ขาณุวรลักษบุรี','คลองขลุง','พรานกระต่าย','ลานกระบือ','ทรายทองวัฒนา','ปางศิลาทอง','บึงสามัคคี','โกสัมพีนคร'],
-  'ขอนแก่น':['เมืองขอนแก่น','บ้านฝาง','พระยืน','หนองเรือ','ชุมแพ','สีชมพู','น้ำพอง','อุบลรัตน์','กระนวน','บ้านไผ่','เปือยน้อย','พล','แวงใหญ่','แวงน้อย','หนองสองห้อง','ภูเวียง','มัญจาคีรี','ชนบท','เขาสวนกวาง','ภูผาม่าน','ซำสูง','โคกโพธิ์ไชย','หนองนาคำ','บ้านแฮด','โนนศิลา','เวียงเก่า'],
-  'จันทบุรี':['เมืองจันทบุรี','ขลุง','ท่าใหม่','โป่งน้ำร้อน','มะขาม','แหลมสิงห์','สอยดาว','แก่งหางแมว','นายายอาม','เขาคิชฌกูฏ'],
-  'ฉะเชิงเทรา':['เมืองฉะเชิงเทรา','บางคล้า','บางน้ำเปรี้ยว','บางปะกง','บ้านโพธิ์','พนมสารคาม','ราชสาส์น','สนามชัยเขต','แปลงยาว','ท่าตะเกียบ','คลองเขื่อน'],
-  'ชลบุรี':['เมืองชลบุรี','บ้านบึง','หนองใหญ่','บางละมุง','พานทอง','พนัสนิคม','ศรีราชา','เกาะสีชัง','สัตหีบ','บ่อทอง','เกาะจันทร์'],
-  'ชัยนาท':['เมืองชัยนาท','มโนรมย์','วัดสิงห์','สรรพยา','สรรคบุรี','หันคา','หนองมะโมง','เนินขาม'],
-  'ชัยภูมิ':['เมืองชัยภูมิ','บ้านเขว้า','คอนสวรรค์','เกษตรสมบูรณ์','หนองบัวแดง','จัตุรัส','บำเหน็จณรงค์','หนองบัวระเหว','เทพสถิต','ภูเขียว','บ้านแท่น','แก้งคร้อ','คอนสาร','ภักดีชุมพล','เนินสง่า','ซับใหญ่'],
-  'ชุมพร':['เมืองชุมพร','ท่าแซะ','ปะทิว','หลังสวน','ละแม','พะโต๊ะ','สวี','ทุ่งตะโก'],
-  'เชียงราย':['เมืองเชียงราย','เวียงชัย','เชียงของ','เทิง','พาน','ป่าแดด','แม่จัน','เชียงแสน','แม่สาย','แม่สรวย','เวียงป่าเป้า','พญาเม็งราย','เวียงแก่น','ขุนตาล','แม่ฟ้าหลวง','แม่ลาว','เวียงเชียงรุ้ง','ดอยหลวง'],
-  'เชียงใหม่':['เมืองเชียงใหม่','จอมทอง','แม่แจ่ม','เชียงดาว','ดอยสะเก็ด','แม่แตง','แม่ริม','สะเมิง','ฝาง','แม่อาย','พร้าว','สันป่าตอง','สันกำแพง','สันทราย','หางดง','ฮอด','ดอยเต่า','อมก๋อย','สารภี','เวียงแหง','ไชยปราการ','แม่วาง','แม่ออน','ดอยหล่อ'],
-  'ตรัง':['เมืองตรัง','กันตัง','ย่านตาขาว','ปะเหลียน','สิเกา','ห้วยยอด','วังวิเศษ','นาโยง','รัษฎา','หาดสำราญ'],
-  'ตราด':['เมืองตราด','คลองใหญ่','เขาสมิง','บ่อไร่','แหลมงอบ','เกาะกูด','เกาะช้าง'],
-  'ตาก':['เมืองตาก','บ้านตาก','สามเงา','แม่ระมาด','ท่าสองยาง','แม่สอด','พบพระ','อุ้มผาง','วังเจ้า'],
-  'นครนายก':['เมืองนครนายก','ปากพลี','บ้านนา','องครักษ์'],
-  'นครปฐม':['เมืองนครปฐม','กำแพงแสน','นครชัยศรี','ดอนตูม','บางเลน','สามพราน','พุทธมณฑล'],
-  'นครพนม':['เมืองนครพนม','ปลาปาก','ท่าอุเทน','บ้านแพง','ธาตุพนม','เรณูนคร','นาแก','ศรีสงคราม','นาหว้า','โพนสวรรค์','นาทม','วังยาง'],
-  'นครราชสีมา':['เมืองนครราชสีมา','ครบุรี','เสิงสาง','คง','บ้านเหลื่อม','จักราช','โชคชัย','ด่านขุนทด','โนนไทย','โนนสูง','ขามสะแกแสง','บัวใหญ่','ประทาย','ปักธงชัย','พิมาย','ห้วยแถลง','ชุมพวง','สูงเนิน','ขามทะเลสอ','สีคิ้ว','ปากช่อง','หนองบุนนาก','แก้งสนามนาง','โนนแดง','วังน้ำเขียว','เทพารักษ์','เมืองยาง','พระทองคำ','ลำทะเมนชัย','บัวลาย','สีดา','เฉลิมพระเกียรติ'],
-  'นครศรีธรรมราช':['เมืองนครศรีธรรมราช','พรหมคีรี','ลานสกา','ฉวาง','พิปูน','เชียรใหญ่','ชะอวด','ท่าศาลา','ทุ่งสง','นาบอน','ทุ่งใหญ่','ปากพนัง','ร่อนพิบูลย์','สิชล','ขนอม','หัวไทร','บางขัน','ถ้ำพรรณรา','ฉวาง','จุฬาภรณ์','พระพรหม','นบพิตำ','ช้างกลาง','เฉลิมพระเกียรติ'],
-  'นครสวรรค์':['เมืองนครสวรรค์','โกรกพระ','ชุมแสง','หนองบัว','บึงเสนาท','บรรพตพิสัย','เก้าเลี้ยว','ตาคลี','ท่าตะโก','ไพศาลี','พยุหะคีรี','ลาดยาว','ตากฟ้า','แม่วงก์','แม่เปิน','ชุมตาบง'],
-  'นนทบุรี':['เมืองนนทบุรี','บางกรวย','บางใหญ่','บางบัวทอง','ไทรน้อย','ปากเกร็ด'],
-  'นราธิวาส':['เมืองนราธิวาส','ตากใบ','บาเจาะ','ยี่งอ','ระแงะ','รือเสาะ','ศรีสาคร','แว้ง','สุคิริน','สุไหงโก-ลก','สุไหงปาดี','จะแนะ','เจาะไอร้อง'],
-  'น่าน':['เมืองน่าน','แม่จริม','บ้านหลวง','นาน้อย','ปัว','ท่าวังผา','เวียงสา','ทุ่งช้าง','เชียงกลาง','นาหมื่น','สันติสุข','บ่อเกลือ','สองแคว','ภูเพียง','เฉลิมพระเกียรติ'],
-  'บึงกาฬ':['เมืองบึงกาฬ','พรเจริญ','โซ่พิสัย','เซกา','ปากคาด','บึงโขงหลง','ศรีวิไล','บุ่งคล้า'],
-  'บุรีรัมย์':['เมืองบุรีรัมย์','คูเมือง','กระสัง','นางรอง','หนองกี่','ละหานทราย','ประโคนชัย','บ้านกรวด','พุทไธสง','ลำปลายมาศ','สตึก','ปะคำ','นาโพธิ์','หนองหงส์','พลับพลาชัย','ห้วยราช','โนนสุวรรณ','ชำนิ','บ้านใหม่ไชยพจน์','โนนดินแดง','บ้านด่าน','แคนดง','เฉลิมพระเกียรติ'],
-  'ปทุมธานี':['เมืองปทุมธานี','คลองหลวง','ธัญบุรี','หนองเสือ','ลาดหลุมแก้ว','ลำลูกกา','สามโคก'],
-  'ประจวบคีรีขันธ์':['เมืองประจวบคีรีขันธ์','กุยบุรี','ทับสะแก','บางสะพาน','บางสะพานน้อย','ปราณบุรี','หัวหิน','สามร้อยยอด'],
-  'ปราจีนบุรี':['เมืองปราจีนบุรี','กบินทร์บุรี','นาดี','บ้านสร้าง','ประจันตคาม','ศรีมหาโพธิ','ศรีมโหสถ'],
-  'ปัตตานี':['เมืองปัตตานี','โคกโพธิ์','หนองจิก','ปะนาเระ','มายอ','ทุ่งยางแดง','สายบุรี','ไม้แก่น','ยะรัง','ยะหริ่ง','จะนะ','บาเจาะ','กะพ้อ','แม่ลาน'],
-  'พระนครศรีอยุธยา':['พระนครศรีอยุธยา','ท่าเรือ','นครหลวง','บางไทร','บางบาล','บางปะอิน','บางปะหัน','ผักไห่','ภาชี','ลาดบัวหลวง','วังน้อย','เสนา','บางซ้าย','อุทัย','มหาราช','บ้านแพรก'],
-  'พะเยา':['เมืองพะเยา','จุน','เชียงคำ','เชียงม่วน','ดอกคำใต้','ปง','แม่ใจ','ภูซาง','ภูกามยาว'],
-  'พังงา':['เมืองพังงา','เกาะยาว','กะปง','ตะกั่วทุ่ง','ตะกั่วป่า','คุระบุรี','ทับปุด','ท้ายเหมือง'],
-  'พัทลุง':['เมืองพัทลุง','กงหรา','เขาชัยสน','ตะโหมด','ควนขนุน','ปากพะยูน','ศรีบรรพต','ป่าพะยอม','บางแก้ว','ป่าบอน','ควนโดน'],
-  'พิจิตร':['เมืองพิจิตร','วังทรายพูน','โพธิ์ประทับช้าง','ตะพานหิน','บางมูลนาก','โพทะเล','สามง่าม','ทับคล้อ','สากเหล็ก','บึงนาราง','ดงเจริญ','วชิรบารมี'],
-  'พิษณุโลก':['เมืองพิษณุโลก','นครไทย','ชาติตระการ','บางระกำ','บางกระทุ่ม','พรหมพิราม','วัดโบสถ์','วังทอง','เนินมะปราง'],
-  'เพชรบุรี':['เมืองเพชรบุรี','เขาย้อย','หนองหญ้าปล้อง','ชะอำ','ท่ายาง','บ้านลาด','บ้านแหลม','แก่งกระจาน'],
-  'เพชรบูรณ์':['เมืองเพชรบูรณ์','ชนแดน','หล่มสัก','หล่มเก่า','วิเชียรบุรี','ศรีเทพ','หนองไผ่','บึงสามพัน','น้ำหนาว','วังโป่ง','เขาค้อ'],
-  'แพร่':['เมืองแพร่','ร้องกวาง','ลอง','สูงเม่น','เด่นชัย','สอง','วังชิ้น','หนองม่วงไข่'],
-  'ภูเก็ต':['เมืองภูเก็ต','กะทู้','ถลาง'],
-  'มหาสารคาม':['เมืองมหาสารคาม','แกดำ','โกสุมพิสัย','กันทรวิชัย','เชียงยืน','บรบือ','นาเชือก','พยัคฆภูมิพิสัย','วาปีปทุม','นาดูน','ยางสีสุราช','กุดรัง','ชื่นชม'],
-  'มุกดาหาร':['เมืองมุกดาหาร','นิคมคำสร้อย','ดอนตาล','ดงหลวง','คำชะอี','หว้านใหญ่','หนองสูง'],
-  'แม่ฮ่องสอน':['เมืองแม่ฮ่องสอน','ขุนยวม','ปาย','แม่สะเรียง','แม่ลาน้อย','สบเมย','ปางมะผ้า'],
-  'ยโสธร':['เมืองยโสธร','ทรายมูล','กุดชุม','คำเขื่อนแก้ว','ป่าติ้ว','มหาชนะชัย','ค้อวัง','เลิงนกทา','ไทยเจริญ'],
-  'ยะลา':['เมืองยะลา','เบตง','บันนังสตา','ธารโต','ยะหา','รามัน','กาบัง','กรงปินัง'],
-  'ร้อยเอ็ด':['เมืองร้อยเอ็ด','เกษตรวิสัย','ปทุมรัตต์','จตุรพักตรพิมาน','ธวัชบุรี','พนมไพร','โพนทอง','โพธิ์ชัย','หนองพอก','เสลภูมิ','สุวรรณภูมิ','เมืองสรวง','โพนทราย','อาจสามารถ','เมยวดี','ศรีสมเด็จ','จังหาร','เชียงขวัญ','หนองฮี','ทุ่งเขาหลวง'],
-  'ระนอง':['เมืองระนอง','ละอุ่น','กะเปอร์','กระบุรี','สุขสำราญ'],
-  'ระยอง':['เมืองระยอง','บ้านฉาง','แกลง','วังจันทร์','บ้านค่าย','ปลวกแดง','เขาชะเมา','นิคมพัฒนา'],
-  'ราชบุรี':['เมืองราชบุรี','จอมบึง','สวนผึ้ง','ดำเนินสะดวก','บ้านโป่ง','บางแพ','โพธาราม','ปากท่อ','วัดเพลง','บ้านคา'],
-  'ลพบุรี':['เมืองลพบุรี','พัฒนานิคม','โคกสำโรง','ชัยบาดาล','ท่าวุ้ง','บ้านหมี่','ท่าหลวง','สระโบสถ์','โคกเจริญ','ลำสนธิ','หนองม้า'],
-  'ลำปาง':['เมืองลำปาง','แม่เมาะ','เกาะคา','เสริมงาม','งาว','แจ้ห่ม','วังเหนือ','เถิน','แม่พริก','แม่ทะ','สบปราบ','ห้างฉัตร','เมืองปาน'],
-  'ลำพูน':['เมืองลำพูน','แม่ทา','บ้านโฮ่ง','ลี้','ทุ่งหัวช้าง','ป่าซาง','บ้านธิ','เวียงหนองล่อง'],
-  'เลย':['เมืองเลย','นาด้วง','เชียงคาน','ปากชม','ด่านซ้าย','นาแห้ว','ภูเรือ','ท่าลี่','วังสะพุง','ภูกระดึง','ภูหลวง','ผาขาว','เอราวัณ','หนองหิน'],
-  'ศรีสะเกษ':['เมืองศรีสะเกษ','ยางชุมน้อย','กันทรารมย์','กันทรลักษ์','ขุขันธ์','ไพรบึง','ปรางค์กู่','ขุนหาญ','ราษีไศล','อุทุมพรพิสัย','บึงบูรพ์','ห้วยทับทัน','โนนคูณ','ศรีรัตนะ','น้ำเกลี้ยง','วังหิน','ภูสิงห์','เมืองจันทร์','เบญจลักษ์','พยุห์','โพธิ์ศรีสุวรรณ','ศิลาลาด'],
-  'สกลนคร':['เมืองสกลนคร','กุสุมาลย์','กุดบาก','พรรณานิคม','พังโคน','วาริชภูมิ','นิคมน้ำอูน','เต่างอย','โคกศรีสุพรรณ','เจิรญศิลป์','โพนนาแก้ว','ภูพาน','โนนนาคำ','บ้านม่วง','อากาศอำนวย','สว่างแดนดิน','ส่องดาว','คำตากล้า','บึงโขงหลง','วานรนิวาส','คูเมือง'],
-  'สงขลา':['เมืองสงขลา','สทิงพระ','จะนะ','นาทวี','เทพา','สะบ้าย้อย','ระโนด','กระแสสินธุ์','รัตภูมิ','สะเดา','หาดใหญ่','นาหม่อม','ควนเนียง','บางกล่ำ','สิงหนคร','คลองหอยโข่ง'],
-  'สตูล':['เมืองสตูล','ควนโดน','ควนกาหลง','ท่าแพ','กระแสสินธุ์','ละงู','ทุ่งหว้า','มะนัง'],
-  'สมุทรปราการ':['เมืองสมุทรปราการ','บางบ่อ','บางพลี','พระประแดง','พระสมุทรเจดีย์','บางเสาธง'],
-  'สมุทรสงคราม':['เมืองสมุทรสงคราม','บางคนที','อัมพวา'],
-  'สมุทรสาคร':['เมืองสมุทรสาคร','กระทุ่มแบน','บ้านแพ้ว'],
-  'สระแก้ว':['เมืองสระแก้ว','คลองหาด','ตาพระยา','วังน้ำเย็น','วังสมบูรณ์','วัฒนานคร','อรัญประเทศ','เขาฉกรรจ์','โคกสูง','บ้านใหม่ไทยเจริญ'],
-  'สระบุรี':['เมืองสระบุรี','แก่งคอย','หนองแค','วิหารแดง','หนองแซง','บ้านหมอ','ดอนพุด','หนองโดน','พระพุทธบาท','เสาไห้','มวกเหล็ก','วังม่วง','เฉลิมพระเกียรติ'],
-  'สิงห์บุรี':['เมืองสิงห์บุรี','บางระจัน','ค่ายบางระจัน','พรหมบุรี','ท่าช้าง','อินทร์บุรี'],
-  'สุโขทัย':['เมืองสุโขทัย','บ้านด้าน','คีรีมาศ','กงไกรลาศ','ศรีสัชนาลัย','ศรีสำโรง','สวรรคโลก','ศรีนคร','ทุ่งเสลี่ยม'],
-  'สุพรรณบุรี':['เมืองสุพรรณบุรี','เดิมบางนางบวช','ด่านช้าง','บางปลาม้า','ศรีประจันต์','ดอนเจดีย์','สองพี่น้อง','สามชุก','อู่ทอง','หนองหญ้าไซ'],
-  'สุราษฎร์ธานี':['เมืองสุราษฎร์ธานี','กาญจนดิษฐ์','ดอนสัก','เกาะสมุย','เกาะพะงัน','ไชยา','ท่าชนะ','คีรีรัฐนิคม','บ้านตาขุน','พนม','ท่าฉาง','บ้านนาสาร','บ้านนาเดิม','เคียนซา','เวียงสระ','พระแสง','พุนพิน','ชัยบุรี','วิภาวดี'],
-  'สุรินทร์':['เมืองสุรินทร์','ชุมพลบุรี','ท่าตูม','จอมพระ','ปราสาท','กาบเชิง','รัตนบุรี','สนม','ศีขรภูมิ','สังขะ','ลำดวน','สำโรงทาบ','บัวเชด','พนมดงรัก','ศรีณรงค์','เขวาสินรินทร์','โนนนารายณ์'],
-  'หนองคาย':['เมืองหนองคาย','ท่าบ่อ','โพนพิสัย','ศรีเชียงใหม่','สังคม','สระใคร','เฝ้าไร่','รัตนวาปี','โพธิ์ตาก'],
-  'หนองบัวลำภู':['เมืองหนองบัวลำภู','นากลาง','โนนสัง','ศรีบุญเรือง','สุวรรณคูหา','นาวัง'],
-  'อ่างทอง':['เมืองอ่างทอง','ไชโย','ป่าโมก','โพธิ์ทอง','แสวงหา','วิเศษชัยชาญ','สามโก้'],
-  'อำนาจเจริญ':['เมืองอำนาจเจริญ','ชานุมาน','ปทุมราชวงศา','พนา','เสนางคนิคม','หัวตะพาน','ลืออำนาจ'],
-  'อุดรธานี':['เมืองอุดรธานี','กุดจับ','หนองวัวซอ','กุมภวาปี','โนนสะอาด','หนองหาน','ทุ่งฝน','ไชยวาน','ศรีธาตุ','วังสามหมอ','บ้านดุง','บ้านผือ','น้ำโสม','เพ็ญ','สร้างคอม','หนองแสง','นายูง','พิบูลย์รักษ์','กู่แก้ว','ประจักษ์ศิลปาคม'],
-  'อุตรดิตถ์':['เมืองอุตรดิตถ์','ตรอน','ท่าปลา','น้ำปาด','ฟากท่า','บ้านโคก','พิชัย','ลับแล','ทองแสนขัน'],
-  'อุทัยธานี':['เมืองอุทัยธานี','ทัพทัน','สว่างอารมณ์','หนองฉาง','หนองขาหย่าง','บ้านไร่','ลานสัก','ห้วยคต'],
-  'อุบลราชธานี':['เมืองอุบลราชธานี','ศรีเมืองใหม่','โขงเจียม','เขื่องใน','เขมราฐ','เดชอุดม','นาจะหลวย','น้ำยืน','บุณฑริก','ตระการพืชผล','กุดข้าวปุ้น','ม่วงสามสิบ','วารินชำราบ','พิบูลมังสาหาร','ตาลสุม','โพธิ์ไทร','สำโรง','ดอนมดแดง','สิรินธร','ทุ่งศรีอุดม','นาเยีย','นาตาล','เหล่าเสือโก้ก','สว่างวีระวงศ์','น้ำขุ่น'],
+  'กรุงเทพฯ':[],
+  'กระบี่':[],
+  'กาญจนบุรี':[],
+  'กาฬสินธุ์':[],
+  'กำแพงเพชร':[],
+  'ขอนแก่น':[],
+  'จันทบุรี':[],
+  'ฉะเชิงเทรา':[],
+  'ชลบุรี':[],
+  'ชัยนาท':[],
+  'ชัยภูมิ':[],
+  'ชุมพร':[],
+  'เชียงราย':[],
+  'เชียงใหม่':[],
+  'ตรัง':[],
+  'ตราด':[],
+  'ตาก':[],
+  'นครนายก':[],
+  'นครปฐม':[],
+  'นครพนม':[],
+  'นครราชสีมา':[],
+  'นครศรีธรรมราช':[],
+  'นครสวรรค์':[],
+  'นนทบุรี':[],
+  'นราธิวาส':[],
+  'น่าน':[],
+  'บึงกาฬ':[],
+  'บุรีรัมย์':[],
+  'ปทุมธานี':[],
+  'ประจวบคีรีขันธ์':[],
+  'ปราจีนบุรี':[],
+  'ปัตตานี':[],
+  'พระนครศรีอยุธยา':[],
+  'พะเยา':[],
+  'พังงา':[],
+  'พัทลุง':[],
+  'พิจิตร':[],
+  'พิษณุโลก':[],
+  'เพชรบุรี':[],
+  'เพชรบูรณ์':[],
+  'แพร่':[],
+  'ภูเก็ต':[],
+  'มหาสารคาม':[],
+  'มุกดาหาร':[],
+  'แม่ฮ่องสอน':[],
+  'ยโสธร':[],
+  'ยะลา':[],
+  'ร้อยเอ็ด':[],
+  'ระนอง':[],
+  'ระยอง':[],
+  'ราชบุรี':[],
+  'ลพบุรี':[],
+  'ลำปาง':[],
+  'ลำพูน':[],
+  'เลย':[],
+  'ศรีสะเกษ':[],
+  'สกลนคร':[],
+  'สงขลา':[],
+  'สตูล':[],
+  'สมุทรปราการ':[],
+  'สมุทรสงคราม':[],
+  'สมุทรสาคร':[],
+  'สระแก้ว':[],
+  'สระบุรี':[],
+  'สิงห์บุรี':[],
+  'สุโขทัย':[],
+  'สุพรรณบุรี':[],
+  'สุราษฎร์ธานี':[],
+  'สุรินทร์':[],
+  'หนองคาย':[],
+  'หนองบัวลำภู':[],
+  'อ่างทอง':[],
+  'อำนาจเจริญ':[],
+  'อุดรธานี':[],
+  'อุตรดิตถ์':[],
+  'อุทัยธานี':[],
+  'อุบลราชธานี':[],
 };
 
 // ── Drill-down location picker state ─────────────────────────────
@@ -22936,11 +23501,9 @@ function _buildProvListCache() {
     .filter(Boolean).sort((a,b)=>a.localeCompare(b,'th'));
   // Build static HTML once (active class added dynamically in render)
   _cachedProvListHTML = _cachedAllProvs.map(p => {
-    const hasDistricts = (PROVINCE_DISTRICTS[p]||[]).length > 0;
     const esc = p.replace(/'/g,"\\'");
     return `<div class="loc-item" data-prov="${p}" onclick="locDrillSelectProv('${esc}')">` +
       `<span style="flex:1">${p}</span>` +
-      (hasDistricts ? '<i class="fas fa-chevron-right" style="font-size:10px;color:#bbb"></i>' : '') +
       `</div>`;
   }).join('');
 }
@@ -22962,9 +23525,9 @@ function locDrillToggle() {
   if(isOpen){ locDrillClose(); }
   else {
     panel.style.display='block';
-    // render ใหม่เฉพาะเมื่อจำเป็น: ถ้าอยู่ระดับ district หรือ list ว่างเปล่า
+    // render ใหม่เฉพาะเมื่อ list ว่างเปล่า
     const list = $('loc-drill-list');
-    const needsRender = _locLevel === 'district' || !list || !list.children.length;
+    const needsRender = !list || !list.children.length;
     if(needsRender) locDrillRender();
     else {
       // อยู่ระดับ province — แค่ patch active class โดยไม่ rebuild innerHTML
@@ -23005,62 +23568,28 @@ function locDrillRender() {
   if(!list) return;
   let html = '';
 
-  if(_locLevel === 'province') {
-    // Level 1: จังหวัด — ใช้ cached HTML แทนการสร้างใหม่ทุกครั้ง
-    html += `<div class="loc-drill-section-head">🗺️ ${(typeof ui==='function')?ui('sf.prov.head'):'จังหวัด'}</div>`;
-    if(_locProv) {
-      html += `<div class="loc-item loc-clear" onclick="locDrillClear()"><i class="fas fa-times-circle"></i> ${(typeof ui==='function')?ui('sf.prov.clear'):'ล้างการเลือกทั้งหมด'}</div>`;
-    }
-    // Build cache if needed
-    if(!_cachedAllProvs) _buildProvListCache();
-    // Inject cached HTML then patch active class via DOM (no full rebuild)
-    list.innerHTML = html + _cachedProvListHTML;
-    // Patch active item efficiently — no need to re-render entire list
-    if(_locProv) {
-      const activeEl = list.querySelector(`[data-prov="${_locProv}"]`);
-      if(activeEl) activeEl.classList.add('active');
-    }
-    return; // early return — innerHTML already set above
-  } else {
-    // Level 2: อำเภอ
-    const backLabel = (typeof ui==='function')?ui('sf.dist.back'):'กลับ';
-    html += `<div class="loc-item loc-back" onclick="locDrillGoBack()">
-      <i class="fas fa-chevron-left"></i> ${backLabel} &nbsp;·&nbsp; <span style="color:#555">${_locProv}</span>
-    </div>`;
-    const distHead = (typeof ui==='function')?ui('sf.dist.head'):'อำเภอ / เขต';
-    html += `<div class="loc-drill-section-head">📍 ${distHead}</div>`;
-    // "ทุกอำเภอ" option
-    const allActive = !_locDist ? ' active' : '';
-    const allDistLabel = (typeof ui==='function')?ui('sf.dist.all'):'ทุกอำเภอใน';
-    html += `<div class="loc-item${allActive}" onclick="locDrillSelectDist('')">
-      <span>${allDistLabel} ${_locProv}</span>
-    </div>`;
-    const districts = PROVINCE_DISTRICTS[_locProv] || [];
-    districts.forEach(d => {
-      const active = d === _locDist ? ' active' : '';
-      html += `<div class="loc-item${active}" onclick="locDrillSelectDist('${d.replace(/'/g,"\'")}')">
-        <span>${d}</span>
-      </div>`;
-    });
-    list.innerHTML = html;
+  // Level 1: จังหวัด — ใช้ cached HTML แทนการสร้างใหม่ทุกครั้ง
+  html += `<div class="loc-drill-section-head">🗺️ ${(typeof ui==='function')?ui('sf.prov.head'):'จังหวัด'}</div>`;
+  if(_locProv) {
+    html += `<div class="loc-item loc-clear" onclick="locDrillClear()"><i class="fas fa-times-circle"></i> ${(typeof ui==='function')?ui('sf.prov.clear'):'ล้างการเลือกทั้งหมด'}</div>`;
+  }
+  // Build cache if needed
+  if(!_cachedAllProvs) _buildProvListCache();
+  // Inject cached HTML then patch active class via DOM (no full rebuild)
+  list.innerHTML = html + _cachedProvListHTML;
+  // Patch active item efficiently — no need to re-render entire list
+  if(_locProv) {
+    const activeEl = list.querySelector(`[data-prov="${_locProv}"]`);
+    if(activeEl) activeEl.classList.add('active');
   }
 }
 
 function locDrillSelectProv(prov) {
   _locProv  = prov;
   _locDist  = '';
-  const hasDist = (PROVINCE_DISTRICTS[prov]||[]).length > 0;
-  if(hasDist) {
-    // มีอำเภอ → แสดงหน้าอำเภอ แต่ยังไม่ปิด dropdown จนกว่าจะเลือกอำเภอ
-    _locLevel = 'district';
-    locDrillCommit();
-    locDrillRender();
-  } else {
-    // ไม่มีอำเภอ → select & close ได้เลย
-    _locLevel = 'province';
-    locDrillCommit();
-    locDrillClose();
-  }
+  _locLevel = 'province';
+  locDrillCommit();
+  locDrillClose();
 }
 
 function locDrillGoBack() {
@@ -23223,49 +23752,29 @@ function madvLocRender() {
   if(!list) return;
   let html = '';
 
-  if(_madvLevel === 'top') {
-    // ── Clear button
-    if(_madvProv || _madvDist) {
-      html += `<div class="madv-loc-item loc-clear" onclick="madvLocClear()"><i class="fas fa-times-circle"></i> ล้างการเลือก</div>`;
-    }
-    html += '<div class="madv-loc-head">🗺️ จังหวัด</div>';
-    // กรุงเทพฯ อยู่บนสุดเสมอ ตามด้วยจังหวัดอื่นเรียงตัวอักษร
-    const _otherProvs = Object.keys(PROVINCE_DISTRICTS)
-      .filter(p => p !== 'กรุงเทพฯ')
-      .sort((a,b)=>a.localeCompare(b,'th'));
-    const allProvs = ['กรุงเทพฯ', ..._otherProvs];
-    allProvs.forEach(function(p){
-      const active = (p === _madvProv && _madvLevel !== 'top') ? ' active' : '';
-      const hasDist = (PROVINCE_DISTRICTS[p]||[]).length > 0;
-      html += `<div class="madv-loc-item${active}" onclick="madvSelectProv('${p.replace(/'/g,"\'")}')">
-        <span style="flex:1">${p}</span>
-        ${hasDist ? '<i class="fas fa-chevron-right" style="font-size:10px;color:#bbb"></i>' : ''}
-      </div>`;
-    });
-  } else {
-    // ── District level
-    html += `<div class="madv-loc-item loc-back" onclick="madvGoBack()"><i class="fas fa-chevron-left"></i> กลับ · <span style="color:#555">${_madvProv}</span></div>`;
-    html += '<div class="madv-loc-head">📍 อำเภอ / เขต</div>';
-    const allActive = !_madvDist ? ' active' : '';
-    html += `<div class="madv-loc-item${allActive}" onclick="madvSelectDist('')"><span>ทุกอำเภอใน ${_madvProv}</span></div>`;
-    (PROVINCE_DISTRICTS[_madvProv]||[]).forEach(function(d){
-      const active = d === _madvDist ? ' active' : '';
-      html += `<div class="madv-loc-item${active}" onclick="madvSelectDist('${d.replace(/'/g,"\'")}')"><span>${d}</span></div>`;
-    });
+  // ── Clear button
+  if(_madvProv || _madvDist) {
+    html += `<div class="madv-loc-item loc-clear" onclick="madvLocClear()"><i class="fas fa-times-circle"></i> ล้างการเลือก</div>`;
   }
+  html += '<div class="madv-loc-head">🗺️ จังหวัด</div>';
+  // กรุงเทพฯ อยู่บนสุดเสมอ ตามด้วยจังหวัดอื่นเรียงตัวอักษร
+  const _otherProvs = Object.keys(PROVINCE_DISTRICTS)
+    .filter(p => p !== 'กรุงเทพฯ')
+    .sort((a,b)=>a.localeCompare(b,'th'));
+  const allProvs = ['กรุงเทพฯ', ..._otherProvs];
+  allProvs.forEach(function(p){
+    const active = (p === _madvProv) ? ' active' : '';
+    html += `<div class="madv-loc-item${active}" onclick="madvSelectProv('${p.replace(/'/g,"\'")}')">
+      <span style="flex:1">${p}</span>
+    </div>`;
+  });
+
   list.innerHTML = html;
 }
 
 function madvSelectProv(prov) {
-  _madvProv = prov; _madvDist = ''; 
-  const hasDist = (PROVINCE_DISTRICTS[prov]||[]).length > 0;
-  if(hasDist) {
-    _madvLevel = 'province';
-    madvCommit(); madvLocRender();
-  } else {
-    _madvLevel = 'top';
-    madvCommit(); madvLocClose();
-  }
+  _madvProv = prov; _madvDist = ''; _madvLevel = 'top';
+  madvCommit(); madvLocClose();
 }
 
 function madvSelectDist(dist) {
@@ -25233,22 +25742,99 @@ async function init(){
     },2000);
   });
 }
-function toggleHamburger(){
-  const nav=document.getElementById('nav-links');
-  const hb=document.getElementById('hamburger');
-  if(!nav||!hb)return;
-  nav.classList.toggle('mob-open');
-  hb.classList.toggle('active');
+/* ══ MOBILE SIDE DRAWER FUNCTIONS ══ */
+function openMobDrawer(){
+  const drawer  = document.getElementById('mob-drawer');
+  const overlay = document.getElementById('mob-overlay');
+  const hb      = document.getElementById('hamburger');
+  if(!drawer) return;
+  // Sync auth UI into drawer footer
+  _mdrSyncAuth();
+  // Sync services grid
+  _mdrSyncSrv();
+  drawer.classList.add('open');
+  overlay.classList.add('open');
+  if(hb) hb.classList.add('active');
+  document.body.style.overflow = 'hidden';
 }
-// Close hamburger when clicking outside (dd-panel clicks must not trigger close)
-document.addEventListener('click',e=>{
-  const nav=document.getElementById('nav-links');
-  const hb=document.getElementById('hamburger');
-  if(nav&&hb&&!e.target.closest('#nav-links')&&!e.target.closest('#hamburger')&&!e.target.closest('.dd-panel')){
-    nav.classList.remove('mob-open');
-    hb.classList.remove('active');
+function closeMobDrawer(){
+  const drawer  = document.getElementById('mob-drawer');
+  const overlay = document.getElementById('mob-overlay');
+  const hb      = document.getElementById('hamburger');
+  if(!drawer) return;
+  drawer.classList.remove('open');
+  overlay.classList.remove('open');
+  if(hb) hb.classList.remove('active');
+  document.body.style.overflow = '';
+}
+function toggleHamburger(){
+  const drawer = document.getElementById('mob-drawer');
+  if(!drawer) return;
+  if(drawer.classList.contains('open')) closeMobDrawer();
+  else openMobDrawer();
+}
+function mdrToggle(id){
+  const body = document.getElementById(id);
+  const hd   = document.getElementById(id+'-hd');
+  if(!body) return;
+  const isOpen = body.classList.contains('open');
+  // Close all others
+  document.querySelectorAll('.mdr-acc-body.open').forEach(el=>{
+    el.classList.remove('open');
+  });
+  document.querySelectorAll('.mdr-acc-hd.open').forEach(el=>{
+    el.classList.remove('open');
+  });
+  // Toggle current
+  if(!isOpen){
+    body.classList.add('open');
+    if(hd) hd.classList.add('open');
   }
+}
+function _mdrSyncAuth(){
+  // Clone auth-ui content into drawer footer
+  const src  = document.getElementById('auth-ui-desktop');
+  const dest = document.getElementById('mdr-auth-ui');
+  if(!src || !dest) return;
+  // Check if already synced (avoid infinite loop)
+  if(dest.dataset.synced === 'true') return;
+  // Render a login button that mirrors the desktop auth-ui
+  // We'll hook into the existing auth state
+  const loginBtn = document.getElementById('btn-login') ||
+    src.querySelector('button') ||
+    document.querySelector('[onclick*="openLogin"],.btn-login');
+  if(loginBtn){
+    dest.innerHTML = '';
+    const btn = document.createElement('button');
+    btn.className = 'mdr-btn-login';
+    btn.innerHTML = loginBtn.innerHTML || '<i class="fas fa-sign-in-alt"></i> เข้าสู่ระบบ';
+    btn.onclick = function(){ closeMobDrawer(); if(loginBtn.onclick) loginBtn.onclick.call(loginBtn); else loginBtn.click(); };
+    dest.appendChild(btn);
+    dest.dataset.synced = 'true';
+  }
+}
+function _mdrSyncSrv(){
+  // Sync services from dd-srv-grid into mdr-srv-grid
+  const src  = document.getElementById('dd-srv-grid');
+  const dest = document.getElementById('mdr-srv-grid');
+  if(!src || !dest || dest.children.length) return;
+  // Copy items as mdr-grid-item buttons
+  Array.from(src.children).forEach(function(item){
+    const btn = document.createElement('button');
+    btn.className = 'mdr-grid-item';
+    btn.innerHTML = item.innerHTML;
+    const origOnclick = item.getAttribute('onclick');
+    if(origOnclick) btn.setAttribute('onclick','closeMobDrawer();' + origOnclick);
+    dest.appendChild(btn);
+  });
+}
+// Close drawer on ESC
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape') closeMobDrawer();
 });
+/* ══ END DRAWER FUNCTIONS ══ */
+
+function toggleHamburger_legacy_noop(){} // kept for safety
 
 const LANG_META = {
   th: { flag:'🇹🇭', code:'TH' },
@@ -27879,6 +28465,7 @@ function resetAdvFilter(){
   const sp=document.getElementById('s-prov'); if(sp) sp.value='';
   const smn=document.getElementById('s-min'); if(smn) smn.selectedIndex=0;
   const smx=document.getElementById('s-max'); if(smx) smx.selectedIndex=0;
+  if(typeof _ppSyncLabel==='function'){_ppSyncLabel('home');}
   // ── apply reset to current page context ──
   const isListingsPage = document.getElementById('page-listings')?.classList.contains('active');
   if(isListingsPage){
@@ -27889,6 +28476,7 @@ function resetAdvFilter(){
     const lpv=document.getElementById('ls-prov'); if(lpv) lpv.value='';
     const lmn=document.getElementById('ls-min'); if(lmn) lmn.value='0';
     const lmx=document.getElementById('ls-max'); if(lmx) lmx.value='999000000';
+    if(typeof _ppSyncLabel==='function')_ppSyncLabel('ls');
     if(typeof _listingsBaseData!=='undefined'){
       _listingsData = [..._listingsBaseData];
       _listingsCurPage = 1;
@@ -29349,91 +29937,31 @@ function resetAdvFilter(){
               </optgroup>
             </select>
           </div>
-          <div>
-            <label id="ls-label-min" style="display:block;font-size:11px;font-weight:700;color:rgba(255,220,150,.9);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px"><i class="fas fa-tag"></i> ราคาต่ำสุด</label>
-            <select id="ls-min" style="width:100%;padding:9px 12px;border:1.5px solid rgba(255,255,255,.25);border-radius:9px;font-size:12px;color:#fff;background:rgba(20,40,80,.85);font-family:inherit" onchange="listingsInlineSearch()">
-              <option value="0">ราคาต่ำสุด</option>
-              <option value="5000">5,000</option>
-              <option value="10000">10,000</option>
-              <option value="15000">15,000</option>
-              <option value="20000">20,000</option>
-              <option value="25000">25,000</option>
-              <option value="30000">30,000</option>
-              <option value="40000">40,000</option>
-              <option value="50000">50,000</option>
-              <option value="60000">60,000</option>
-              <option value="70000">70,000</option>
-              <option value="80000">80,000</option>
-              <option value="100000">100K</option>
-              <option value="150000">150K</option>
-              <option value="200000">200K</option>
-              <option value="300000">300K</option>
-              <option value="500000">500K</option>
-              <option value="1000000">1M</option>
-              <option value="2000000">2M</option>
-              <option value="3000000">3M</option>
-              <option value="4000000">4M</option>
-              <option value="5000000">5M</option>
-              <option value="6000000">6M</option>
-              <option value="7000000">7M</option>
-              <option value="8000000">8M</option>
-              <option value="9000000">9M</option>
-              <option value="10000000">10M</option>
-              <option value="15000000">15M</option>
-              <option value="20000000">20M</option>
-              <option value="25000000">25M</option>
-              <option value="30000000">30M</option>
-              <option value="40000000">40M</option>
-              <option value="50000000">50M</option>
-              <option value="60000000">60M</option>
-              <option value="70000000">70M</option>
-              <option value="80000000">80M</option>
-              <option value="90000000">90M</option>
-              <option value="100000000">100M</option>
-            </select>
-          </div>
-          <div>
-            <label id="ls-label-max" style="display:block;font-size:11px;font-weight:700;color:rgba(255,220,150,.9);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px"><i class="fas fa-tag"></i> ราคาสูงสุด</label>
-            <select id="ls-max" style="width:100%;padding:9px 12px;border:1.5px solid rgba(255,255,255,.25);border-radius:9px;font-size:12px;color:#fff;background:rgba(20,40,80,.85);font-family:inherit" onchange="listingsInlineSearch()">
-              <option value="5000">5,000</option>
-              <option value="10000">10,000</option>
-              <option value="15000">15,000</option>
-              <option value="20000">20,000</option>
-              <option value="25000">25,000</option>
-              <option value="30000">30,000</option>
-              <option value="40000">40,000</option>
-              <option value="50000">50,000</option>
-              <option value="60000">60,000</option>
-              <option value="70000">70,000</option>
-              <option value="80000">80,000</option>
-              <option value="100000">100K</option>
-              <option value="150000">150K</option>
-              <option value="200000">200K</option>
-              <option value="300000">300K</option>
-              <option value="500000">500K</option>
-              <option value="1000000">1M</option>
-              <option value="2000000">2M</option>
-              <option value="3000000">3M</option>
-              <option value="4000000">4M</option>
-              <option value="5000000">5M</option>
-              <option value="6000000">6M</option>
-              <option value="7000000">7M</option>
-              <option value="8000000">8M</option>
-              <option value="9000000">9M</option>
-              <option value="10000000">10M</option>
-              <option value="15000000">15M</option>
-              <option value="20000000">20M</option>
-              <option value="25000000">25M</option>
-              <option value="30000000">30M</option>
-              <option value="40000000">40M</option>
-              <option value="50000000">50M</option>
-              <option value="60000000">60M</option>
-              <option value="70000000">70M</option>
-              <option value="80000000">80M</option>
-              <option value="90000000">90M</option>
-              <option value="100000000">100M</option>
-              <option value="999000000" selected>ราคาสูงสุด</option>
-            </select>
+          <div class="price-picker-wrap" id="ls-pp-wrap" style="position:relative">
+            <select id="ls-min" style="display:none"></select>
+            <select id="ls-max" style="display:none"></select>
+            <button type="button" class="price-picker-btn" id="ls-pp-btn" onclick="togglePricePicker('ls')" style="background:rgba(20,40,80,.85);border:1.5px solid rgba(255,255,255,.25);color:#fff;border-radius:9px;height:42px;font-size:12px">
+              <span class="ppb-text" id="ls-pp-label">ช่วงราคา</span>
+              <i class="fas fa-chevron-down ppb-icon" style="color:rgba(255,255,255,.5)"></i>
+            </button>
+            <div class="price-picker-panel" id="ls-pp-panel">
+              <div class="pp-cols">
+                <div>
+                  <div class="pp-col-label"><i class="fas fa-arrow-down"></i> ราคาต่ำสุด</div>
+                  <div class="pp-list" id="ls-pp-min-list"></div>
+                </div>
+                <div>
+                  <div class="pp-col-label"><i class="fas fa-arrow-up"></i> ราคาสูงสุด</div>
+                  <div class="pp-list" id="ls-pp-max-list"></div>
+                </div>
+              </div>
+              <hr class="pp-divider">
+              <div class="pp-footer">
+                <button class="pp-clear" onclick="clearPricePicker('ls')"><i class="fas fa-undo"></i> ล้าง</button>
+                <button class="pp-apply" onclick="applyPricePicker('ls')"><i class="fas fa-check"></i> ตกลง</button>
+              </div>
+            </div>
+          </div>            </select>
           </div>
           <div class="ls-btn-row" style="display:contents">
           <button onclick="listingsDoSearchAndScroll()" style="background:var(--a);color:#1A1A2E;border:none;border-radius:9px;padding:9px 20px;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:6px;height:42px"><i class="fas fa-search"></i> ค้นหา</button>
