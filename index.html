@@ -2134,41 +2134,7 @@ footer{background:linear-gradient(135deg,#2d2650 0%,#3d3373 100%);color:rgba(255
 .tx-tabs{display:flex;margin-bottom:18px;border-radius:10px;overflow:hidden;border:1.5px solid var(--bd)}
 .tx-tab{flex:1;padding:10px;text-align:center;cursor:pointer;font-size:14px;font-weight:600;background:#F5F0E8;color:var(--tx2);transition:.2s}
 .tx-tab.active{background:var(--p);color:#F0ECE3}
-.sf{display:grid;grid-template-columns:1.6fr 0.9fr 0.9fr 1.1fr auto auto;gap:10px;align-items:end}
-/* ── Price Range Picker ── */
-.price-picker-wrap{position:relative}
-.price-picker-btn{width:100%;padding:10px 12px;border:1.5px solid rgba(200,146,42,.4);border-radius:10px;font-size:13px;color:#1a2744;background:rgba(255,255,255,0.95);font-weight:600;height:44px;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:6px;white-space:nowrap;overflow:hidden;text-align:left;font-family:inherit}
-.price-picker-btn:hover{border-color:var(--p)}
-.price-picker-btn.active{border-color:var(--p);box-shadow:0 0 0 3px rgba(26,39,68,.12)}
-.price-picker-btn .ppb-text{flex:1;overflow:hidden;text-overflow:ellipsis;font-size:13px}
-.price-picker-btn .ppb-icon{color:rgba(26,39,68,.4);font-size:11px;flex-shrink:0;transition:.2s}
-.price-picker-btn.active .ppb-icon{transform:rotate(180deg);color:var(--p)}
-.price-picker-panel{position:fixed;z-index:99999;background:#fff;border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,.22);border:1.5px solid var(--bd);padding:16px;min-width:380px;display:none;box-sizing:border-box}
-.price-picker-panel.open{display:block;animation:ppSlide .15s ease}
-.price-picker-panel.drop-up{animation:ppSlideUp .15s ease}
-@keyframes ppSlide{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
-@keyframes ppSlideUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-.pp-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.pp-col-label{font-size:11px;font-weight:800;color:var(--p);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;display:flex;align-items:center;gap:5px}
-.pp-col-label i{font-size:10px}
-.pp-list{max-height:240px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(200,146,42,.4) transparent}
-.pp-list::-webkit-scrollbar{width:4px}
-.pp-list::-webkit-scrollbar-thumb{background:rgba(200,146,42,.4);border-radius:4px}
-.pp-opt{padding:7px 10px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:500;color:var(--tx);transition:.12s;white-space:nowrap}
-.pp-opt:hover{background:rgba(200,146,42,.12);color:var(--p);font-weight:600}
-.pp-opt.selected{background:var(--p);color:#F0ECE3;font-weight:700}
-.pp-divider{border:none;border-top:1.5px solid var(--bd);margin:12px 0}
-.pp-footer{display:flex;gap:8px}
-.pp-clear{flex:1;padding:8px;border:1.5px solid var(--bd);border-radius:8px;background:#fff;color:var(--tx2);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
-.pp-clear:hover{border-color:var(--p);color:var(--p)}
-.pp-apply{flex:2;padding:8px;border:none;border-radius:8px;background:var(--p);color:#F0ECE3;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
-.pp-apply:hover{opacity:.9}
-/* hidden selects kept for logic compat */
-.price-picker-wrap select{display:none!important}
-@media(max-width:600px){
-  .price-picker-panel{min-width:calc(100vw - 32px)!important;max-width:calc(100vw - 32px)!important}
-  .price-picker-panel.open{animation:none}
-}
+.sf{display:grid;grid-template-columns:1.6fr 0.9fr 0.9fr 0.9fr 0.9fr auto auto;gap:10px;align-items:end}
 .sf label{display:block;font-size:13px;font-weight:800;color:#1a2744;margin-bottom:5px;text-shadow:none;letter-spacing:.2px}
 .sf select,.sf input{width:100%;padding:10px 12px;border:1.5px solid rgba(200,146,42,.4);border-radius:10px;font-size:14px;color:#1a2744;background:rgba(255,255,255,0.95);font-weight:600;height:44px;box-sizing:border-box}
 .sf select:focus,.sf input:focus{outline:none;border-color:var(--p)}
@@ -6767,31 +6733,8 @@ footer::after{
         </div>
       </div>
     </div>
-    <div class="price-picker-wrap" id="home-pp-wrap">
-      <select id="s-min" style="display:none"></select>
-      <select id="s-max" style="display:none"></select>
-      <button type="button" class="price-picker-btn" id="home-pp-btn" onclick="togglePricePicker('home')">
-        <span class="ppb-text" id="home-pp-label">ช่วงราคา</span>
-        <i class="fas fa-chevron-down ppb-icon"></i>
-      </button>
-      <div class="price-picker-panel" id="home-pp-panel">
-        <div class="pp-cols">
-          <div>
-            <div class="pp-col-label"><i class="fas fa-arrow-down"></i> ราคาต่ำสุด</div>
-            <div class="pp-list" id="home-pp-min-list"></div>
-          </div>
-          <div>
-            <div class="pp-col-label"><i class="fas fa-arrow-up"></i> ราคาสูงสุด</div>
-            <div class="pp-list" id="home-pp-max-list"></div>
-          </div>
-        </div>
-        <hr class="pp-divider">
-        <div class="pp-footer">
-          <button class="pp-clear" onclick="clearPricePicker('home')"><i class="fas fa-undo"></i> ล้าง</button>
-          <button class="pp-apply" onclick="applyPricePicker('home')"><i class="fas fa-check"></i> ตกลง</button>
-        </div>
-      </div>
-    </div>
+    <div><select id="s-min" onchange="updatePriceMax()" style="width:100%;padding:10px 12px;border:1.5px solid rgba(200,146,42,.4);border-radius:10px;font-size:13px;color:#1a2744;background:rgba(255,255,255,0.95);font-weight:600"></select></div>
+    <div><select id="s-max" style="width:100%;padding:10px 12px;border:1.5px solid rgba(200,146,42,.4);border-radius:10px;font-size:13px;color:#1a2744;background:rgba(255,255,255,0.95);font-weight:600"></select></div>
     <button class="btn-search" onclick="doSearch()"><i class="fas fa-search"></i> ค้นหา</button>
     <button class="btn-reset-search" onclick="resetSearch()"><i class="fas fa-undo"></i> รีเซ็ต</button>
    </div>
@@ -10178,7 +10121,6 @@ function modalAdvReset(type){
     if(typeof locDrillClose==='function') locDrillClose();
     var _smn = document.getElementById('s-min'); if(_smn) _smn.selectedIndex=0;
     var _smx = document.getElementById('s-max'); if(_smx) _smx.selectedIndex=0;
-    if(typeof _ppSyncLabel==='function'){_ppSyncLabel('home');}
     // reset tx tabs
     if(typeof tx !== 'undefined') tx = 'ALL';
     var _bt = document.querySelectorAll('.tx-tab');
@@ -11152,7 +11094,6 @@ function resetSearch(){
   locDrillClear(); locDrillClose();
   const smn=$('s-min');if(smn)smn.selectedIndex=0;
   const smx=$('s-max');if(smx)smx.selectedIndex=0;
-  if(typeof _ppSyncLabel==='function'){_ppSyncLabel('home');}
   const pr=$('s-price-range');if(pr)pr.value='0|0';
   // ── reset tx tabs ──
   tx='ALL';
@@ -16342,218 +16283,7 @@ function renderPriceOpts(){
   $('s-min').innerHTML = _buildPriceOpts(PRICE_UNIFIED_OPTS, false);
   $('s-max').innerHTML = _buildPriceOpts(PRICE_UNIFIED_OPTS, true);
   $('s-max').value = '999000000';
-  // init price pickers after options built
-  if(typeof initPricePickers === 'function') initPricePickers();
 }
-
-// ══════════════════════════════════════════════════════════
-// PRICE RANGE PICKER — unified component for home + listings
-// ══════════════════════════════════════════════════════════
-const _PP = {
-  home: { minVal: 0, maxVal: 999000000, tmpMin: 0, tmpMax: 999000000 },
-  ls:   { minVal: 0, maxVal: 999000000, tmpMin: 0, tmpMax: 999000000 }
-};
-
-const PP_OPTS = [
-  {v:0,       label:'ราคาต่ำสุด', minOnly:true},
-  {v:5000,    label:'5,000'},
-  {v:10000,   label:'10,000'},
-  {v:20000,   label:'20,000'},
-  {v:30000,   label:'30,000'},
-  {v:40000,   label:'40,000'},
-  {v:50000,   label:'50,000'},
-  {v:80000,   label:'80,000'},
-  {v:100000,  label:'100K'},
-  {v:150000,  label:'150K'},
-  {v:200000,  label:'200K'},
-  {v:300000,  label:'300K'},
-  {v:500000,  label:'500K'},
-  {v:1000000, label:'1M'},
-  {v:2000000, label:'2M'},
-  {v:3000000, label:'3M'},
-  {v:5000000, label:'5M'},
-  {v:7000000, label:'7M'},
-  {v:10000000,label:'10M'},
-  {v:15000000,label:'15M'},
-  {v:20000000,label:'20M'},
-  {v:30000000,label:'30M'},
-  {v:50000000,label:'50M'},
-  {v:80000000,label:'80M'},
-  {v:100000000,label:'100M'},
-  {v:999000000,label:'ไม่จำกัด', maxOnly:true}
-];
-
-function _ppLabel(min, max) {
-  if(min === 0 && max >= 999000000) return 'ช่วงราคา';
-  const fmtV = v => v >= 1000000 ? (v/1000000).toFixed(v%1000000===0?0:1)+'M' : v >= 1000 ? (v/1000).toFixed(0)+'K' : v.toLocaleString();
-  if(min > 0 && max >= 999000000) return fmtV(min) + ' ขึ้นไป';
-  if(min === 0) return 'ไม่เกิน ' + fmtV(max);
-  return fmtV(min) + ' – ' + fmtV(max);
-}
-
-function _ppRenderList(ns, side) {
-  const listEl = document.getElementById(ns+'-pp-'+side+'-list');
-  if(!listEl) return;
-  const st = _PP[ns];
-  const isMin = side === 'min';
-  const opts = isMin ? PP_OPTS.filter(o=>!o.maxOnly) : PP_OPTS.filter(o=>!o.minOnly);
-  listEl.innerHTML = opts.map(o => {
-    const sel = isMin ? (st.tmpMin === o.v) : (st.tmpMax === o.v);
-    // disable max options lower than chosen min (but allow equal)
-    const disabled = !isMin && o.v > 0 && o.v < st.tmpMin;
-    return `<div class="pp-opt${sel?' selected':''}${disabled?' disabled':''}" 
-      style="${disabled?'opacity:.35;cursor:default;':''}"
-      onclick="${disabled?'':'_ppSelect(\''+ns+'\',\''+side+'\','+o.v+')'}">${o.label}</div>`;
-  }).join('');
-}
-
-function _ppSelect(ns, side, val) {
-  const st = _PP[ns];
-  if(side === 'min') {
-    st.tmpMin = val;
-    // auto-adjust max if needed
-    if(st.tmpMax > 0 && st.tmpMax < val && st.tmpMax < 999000000) st.tmpMax = 999000000;
-  } else {
-    st.tmpMax = val;
-  }
-  _ppRenderList(ns, 'min');
-  _ppRenderList(ns, 'max');
-}
-
-function togglePricePicker(ns) {
-  const panel = document.getElementById(ns+'-pp-panel');
-  const btn   = document.getElementById(ns+'-pp-btn');
-  if(!panel) return;
-  const isOpen = panel.classList.contains('open');
-  // close all pickers first
-  document.querySelectorAll('.price-picker-panel.open').forEach(p=>{ p.classList.remove('open'); p.classList.remove('drop-up'); });
-  document.querySelectorAll('.price-picker-btn.active').forEach(b=>b.classList.remove('active'));
-  if(!isOpen) {
-    // sync tmp from hidden selects
-    const st = _PP[ns];
-    const minEl = document.getElementById(ns==='home'?'s-min':'ls-min');
-    const maxEl = document.getElementById(ns==='home'?'s-max':'ls-max');
-    if(minEl) st.tmpMin = parseInt(minEl.value)||0;
-    if(maxEl) st.tmpMax = parseInt(maxEl.value)||999000000;
-    _ppRenderList(ns,'min');
-    _ppRenderList(ns,'max');
-    // ── Smart positioning: drop-down or drop-up ──
-    panel.style.cssText = 'display:block;visibility:hidden;left:-9999px;top:0';
-    const panelH = panel.offsetHeight || 320;
-    const panelW = panel.offsetWidth  || 380;
-    panel.style.cssText = '';
-    const btnRect  = btn.getBoundingClientRect();
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-    const spaceBelow = vh - btnRect.bottom - 8;
-    const spaceAbove = btnRect.top - 8;
-    const goUp = spaceBelow < panelH && spaceAbove > spaceBelow;
-    // horizontal: prefer left-align, shift left if overflows right
-    let left = btnRect.left;
-    if(left + panelW > vw - 8) left = Math.max(8, vw - panelW - 8);
-    panel.style.left = left + 'px';
-    panel.style.minWidth = Math.min(panelW, vw - 16) + 'px';
-    if(goUp) {
-      panel.style.bottom = (vh - btnRect.top + 6) + 'px';
-      panel.style.top = 'auto';
-      panel.classList.add('drop-up');
-    } else {
-      panel.style.top  = (btnRect.bottom + 6) + 'px';
-      panel.style.bottom = 'auto';
-      panel.classList.remove('drop-up');
-    }
-    panel.classList.add('open');
-    btn.classList.add('active');
-  }
-}
-
-function applyPricePicker(ns) {
-  const st = _PP[ns];
-  st.minVal = st.tmpMin;
-  st.maxVal = st.tmpMax;
-  // sync to hidden selects
-  const minId = ns==='home'?'s-min':'ls-min';
-  const maxId = ns==='home'?'s-max':'ls-max';
-  const minEl = document.getElementById(minId);
-  const maxEl = document.getElementById(maxId);
-  if(minEl) minEl.value = String(st.minVal);
-  if(maxEl) maxEl.value = String(st.maxVal);
-  // update button label
-  const lbl = document.getElementById(ns+'-pp-label');
-  if(lbl) lbl.textContent = _ppLabel(st.minVal, st.maxVal);
-  const btn = document.getElementById(ns+'-pp-btn');
-  if(btn) { btn.style.borderColor = (st.minVal>0||st.maxVal<999000000)?'var(--p)':''; }
-  // close panel
-  const panel = document.getElementById(ns+'-pp-panel');
-  if(panel){panel.classList.remove('open');panel.classList.remove('drop-up');}
-  if(btn) btn.classList.remove('active');
-  // trigger search
-  if(ns==='home') { if(typeof applyFilters==='function') applyFilters().catch(console.error); }
-  if(ns==='ls')   { if(typeof listingsInlineSearch==='function') listingsInlineSearch(); }
-}
-
-function clearPricePicker(ns) {
-  const st = _PP[ns];
-  st.tmpMin = 0; st.tmpMax = 999000000;
-  _ppRenderList(ns,'min'); _ppRenderList(ns,'max');
-}
-
-function _ppSyncLabel(ns) {
-  const minId = ns==='home'?'s-min':'ls-min';
-  const maxId = ns==='home'?'s-max':'ls-max';
-  const minEl = document.getElementById(minId);
-  const maxEl = document.getElementById(maxId);
-  const min = parseInt(minEl?.value||'0')||0;
-  const max = parseInt(maxEl?.value||'999000000')||999000000;
-  const lbl = document.getElementById(ns+'-pp-label');
-  if(lbl) lbl.textContent = _ppLabel(min, max);
-  const btn = document.getElementById(ns+'-pp-btn');
-  if(btn) btn.style.borderColor = (min>0||max<999000000)?'var(--p)':'';
-  _PP[ns].minVal = min; _PP[ns].maxVal = max;
-  _PP[ns].tmpMin = min; _PP[ns].tmpMax = max;
-}
-
-function initPricePickers() {
-  _ppSyncLabel('home');
-  _ppSyncLabel('ls');
-}
-
-// close pickers when clicking outside
-document.addEventListener('click', function(e){
-  if(!e.target.closest('.price-picker-wrap')){
-    document.querySelectorAll('.price-picker-panel.open').forEach(p=>{p.classList.remove('open');p.classList.remove('drop-up');});
-    document.querySelectorAll('.price-picker-btn.active').forEach(b=>b.classList.remove('active'));
-  }
-});
-// reposition on scroll/resize to keep panel aligned with button
-function _ppReposition(){
-  document.querySelectorAll('.price-picker-panel.open').forEach(function(panel){
-    const ns = panel.id.replace('-pp-panel','');
-    const btn = document.getElementById(ns+'-pp-btn');
-    if(!btn) return;
-    const btnRect = btn.getBoundingClientRect();
-    const vw = window.innerWidth, vh = window.innerHeight;
-    const panelW = panel.offsetWidth;
-    const panelH = panel.offsetHeight;
-    let left = btnRect.left;
-    if(left + panelW > vw - 8) left = Math.max(8, vw - panelW - 8);
-    panel.style.left = left + 'px';
-    const spaceBelow = vh - btnRect.bottom - 8;
-    const spaceAbove = btnRect.top - 8;
-    const goUp = spaceBelow < panelH && spaceAbove > spaceBelow;
-    if(goUp){
-      panel.style.bottom = (vh - btnRect.top + 6) + 'px';
-      panel.style.top = 'auto';
-      panel.classList.add('drop-up');
-    } else {
-      panel.style.top = (btnRect.bottom + 6) + 'px';
-      panel.style.bottom = 'auto';
-      panel.classList.remove('drop-up');
-    }
-  });
-}
-window.addEventListener('scroll', _ppReposition, {passive:true});
-window.addEventListener('resize', _ppReposition, {passive:true});
 function _refreshPriceOpts(){
   // เรียกเมื่อ tx เปลี่ยน เพื่อ swap ชุดราคา
   const minEl = $('s-min'), maxEl = $('s-max');
@@ -16563,9 +16293,8 @@ function _refreshPriceOpts(){
   // คืนค่าเดิมถ้ายังมีใน list
   if([...minEl.options].some(o=>o.value===prevMin)) minEl.value = prevMin;
   if([...maxEl.options].some(o=>o.value===prevMax)) maxEl.value = prevMax;
-  if(typeof _ppSyncLabel==='function')_ppSyncLabel('home');
 }
-function setPriceRange(val){ const parts=(val||'0|0').split('|'); const mn=parseInt(parts[0])||0; const mx=parseInt(parts[1])||999000000; $('s-min').value=String(mn); $('s-max').value=String(mx||999000000); if(typeof _ppSyncLabel==='function')_ppSyncLabel('home'); }
+function setPriceRange(val){ const parts=(val||'0|0').split('|'); const mn=parseInt(parts[0])||0; const mx=parseInt(parts[1])||999000000; $('s-min').value=String(mn); $('s-max').value=String(mx||999000000); }
 function updatePriceMax(){const min=+$('s-min').value;$$('#s-max option').forEach(o=>{o.disabled=+o.value>0&&+o.value<min;});}
 
 function setTx(t,el){ tx=t; $$('.tx-tab').forEach(b=>b.classList.remove('active')); el.classList.add('active'); const pb=$('price-buy-section'),pr=$('price-rent-section'); if(pb&&pr){ pb.style.display=t==='RENT'?'none':'block'; pr.style.display=t==='RENT'?'block':'none'; } if(typeof _refreshPriceOpts==='function') _refreshPriceOpts(); applyFilters().catch(console.error); const _heroStats=document.getElementById('hero-stat-counters'); if(_heroStats){ if(window._dataReady && typeof syncAllStats==='function'){ syncAllStats(true); } else if(typeof animateStatCounters==='function'){ animateStatCounters(_heroStats.closest('.page')||document); } } }
@@ -16587,7 +16316,6 @@ function _resetFilterState(){
   var kw=$('s-kw'); if(kw){kw.value=''; var al=$('ac-list');if(al)al.style.display='none';}
   // reset price to full range
   $('s-min').value=0; $('s-max').value=999000000;
-  if(typeof _ppSyncLabel==='function')_ppSyncLabel('home');
   // reset province
   var sp=$('s-prov'); if(sp) sp.value='';
   // reset type select
@@ -16615,7 +16343,6 @@ function filterPriceDD(min,max,forceTx){
   // reset type + keyword ก่อน แล้วค่อย set ราคาที่เลือก
   _resetFilterState();
   $('s-min').value=min; $('s-max').value=max;
-  if(typeof _ppSyncLabel==='function')_ppSyncLabel('home');
   applyFilters().catch(console.error);
   scrollToEl('all-sec');
 }
@@ -18460,7 +18187,6 @@ function showListingsPage(title, data) {
   const lsType = document.getElementById('ls-type'); if(lsType) lsType.value = '';
   const lsMinEl = document.getElementById('ls-min'); if(lsMinEl) lsMinEl.value = '0';
   const lsMaxEl = document.getElementById('ls-max'); if(lsMaxEl) lsMaxEl.value = '999000000';
-  if(typeof _ppSyncLabel==='function'){_ppSyncLabel('ls');}
   const lsTxEl = document.getElementById('ls-tx'); if(lsTxEl) lsTxEl.value = '';
   _populateListingsProvince();
   _updateListingsTxTabs('ALL');
@@ -18582,7 +18308,6 @@ function listingsResetSearch() {
   const lsPopular = document.getElementById('ls-popular'); if(lsPopular) lsPopular.selectedIndex = 0;
   const lsMin = document.getElementById('ls-min'); if(lsMin) lsMin.selectedIndex = 0;
   const lsMax = document.getElementById('ls-max'); if(lsMax) lsMax.selectedIndex = 0;
-  if(typeof _ppSyncLabel==='function')_ppSyncLabel('ls');
   const lsTransit = document.getElementById('ls-transit'); if(lsTransit) lsTransit.selectedIndex = 0;
   _listingsTxFilter = 'ALL';
   _updateListingsTxTabs('ALL');
@@ -28465,7 +28190,6 @@ function resetAdvFilter(){
   const sp=document.getElementById('s-prov'); if(sp) sp.value='';
   const smn=document.getElementById('s-min'); if(smn) smn.selectedIndex=0;
   const smx=document.getElementById('s-max'); if(smx) smx.selectedIndex=0;
-  if(typeof _ppSyncLabel==='function'){_ppSyncLabel('home');}
   // ── apply reset to current page context ──
   const isListingsPage = document.getElementById('page-listings')?.classList.contains('active');
   if(isListingsPage){
@@ -28476,7 +28200,6 @@ function resetAdvFilter(){
     const lpv=document.getElementById('ls-prov'); if(lpv) lpv.value='';
     const lmn=document.getElementById('ls-min'); if(lmn) lmn.value='0';
     const lmx=document.getElementById('ls-max'); if(lmx) lmx.value='999000000';
-    if(typeof _ppSyncLabel==='function')_ppSyncLabel('ls');
     if(typeof _listingsBaseData!=='undefined'){
       _listingsData = [..._listingsBaseData];
       _listingsCurPage = 1;
@@ -29937,31 +29660,91 @@ function resetAdvFilter(){
               </optgroup>
             </select>
           </div>
-          <div class="price-picker-wrap" id="ls-pp-wrap" style="position:relative">
-            <select id="ls-min" style="display:none"></select>
-            <select id="ls-max" style="display:none"></select>
-            <button type="button" class="price-picker-btn" id="ls-pp-btn" onclick="togglePricePicker('ls')" style="background:rgba(20,40,80,.85);border:1.5px solid rgba(255,255,255,.25);color:#fff;border-radius:9px;height:42px;font-size:12px">
-              <span class="ppb-text" id="ls-pp-label">ช่วงราคา</span>
-              <i class="fas fa-chevron-down ppb-icon" style="color:rgba(255,255,255,.5)"></i>
-            </button>
-            <div class="price-picker-panel" id="ls-pp-panel">
-              <div class="pp-cols">
-                <div>
-                  <div class="pp-col-label"><i class="fas fa-arrow-down"></i> ราคาต่ำสุด</div>
-                  <div class="pp-list" id="ls-pp-min-list"></div>
-                </div>
-                <div>
-                  <div class="pp-col-label"><i class="fas fa-arrow-up"></i> ราคาสูงสุด</div>
-                  <div class="pp-list" id="ls-pp-max-list"></div>
-                </div>
-              </div>
-              <hr class="pp-divider">
-              <div class="pp-footer">
-                <button class="pp-clear" onclick="clearPricePicker('ls')"><i class="fas fa-undo"></i> ล้าง</button>
-                <button class="pp-apply" onclick="applyPricePicker('ls')"><i class="fas fa-check"></i> ตกลง</button>
-              </div>
-            </div>
-          </div>            </select>
+          <div>
+            <label id="ls-label-min" style="display:block;font-size:11px;font-weight:700;color:rgba(255,220,150,.9);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px"><i class="fas fa-tag"></i> ราคาต่ำสุด</label>
+            <select id="ls-min" style="width:100%;padding:9px 12px;border:1.5px solid rgba(255,255,255,.25);border-radius:9px;font-size:12px;color:#fff;background:rgba(20,40,80,.85);font-family:inherit" onchange="listingsInlineSearch()">
+              <option value="0">ราคาต่ำสุด</option>
+              <option value="5000">5,000</option>
+              <option value="10000">10,000</option>
+              <option value="15000">15,000</option>
+              <option value="20000">20,000</option>
+              <option value="25000">25,000</option>
+              <option value="30000">30,000</option>
+              <option value="40000">40,000</option>
+              <option value="50000">50,000</option>
+              <option value="60000">60,000</option>
+              <option value="70000">70,000</option>
+              <option value="80000">80,000</option>
+              <option value="100000">100K</option>
+              <option value="150000">150K</option>
+              <option value="200000">200K</option>
+              <option value="300000">300K</option>
+              <option value="500000">500K</option>
+              <option value="1000000">1M</option>
+              <option value="2000000">2M</option>
+              <option value="3000000">3M</option>
+              <option value="4000000">4M</option>
+              <option value="5000000">5M</option>
+              <option value="6000000">6M</option>
+              <option value="7000000">7M</option>
+              <option value="8000000">8M</option>
+              <option value="9000000">9M</option>
+              <option value="10000000">10M</option>
+              <option value="15000000">15M</option>
+              <option value="20000000">20M</option>
+              <option value="25000000">25M</option>
+              <option value="30000000">30M</option>
+              <option value="40000000">40M</option>
+              <option value="50000000">50M</option>
+              <option value="60000000">60M</option>
+              <option value="70000000">70M</option>
+              <option value="80000000">80M</option>
+              <option value="90000000">90M</option>
+              <option value="100000000">100M</option>
+            </select>
+          </div>
+          <div>
+            <label id="ls-label-max" style="display:block;font-size:11px;font-weight:700;color:rgba(255,220,150,.9);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px"><i class="fas fa-tag"></i> ราคาสูงสุด</label>
+            <select id="ls-max" style="width:100%;padding:9px 12px;border:1.5px solid rgba(255,255,255,.25);border-radius:9px;font-size:12px;color:#fff;background:rgba(20,40,80,.85);font-family:inherit" onchange="listingsInlineSearch()">
+              <option value="5000">5,000</option>
+              <option value="10000">10,000</option>
+              <option value="15000">15,000</option>
+              <option value="20000">20,000</option>
+              <option value="25000">25,000</option>
+              <option value="30000">30,000</option>
+              <option value="40000">40,000</option>
+              <option value="50000">50,000</option>
+              <option value="60000">60,000</option>
+              <option value="70000">70,000</option>
+              <option value="80000">80,000</option>
+              <option value="100000">100K</option>
+              <option value="150000">150K</option>
+              <option value="200000">200K</option>
+              <option value="300000">300K</option>
+              <option value="500000">500K</option>
+              <option value="1000000">1M</option>
+              <option value="2000000">2M</option>
+              <option value="3000000">3M</option>
+              <option value="4000000">4M</option>
+              <option value="5000000">5M</option>
+              <option value="6000000">6M</option>
+              <option value="7000000">7M</option>
+              <option value="8000000">8M</option>
+              <option value="9000000">9M</option>
+              <option value="10000000">10M</option>
+              <option value="15000000">15M</option>
+              <option value="20000000">20M</option>
+              <option value="25000000">25M</option>
+              <option value="30000000">30M</option>
+              <option value="40000000">40M</option>
+              <option value="50000000">50M</option>
+              <option value="60000000">60M</option>
+              <option value="70000000">70M</option>
+              <option value="80000000">80M</option>
+              <option value="90000000">90M</option>
+              <option value="100000000">100M</option>
+              <option value="999000000" selected>ราคาสูงสุด</option>
+            </select>
           </div>
           <div class="ls-btn-row" style="display:contents">
           <button onclick="listingsDoSearchAndScroll()" style="background:var(--a);color:#1A1A2E;border:none;border-radius:9px;padding:9px 20px;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:6px;height:42px"><i class="fas fa-search"></i> ค้นหา</button>
