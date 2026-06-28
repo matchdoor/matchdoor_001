@@ -11944,19 +11944,118 @@ function renderMyAccount(){
     </div>
   </div>
   ${window._isAdminUser ? `<div class="ma-panel" id="ma-panel-admin">
-    <!-- Admin sub-tabs -->
-    <div style="display:flex;gap:6px;margin-bottom:16px;border-bottom:2px solid var(--lt);padding-bottom:12px;flex-wrap:wrap">
-      <button id="adm-tab-dashboard" class="adm-subtab" onclick="_admSubTab('dashboard',this);renderAdminDashboard()" style="padding:7px 14px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;font-weight:700;background:transparent;color:var(--tx);cursor:pointer"><i class="fas fa-tachometer-alt"></i> Dashboard</button>
-      <button id="adm-tab-listings" class="adm-subtab active" onclick="_admSubTab('listings',this);renderAdminListingsPanel()" style="padding:7px 14px;border:1.5px solid var(--p);border-radius:8px;font-size:12px;font-weight:700;background:var(--p);color:#fff;cursor:pointer"><i class="fas fa-list"></i> จัดการประกาศ</button>
-      <button id="adm-tab-properties" class="adm-subtab" onclick="_admSubTab('properties',this);renderAdminPropertiesPanel()" style="padding:7px 14px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;font-weight:700;background:transparent;color:var(--tx);cursor:pointer"><i class="fas fa-building"></i> ทรัพย์ทั้งหมด</button>
-      <button id="adm-tab-users" class="adm-subtab" onclick="_admSubTab('users',this);renderAdminUsersPanel()" style="padding:7px 14px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;font-weight:700;background:transparent;color:var(--tx);cursor:pointer"><i class="fas fa-users"></i> จัดการ Users</button>
-      <button id="adm-tab-tokens" class="adm-subtab" onclick="_admSubTab('tokens',this);renderAdminTokensPanel()" style="padding:7px 14px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;font-weight:700;background:transparent;color:var(--tx);cursor:pointer"><i class="fas fa-coins"></i> Token Orders</button>
+    <style>
+      /* Admin sidebar layout — Desktop only */
+      @media (min-width: 768px) {
+        #adm-layout {
+          display: flex;
+          gap: 0;
+          min-height: 500px;
+        }
+        #adm-sidebar {
+          display: flex !important;
+          flex-direction: column;
+          gap: 4px;
+          width: 190px;
+          min-width: 190px;
+          padding: 8px 10px;
+          border-right: 2px solid var(--lt);
+          margin-right: 20px;
+        }
+        #adm-sidebar .adm-subtab {
+          display: flex !important;
+          align-items: center;
+          gap: 9px;
+          width: 100%;
+          text-align: left;
+          padding: 10px 14px !important;
+          border-radius: 10px !important;
+          border: none !important;
+          font-size: 13px !important;
+          font-weight: 600;
+          background: transparent;
+          color: var(--tx);
+          cursor: pointer;
+          transition: background 0.15s, color 0.15s;
+        }
+        #adm-sidebar .adm-subtab:hover {
+          background: var(--lt);
+        }
+        #adm-sidebar .adm-subtab.active {
+          background: var(--p) !important;
+          color: #fff !important;
+        }
+        #adm-sidebar .adm-subtab i {
+          width: 16px;
+          text-align: center;
+          flex-shrink: 0;
+        }
+        #adm-content-area {
+          flex: 1;
+          min-width: 0;
+        }
+        /* Hide horizontal bar on desktop */
+        #adm-hbar { display: none !important; }
+      }
+      /* Mobile — keep original horizontal style */
+      @media (max-width: 767px) {
+        #adm-layout { display: block; }
+        #adm-sidebar { display: none !important; }
+        #adm-hbar {
+          display: flex;
+          gap: 6px;
+          margin-bottom: 16px;
+          border-bottom: 2px solid var(--lt);
+          padding-bottom: 12px;
+          flex-wrap: wrap;
+        }
+        #adm-hbar .adm-subtab {
+          padding: 7px 14px;
+          border: 1.5px solid var(--bd);
+          border-radius: 8px;
+          font-size: 12px;
+          font-weight: 700;
+          background: transparent;
+          color: var(--tx);
+          cursor: pointer;
+        }
+        #adm-hbar .adm-subtab.active {
+          background: var(--p) !important;
+          color: #fff !important;
+          border-color: var(--p) !important;
+        }
+      }
+    </style>
+
+    <!-- Mobile horizontal bar (hidden on desktop) -->
+    <div id="adm-hbar">
+      <button id="adm-tab-dashboard" class="adm-subtab" onclick="_admSubTab('dashboard',this);renderAdminDashboard()"><i class="fas fa-tachometer-alt"></i> Dashboard</button>
+      <button id="adm-tab-listings" class="adm-subtab active" onclick="_admSubTab('listings',this);renderAdminListingsPanel()"><i class="fas fa-list"></i> จัดการประกาศ</button>
+      <button id="adm-tab-properties" class="adm-subtab" onclick="_admSubTab('properties',this);renderAdminPropertiesPanel()"><i class="fas fa-building"></i> ทรัพย์ทั้งหมด</button>
+      <button id="adm-tab-users" class="adm-subtab" onclick="_admSubTab('users',this);renderAdminUsersPanel()"><i class="fas fa-users"></i> จัดการ Users</button>
+      <button id="adm-tab-tokens" class="adm-subtab" onclick="_admSubTab('tokens',this);renderAdminTokensPanel()"><i class="fas fa-coins"></i> Token Orders</button>
     </div>
-    <div class="ma-section" id="admin-dashboard-section" style="display:none"></div>
-    <div class="ma-section" id="admin-listings-section"><div style="text-align:center;padding:40px 0;color:var(--tx2)"><i class="fas fa-spinner fa-spin" style="font-size:24px"></i><div style="margin-top:8px">กำลังโหลด...</div></div></div>
-    <div class="ma-section" id="admin-properties-section" style="display:none"></div>
-    <div class="ma-section" id="admin-users-section" style="display:none"></div>
-    <div class="ma-section" id="admin-tokens-section" style="display:none"></div>
+
+    <!-- Main layout wrapper -->
+    <div id="adm-layout">
+      <!-- Desktop sidebar (hidden on mobile) -->
+      <div id="adm-sidebar">
+        <button id="adm-tab-dashboard" class="adm-subtab" onclick="_admSubTab('dashboard',this);renderAdminDashboard()"><i class="fas fa-tachometer-alt"></i> Dashboard</button>
+        <button id="adm-tab-listings" class="adm-subtab active" onclick="_admSubTab('listings',this);renderAdminListingsPanel()"><i class="fas fa-list"></i> จัดการประกาศ</button>
+        <button id="adm-tab-properties" class="adm-subtab" onclick="_admSubTab('properties',this);renderAdminPropertiesPanel()"><i class="fas fa-building"></i> ทรัพย์ทั้งหมด</button>
+        <button id="adm-tab-users" class="adm-subtab" onclick="_admSubTab('users',this);renderAdminUsersPanel()"><i class="fas fa-users"></i> จัดการ Users</button>
+        <button id="adm-tab-tokens" class="adm-subtab" onclick="_admSubTab('tokens',this);renderAdminTokensPanel()"><i class="fas fa-coins"></i> Token Orders</button>
+      </div>
+
+      <!-- Content area -->
+      <div id="adm-content-area">
+        <div class="ma-section" id="admin-dashboard-section" style="display:none"></div>
+        <div class="ma-section" id="admin-listings-section"><div style="text-align:center;padding:40px 0;color:var(--tx2)"><i class="fas fa-spinner fa-spin" style="font-size:24px"></i><div style="margin-top:8px">กำลังโหลด...</div></div></div>
+        <div class="ma-section" id="admin-properties-section" style="display:none"></div>
+        <div class="ma-section" id="admin-users-section" style="display:none"></div>
+        <div class="ma-section" id="admin-tokens-section" style="display:none"></div>
+      </div>
+    </div>
   </div>` : ''}`;
   // Initialize profile in locked/view mode after render
   setTimeout(_maInitProfileLockState, 50);
@@ -13039,12 +13138,17 @@ async function adminRejectListing(listingId, note) {
 //  ADMIN: Sub-tab navigation
 // ══════════════════════════════════════════════════════════════
 function _admSubTab(name, el) {
+  // Reset all buttons (sidebar + mobile bar) — use class, not inline styles
   document.querySelectorAll('.adm-subtab').forEach(b => {
-    b.style.background = 'transparent';
-    b.style.color = 'var(--tx)';
-    b.style.borderColor = 'var(--bd)';
+    b.classList.remove('active');
+    b.style.background = '';
+    b.style.color = '';
+    b.style.borderColor = '';
   });
-  if(el){ el.style.background='var(--p)'; el.style.color='#fff'; el.style.borderColor='var(--p)'; }
+  // Activate all buttons with matching id (covers both sidebar + mobile bar)
+  document.querySelectorAll('#adm-tab-' + name).forEach(b => b.classList.add('active'));
+  if (el) el.classList.add('active');
+
   const sections = ['dashboard','listings','properties','users','tokens'];
   sections.forEach(s => {
     const el2 = document.getElementById('admin-'+s+'-section');
