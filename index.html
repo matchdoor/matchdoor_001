@@ -2671,7 +2671,7 @@ footer::after{
 .ab-tel{background:var(--p);color:#fff}
 .fav-actions{display:flex;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap}
 .btn-fa{padding:8px 18px;border-radius:8px;font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:6px;border:1.5px solid rgba(255,255,255,.35);color:#fff;cursor:pointer;background:rgba(255,255,255,.12)}
-.float-wrap{position:fixed;bottom:24px;right:14px;z-index:1200;display:flex;flex-direction:column;align-items:flex-end;gap:10px;transition:opacity .2s,pointer-events .2s}
+.float-wrap{position:fixed;bottom:calc(24px + var(--bnav-h,0px));right:14px;z-index:1200;display:flex;flex-direction:column;align-items:flex-end;gap:10px;transition:opacity .2s,bottom .2s,pointer-events .2s}
 .float-wrap.dd-open{opacity:0;pointer-events:none!important}
 /* scroll-top sits at top of float-wrap stack — hidden by default, shown on scroll */
 .float-top{width:42px;height:42px;border-radius:50%;background:rgba(15,52,96,.85);color:#fff;font-size:17px;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;cursor:pointer;border:none;transform:translateY(6px)}
@@ -11749,19 +11749,6 @@ function renderMyAccount(){
     </div>
   </div>
   <!-- ═══ AGENT PROFILE PREVIEW (แสดงเมื่อ show_on_agents=true) ═══ -->
-  <div id="ma-agent-preview-section" style="display:none;margin:0 16px 16px;border-radius:16px;overflow:hidden;border:2px solid rgba(16,185,129,.25);background:linear-gradient(135deg,rgba(16,185,129,.04),rgba(255,255,255,.95))">
-    <div style="background:linear-gradient(135deg,#10b981,#059669);padding:12px 18px;display:flex;align-items:center;justify-content:space-between">
-      <div style="display:flex;align-items:center;gap:8px;color:#fff;font-size:13px;font-weight:700">
-        <i class="fas fa-id-badge"></i> ตัวอย่างโปรไฟล์ตัวแทนของคุณ
-      </div>
-      <button onclick="_viewMyAgentProfile()" style="background:rgba(255,255,255,.2);color:#fff;border:1.5px solid rgba(255,255,255,.4);border-radius:20px;padding:5px 14px;font-size:11px;font-weight:700;cursor:pointer">
-        <i class="fas fa-external-link-alt"></i> ดูหน้าเต็ม
-      </button>
-    </div>
-    <div id="ma-agent-preview-body" style="padding:16px">
-      <!-- Filled by _maRenderAgentPreview() -->
-    </div>
-  </div>
   <!-- ═══ TABS ═══ -->
   <div class="ma-tab-bar" id="ma-tab-bar">
     <button class="ma-tab active" data-tab="profile" onclick="_maTab('profile',this)"><i class="fas fa-user"></i> ${sanitize(t('ma.tab.profile'))}</button>
