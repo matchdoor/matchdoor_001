@@ -4203,6 +4203,64 @@ footer::after{
 .adv-sheet-drag:active,.qs-mob-sheet-drag:active{cursor:grabbing}
 @media(max-width:600px){.apply-modal{touch-action:pan-x}}
 
+
+/* ═══ Project cards ═══ */
+.project-card{
+  min-width:260px;max-width:260px;border-radius:16px;overflow:hidden;
+  background:#fff;border:1.5px solid var(--bd);
+  box-shadow:0 2px 12px rgba(0,0,0,.08);
+  cursor:pointer;transition:.22s;flex-shrink:0;
+}
+.project-card:hover{transform:translateY(-4px);box-shadow:0 8px 28px rgba(0,0,0,.14)}
+.project-card-img{width:100%;height:160px;object-fit:cover;display:block;background:linear-gradient(135deg,var(--pastel1),var(--pastel3))}
+.project-card-img-ph{width:100%;height:160px;display:flex;align-items:center;justify-content:center;font-size:48px;background:linear-gradient(135deg,var(--pastel1),var(--pastel3))}
+.project-card-body{padding:14px 14px 16px}
+.project-card-type{display:inline-block;background:var(--p);color:#fff;border-radius:20px;padding:2px 10px;font-size:10px;font-weight:700;margin-bottom:6px}
+.project-card-title{font-size:14px;font-weight:700;color:var(--tx);margin-bottom:4px;line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.project-card-loc{font-size:12px;color:var(--tx2);margin-bottom:8px;display:flex;align-items:center;gap:4px}
+.project-card-stats{display:flex;gap:12px;border-top:1px solid var(--lt);padding-top:10px;margin-top:4px}
+.project-card-stat{text-align:center;flex:1}
+.project-card-stat .n{font-size:16px;font-weight:800;color:var(--p)}
+.project-card-stat .l{font-size:10px;color:var(--tx2);margin-top:1px}
+/* ═══ Developer cards ═══ */
+.developer-card{
+  min-width:220px;max-width:220px;border-radius:16px;overflow:hidden;
+  background:#fff;border:1.5px solid var(--bd);
+  box-shadow:0 2px 12px rgba(0,0,0,.08);
+  cursor:pointer;transition:.22s;flex-shrink:0;text-align:center;
+}
+.developer-card:hover{transform:translateY(-4px);box-shadow:0 8px 28px rgba(0,0,0,.14)}
+.developer-card-logo{width:100%;height:110px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1B3A6B,#2a5298);padding:16px;box-sizing:border-box}
+.developer-card-logo img{max-width:100%;max-height:80px;object-fit:contain;border-radius:8px}
+.developer-card-logo-ph{font-size:42px;font-weight:800;color:#fff;letter-spacing:-2px}
+.developer-card-body{padding:12px 14px 16px}
+.developer-card-name{font-size:14px;font-weight:700;color:var(--tx);margin-bottom:4px;line-height:1.3}
+.developer-card-tag{font-size:11px;color:var(--tx2);margin-bottom:10px}
+.developer-card-count{display:inline-block;background:var(--lt);color:var(--p);border-radius:20px;padding:3px 12px;font-size:12px;font-weight:700}
+/* ═══ Featured agent mini cards ═══ */
+.feat-agent-card{
+  min-width:200px;max-width:200px;border-radius:16px;overflow:hidden;
+  background:#fff;border:1.5px solid var(--bd);
+  box-shadow:0 2px 12px rgba(0,0,0,.08);
+  cursor:pointer;transition:.22s;flex-shrink:0;text-align:center;
+}
+.feat-agent-card:hover{transform:translateY(-4px);box-shadow:0 8px 28px rgba(0,0,0,.14)}
+.feat-agent-photo{width:100%;height:140px;object-fit:cover;object-position:top;display:block}
+.feat-agent-photo-ph{width:100%;height:140px;display:flex;align-items:center;justify-content:center;font-size:52px;font-weight:800;color:#fff}
+.feat-agent-body{padding:12px 12px 14px}
+.feat-agent-name{font-size:13px;font-weight:700;color:var(--tx);margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.feat-agent-role{font-size:11px;color:var(--tx2);margin-bottom:6px}
+.feat-agent-stars{color:#f39c12;font-size:12px;margin-bottom:4px}
+.feat-agent-rating{font-size:11px;color:var(--tx2)}
+.feat-agent-count{font-size:11px;color:var(--p);font-weight:600;margin-top:2px}
+.feat-agent-btn{display:block;margin-top:10px;padding:7px;border:1.5px solid var(--bd);border-radius:8px;font-size:11px;font-weight:600;color:var(--p);text-align:center;transition:.15s}
+.feat-agent-btn:hover{background:var(--p);color:#fff;border-color:var(--p)}
+@media(max-width:600px){
+  .project-card{min-width:200px;max-width:200px}
+  .developer-card{min-width:170px;max-width:170px}
+  .feat-agent-card{min-width:160px;max-width:160px}
+  .project-card-img,.project-card-img-ph{height:130px}
+}
 </style>
 <style>
 /* ── Drill-down location picker ── */
@@ -6931,7 +6989,7 @@ footer::after{
     <div class="gallery-carousel-hd">
       <div class="sec-title"><i class="fas fa-fire" style="color:#ff4d6d"></i> ยอดนิยม</div>
       <div style="display:flex;align-items:center;gap:10px">
-        <span class="view-all" onclick="openAllModal('rec')">ดูทั้งหมด →</span>
+        <span class="view-all" onclick="_goListingsHot()">ดูทั้งหมด →</span>
         <div class="gallery-nav">
           <button class="gallery-nav-btn" id="gc-prev" onclick="gcStep(-1)"><i class="fas fa-chevron-left"></i></button>
           <button class="gallery-nav-btn" id="gc-next" onclick="gcStep(1)"><i class="fas fa-chevron-right"></i></button>
@@ -6946,12 +7004,13 @@ footer::after{
   <div class="gallery-dots" id="gc-dots"></div>
   <div id="rec-grid" style="display:none"></div>
 </section>
- <section id="new-sec" style="padding:28px 0 22px;background:var(--bg)">
+
+<section id="new-sec" style="padding:28px 0 22px;background:var(--bg)">
   <div style="max-width:1320px;margin:0 auto;padding:0 20px">
     <div class="sec-hd">
       <div class="sec-title">มาใหม่ล่าสุด</div>
       <div style="display:flex;align-items:center;gap:10px">
-        <span class="view-all" onclick="openAllModal('new')">ดูทั้งหมด →</span>
+        <span class="view-all" onclick="_goListingsNew()">ดูทั้งหมด →</span>
         <div class="gallery-nav">
           <button class="gallery-nav-btn" onclick="hGalleryMove('new-track',-1)"><i class="fas fa-chevron-left"></i></button>
           <button class="gallery-nav-btn" onclick="hGalleryMove('new-track',1)"><i class="fas fa-chevron-right"></i></button>
@@ -6963,29 +7022,63 @@ footer::after{
     </div>
   </div>
 </section>
- <div class="wrap" id="all-sec">
-  <!-- Row 1: title (left) + count + view-all + sort (right) -->
-  <div class="sec-hd all-sec-row1" style="flex-wrap:nowrap;gap:8px;margin-bottom:16px">
-    <div class="sec-title" id="all-title" style="min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1"><button onclick="showListingsPage()" style="background:none;border:none;padding:0;margin:0;font:inherit;font-size:inherit;font-weight:inherit;color:inherit;cursor:pointer;text-align:left">ประกาศทั้งหมด</button></div>
-    <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
-      <span id="res-count" class="res-count-home" style="font-size:13px;color:var(--gr);white-space:nowrap"></span>
-      <span class="view-all" onclick="openAllModal('all')">ดูทั้งหมด →</span>
-      <select id="all-grid-sort" class="sort-select" style="font-size:12px;padding:5px 8px;min-width:110px" onchange="homeAllGridSortChange(this)">
-        <option value="default">แนะนำ</option>
-        <option value="price_asc">ราคา ต่ำ→สูง</option>
-        <option value="price_desc">ราคา สูง→ต่ำ</option>
-        <option value="newest">ใหม่สุด</option>
-        <option value="oldest">เก่าสุด</option>
-        <option value="alpha">ชื่อ A–Z</option>
-      </select>
+
+<!-- ═══ โครงการที่แนะนำ ═══ -->
+<section id="projects-sec" style="padding:32px 0 28px;background:var(--bg)">
+  <div style="max-width:1320px;margin:0 auto;padding:0 20px">
+    <div class="sec-hd">
+      <div class="sec-title"><i class="fas fa-city" style="color:var(--p)"></i> โครงการที่แนะนำ</div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="view-all" onclick="_goProjectsAll()">ดูทั้งหมด →</span>
+        <div class="gallery-nav">
+          <button class="gallery-nav-btn" onclick="hGalleryMove('projects-track',-1)"><i class="fas fa-chevron-left"></i></button>
+          <button class="gallery-nav-btn" onclick="hGalleryMove('projects-track',1)"><i class="fas fa-chevron-right"></i></button>
+        </div>
+      </div>
+    </div>
+    <div class="h-gallery-wrap" id="projects-track-wrap">
+      <div class="h-gallery-track" id="projects-track" style="gap:16px"></div>
     </div>
   </div>
-  <div class="prop-grid" id="all-grid"></div>
-  <div class="pagination" id="all-grid-pagination" style="display:none">
-    <div class="pg-info" id="all-pg-info"></div>
-    <div class="pg-controls" id="all-pg-controls"></div>
-  </div>
+</section>
 
+<!-- ═══ ผู้พัฒนาโครงการที่แนะนำ ═══ -->
+<section id="developers-sec" style="padding:32px 0 28px;background:var(--lt)">
+  <div style="max-width:1320px;margin:0 auto;padding:0 20px">
+    <div class="sec-hd">
+      <div class="sec-title"><i class="fas fa-hard-hat" style="color:var(--a)"></i> ผู้พัฒนาโครงการที่แนะนำ</div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="view-all" onclick="_goDevelopersAll()">ดูทั้งหมด →</span>
+        <div class="gallery-nav">
+          <button class="gallery-nav-btn" onclick="hGalleryMove('developers-track',-1)"><i class="fas fa-chevron-left"></i></button>
+          <button class="gallery-nav-btn" onclick="hGalleryMove('developers-track',1)"><i class="fas fa-chevron-right"></i></button>
+        </div>
+      </div>
+    </div>
+    <div class="h-gallery-wrap" id="developers-track-wrap">
+      <div class="h-gallery-track" id="developers-track" style="gap:16px"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ ตัวแทนแนะนำ ═══ -->
+<section id="featured-agents-sec" style="padding:32px 0 36px;background:var(--bg)">
+  <div style="max-width:1320px;margin:0 auto;padding:0 20px">
+    <div class="sec-hd">
+      <div class="sec-title"><i class="fas fa-user-tie" style="color:var(--p)"></i> ตัวแทนแนะนำ</div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="view-all" onclick="showPage('agents')">ดูทั้งหมด →</span>
+        <div class="gallery-nav">
+          <button class="gallery-nav-btn" onclick="hGalleryMove('featured-agents-track',-1)"><i class="fas fa-chevron-left"></i></button>
+          <button class="gallery-nav-btn" onclick="hGalleryMove('featured-agents-track',1)"><i class="fas fa-chevron-right"></i></button>
+        </div>
+      </div>
+    </div>
+    <div class="h-gallery-wrap" id="featured-agents-track-wrap">
+      <div class="h-gallery-track" id="featured-agents-track" style="gap:16px"></div>
+    </div>
+  </div>
+</section>
  <div id="osrv-sec" class="osrv-sec" style="padding:32px 0 28px">
   <div style="max-width:1320px;margin:0 auto;padding:0 20px">
     <div class="sec-hd">
@@ -7059,7 +7152,7 @@ footer::after{
   </div>
 </section>
 
- <section class="blog-sec" id="blog-sec" style="padding:32px 0 28px">
+<section class="blog-sec" id="blog-sec" style="padding:32px 0 28px">
   <div style="max-width:1320px;margin:0 auto;padding:0 20px">
     <div class="sec-hd">
       <div class="sec-title" data-i18n="sec.blog">บทความน่ารู้</div>
@@ -7076,7 +7169,7 @@ footer::after{
     </div>
   </div>
 </section>
-</div><!-- end wrap#all-sec -->
+
 <!-- ═══ WHY CHOOSE US (ทำไมเลือก Matchdoor) ═══ -->
 <section class="why-sec" id="why-sec">
   <div style="max-width:1320px;margin:0 auto;padding:0 20px">
@@ -11331,7 +11424,18 @@ function initSB(){
   const url = (C.SUPABASE_URL||'').trim();
   const key = (C.SUPABASE_KEY||'').trim();
   if(!url || !key || url==='demo' || !url.startsWith('https://')) return false;
-  try{ sb=window.supabase.createClient(url,key); return true; }
+  try{
+    sb = window.supabase.createClient(url, key, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        storageKey: 'md_sb_session',
+        flowType: 'pkce',
+      }
+    });
+    return true;
+  }
   catch(e){ console.error('Supabase init failed:',e); return false; }
 }
 async function sbFetch(table,opts={}){ const q=sb.from(table).select(opts.select||'*'); if(opts.eq) Object.entries(opts.eq).forEach(([k,v])=>q.eq(k,v)); if(opts.order) q.order(opts.order,{ascending:false}); const {data,error}=await q; if(error){ console.error('[sbFetch]',table,error); return null; } return data; }
@@ -11377,10 +11481,37 @@ async function filterProperties(filters={}){
 }
 async function checkAuth(){
   if(!sb) return;
-  const {data:{user:u}} = await sb.auth.getUser();
-  user = u||null;
-  // Reset cache เสมอก่อนโหลดใหม่ — กัน stale data จาก session ก่อนหน้า
+
+  // ── ขั้นที่ 1: restore session จาก localStorage ก่อนเสมอ (เร็ว, ไม่ต้องรอ network) ──
+  // getSession() อ่าน token จาก localStorage ทันที ทำให้ UI แสดง user ได้ก่อนที่ network จะพร้อม
+  const { data: { session: storedSession } } = await sb.auth.getSession();
+  if (storedSession?.user) {
+    user = storedSession.user;
+    _cachedUserProfile = null;
+    renderAuthUI();
+    updateFormBtns();
+  }
+
+  // ── ขั้นที่ 2: verify กับ Supabase server (ตรวจสอบว่า token ยังใช้ได้จริง) ──
+  // getUser() จะ auto-refresh token ถ้าใกล้หมดอายุ ผ่าน autoRefreshToken
+  const { data: { user: u }, error: authErr } = await sb.auth.getUser();
+
+  if (authErr) {
+    // network error หรือ token เสีย — ถ้า session ยังอยู่ใน localStorage ให้ใช้ต่อก่อน
+    // (ไม่ logout ทันที กัน case ที่ internet หลุดชั่วคราว)
+    if (!storedSession) {
+      user = null;
+      _cachedUserProfile = null;
+    }
+    console.warn('[checkAuth] getUser error:', authErr.message);
+    renderAuthUI();
+    updateFormBtns();
+    return;
+  }
+
+  user = u || null;
   _cachedUserProfile = null;
+
   if(user){
     await _loadUserProfile(true);
     // ── Restore show_on_agents preference ──────────────────────────
@@ -11409,9 +11540,43 @@ async function checkAuth(){
 function initAuthListener(){
   if(!sb) return;
   sb.auth.onAuthStateChange((_event, session) => {
+
+    // ── INITIAL_SESSION: ยิงครั้งแรกเมื่อ page โหลด / refresh ──
+    // session จะมีค่าถ้า user เคย login ไว้แล้ว (restore จาก localStorage)
+    if(_event === 'INITIAL_SESSION'){
+      user = session?.user || null;
+      if(user){
+        _cachedUserProfile = null;
+        renderAuthUI();
+        updateFormBtns();
+        _loadUserProfile(true).catch(()=>{});
+        setTimeout(_restoreAgentProfileVisibility, 400);
+      }
+      return; // ไม่ toast ตอน INITIAL_SESSION
+    }
+
+    // ── TOKEN_REFRESHED: Supabase refresh token อัตโนมัติ ──
+    // อัปเดต user object ให้ตรงกับ token ใหม่ โดยไม่แสดง toast
+    if(_event === 'TOKEN_REFRESHED'){
+      user = session?.user || null;
+      renderAuthUI();
+      updateFormBtns();
+      return;
+    }
+
+    // ── USER_UPDATED: user แก้ไขข้อมูลโปรไฟล์ ──
+    if(_event === 'USER_UPDATED'){
+      user = session?.user || null;
+      _cachedUserProfile = null;
+      renderAuthUI();
+      updateFormBtns();
+      return;
+    }
+
     user = session?.user || null;
     renderAuthUI();
     updateFormBtns();
+
     if(_event === 'SIGNED_IN'){
       _closeModal('login-modal');
       _closeModal('signup-modal');
@@ -11432,8 +11597,9 @@ function initAuthListener(){
       // ── Restore agent profile visibility preference ──
       setTimeout(_restoreAgentProfileVisibility, 600);
     }
+
     if(_event === 'SIGNED_OUT'){
-      // Reset cache ทุกครั้งที่ sign out
+      // Reset cache ทุกครั้งที่ sign out (เฉพาะ explicit sign out เท่านั้น)
       _cachedUserProfile = null;
       window._isAdminUser = false;
       window._adminCheckDone = false;
@@ -11445,6 +11611,7 @@ function initAuthListener(){
         renderMyAccount();
       }
     }
+
     if(_event === 'PASSWORD_RECOVERY'){
       // เปิด modal ตั้งรหัสผ่านใหม่ทันที
       _openModal('reset-pw-modal');
@@ -15467,11 +15634,15 @@ async function logout(){
   }
   // Clear ALL browser storage — ล้าง session เก่าทั้งหมดเพื่อกัน OAuth redirect loop
   try {
-    const lsKeys = Object.keys(localStorage).filter(k => k.startsWith('sb-') || k.includes('supabase'));
+    const lsKeys = Object.keys(localStorage).filter(k =>
+      k.startsWith('sb-') || k.includes('supabase') || k === 'md_sb_session'
+    );
     lsKeys.forEach(k => localStorage.removeItem(k));
   } catch(e){}
   try {
-    const ssKeys = Object.keys(sessionStorage).filter(k => k.startsWith('sb-') || k.includes('supabase'));
+    const ssKeys = Object.keys(sessionStorage).filter(k =>
+      k.startsWith('sb-') || k.includes('supabase') || k === 'md_sb_session'
+    );
     ssKeys.forEach(k => sessionStorage.removeItem(k));
   } catch(e){}
   // ล้าง OAuth hash/params ที่อาจค้างอยู่ใน URL
@@ -16166,10 +16337,15 @@ function afterLoad(){
 
   loading(false);
 
-  // ── Auth: register listener และ check session ทันที — ต้องทำก่อน idle ──
-  // initAuthListener() ต้อง register ก่อนที่ Supabase จะ process OAuth hash
-  // ถ้าวางใน idle callback อาจช้าเกินไปและ SIGNED_IN event หายไป
-  if(sb){ initAuthListener(); checkAuth(); }
+  // ── Auth: register listener ก่อน checkAuth เสมอ ──────────────────
+  // 1) initAuthListener() ต้อง register ก่อน เพื่อรับ INITIAL_SESSION / SIGNED_IN
+  // 2) checkAuth() restore session จาก localStorage แล้ว verify กับ server
+  // ลำดับนี้สำคัญมาก — อย่าสลับ
+  if(sb){
+    initAuthListener(); // register onAuthStateChange ก่อน
+    // รอ 1 tick ให้ Supabase process INITIAL_SESSION event ก่อน checkAuth
+    setTimeout(() => checkAuth(), 0);
+  }
 
   // ── defer secondary sections — ไม่บล็อก first paint ──────────────
   const idle = window.requestIdleCallback || (cb => setTimeout(cb, 100));
@@ -16498,7 +16674,39 @@ function setPriceRange(val){ const parts=(val||'0|0').split('|'); const mn=parse
 function updatePriceMax(){const min=+$('s-min').value;$$('#s-max option').forEach(o=>{o.disabled=+o.value>0&&+o.value<min;});}
 
 function setTx(t,el){ tx=t; $$('.tx-tab').forEach(b=>b.classList.remove('active')); el.classList.add('active'); const pb=$('price-buy-section'),pr=$('price-rent-section'); if(pb&&pr){ pb.style.display=t==='RENT'?'none':'block'; pr.style.display=t==='RENT'?'block':'none'; } if(typeof _refreshPriceOpts==='function') _refreshPriceOpts(); applyFilters().catch(console.error); const _heroStats=document.getElementById('hero-stat-counters'); if(_heroStats){ if(window._dataReady && typeof syncAllStats==='function'){ syncAllStats(true); } else if(typeof animateStatCounters==='function'){ animateStatCounters(_heroStats.closest('.page')||document); } } }
-function setCat(type,el){ curType=type; $$('.cat-card').forEach(c=>c.classList.remove('active')); if(el)el.classList.add('active'); applyFilters().catch(console.error); scrollToEl('all-sec'); }
+// ── ฟังก์ชัน navigate ไปหน้า listings พร้อม filter ──────────────────────────
+function _goListingsWithFilter(opts){
+  // opts: { type, min, max, tx }
+  showListingsPage();
+  setTimeout(function(){
+    var lsKw   = document.getElementById('ls-kw');   if(lsKw)   lsKw.value   = '';
+    var lsType = document.getElementById('ls-type');
+    if(lsType) lsType.value = opts.type||'';
+    var lsTx   = document.getElementById('ls-tx');
+    if(lsTx){
+      var txv = opts.tx||'';
+      lsTx.value = txv==='BUY'?'BUY':txv==='RENT'?'RENT':'';
+    }
+    var lsMin  = document.getElementById('ls-min');
+    var lsMax  = document.getElementById('ls-max');
+    if(lsMin && opts.min > 0){
+      var mnOpts = Array.from(lsMin.options).map(function(o){return +o.value;}).filter(function(v){return v>0;}).sort(function(a,b){return a-b;});
+      if(mnOpts.length){ var cl=mnOpts.reduce(function(p,c){return Math.abs(c-opts.min)<Math.abs(p-opts.min)?c:p;},mnOpts[0]); lsMin.value=cl; }
+    }
+    if(lsMax && opts.max < 999e6){
+      var mxOpts = Array.from(lsMax.options).map(function(o){return +o.value;}).filter(function(v){return v>0;}).sort(function(a,b){return a-b;});
+      if(mxOpts.length){ var cl2=mxOpts.reduce(function(p,c){return Math.abs(c-opts.max)<Math.abs(p-opts.max)?c:p;},mxOpts[mxOpts.length-1]); lsMax.value=cl2; }
+    }
+    if(typeof listingsInlineSearch==='function') listingsInlineSearch();
+    else if(typeof renderListingsPage==='function') renderListingsPage();
+  }, 150);
+}
+function setCat(type,el){
+  $$('.cat-card').forEach(c=>c.classList.remove('active'));
+  if(el) el.classList.add('active');
+  // ถ้าเลือก "ทั้งหมด" (type='') เปิด listings ไม่มี filter ประเภท
+  _goListingsWithFilter({ type: type, tx: tx||'ALL' });
+}
 function setCatNav(t){ showPage('home'); setTimeout(()=>{curType=t;applyFilters().catch(console.error);scrollToEl('all-sec');},100); }
 function _syncTxTabs(newTx){
   tx=newTx;
@@ -16527,24 +16735,11 @@ function _resetFilterState(){
 }
 function filterTypeDD(t){
   _closeHamburger(); closeAllDD();
-  if(!$('page-home').classList.contains('active')) showPage('home');
-  _syncTxTabs('BUY');
-  // reset price + keyword ก่อน แล้วค่อย set ประเภทที่เลือก
-  _resetFilterState();
-  curType=t;
-  var st=$('s-type'); if(st) st.value=t;
-  applyFilters().catch(console.error);
-  scrollToEl('all-sec');
+  _goListingsWithFilter({ type: t, tx: 'BUY' });
 }
 function filterPriceDD(min,max,forceTx){
   _closeHamburger(); closeAllDD();
-  if(!$('page-home').classList.contains('active')) showPage('home');
-  if(forceTx) _syncTxTabs(forceTx);
-  // reset type + keyword ก่อน แล้วค่อย set ราคาที่เลือก
-  _resetFilterState();
-  $('s-min').value=min; $('s-max').value=max;
-  applyFilters().catch(console.error);
-  scrollToEl('all-sec');
+  _goListingsWithFilter({ min: min, max: max, tx: forceTx||tx||'ALL' });
 }
 function filterRentDD(type,minRent,maxRent){
   _closeHamburger(); closeAllDD();
@@ -16643,9 +16838,67 @@ function _fuzzyMatch(kw, p) {
 }
 
 
-function doSearch(){ curType=($('s-type')?.value||'').trim(); $$('.cat-card').forEach((c,i)=>c.classList.toggle('active',i===0)); applyFilters().catch(console.error); scrollToEl('all-sec');
+function doSearch(){
+  // ── อ่านค่าจาก Hero search box ──────────────────────────────────────────
+  const _kw   = ($('s-kw')?.value||'').trim();
+  const _type = ($('s-type')?.value||'').trim();
+  const _pv   = (typeof _locProv!=='undefined'&&_locProv!==null) ? _locProv : ($('s-prov')?.value||'');
+  const _min  = +$('s-min')?.value||0;
+  const _max  = +$('s-max')?.value||999e6;
+  const _txVal = tx||'ALL';  // ค่าจาก setTx() ที่ user เลือกไว้
+
   // GA4: search event
-  try{ if(typeof trackEvent==='function'){ const _kw=($('s-kw')?.value||'').trim(); const _tx=($('s-tx')?.value||$('tx-tab.active')?.dataset?.tx||''); const _type=($('s-type')?.value||''); const _prov=($('s-prov')?.value||''); if(_kw||_type||_prov) trackEvent('search',{search_term:_kw,tx:_tx,property_type:_type,province:_prov,source:'home'}); } }catch(e){}
+  try{ if(typeof trackEvent==='function'){ if(_kw||_type||_pv) trackEvent('search',{search_term:_kw,tx:_txVal,property_type:_type,province:_pv,source:'home'}); } }catch(e){}
+
+  // ── ถ้าอยู่หน้า home ให้เปิดหน้า listings และ sync filter ─────────────
+  const _activePage = document.querySelector('.page.active');
+  const _onHome = !_activePage || _activePage.id === 'page-home';
+
+  if (_onHome) {
+    // Sync ค่าไปยัง listings filter inputs ก่อน navigate
+    function _syncAndNavigate() {
+      const lsKw   = document.getElementById('ls-kw');   if(lsKw)   lsKw.value   = _kw;
+      const lsType = document.getElementById('ls-type');  if(lsType) lsType.value  = _type;
+      const lsTx   = document.getElementById('ls-tx');
+      if(lsTx) { lsTx.value = _txVal==='BUY'?'BUY':_txVal==='RENT'?'RENT':''; }
+      // sync province
+      const lsProv = document.getElementById('ls-prov');
+      if(lsProv && _pv) {
+        const opt = Array.from(lsProv.options).find(o=>o.value===_pv||o.text===_pv);
+        if(opt) lsProv.value = opt.value;
+      }
+      // sync price — ค้นหา option ที่ใกล้เคียงที่สุด
+      const lsMin = document.getElementById('ls-min');
+      const lsMax = document.getElementById('ls-max');
+      if(lsMin && _min > 0) {
+        const opts = Array.from(lsMin.options).map(o=>+o.value).filter(v=>v>0).sort((a,b)=>a-b);
+        const closest = opts.reduce((p,c)=>Math.abs(c-_min)<Math.abs(p-_min)?c:p, opts[0]||0);
+        if(closest) lsMin.value = closest;
+      }
+      if(lsMax && _max < 999e6) {
+        const opts = Array.from(lsMax.options).map(o=>+o.value).filter(v=>v>0).sort((a,b)=>a-b);
+        const closest = opts.reduce((p,c)=>Math.abs(c-_max)<Math.abs(p-_max)?c:p, opts[opts.length-1]||999e6);
+        if(closest) lsMax.value = closest;
+      }
+      // trigger listings filter — ใช้ listingsInlineSearch ซึ่งอ่าน ls-* inputs โดยตรง
+      if(typeof listingsInlineSearch==='function') {
+        listingsInlineSearch();
+      } else if(typeof renderListingsPage==='function') {
+        renderListingsPage();
+      }
+    }
+
+    // เปิดหน้า listings แล้ว sync filter
+    showListingsPage();
+    setTimeout(_syncAndNavigate, 150);
+    return;
+  }
+
+  // ── ถ้าอยู่หน้าอื่น (เช่น listings เปิดอยู่แล้ว) ทำ filter ปกติ ───────
+  curType = _type;
+  $$('.cat-card').forEach((c,i)=>c.classList.toggle('active',i===0));
+  applyFilters().catch(console.error);
+  scrollToEl('all-sec');
 }
 async function applyFilters(){
   const kw=($('s-kw')?.value||'').trim();
@@ -18498,6 +18751,21 @@ function listingsFilterTx(tx) {
   _scrollToListingsResults();
 }
 
+// ── Navigate to listings page filtered by Hot / New ──────────────────────────
+function _goListingsHot(){
+  showListingsPage();
+  setTimeout(function(){
+    if(typeof listingsFilterHot === 'function') listingsFilterHot();
+    else if(typeof renderListingsPage === 'function') renderListingsPage();
+  }, 150);
+}
+function _goListingsNew(){
+  showListingsPage();
+  setTimeout(function(){
+    if(typeof listingsFilterNew === 'function') listingsFilterNew();
+    else if(typeof renderListingsPage === 'function') renderListingsPage();
+  }, 150);
+}
 function listingsFilterHot() {
   _updateListingsTxTabs('HOT');
   const base = _listingsBaseData.filter(p=>p.isRec);
@@ -33917,6 +34185,205 @@ if (document.readyState === 'loading') {
   setTimeout(_v24Init, 100);
 }
 
+
+// ═══════════════════════════════════════════════════════════════
+//  โครงการที่แนะนำ / ผู้พัฒนา / ตัวแทนแนะนำ — Home Page Sections
+// ═══════════════════════════════════════════════════════════════
+
+/* ── helpers ── */
+function _fmtPrice(p){
+  if(!p) return '';
+  if(p>=1e6) return '฿'+(p/1e6).toFixed(1).replace(/\.?0+$/,'')+'M';
+  if(p>=1000) return '฿'+(p/1000).toFixed(0)+'K';
+  return '฿'+p.toLocaleString('th-TH');
+}
+function _typeEmoji(t){
+  return({'บ้านเดี่ยว':'🏡','คอนโด':'🏢','ทาวน์โฮม':'🏘️','ที่ดิน':'🗺️','อาคารพาณิชย์':'🏪','วิลล่า':'🌅','รีสอร์ท':'🏖️','โรงแรม':'🏨'})[t]||'🏠';
+}
+function _agColor(name){
+  const colors=['#1B3A6B','#2ea66c','#e67e22','#8e44ad','#c0392b','#16a085','#2c3e50','#d35400'];
+  let h=0; for(let i=0;i<(name||'').length;i++) h=(h+name.charCodeAt(i))%colors.length;
+  return colors[h];
+}
+
+/* ── Build project groups from props array ── */
+function _buildProjects(){
+  const all = (typeof props !== 'undefined' && props.length) ? props : [];
+  // group by title prefix (ชื่อโครงการคือส่วนแรกของ title ก่อน "-" หรือ " ")
+  const groups = {};
+  all.filter(p=>p.type==='คอนโด'||p.type==='บ้านเดี่ยว'||p.type==='ทาวน์โฮม'||p.type==='วิลล่า').forEach(p=>{
+    // ใช้ title ทั้งหมดถ้าสั้น หรือตัด keyword แรก
+    const key = (p.title||'').split(/[-–|·,]/)[0].trim().slice(0,40) || p.title;
+    if(!key) return;
+    if(!groups[key]) groups[key] = { name:key, type:p.type, props:[], province:p.province||'', photo:null };
+    groups[key].props.push(p);
+    if(!groups[key].photo && p.photos && p.photos[0]) groups[key].photo = p.photos[0];
+  });
+  return Object.values(groups)
+    .filter(g=>g.props.length>=1)
+    .sort((a,b)=>b.props.length-a.props.length)
+    .slice(0,20);
+}
+
+/* ── Build developer groups from agents array ── */
+function _buildDevelopers(){
+  const allAgents = (typeof agents !== 'undefined' && agents.length) ? agents : [];
+  return allAgents
+    .filter(a=>a.name)
+    .sort((a,b)=>{
+      const pa = (typeof props !== 'undefined') ? props.filter(p=>p.agentId===a.id||a.propIds?.includes(p.id)).length : 0;
+      const pb = (typeof props !== 'undefined') ? props.filter(p=>p.agentId===b.id||b.propIds?.includes(p.id)).length : 0;
+      return pb-pa;
+    })
+    .slice(0,12);
+}
+
+/* ── Render: โครงการ ── */
+function renderProjectsSec(){
+  const track = document.getElementById('projects-track');
+  if(!track) return;
+  const projects = _buildProjects();
+  if(!projects.length){
+    track.closest('section').style.display='none'; return;
+  }
+  track.innerHTML = projects.map(g=>{
+    const imgHtml = g.photo
+      ? `<img class="project-card-img" src="${g.photo}" alt="${g.name}" loading="lazy" onerror="this.parentNode.innerHTML='<div class=\\'project-card-img-ph\\'>${_typeEmoji(g.type)}</div>'">`
+      : `<div class="project-card-img-ph">${_typeEmoji(g.type)}</div>`;
+    const priceMin = Math.min(...g.props.map(p=>p.price).filter(Boolean));
+    const priceTxt = isFinite(priceMin) ? _fmtPrice(priceMin)+'+' : '';
+    return `<div class="project-card" onclick="_openProjectModal(${JSON.stringify(g.name).replace(/</g,'&lt;')})">
+      ${imgHtml}
+      <div class="project-card-body">
+        <div class="project-card-type">${g.type}</div>
+        <div class="project-card-title">${g.name}</div>
+        <div class="project-card-loc"><i class="fas fa-map-marker-alt" style="color:var(--a);font-size:10px"></i>${g.province||'ไม่ระบุ'}</div>
+        ${priceTxt?`<div style="font-size:12px;font-weight:700;color:var(--p);margin-bottom:6px">เริ่ม ${priceTxt}</div>`:''}
+        <div class="project-card-stats">
+          <div class="project-card-stat"><div class="n">${g.props.length}</div><div class="l">ยูนิต</div></div>
+          <div class="project-card-stat"><div class="n">${g.props.filter(p=>p.tx==='BUY').length}</div><div class="l">ขาย</div></div>
+          <div class="project-card-stat"><div class="n">${g.props.filter(p=>p.tx==='RENT').length}</div><div class="l">เช่า</div></div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  if(typeof initAllCardSwipes==='function') setTimeout(initAllCardSwipes,100);
+}
+
+/* ── Render: ผู้พัฒนา ── */
+function renderDevelopersSec(){
+  const track = document.getElementById('developers-track');
+  if(!track) return;
+  const devs = _buildDevelopers();
+  if(!devs.length){
+    track.closest('section').style.display='none'; return;
+  }
+  track.innerHTML = devs.map(a=>{
+    const propCount = (typeof props!=='undefined') ? props.filter(p=>p.agentId===a.id||a.propIds?.includes(p.id)).length : 0;
+    const logoHtml = (a.avatar_url||a.photo_url)
+      ? `<img src="${a.avatar_url||a.photo_url}" alt="${a.name}" onerror="this.parentNode.innerHTML='<div class=\\'developer-card-logo-ph\\'>${(a.initials||a.name[0]||'M')}</div>'">`
+      : `<div class="developer-card-logo-ph">${a.initials||a.name[0]||'M'}</div>`;
+    return `<div class="developer-card" onclick="_openDeveloperModal(${JSON.stringify(a.id)})">
+      <div class="developer-card-logo">${logoHtml}</div>
+      <div class="developer-card-body">
+        <div class="developer-card-name">${a.name}</div>
+        <div class="developer-card-tag">${a.title||'ผู้พัฒนาโครงการ'}</div>
+        <div class="developer-card-count"><i class="fas fa-building"></i> ${propCount} โครงการ</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ── Render: ตัวแทนแนะนำ ── */
+function renderFeaturedAgentsSec(){
+  const track = document.getElementById('featured-agents-track');
+  if(!track) return;
+  const allAgents = (typeof agents!=='undefined' && agents.length) ? agents : [];
+  const featured = allAgents.slice(0,10);
+  if(!featured.length){
+    track.closest('section').style.display='none'; return;
+  }
+  track.innerHTML = featured.map(a=>{
+    const propCount = (typeof props!=='undefined') ? props.filter(p=>p.agentId===a.id||a.propIds?.includes(p.id)).length : 0;
+    const photoHtml = (a.avatar_url||a.photo_url)
+      ? `<img class="feat-agent-photo" src="${a.avatar_url||a.photo_url}" alt="${a.name}" loading="lazy" onerror="this.style.display='none';this.nextSibling.style.display='flex'">`
+        + `<div class="feat-agent-photo-ph" style="display:none;background:${_agColor(a.name)}">${a.initials||a.name[0]||'A'}</div>`
+      : `<div class="feat-agent-photo-ph" style="background:${_agColor(a.name)}">${a.initials||a.name[0]||'A'}</div>`;
+    const stars = '★'.repeat(Math.min(5,Math.round(a.rating||4.5)))+'☆'.repeat(Math.max(0,5-Math.round(a.rating||4.5)));
+    return `<div class="feat-agent-card" onclick="showAgentDetail(${JSON.stringify(a).replace(/</g,'&lt;')})">
+      ${photoHtml}
+      <div class="feat-agent-body">
+        <div class="feat-agent-name">${a.name}</div>
+        <div class="feat-agent-role">${a.title||'ตัวแทน Matchdoor'}</div>
+        <div class="feat-agent-stars">${stars}</div>
+        <div class="feat-agent-rating">${(a.rating||4.5).toFixed(1)} คะแนน</div>
+        <div class="feat-agent-count"><i class="fas fa-building"></i> ${propCount} ทรัพย์</div>
+        <div class="feat-agent-btn"><i class="fas fa-id-card"></i> ดูโปรไฟล์</div>
+      </div>
+    </div>`;
+  }).join('');
+  if(typeof initAllCardSwipes==='function') setTimeout(initAllCardSwipes,100);
+}
+
+/* ── Modal: กดโครงการ → แสดงทรัพย์ในโครงการนั้น ── */
+function _openProjectModal(projectName){
+  const matched = (typeof props!=='undefined') ? props.filter(p=>(p.title||'').split(/[-–|·,]/)[0].trim().slice(0,40)===projectName || p.title===projectName) : [];
+  if(!matched.length){ toast('ไม่พบทรัพย์ในโครงการนี้'); return; }
+  showListingsPage();
+  setTimeout(function(){
+    const lsKw = document.getElementById('ls-kw');
+    if(lsKw){ lsKw.value = projectName; }
+    if(typeof listingsInlineSearch==='function') listingsInlineSearch();
+    else if(typeof renderListingsPage==='function') renderListingsPage();
+  }, 150);
+}
+
+/* ── Modal: กดผู้พัฒนา → แสดงโครงการของผู้พัฒนานั้น ── */
+function _openDeveloperModal(agentId){
+  const ag = (typeof agents!=='undefined') ? agents.find(a=>String(a.id)===String(agentId)) : null;
+  if(!ag){ return; }
+  if(typeof showAgentDetail==='function'){ showAgentDetail(ag); return; }
+  showPage('agents');
+}
+
+/* ── ดูทั้งหมด ── */
+function _goProjectsAll(){
+  showListingsPage();
+  setTimeout(function(){
+    const lsType = document.getElementById('ls-type');
+    if(lsType){ lsType.value=''; }
+    if(typeof listingsInlineSearch==='function') listingsInlineSearch();
+  }, 150);
+}
+function _goDevelopersAll(){ showPage('agents'); }
+
+/* ── Render ทุก sections พร้อมกัน (เรียกหลัง data ready) ── */
+function renderHomeBonusSections(){
+  renderProjectsSec();
+  renderDevelopersSec();
+  renderFeaturedAgentsSec();
+}
+
+// Hook เข้า data-ready callback
+(function(){
+  var _origRenderAll = window.renderAll;
+  if(typeof _origRenderAll === 'function'){
+    window.renderAll = function(){
+      _origRenderAll.apply(this,arguments);
+      setTimeout(renderHomeBonusSections, 400);
+    };
+  }
+  // fallback: รันเมื่อ props พร้อม
+  var _check = setInterval(function(){
+    if(typeof props!=='undefined' && props.length > 0){
+      clearInterval(_check);
+      setTimeout(renderHomeBonusSections, 300);
+    }
+  }, 800);
+  // hard timeout fallback
+  setTimeout(function(){ clearInterval(_check); renderHomeBonusSections(); }, 8000);
+})();
+
 // Expose สำหรับ external call / debug
 window._v24 = {
   loadSocialPosts:       loadSocialPostsFromDB,
@@ -33959,6 +34426,294 @@ document.addEventListener('click',function(e){
 });
 // sync ft flag/code when setLang runs (patch into setLang post-call)
 const _origSetLang = typeof setLang === 'function' ? setLang : null;
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════
+     MATCHDOOR SCROLL REVEAL SYSTEM
+     Fade-in + slide-up เมื่อ scroll ผ่าน element
+     รองรับทุกหน้า: home, listings, agents, portfolio, blog ฯลฯ
+════════════════════════════════════════════════════════════════ -->
+<style>
+/* ── Base state: ซ่อน element ก่อน reveal ── */
+.md-reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.85s cubic-bezier(0.22,1,0.36,1),
+              transform 0.85s cubic-bezier(0.22,1,0.36,1);
+  will-change: opacity, transform;
+}
+/* ── Revealed state ── */
+.md-reveal.md-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+/* ── Stagger delays สำหรับการ์ดที่อยู่เรียงกัน ── */
+.md-reveal[data-delay="1"] { transition-delay: 0.12s; }
+.md-reveal[data-delay="2"] { transition-delay: 0.22s; }
+.md-reveal[data-delay="3"] { transition-delay: 0.32s; }
+.md-reveal[data-delay="4"] { transition-delay: 0.42s; }
+.md-reveal[data-delay="5"] { transition-delay: 0.52s; }
+.md-reveal[data-delay="6"] { transition-delay: 0.62s; }
+/* ── Slide from left (สำหรับ hero text / section title) ── */
+.md-reveal-left {
+  opacity: 0;
+  transform: translateX(-24px);
+  transition: opacity 0.75s cubic-bezier(0.22,1,0.36,1),
+              transform 0.75s cubic-bezier(0.22,1,0.36,1);
+  will-change: opacity, transform;
+}
+.md-reveal-left.md-visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+/* ── Scale-in สำหรับ badge / stat number ── */
+.md-reveal-scale {
+  opacity: 0;
+  transform: scale(0.88);
+  transition: opacity 0.7s cubic-bezier(0.22,1,0.36,1),
+              transform 0.7s cubic-bezier(0.22,1,0.36,1);
+  will-change: opacity, transform;
+}
+.md-reveal-scale.md-visible {
+  opacity: 1;
+  transform: scale(1);
+}
+/* ── ปิด animation เมื่อ prefers-reduced-motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .md-reveal, .md-reveal-left, .md-reveal-scale {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+</style>
+
+<script>
+(function(){
+'use strict';
+
+/* ════════════════════════════════════════════════
+   1. INTERSECTION OBSERVER — reveal เมื่อ scroll ผ่าน
+════════════════════════════════════════════════ */
+var _revealObserver = null;
+
+function _createObserver(){
+  if(_revealObserver) return;
+  _revealObserver = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting){
+        entry.target.classList.add('md-visible');
+        _revealObserver.unobserve(entry.target); // reveal ครั้งเดียวพอ
+      }
+    });
+  },{
+    threshold: 0.08,
+    rootMargin: '0px 0px -40px 0px'
+  });
+}
+
+/* ════════════════════════════════════════════════
+   2. SELECTORS — element ที่ต้องการ reveal
+════════════════════════════════════════════════ */
+var REVEAL_SELECTORS = [
+  /* Cards ทุกประเภท */
+  '.prop-card','.blog-card','.agent-card','.gal-card',
+  '.osrv-card','.project-card','.developer-card','.feat-agent-card',
+  '.why-card','.cat-card','.price-card','.rv-card','.rv-home-grid .rv-item',
+
+  /* Section headers */
+  '.sec-hd','.sec-title:not(.nav-title)',
+
+  /* About / stats */
+  '.about-stat-num','.about-stat-label','.about-blurb',
+  '.rv-home-stats .rv-stat-item',
+
+  /* Why section cards */
+  '.why-card',
+
+  /* Hero elements */
+  '.hero h1','.hero p','.hero-btns','.hero-badge','.hero-cats',
+
+  /* Sections ทั่วไป */
+  '.srv-item','.dev-strip-wrap',
+
+  /* Listings page */
+  '#listings-grid .prop-card',
+
+  /* Agent page */
+  '#agents-grid .agent-card',
+
+  /* Portfolio page */
+  '.port-item','.port-card',
+
+  /* Blog page */
+  '#blog-grid .blog-card',
+
+  /* Contact section */
+  '.srv-list .srv-item','.yt-wrap',
+
+  /* Transit strip */
+  '.transit-card','.transit-item',
+
+  /* Popular location cards */
+  '.pop-loc-card','.loc-card',
+
+  /* Footer sections */
+  '.footer-col'
+].join(',');
+
+/* ════════════════════════════════════════════════
+   3. APPLY REVEAL — ใส่ class + stagger แล้ว observe
+════════════════════════════════════════════════ */
+function _applyReveal(root){
+  if(!root) root = document;
+  _createObserver();
+
+  var elements = root.querySelectorAll(REVEAL_SELECTORS);
+  if(!elements.length) return;
+
+  /* จัดกลุ่ม stagger: card ที่อยู่ใน parent เดียวกัน */
+  var parentMap = {};
+  elements.forEach(function(el){
+    /* ข้าม element ที่ถูก reveal แล้ว หรืออยู่ใน hidden page */
+    if(el.classList.contains('md-reveal') ||
+       el.classList.contains('md-reveal-left') ||
+       el.classList.contains('md-reveal-scale')) return;
+
+    /* เลือก animation type ตาม element */
+    var tag = el.tagName.toLowerCase();
+    var cls = el.className || '';
+
+    if(cls.indexOf('about-stat-num') > -1 || cls.indexOf('rv-stat-item') > -1){
+      el.classList.add('md-reveal-scale');
+    } else if(tag === 'h1' || cls.indexOf('sec-title') > -1 || cls.indexOf('about-blurb') > -1){
+      el.classList.add('md-reveal-left');
+    } else {
+      el.classList.add('md-reveal');
+    }
+
+    /* stagger: นับ index ของ sibling ที่มี class เดียวกัน */
+    var parentKey = (el.parentNode ? (el.parentNode._mdRevealId || (el.parentNode._mdRevealId = 'p'+(Math.random()*1e9|0))) : 'root');
+    if(!parentMap[parentKey]) parentMap[parentKey] = 0;
+    parentMap[parentKey]++;
+    var idx = parentMap[parentKey];
+    if(idx >= 2 && idx <= 6){
+      el.setAttribute('data-delay', idx);
+    }
+
+    _revealObserver.observe(el);
+  });
+}
+
+/* ════════════════════════════════════════════════
+   4. RE-APPLY หลัง dynamic render (cards inject หลัง data load)
+════════════════════════════════════════════════ */
+var _mutationObserver = new MutationObserver(function(mutations){
+  mutations.forEach(function(m){
+    if(m.addedNodes.length){
+      m.addedNodes.forEach(function(node){
+        if(node.nodeType !== 1) return;
+        /* ถ้า node เองเป็น card ที่ต้องการ reveal */
+        var cls = node.className || '';
+        var isCard = ['prop-card','blog-card','agent-card','feat-agent-card',
+                      'osrv-card','project-card','developer-card','why-card',
+                      'gal-card','cat-card','rv-card','rv-item','port-card',
+                      'transit-card','pop-loc-card','footer-col']
+                     .some(function(c){ return cls.indexOf(c) > -1; });
+        if(isCard){
+          _applyRevealToSingle(node);
+        }
+        /* ถ้า node เป็น container ที่มี card ข้างใน */
+        if(node.querySelectorAll){
+          var inner = node.querySelectorAll(REVEAL_SELECTORS);
+          if(inner.length) setTimeout(function(){ _applyReveal(node); }, 80);
+        }
+      });
+    }
+  });
+});
+
+function _applyRevealToSingle(el){
+  if(el.classList.contains('md-reveal') ||
+     el.classList.contains('md-reveal-left') ||
+     el.classList.contains('md-reveal-scale')) return;
+  _createObserver();
+  el.classList.add('md-reveal');
+  _revealObserver.observe(el);
+}
+
+/* ════════════════════════════════════════════════
+   5. PAGE SWITCH HOOK — re-apply เมื่อเปลี่ยนหน้า
+════════════════════════════════════════════════ */
+function _hookPageSwitch(){
+  /* Patch showPage ถ้ามี */
+  var _origShowPage = window.showPage;
+  if(typeof _origShowPage === 'function'){
+    window.showPage = function(name){
+      _origShowPage.apply(this, arguments);
+      setTimeout(function(){
+        var pageEl = document.getElementById(name+'-page') ||
+                     document.getElementById(name) ||
+                     document.querySelector('[data-page="'+name+'"]');
+        if(pageEl) _applyReveal(pageEl);
+        else _applyReveal(document);
+      }, 200);
+    };
+  }
+
+  /* Patch _silentShowPage ถ้ามี */
+  var _origSilent = window._silentShowPage;
+  if(typeof _origSilent === 'function'){
+    window._silentShowPage = function(){
+      _origSilent.apply(this, arguments);
+      setTimeout(function(){ _applyReveal(document); }, 250);
+    };
+  }
+
+  /* Patch showListingsPage ถ้ามี */
+  var _origListings = window.showListingsPage;
+  if(typeof _origListings === 'function'){
+    window.showListingsPage = function(){
+      _origListings.apply(this, arguments);
+      setTimeout(function(){
+        var g = document.getElementById('listings-grid');
+        if(g) _applyReveal(g);
+      }, 300);
+    };
+  }
+}
+
+/* ════════════════════════════════════════════════
+   6. INIT
+════════════════════════════════════════════════ */
+function _init(){
+  /* Observe DOM mutations บน main content area */
+  var mainTarget = document.getElementById('app') ||
+                   document.getElementById('main-content') ||
+                   document.body;
+  _mutationObserver.observe(mainTarget, {
+    childList: true,
+    subtree: true
+  });
+
+  /* Apply reveal บน element ที่มีอยู่แล้วตอน load */
+  _applyReveal(document);
+
+  /* Hook page-switch functions */
+  setTimeout(_hookPageSwitch, 500);
+
+  /* Re-apply หลัง data load (props อาจ inject card ทีหลัง) */
+  setTimeout(function(){ _applyReveal(document); }, 1200);
+  setTimeout(function(){ _applyReveal(document); }, 3000);
+}
+
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', _init);
+} else {
+  _init();
+}
+
+})();
 </script>
 </body>
 </html>
