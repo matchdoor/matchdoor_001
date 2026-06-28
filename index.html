@@ -2788,6 +2788,26 @@ footer::after{
 .ma-panel.active{display:block}
 .ma-listing-cards-grid{display:grid;grid-template-columns:1fr;gap:0}
 @media(min-width:900px){.ma-listing-cards-grid{grid-template-columns:1fr 1fr;gap:8px}}
+
+/* ── Compact card grid (v37) — ใช้ในหน้าโปรไฟล์ & Admin ── */
+.cc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media(max-width:1100px){.cc-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:700px){.cc-grid{grid-template-columns:repeat(2,1fr);gap:8px}}
+@media(max-width:420px){.cc-grid{grid-template-columns:1fr}}
+.cc-card{background:#fff;border:1.5px solid var(--bd);border-radius:12px;overflow:hidden;position:relative;display:flex;flex-direction:column;transition:.2s}
+.cc-card:hover{box-shadow:0 4px 14px rgba(0,0,0,.08);border-color:var(--p)}
+.cc-img-wrap{position:relative;width:100%;height:100px;background:var(--lt);overflow:hidden;flex-shrink:0}
+.cc-img-wrap img{width:100%;height:100%;object-fit:cover;display:block}
+.cc-img-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:26px;color:var(--tx2)}
+.cc-badge-boost{position:absolute;top:5px;left:5px;z-index:2;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font-size:8.5px;font-weight:800;padding:2px 7px;border-radius:20px;display:flex;align-items:center;gap:3px;box-shadow:0 2px 5px rgba(0,0,0,.2)}
+.cc-badge-status{position:absolute;top:5px;right:5px;z-index:2;font-size:8.5px;font-weight:700;padding:2px 7px;border-radius:20px;white-space:nowrap}
+.cc-body{padding:8px 9px;display:flex;flex-direction:column;gap:3px;flex:1}
+.cc-title{font-size:11.5px;font-weight:700;color:var(--tx);line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:28px}
+.cc-price{font-size:13px;font-weight:800;color:var(--p)}
+.cc-meta{font-size:9.5px;color:var(--tx2);line-height:1.5;display:flex;flex-direction:column;gap:1px;overflow:hidden}
+.cc-meta span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.cc-actions{display:flex;flex-wrap:wrap;gap:3px;margin-top:auto;padding-top:6px}
+.cc-actions button,.cc-actions span.cc-act{font-size:9px;padding:4px 6px;border-radius:6px;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:2px;white-space:nowrap;line-height:1.4}
 .ma-section{background:#fff;border-radius:16px;padding:20px;margin-bottom:16px;border:1.5px solid var(--bd);box-shadow:0 2px 10px rgba(27,58,107,.05)}
 .ma-section-title{font-size:14px;font-weight:700;color:var(--p);margin-bottom:16px;display:flex;align-items:center;gap:8px;padding-bottom:10px;border-bottom:1.5px solid var(--lt)}
 .ma-field{margin-bottom:14px}
@@ -12594,40 +12614,53 @@ async function renderAdminPropertiesPanel() {
     if(statusFilter !== 'all') rows = rows.filter(p=>p.status===statusFilter);
 
     const sc = {'approved':'#2ecc71','pending':'#f39c12','inactive':'#95a5a6','rejected':'#e74c3c'};
-    function propRow(p){
+    function propCard(p){
       const photo = (p.photos||[])[0]||'';
       const price = p.price>=1e6?(p.price/1e6).toFixed(1)+'M':(p.price||0).toLocaleString();
       const status = p.status||'approved';
       const scol = sc[status]||'#bbb';
-      return `<div id="admp-${p.id}" style="border:1.5px solid var(--bd);border-radius:12px;overflow:hidden;display:grid;grid-template-columns:90px 1fr;gap:0;margin-bottom:10px">
-        <div style="background:var(--lt);display:flex;align-items:center;justify-content:center;min-height:80px">
-          ${photo?`<img src="${sanitize(photo)}" style="width:90px;height:80px;object-fit:cover;display:block">`:'<i class="fas fa-home" style="font-size:22px;color:var(--tx2)"></i>'}
+      return `<div class="cc-card" id="admp-${p.id}">
+        <div class="cc-img-wrap">
+          ${photo?`<img src="${sanitize(photo)}" loading="lazy" alt="">`:'<div class="cc-img-ph"><i class="fas fa-home"></i></div>'}
+          <span class="cc-badge-status" style="background:${scol};color:#fff">${status}</span>
         </div>
-        <div style="padding:10px 12px">
-          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px;margin-bottom:4px">
-            <div style="font-size:13px;font-weight:700;color:var(--p);line-height:1.3;flex:1">${sanitize(p.title||'ไม่มีชื่อ')}</div>
-            <span style="background:${scol}22;color:${scol};border:1px solid ${scol}44;border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700;flex-shrink:0">${status}</span>
+        <div class="cc-body">
+          <div class="cc-title">${sanitize(p.title||'ไม่มีชื่อ')}</div>
+          <div class="cc-price">฿${price}</div>
+          <div class="cc-meta">
+            <span><i class="fas fa-tag" style="color:#c8922a"></i> ${sanitize(p.type||'')} · ${p.tx==='RENT'?'เช่า':'ขาย'}</span>
+            <span><i class="fas fa-map-marker-alt" style="color:var(--a)"></i> ${sanitize(p.province||'')} ${sanitize(p.district||'')}</span>
           </div>
-          <div style="font-size:11px;color:var(--tx2);margin-bottom:3px">
-            <i class="fas fa-tag" style="color:#c8922a"></i> ${sanitize(p.type||'')} · ${p.tx==='RENT'?'เช่า':'ขาย'} · ฿${price}
-            ${p.bed?` · ${p.bed}นอน`:''}${p.bath?` ${p.bath}น้ำ`:''}
+          <div style="display:flex;gap:3px;flex-wrap:wrap">
+            ${p.is_new?'<span style="background:#2ecc7122;color:#27ae60;border-radius:10px;padding:1px 6px;font-size:8.5px">NEW</span>':''}
+            ${p.is_rec?'<span style="background:#e74c3c22;color:#e74c3c;border-radius:10px;padding:1px 6px;font-size:8.5px">HOT</span>':''}
+            ${p.is_boosted?'<span style="background:#f39c1222;color:#f39c12;border-radius:10px;padding:1px 6px;font-size:8.5px"><i class="fas fa-rocket"></i></span>':''}
           </div>
-          <div style="font-size:11px;color:var(--tx2);margin-bottom:6px">
-            <i class="fas fa-map-marker-alt" style="color:var(--a)"></i> ${sanitize(p.province||'')} ${sanitize(p.district||'')}
-            ${p.is_new?'<span style="background:#2ecc7122;color:#27ae60;border-radius:10px;padding:1px 6px;font-size:9px;margin-left:4px">NEW</span>':''}
-            ${p.is_rec?'<span style="background:#e74c3c22;color:#e74c3c;border-radius:10px;padding:1px 6px;font-size:9px;margin-left:2px">HOT</span>':''}
-            ${p.is_boosted?'<span style="background:#f39c1222;color:#f39c12;border-radius:10px;padding:1px 6px;font-size:9px;margin-left:2px"><i class="fas fa-rocket"></i>Boost</span>':''}
-          </div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap">
-            <button onclick="showPage('property','${p.id}')" style="font-size:10px;padding:4px 10px;background:var(--p);color:#fff;border:none;border-radius:7px;cursor:pointer"><i class="fas fa-eye"></i> ดู</button>
-            <button onclick="adminTogglePropFlag('${p.id}','is_new',${!p.is_new})" style="font-size:10px;padding:4px 10px;background:${p.is_new?'#2ecc71':'var(--lt)'};color:${p.is_new?'#fff':'var(--tx)'};border:1px solid var(--bd);border-radius:7px;cursor:pointer"><i class="fas fa-star"></i> New</button>
-            <button onclick="adminTogglePropFlag('${p.id}','is_rec',${!p.is_rec})" style="font-size:10px;padding:4px 10px;background:${p.is_rec?'#e74c3c':'var(--lt)'};color:${p.is_rec?'#fff':'var(--tx)'};border:1px solid var(--bd);border-radius:7px;cursor:pointer"><i class="fas fa-fire"></i> Hot</button>
-            <button onclick="adminTogglePropFlag('${p.id}','is_boosted',${!p.is_boosted})" style="font-size:10px;padding:4px 10px;background:${p.is_boosted?'#f39c12':'var(--lt)'};color:${p.is_boosted?'#fff':'var(--tx)'};border:1px solid var(--bd);border-radius:7px;cursor:pointer"><i class="fas fa-rocket"></i> Boost</button>
-            <button onclick="adminDeleteProperty('${p.id}')" style="font-size:10px;padding:4px 10px;background:#e74c3c22;color:#e74c3c;border:1px solid #e74c3c44;border-radius:7px;cursor:pointer"><i class="fas fa-trash"></i> ลบ</button>
+          <div class="cc-actions">
+            <button onclick="showPage('property','${p.id}')" style="background:var(--p);color:#fff" title="ดู"><i class="fas fa-eye"></i></button>
+            <button onclick="adminTogglePropFlag('${p.id}','is_new',${!p.is_new})" style="background:${p.is_new?'#2ecc71':'var(--lt)'};color:${p.is_new?'#fff':'var(--tx)'}" title="New"><i class="fas fa-star"></i></button>
+            <button onclick="adminTogglePropFlag('${p.id}','is_rec',${!p.is_rec})" style="background:${p.is_rec?'#e74c3c':'var(--lt)'};color:${p.is_rec?'#fff':'var(--tx)'}" title="Hot"><i class="fas fa-fire"></i></button>
+            <button onclick="adminTogglePropFlag('${p.id}','is_boosted',${!p.is_boosted})" style="background:${p.is_boosted?'#f39c12':'var(--lt)'};color:${p.is_boosted?'#fff':'var(--tx)'}" title="Boost"><i class="fas fa-rocket"></i></button>
+            <button onclick="adminDeleteProperty('${p.id}')" style="background:#e74c3c22;color:#e74c3c" title="ลบ"><i class="fas fa-trash"></i></button>
           </div>
         </div>
       </div>`;
     }
+
+    window._admPropAll = rows;
+    const _ADM_PROP_PER_PAGE = 16;
+    window._admPropGoPage = function(p){
+      const arr = window._admPropAll || [];
+      const totalPages = Math.max(1, Math.ceil(arr.length / _ADM_PROP_PER_PAGE));
+      p = Math.max(1, Math.min(p, totalPages));
+      window._admPropPage = p;
+      const start = (p-1)*_ADM_PROP_PER_PAGE;
+      const slice = arr.slice(start, start + _ADM_PROP_PER_PAGE);
+      const wrap = document.getElementById('adm-prop-grid');
+      if(wrap) wrap.innerHTML = slice.length ? slice.map(propCard).join('') : '<div style="grid-column:1/-1;text-align:center;padding:30px;color:var(--tx2)"><i class="fas fa-search" style="font-size:28px;opacity:.3;margin-bottom:8px;display:block"></i>ไม่พบทรัพย์</div>';
+      _ccRenderPagination('adm-prop-pagination', p, totalPages, arr.length, _ADM_PROP_PER_PAGE, '_admPropGoPage');
+      if(wrap && p>1) wrap.scrollIntoView({behavior:'smooth', block:'start'});
+    };
 
     section.innerHTML = `
       <!-- Filter bar -->
@@ -12645,7 +12678,10 @@ async function renderAdminPropertiesPanel() {
         </select>
         <div style="font-size:12px;color:var(--tx2);font-weight:600">${rows.length} รายการ</div>
       </div>
-      ${rows.length ? rows.map(propRow).join('') : '<div style="text-align:center;padding:30px;color:var(--tx2)"><i class="fas fa-search" style="font-size:28px;opacity:.3;margin-bottom:8px;display:block"></i>ไม่พบทรัพย์</div>'}`;
+      <div class="cc-grid" id="adm-prop-grid"></div>
+      <div class="pagination" id="adm-prop-pagination" style="display:none"></div>`;
+
+    window._admPropGoPage(1);
   } catch(e) {
     section.innerHTML = `<div style="padding:20px;color:#e74c3c;text-align:center"><i class="fas fa-exclamation-circle"></i> โหลดล้มเหลว: ${e.message}</div>`;
   }
@@ -12721,7 +12757,7 @@ async function renderAdminListingsPanel() {
 
     const all     = viewData || [];
     const pending = all.filter(r => r.status === 'รอตรวจสอบ');
-    const rest    = all.filter(r => r.status !== 'รอตรวจสอบ').slice(0, 30);
+    const rest    = all.filter(r => r.status !== 'รอตรวจสอบ');
 
     // Update badge
     const badge = document.getElementById('ma-admin-badge');
@@ -12771,7 +12807,6 @@ async function renderAdminListingsPanel() {
             </div>
             <div style="font-size:11px;color:rgba(0,0,0,.4)">ลงวันที่: ${new Date(r.created_at).toLocaleDateString('th-TH')}</div>
             ${r.admin_note ? `<div style="font-size:11px;color:#e74c3c;margin-top:6px;padding:5px 10px;background:#e74c3c11;border-radius:6px"><i class="fas fa-comment"></i> หมายเหตุ: ${sanitize(r.admin_note)}</div>` : ''}
-            ${isPending ? `
             <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
               <button onclick="adminApproveListing('${r.id}')"
                 style="background:linear-gradient(135deg,#2ecc71,#27ae60);color:#fff;border:none;border-radius:8px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:5px">
@@ -12783,12 +12818,34 @@ async function renderAdminListingsPanel() {
               </button>
               <input id="note-${r.id}" type="text" placeholder="หมายเหตุ (ไม่บังคับ)" style="flex:1;min-width:120px;padding:6px 10px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px">
               <button onclick="adminEditListing('${r.id}')" style="background:#3498db22;color:#2980b9;border:1px solid #3498db44;border-radius:8px;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:5px"><i class="fas fa-edit"></i> แก้ไข</button>
-            </div>` : `
-            <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
-              ${r.status === 'อนุมัติ' && r.property_id ? `<button onclick="showPage('property','${r.property_id}')" style="background:var(--p);color:#fff;border:none;border-radius:8px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:4px"><i class="fas fa-eye"></i> ดูประกาศ</button>` : ''}
-              <button onclick="adminEditListing('${r.id}')" style="background:#3498db22;color:#2980b9;border:1px solid #3498db44;border-radius:8px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:4px"><i class="fas fa-edit"></i> แก้ไข</button>
-              ${r.status !== 'ปฏิเสธ' && r.status !== 'หมดอายุ' ? `<button onclick="adminRejectListingPrompt('${r.id}','${sanitize(r.title||'').replace(/'/g, "\'")}')" style="background:#e74c3c22;color:#e74c3c;border:1px solid #e74c3c44;border-radius:8px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:4px"><i class="fas fa-ban"></i> ปิดประกาศ</button>` : ''}
-            </div>`}
+            </div>
+          </div>
+        </div>
+      </div>`;
+    }
+
+    // ── compact history card (4/row, paginated) ──
+    function _renderHistCard(r) {
+      const photo = (r.photos || [])[0] || '';
+      const price = r.price >= 1e6 ? (r.price/1e6).toFixed(1) + 'M' : (r.price || 0).toLocaleString();
+      const sc = statusColor[r.status] || '#bbb';
+      const si = statusIcon[r.status] || 'fa-circle';
+      return `<div class="cc-card" id="alr-${r.id}">
+        <div class="cc-img-wrap">
+          ${photo ? `<img src="${sanitize(photo)}" loading="lazy" alt="">` : `<div class="cc-img-ph"><i class="fas fa-home"></i></div>`}
+          <span class="cc-badge-status" style="background:${sc};color:#fff"><i class="fas ${si}"></i> ${r.status}</span>
+        </div>
+        <div class="cc-body">
+          <div class="cc-title">${sanitize(r.title || 'ไม่มีชื่อ')}</div>
+          <div class="cc-price">฿${price}</div>
+          <div class="cc-meta">
+            <span><i class="fas fa-user" style="color:var(--p)"></i> ${sanitize(r.user_display_name || r.user_email || '?')}</span>
+            <span><i class="fas fa-map-marker-alt" style="color:var(--a)"></i> ${sanitize(r.province || '')} ${sanitize(r.location || '')}</span>
+          </div>
+          <div class="cc-actions">
+            ${r.status === 'อนุมัติ' && r.property_id ? `<button onclick="showPage('property','${r.property_id}')" style="background:var(--p);color:#fff" title="ดูประกาศ"><i class="fas fa-eye"></i></button>` : ''}
+            <button onclick="adminEditListing('${r.id}')" style="background:#3498db22;color:#2980b9" title="แก้ไข"><i class="fas fa-edit"></i></button>
+            ${r.status !== 'ปฏิเสธ' && r.status !== 'หมดอายุ' ? `<button onclick="adminRejectListingPrompt('${r.id}','${sanitize(r.title||'').replace(/'/g, "\'")}')" style="background:#e74c3c22;color:#e74c3c" title="ปิดประกาศ"><i class="fas fa-ban"></i></button>` : ''}
           </div>
         </div>
       </div>`;
@@ -12798,9 +12855,21 @@ async function renderAdminListingsPanel() {
       ? pending.map(_renderRow).join('')
       : '<div style="text-align:center;padding:20px;color:var(--gr);font-size:13px"><i class="fas fa-check-circle" style="color:#2ecc71;font-size:28px;display:block;margin-bottom:8px"></i>ไม่มีรายการรอ Approve</div>';
 
-    const historyHtml = rest.length
-      ? rest.map(_renderRow).join('')
-      : '';
+    window._admHistAll = rest;
+    const _ADM_HIST_PER_PAGE = 16;
+    window._admHistGoPage = function(p){
+      const arr = window._admHistAll || [];
+      const totalPages = Math.max(1, Math.ceil(arr.length / _ADM_HIST_PER_PAGE));
+      p = Math.max(1, Math.min(p, totalPages));
+      window._admHistPage = p;
+      const start = (p-1)*_ADM_HIST_PER_PAGE;
+      const slice = arr.slice(start, start + _ADM_HIST_PER_PAGE);
+      const wrap = document.getElementById('adm-hist-grid');
+      if(wrap) wrap.innerHTML = slice.length ? slice.map(_renderHistCard).join('') : '<div style="grid-column:1/-1;text-align:center;padding:24px;color:var(--tx2)">ไม่มีข้อมูล</div>';
+      _ccRenderPagination('adm-hist-pagination', p, totalPages, arr.length, _ADM_HIST_PER_PAGE, '_admHistGoPage');
+      const wrap2 = document.getElementById('adm-hist-grid');
+      if(wrap2 && p>1) wrap2.scrollIntoView({behavior:'smooth', block:'start'});
+    };
 
     section.innerHTML = `
       <!-- Summary bar -->
@@ -12828,11 +12897,15 @@ async function renderAdminListingsPanel() {
         ${pending.length ? `<span style="background:#f39c12;color:#fff;border-radius:20px;padding:1px 8px;font-size:11px">${pending.length}</span>` : ''}
       </div>
       ${pendingHtml}
-      ${historyHtml ? `
+      ${rest.length ? `
       <div style="font-size:14px;font-weight:800;color:var(--p);margin:20px 0 12px;display:flex;align-items:center;gap:8px">
         <i class="fas fa-history" style="color:var(--gr)"></i> ประวัติล่าสุด
+        <span style="background:var(--lt);color:var(--tx2);border-radius:20px;padding:1px 8px;font-size:11px">${rest.length}</span>
       </div>
-      ${historyHtml}` : ''}`;
+      <div class="cc-grid" id="adm-hist-grid"></div>
+      <div class="pagination" id="adm-hist-pagination" style="display:none"></div>` : ''}`;
+
+    if(rest.length) window._admHistGoPage(1);
 
   } catch(e) {
     // Fallback: ถ้า view ล้มเหลว (เช่น permission denied) ลอง query ตรงแทน
@@ -14512,6 +14585,76 @@ async function _maSaveProfileModal(){
   renderMyAccount();
 }
 
+let _maListingsPage = 1;
+const _MA_LISTINGS_PER_PAGE = 16;
+
+function _maListingCardHTML(ul, statusBadge){
+  const photo=(ul.photos||[])[0]||'';
+  const priceStr=ul.price>=1e6?(ul.price/1e6).toFixed(1)+'M':(ul.price||0).toLocaleString();
+  const txLabel=ul.transaction==='RENT'?'ให้เช่า':'ขาย';
+  const sMap={'รอตรวจสอบ':'#f39c12','อนุมัติ':'#2ecc71','ปฏิเสธ':'#e74c3c','ปิด':'#95a5a6','หมดอายุ':'#7f8c8d'};
+  const sc = sMap[ul.status]||'#bbb';
+  return `<div class="cc-card" style="${ul.is_boosted?'border-color:#f39c12;box-shadow:0 0 0 2px #f39c1222':''}">
+    <div class="cc-img-wrap">
+      ${photo?`<img src="${photo}" alt="listing" loading="lazy">`:`<div class="cc-img-ph">🏠</div>`}
+      ${ul.is_boosted ? `<div class="cc-badge-boost"><i class="fas fa-rocket"></i> Boosted</div>` : ''}
+      <span class="cc-badge-status" style="background:${sc};color:#fff">${ul.status}</span>
+    </div>
+    <div class="cc-body">
+      <div class="cc-title">${sanitize(ul.title)}</div>
+      <div class="cc-price">฿${priceStr}${txLabel==='ให้เช่า'?'<span style="font-size:10px;font-weight:500;color:var(--tx2)">/เดือน</span>':''}</div>
+      <div class="cc-meta">
+        <span><i class="fas fa-tag" style="color:#c8922a"></i> ${sanitize(ul.property_type)} · ${txLabel}</span>
+        <span><i class="fas fa-map-marker-alt" style="color:#e74c3c"></i> ${sanitize(ul.province||ul.location||'')}</span>
+      </div>
+      <div class="cc-actions">
+        ${ul.status==='อนุมัติ'&&ul.property_id?`<button onclick="openModal('${ul.property_id}')" style="background:var(--p);color:#fff" title="ดูประกาศ"><i class="fas fa-eye"></i></button>`:''}
+        ${ul.status==='อนุมัติ'&&!ul.is_boosted?`<button onclick="boostMyListing('${ul.id}')" style="background:linear-gradient(135deg,#f39c12,#e67e22);color:#fff" title="Boost (1 Token)"><i class="fas fa-rocket"></i></button>`:''}
+        ${ul.status==='อนุมัติ'&&ul.is_boosted?`<span class="cc-act" style="background:#f39c1222;color:#f39c12;border:1px solid #f39c1244" title="กำลัง Boost"><i class="fas fa-rocket"></i></span>`:''}
+        <button onclick="editUserListing('${ul.id}')" style="background:#3498db22;color:#2980b9" title="แก้ไข"><i class="fas fa-edit"></i></button>
+        <button onclick="shareMyListing('${ul.id}','${ul.property_id||''}')" style="background:#10b98122;color:#10b981" title="แชร์"><i class="fas fa-share-alt"></i></button>
+        <button onclick="openReportListingModal('${ul.id}','${ul.property_id||''}')" style="background:#f1c40f22;color:#b7950b" title="รายงาน"><i class="fas fa-flag"></i></button>
+        <button onclick="deleteMyListing('${ul.id}')" style="background:#e74c3c22;color:#e74c3c" title="ลบ"><i class="fas fa-trash-alt"></i></button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function _maGoListingsPage(p){
+  const totalPages = Math.max(1, Math.ceil(_myUserListings.length / _MA_LISTINGS_PER_PAGE));
+  _maListingsPage = Math.max(1, Math.min(p, totalPages));
+  _maRenderListingsGrid();
+  document.getElementById('ma-profile-listings-area')?.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function _maRenderListingsGrid(){
+  const area = document.getElementById('ma-profile-listings-area');
+  if(!area) return;
+  const statusBadge=s=>{
+    const map={'รอตรวจสอบ':['#f39c12','fa-clock','รอตรวจสอบ'],'อนุมัติ':['#2ecc71','fa-check-circle','อนุมัติ'],'ปฏิเสธ':['#e74c3c','fa-times-circle','ปฏิเสธ'],'ปิด':['#95a5a6','fa-ban','ปิด'],'หมดอายุ':['#7f8c8d','fa-hourglass-end','หมดอายุ']};
+    const [c,ic,lb]=map[s]||['#bbb','fa-circle',s];
+    return `<span style="background:${c}22;color:${c};border:1px solid ${c}44;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;display:inline-flex;align-items:center;gap:4px"><i class="fas ${ic}" style="font-size:9px"></i>${lb}</span>`;
+  };
+
+  const totalPages = Math.max(1, Math.ceil(_myUserListings.length / _MA_LISTINGS_PER_PAGE));
+  _maListingsPage = Math.max(1, Math.min(_maListingsPage, totalPages));
+  const start = (_maListingsPage-1)*_MA_LISTINGS_PER_PAGE;
+  const slice = _myUserListings.slice(start, start + _MA_LISTINGS_PER_PAGE);
+  const html = slice.map(ul => _maListingCardHTML(ul, statusBadge)).join('');
+
+  area.innerHTML=`
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+      <div style="font-size:15px;font-weight:700;color:var(--tx)"><i class="fas fa-building" style="color:var(--p);margin-right:6px"></i>ประกาศของฉัน <span style="font-size:12px;color:var(--tx2);font-weight:500">(${_myUserListings.length} รายการ)</span></div>
+      <button onclick="openUserListingModal()" ${_tokenBalance<1?'disabled style="opacity:.5;cursor:not-allowed"':''} style="background:var(--p);color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px">
+        <i class="fas fa-plus"></i> ลงประกาศใหม่
+      </button>
+    </div>
+    <div class="cc-grid">${html}</div>
+    <div class="pagination" id="ma-listings-pagination" style="display:none"></div>`;
+
+  _ccRenderPagination('ma-listings-pagination', _maListingsPage, totalPages, _myUserListings.length, _MA_LISTINGS_PER_PAGE, '_maGoListingsPage');
+}
+
 /* ── Render listings feed in profile right panel ── */
 async function _maRenderProfileListings(){
   const area = document.getElementById('ma-profile-listings-area');
@@ -14521,12 +14664,6 @@ async function _maRenderProfileListings(){
   if(window._myAgentProfileShown && typeof _maRenderAgentPreview === 'function'){
     setTimeout(_maRenderAgentPreview, 100);
   }
-
-  const statusBadge=s=>{
-    const map={'รอตรวจสอบ':['#f39c12','fa-clock','รอตรวจสอบ'],'อนุมัติ':['#2ecc71','fa-check-circle','อนุมัติ'],'ปฏิเสธ':['#e74c3c','fa-times-circle','ปฏิเสธ'],'ปิด':['#95a5a6','fa-ban','ปิด'],'หมดอายุ':['#7f8c8d','fa-hourglass-end','หมดอายุ']};
-    const [c,ic,lb]=map[s]||['#bbb','fa-circle',s];
-    return `<span style="background:${c}22;color:${c};border:1px solid ${c}44;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;display:inline-flex;align-items:center;gap:4px"><i class="fas ${ic}" style="font-size:9px"></i>${lb}</span>`;
-  };
 
   if(!_myUserListings.length){
     area.innerHTML=`<div class="ma-info-card" style="text-align:center;padding:48px 20px">
@@ -14540,51 +14677,10 @@ async function _maRenderProfileListings(){
     return;
   }
 
-  const html = _myUserListings.map(ul=>{
-    const photo=(ul.photos||[])[0]||'';
-    const priceStr=ul.price>=1e6?(ul.price/1e6).toFixed(1)+'M':(ul.price||0).toLocaleString();
-    const txLabel=ul.transaction==='RENT'?'ให้เช่า':'ขาย';
-    const exp=ul.expires_at?new Date(ul.expires_at).toLocaleDateString('th-TH'):'';
-    return `<div class="ma-listing-card" style="position:relative;${ul.is_boosted?'border-color:#f39c12;box-shadow:0 0 0 2px #f39c1222':''}">
-      ${photo?`<img class="ma-listing-card-img" src="${photo}" alt="listing" loading="lazy">`:`<div class="ma-listing-card-img-placeholder">🏠</div>`}
-      ${ul.is_boosted ? `<div style="position:absolute;top:6px;left:6px;z-index:2;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font-size:9px;font-weight:800;padding:3px 8px;border-radius:20px;display:flex;align-items:center;gap:4px;box-shadow:0 2px 6px rgba(0,0,0,.2)"><i class="fas fa-rocket"></i> ${boostDaysLabel(ul.boosted_at)}</div>` : ''}
-      <div class="ma-listing-card-body">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px">
-          <div class="ma-listing-card-title">${sanitize(ul.title)}</div>
-          ${statusBadge(ul.status)}
-        </div>
-        <div class="ma-listing-card-price">฿${priceStr} ${txLabel==='ให้เช่า'?'<span style="font-size:12px;font-weight:500;color:var(--tx2)">/เดือน</span>':''}</div>
-        <div class="ma-listing-card-meta">
-          <span class="ma-listing-card-tag"><i class="fas fa-tag" style="color:#c8922a"></i>${sanitize(ul.property_type)}</span>
-          <span class="ma-listing-card-tag"><i class="fas fa-map-marker-alt" style="color:#e74c3c"></i>${sanitize(ul.province||ul.location||'')}</span>
-          <span class="ma-listing-card-tag"><i class="fas fa-calendar" style="color:var(--p)"></i>${new Date(ul.created_at).toLocaleDateString('th-TH')}</span>
-          ${exp?`<span class="ma-listing-card-tag"><i class="fas fa-hourglass-end" style="color:#e74c3c"></i>หมดอายุ ${exp}</span>`:''}
-        </div>
-        ${ul.view_count||ul.share_count ? `<div style="font-size:11px;color:var(--tx2);margin-top:4px;display:flex;gap:8px"><span><i class="fas fa-eye" style="color:var(--p)"></i> ${ul.view_count||0}</span><span><i class="fas fa-share" style="color:#10b981"></i> ${ul.share_count||0}</span></div>` : ''}
-        ${ul.admin_note?`<div style="font-size:11px;color:#e74c3c;margin-top:8px;padding:6px 10px;background:#e74c3c11;border-radius:6px"><i class="fas fa-comment"></i> ${sanitize(ul.admin_note)}</div>`:''}
-        <!-- Action Buttons [v26] -->
-        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px">
-          ${ul.status==='อนุมัติ'&&ul.property_id?`<button onclick="openModal('${ul.property_id}')" style="font-size:11px;padding:5px 11px;background:var(--p);color:#fff;border:none;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px"><i class="fas fa-eye"></i> ดูประกาศ</button>`:''}
-          ${ul.status==='อนุมัติ'&&!ul.is_boosted?`<button onclick="boostMyListing('${ul.id}')" style="font-size:11px;padding:5px 11px;background:linear-gradient(135deg,#f39c12,#e67e22);color:#fff;border:none;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px" title="ใช้ 1 Token"><i class="fas fa-rocket"></i> Boost</button>`:''}
-          ${ul.status==='อนุมัติ'&&ul.is_boosted?`<span style="font-size:11px;padding:5px 11px;background:#f39c1222;color:#f39c12;border:1px solid #f39c1244;border-radius:8px;display:inline-flex;align-items:center;gap:4px"><i class="fas fa-rocket"></i> กำลัง Boost</span>`:''}
-          <button onclick="editUserListing('${ul.id}')" style="font-size:11px;padding:5px 11px;background:#3498db22;color:#2980b9;border:1px solid #3498db44;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px" title="แก้ไขข้อมูล ไม่หัก Token"><i class="fas fa-edit"></i> แก้ไข</button>
-          <button onclick="shareMyListing('${ul.id}','${ul.property_id||''}')" style="font-size:11px;padding:5px 11px;background:#10b98122;color:#10b981;border:1px solid #10b98144;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px"><i class="fas fa-share-alt"></i> แชร์</button>
-          <button onclick="openReportListingModal('${ul.id}','${ul.property_id||''}')" style="font-size:11px;padding:5px 11px;background:#f1c40f22;color:#b7950b;border:1px solid #f1c40f44;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px"><i class="fas fa-flag"></i> รายงาน</button>
-          <button onclick="deleteMyListing('${ul.id}')" style="font-size:11px;padding:5px 11px;background:#e74c3c22;color:#e74c3c;border:1px solid #e74c3c44;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px" title="ลบ (ไม่ได้ Token คืน)"><i class="fas fa-trash-alt"></i> ลบ</button>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
-
-  area.innerHTML=`
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
-      <div style="font-size:15px;font-weight:700;color:var(--tx)"><i class="fas fa-building" style="color:var(--p);margin-right:6px"></i>ประกาศของฉัน <span style="font-size:12px;color:var(--tx2);font-weight:500">(${_myUserListings.length} รายการ)</span></div>
-      <button onclick="openUserListingModal()" ${_tokenBalance<1?'disabled style="opacity:.5;cursor:not-allowed"':''} style="background:var(--p);color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px">
-        <i class="fas fa-plus"></i> ลงประกาศใหม่
-      </button>
-    </div>
-    <div class="ma-listing-cards-grid">${html}</div>`;
+  _maListingsPage = 1;
+  _maRenderListingsGrid();
 }
+
 
 
 /* ══════════════════════════════════════════════
@@ -18073,6 +18169,28 @@ function renderListingsPagination(totalPages) {
   html += `<button class="pg-btn pg-next${cur===totalPages?' disabled':''}" onclick="goListingsPage(${cur+1})" ${cur===totalPages?'disabled':''} title="${pgNext}"><i class="fas fa-angle-right"></i></button>`;
   html += `<button class="pg-btn pg-last${cur===totalPages?' disabled':''}" onclick="goListingsPage(${totalPages})" ${cur===totalPages?'disabled':''} title="${pgLast}"><span class="pg-label">${pgLast}</span> <i class="fas fa-angle-double-right"></i></button>`;
   
+  html += '</div>';
+  pg.innerHTML = html;
+}
+
+// ── v37: Generic compact pagination (ใช้ใน Profile & Admin grids) ──────
+function _ccRenderPagination(containerId, cur, totalPages, totalItems, perPage, goFnName){
+  const pg = document.getElementById(containerId);
+  if(!pg) return;
+  if(totalPages <= 1){ pg.innerHTML=''; pg.style.display='none'; return; }
+  pg.style.display='';
+  const startItem = (cur-1)*perPage + 1;
+  const endItem = Math.min(cur*perPage, totalItems);
+  let html = `<div class="pg-info">แสดง ${startItem.toLocaleString()}–${endItem.toLocaleString()} จาก ${totalItems.toLocaleString()} รายการ</div><div class="pg-controls">`;
+  html += `<button class="pg-btn pg-first${cur===1?' disabled':''}" onclick="${goFnName}(1)" ${cur===1?'disabled':''} title="หน้าแรก"><i class="fas fa-angle-double-left"></i> <span class="pg-label">หน้าแรก</span></button>`;
+  html += `<button class="pg-btn pg-prev${cur===1?' disabled':''}" onclick="${goFnName}(${cur-1})" ${cur===1?'disabled':''} title="หน้าก่อน"><i class="fas fa-angle-left"></i></button>`;
+  const pages = buildPageRange(cur, totalPages);
+  for(const p of pages){
+    if(p==='...') html += '<span class="pg-ellipsis">…</span>';
+    else html += `<button class="pg-btn${p===cur?' active':''}" onclick="${goFnName}(${p})">${p}</button>`;
+  }
+  html += `<button class="pg-btn pg-next${cur===totalPages?' disabled':''}" onclick="${goFnName}(${cur+1})" ${cur===totalPages?'disabled':''} title="หน้าถัดไป"><i class="fas fa-angle-right"></i></button>`;
+  html += `<button class="pg-btn pg-last${cur===totalPages?' disabled':''}" onclick="${goFnName}(${totalPages})" ${cur===totalPages?'disabled':''} title="หน้าสุดท้าย"><span class="pg-label">หน้าสุดท้าย</span> <i class="fas fa-angle-double-right"></i></button>`;
   html += '</div>';
   pg.innerHTML = html;
 }
