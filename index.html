@@ -17,6 +17,54 @@
     }
   })();
 </script>
+
+<!-- ═══ OAuth URL Guard — ต้องรันก่อน Supabase โหลด ═══════════════
+     ปัญหา: ถ้า user กด Refresh หลังจาก Google OAuth callback สำเร็จแล้ว
+     URL ยังมี ?code=xxx ค้างอยู่ → Supabase พยายาม exchange code ซ้ำ
+     → code หมดอายุ (one-time use) → Supabase ถือว่า auth ล้มเหลว
+     → redirect ไปที่ authorize URL ใหม่ → วนซ้ำเป็น loop
+     แก้: ตรวจ URL ก่อน Supabase โหลด ถ้าเจอ OAuth params ให้ล้างออกทันที
+     แต่ถ้ายังไม่มี session (เพิ่ง redirect กลับมาจริงๆ) → ให้ Supabase process ตามปกติ
+════════════════════════════════════════════════════════════════════ -->
+<script>
+(function _oauthUrlGuard(){
+  try {
+    var search = window.location.search;
+    var hash   = window.location.hash;
+
+    var hasCode        = search.includes('code=');
+    var hasAccessToken = search.includes('access_token=') || hash.includes('access_token=');
+    var hasError       = search.includes('error=') || hash.includes('error=');
+
+    if (!hasCode && !hasAccessToken && !hasError) return; // URL ปกติ ไม่ต้องทำอะไร
+
+    // ตรวจว่ามี session อยู่แล้วใน localStorage หรือยัง
+    // ถ้ามีแล้ว = user refresh หน้าหลังจาก login สำเร็จ → ล้าง OAuth params ออก
+    // ถ้าไม่มี = เพิ่ง redirect กลับมาจาก Google จริงๆ → ให้ Supabase จัดการ
+    var hasExistingSession = false;
+    try {
+      // ตรวจใน localStorage ทั้ง key ใหม่ (md_sb_session) และ key เก่า (sb-*)
+      var lsKeys = Object.keys(localStorage);
+      for (var i = 0; i < lsKeys.length; i++) {
+        var k = lsKeys[i];
+        if ((k === 'md_sb_session' || k.startsWith('sb-')) && localStorage.getItem(k)) {
+          var val = localStorage.getItem(k);
+          if (val && val.includes('"access_token"')) {
+            hasExistingSession = true;
+            break;
+          }
+        }
+      }
+    } catch(e){}
+
+    if (hasExistingSession) {
+      // มี session อยู่แล้ว → OAuth params ค้างมาจาก refresh → ล้างออกทันที
+      window.history.replaceState(null, '', window.location.origin + '/');
+    }
+    // ไม่มี session → เพิ่ง callback จาก OAuth จริง → ไม่ล้าง ให้ Supabase exchange code
+  } catch(e){}
+})();
+</script>
 <base href="/">
 
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -11030,8 +11078,8 @@ function _popupRefreshMarkersFromData(data){
 // 🔧 จุด CONFIG ทั้งหมด — แก้ไขตรงนี้ที่เดียว
 const C = {
   // --- [1] Supabase Project ---
-  SUPABASE_URL:'https://ziuqqitjqmzmypceubhm.supabase.co', // 🔧 [CONFIG-1] Supabase Project URL
-  SUPABASE_KEY:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InppdXFxaXRqcW16bXlwY2V1YmhtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA4OTY4NDMsImV4cCI6MjA5NjQ3Mjg0M30.symvYEi5tEEOiRhifieeofnURs222_0sKX1B4wgEg3Q', // 🔧 [CONFIG-2] Supabase Anon/Public Key เท่านั้น!
+  SUPABASE_URL:'https://imzjjjxvmlpafvaiidgl.supabase.co', // 🔧 [CONFIG-1] Supabase Project URL
+  SUPABASE_KEY:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imltempqanh2bWxwYWZ2YWlpZGdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI2NDcxNzEsImV4cCI6MjA5ODIyMzE3MX0.-sbW6LzmCLP3PH-e15ANJVcd0DDOEVz4eclkQuIl3Pg', // 🔧 [CONFIG-2] Supabase Anon/Public Key เท่านั้น!
 
   // --- [2] Supabase Storage ---
   STORAGE_BUCKET: 'matchdoor-assets', // 🔧 [CONFIG-3] ชื่อ Storage Bucket หลัก
@@ -11427,11 +11475,15 @@ function initSB(){
   try{
     sb = window.supabase.createClient(url, key, {
       auth: {
-        persistSession: true,
-        autoRefreshToken: true,
-        detectSessionInUrl: true,
-        storageKey: 'md_sb_session',
-        flowType: 'pkce',
+        persistSession: true,       // เก็บ session ใน localStorage ข้ามการ refresh/ปิด browser
+        autoRefreshToken: true,      // refresh access token อัตโนมัติก่อนหมดอายุ
+        detectSessionInUrl: true,    // ดัก OAuth callback จาก URL hash/query
+        storageKey: 'md_sb_session', // key เฉพาะของ Matchdoor ใน localStorage
+        // *** ไม่ใช้ flowType:'pkce' ***
+        // PKCE ต้องการ code_verifier ใน sessionStorage ระหว่าง redirect
+        // ถ้า browser ล้าง sessionStorage (Safari ITP, incognito, tab restore)
+        // → Supabase ไม่เจอ verifier → ล้มเหลว → redirect ไป authorize URL วนซ้ำ
+        // implicit flow (default) ไม่มีปัญหานี้กับ SPA แบบ single-file
       }
     });
     return true;
@@ -11581,13 +11633,17 @@ function initAuthListener(){
       _closeModal('login-modal');
       _closeModal('signup-modal');
       toast('เข้าสู่ระบบสำเร็จ ✅');
-      // ── Clean URL: ล้าง OAuth hash/PKCE code ที่ค้างอยู่ใน URL ──
-      const _hasOAuthParams = (location.hash && (location.hash.includes('access_token=') || location.hash.includes('error=')))
-        || (location.search && (location.search.includes('code=') || location.search.includes('access_token=')));
-      if (_hasOAuthParams) {
-        history.replaceState(null, '', window.location.origin + '/');
-        if (typeof _silentShowPage === 'function') _silentShowPage('home');
-      }
+      // ── Clean URL: ล้าง OAuth hash/code ทันทีหลัง sign in สำเร็จ ──
+      // สำคัญมาก: ต้องล้างก่อนที่ user จะ refresh หน้า
+      // มิฉะนั้น ?code= ที่ค้างอยู่จะถูก Supabase พยายาม exchange ซ้ำ → redirect loop
+      try {
+        const _hasCode   = location.search.includes('code=');
+        const _hasToken  = location.search.includes('access_token=') || location.hash.includes('access_token=');
+        const _hasError  = location.search.includes('error=') || location.hash.includes('error=');
+        if (_hasCode || _hasToken || _hasError) {
+          history.replaceState(null, '', window.location.origin + '/');
+        }
+      } catch(e){}
       // ── Welcome Bonus: ตรวจและเติม Token ฟรีสำหรับ User ใหม่ ──
       if(session?.user?.id) grantWelcomeBonus(session.user.id);
       // If user came from my-account FAB, navigate to my-account page
@@ -15484,8 +15540,12 @@ async function loginWith(p){
   const btn = document.querySelector('#login-modal .login-provider[onclick*="'+p+'"]') || document.querySelector('#signup-modal .login-provider[onclick*="'+p+'"]');
   if(btn){ btn.disabled=true; btn.textContent='กำลังเชื่อมต่อ...'; }
   const {error}=await sb.auth.signInWithOAuth({
-    provider:p,
-    options:{ redirectTo: window.location.origin + '/' }
+    provider: p,
+    options: {
+      redirectTo: window.location.origin + '/',
+      // queryParams: ระบุ scope ชัดเจนเพื่อป้องกัน Google ขอ consent ซ้ำ
+      queryParams: p === 'google' ? { access_type: 'online', prompt: 'select_account' } : undefined,
+    }
   });
   if(error){ toast(error.message,true); if(btn){btn.disabled=false; btn.innerHTML=p==='google'?'<i class="fab fa-google" style="color:#DB4437"></i> เข้าสู่ระบบด้วย Google':'<i class="fab fa-facebook" style="color:var(--fb)"></i> เข้าสู่ระบบด้วย Facebook';} }
 }
