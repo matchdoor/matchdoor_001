@@ -34433,91 +34433,135 @@ function _agColor(name){
 }
 
 /* ── Build project groups from props array ── */
-function _buildProjects(){
-  const all = (typeof props !== 'undefined' && props.length) ? props : [];
-  // group by title prefix (ชื่อโครงการคือส่วนแรกของ title ก่อน "-" หรือ " ")
-  const groups = {};
-  all.filter(p=>p.type==='คอนโด'||p.type==='บ้านเดี่ยว'||p.type==='ทาวน์โฮม'||p.type==='วิลล่า').forEach(p=>{
-    // ใช้ title ทั้งหมดถ้าสั้น หรือตัด keyword แรก
-    const key = (p.title||'').split(/[-–|·,]/)[0].trim().slice(0,40) || p.title;
-    if(!key) return;
-    if(!groups[key]) groups[key] = { name:key, type:p.type, props:[], province:p.province||'', photo:null };
-    groups[key].props.push(p);
-    if(!groups[key].photo && p.photos && p.photos[0]) groups[key].photo = p.photos[0];
-  });
-  return Object.values(groups)
-    .filter(g=>g.props.length>=1)
-    .sort((a,b)=>b.props.length-a.props.length)
-    .slice(0,20);
+/* ── helper: emoji ประเภทอสังหา ── */
+function _homeTypeEmoji(t){
+  const m={'คอนโด':'🏢','บ้านเดี่ยว':'🏠','ทาวน์โฮม':'🏘️','วิลล่า':'🏡','ที่ดิน':'🌿','อาคารพาณิชย์':'🏬'};
+  return m[t]||'🏙️';
+}
+function _homeFmtPrice(n){
+  if(!n) return '';
+  if(n>=1e6) return (n/1e6).toFixed(n%1e6===0?0:1)+'ล้าน';
+  if(n>=1000) return Math.round(n/1000)+'K';
+  return n.toLocaleString();
 }
 
-/* ── Build developer groups from agents array ── */
-function _buildDevelopers(){
-  const allAgents = (typeof agents !== 'undefined' && agents.length) ? agents : [];
-  return allAgents
-    .filter(a=>a.name)
-    .sort((a,b)=>{
-      const pa = (typeof props !== 'undefined') ? props.filter(p=>p.agentId===a.id||a.propIds?.includes(p.id)).length : 0;
-      const pb = (typeof props !== 'undefined') ? props.filter(p=>p.agentId===b.id||b.propIds?.includes(p.id)).length : 0;
-      return pb-pa;
-    })
-    .slice(0,12);
-}
-
-/* ── Render: โครงการ ── */
-function renderProjectsSec(){
+/* ── Render: โครงการ (ดึงจาก Supabase v_projects_with_developer) ── */
+async function renderProjectsSec(){
   const track = document.getElementById('projects-track');
   if(!track) return;
-  const projects = _buildProjects();
-  if(!projects.length){
-    track.closest('section').style.display='none'; return;
-  }
-  track.innerHTML = projects.map(g=>{
-    const imgHtml = g.photo
-      ? `<img class="project-card-img" src="${g.photo}" alt="${g.name}" loading="lazy" onerror="this.parentNode.innerHTML='<div class=\\'project-card-img-ph\\'>${_typeEmoji(g.type)}</div>'">`
-      : `<div class="project-card-img-ph">${_typeEmoji(g.type)}</div>`;
-    const priceMin = Math.min(...g.props.map(p=>p.price).filter(Boolean));
-    const priceTxt = isFinite(priceMin) ? _fmtPrice(priceMin)+'+' : '';
-    return `<div class="project-card" onclick="_openProjectModal(${JSON.stringify(g.name).replace(/</g,'&lt;')})">
-      ${imgHtml}
-      <div class="project-card-body">
-        <div class="project-card-type">${g.type}</div>
-        <div class="project-card-title">${g.name}</div>
-        <div class="project-card-loc"><i class="fas fa-map-marker-alt" style="color:var(--a);font-size:10px"></i>${g.province||'ไม่ระบุ'}</div>
-        ${priceTxt?`<div style="font-size:12px;font-weight:700;color:var(--p);margin-bottom:6px">เริ่ม ${priceTxt}</div>`:''}
-        <div class="project-card-stats">
-          <div class="project-card-stat"><div class="n">${g.props.length}</div><div class="l">ยูนิต</div></div>
-          <div class="project-card-stat"><div class="n">${g.props.filter(p=>p.tx==='BUY').length}</div><div class="l">ขาย</div></div>
-          <div class="project-card-stat"><div class="n">${g.props.filter(p=>p.tx==='RENT').length}</div><div class="l">เช่า</div></div>
+  // loading state
+  track.innerHTML = '<div style="display:flex;align-items:center;gap:10px;padding:20px;color:var(--tx2);font-size:14px"><i class="fas fa-spinner fa-spin" style="color:var(--p)"></i> กำลังโหลดโครงการ...</div>';
+  try {
+    const { data, error } = await sb
+      .from('v_projects_with_developer')
+      .select('id,name,type,status,province,district,cover_url,price_min,price_max,total_units,available_units,property_count,is_featured,sort_order,developer_name,developer_logo,highlights')
+      .eq('is_active', true)
+      .order('sort_order', { ascending: true })
+      .limit(12);
+    if(error) throw error;
+    const projects = data || [];
+    if(!projects.length){
+      track.closest('section').style.display='none'; return;
+    }
+    track.innerHTML = projects.map(g=>{
+      const emoji = _homeTypeEmoji(g.type);
+      const imgHtml = g.cover_url
+        ? `<img class="project-card-img" src="${g.cover_url}" alt="${g.name}" loading="lazy" onerror="this.parentNode.innerHTML='<div class=\\'project-card-img-ph\\'>${emoji}</div>'">`
+        : `<div class="project-card-img-ph">${emoji}</div>`;
+      const priceTxt = g.price_min ? 'เริ่ม '+_homeFmtPrice(g.price_min)+(g.price_max?' – '+_homeFmtPrice(g.price_max):'+') : '';
+      const devBadge = g.developer_name
+        ? `<div style="font-size:10px;color:var(--tx2);margin-bottom:4px;display:flex;align-items:center;gap:3px">${g.developer_logo?`<img src="${g.developer_logo}" style="height:12px;width:auto;object-fit:contain" onerror="this.style.display='none'">`:''}<span>${g.developer_name}</span></div>`
+        : '';
+      return `<div class="project-card" onclick="_openProjectPage(${JSON.stringify(String(g.id))})">
+        ${imgHtml}
+        <div class="project-card-body">
+          <div class="project-card-type">${g.type||''}</div>
+          ${devBadge}
+          <div class="project-card-title">${g.name}</div>
+          <div class="project-card-loc"><i class="fas fa-map-marker-alt" style="color:var(--a);font-size:10px"></i>${g.province||'ไม่ระบุ'}${g.district?' · '+g.district:''}</div>
+          ${priceTxt?`<div style="font-size:12px;font-weight:700;color:var(--p);margin-bottom:6px">${priceTxt}</div>`:''}
+          <div class="project-card-stats">
+            <div class="project-card-stat"><div class="n">${g.total_units||0}</div><div class="l">ยูนิต</div></div>
+            <div class="project-card-stat"><div class="n">${g.available_units||0}</div><div class="l">พร้อมขาย</div></div>
+            <div class="project-card-stat"><div class="n">${g.property_count||0}</div><div class="l">ประกาศ</div></div>
+          </div>
         </div>
-      </div>
-    </div>`;
-  }).join('');
-  if(typeof initAllCardSwipes==='function') setTimeout(initAllCardSwipes,100);
+      </div>`;
+    }).join('');
+    if(typeof initAllCardSwipes==='function') setTimeout(initAllCardSwipes,100);
+  } catch(e){
+    console.warn('[home] renderProjectsSec error', e);
+    track.closest('section').style.display='none';
+  }
 }
 
-/* ── Render: ผู้พัฒนา ── */
-function renderDevelopersSec(){
+/* ── cache ผู้พัฒนาที่โหลดมาจาก home section (ใช้ onclick) ── */
+var _homeDevCache = [];
+
+/* ── Render: ผู้พัฒนา (ดึงจาก Supabase developers table) ── */
+async function renderDevelopersSec(){
   const track = document.getElementById('developers-track');
   if(!track) return;
-  const devs = _buildDevelopers();
-  if(!devs.length){
-    track.closest('section').style.display='none'; return;
+  track.innerHTML = '<div style="display:flex;align-items:center;gap:10px;padding:20px;color:var(--tx2);font-size:14px"><i class="fas fa-spinner fa-spin" style="color:var(--a)"></i> กำลังโหลดผู้พัฒนา...</div>';
+  try {
+    // ดึง developers
+    const { data: devData, error: devErr } = await sb
+      .from('developers')
+      .select('id,name,name_en,logo_url,province,description,total_projects,total_units,awards,sort_order')
+      .eq('is_active', true)
+      .order('sort_order', { ascending: true })
+      .limit(10);
+    if(devErr) throw devErr;
+    const devs = devData || [];
+    if(!devs.length){
+      track.closest('section').style.display='none'; return;
+    }
+    // ดึงจำนวน projects จริงต่อ developer
+    const { data: pCounts } = await sb
+      .from('projects')
+      .select('developer_id,id,total_units')
+      .eq('is_active', true);
+    const pList = pCounts || [];
+    // เก็บใน cache เพื่อให้ onclick ใช้ได้โดยไม่ต้อง query ซ้ำ
+    _homeDevCache = devs;
+    track.innerHTML = devs.map(d=>{
+      const myProj = pList.filter(p=>p.developer_id===d.id);
+      const projCount = myProj.length || d.total_projects || 0;
+      const unitCount = myProj.reduce((s,p)=>s+(p.total_units||0),0) || d.total_units || 0;
+      const logoHtml = d.logo_url
+        ? `<img src="${d.logo_url}" alt="${d.name}" onerror="this.parentNode.innerHTML='<div class=\\'developer-card-logo-ph\\'>${(d.name||'M')[0]}</div>'">`
+        : `<div class="developer-card-logo-ph">${(d.name||'M')[0]}</div>`;
+      return `<div class="developer-card" onclick="_openHomeDev(${JSON.stringify(String(d.id))})">
+        <div class="developer-card-logo">${logoHtml}</div>
+        <div class="developer-card-body">
+          <div class="developer-card-name">${d.name}</div>
+          <div class="developer-card-tag">${d.name_en||d.province||'ผู้พัฒนาโครงการ'}</div>
+          <div class="developer-card-count"><i class="fas fa-building"></i> ${projCount} โครงการ · ${unitCount.toLocaleString()} ยูนิต</div>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e){
+    console.warn('[home] renderDevelopersSec error', e);
+    track.closest('section').style.display='none';
   }
-  track.innerHTML = devs.map(a=>{
-    const propCount = (typeof props!=='undefined') ? props.filter(p=>p.agentId===a.id||a.propIds?.includes(p.id)).length : 0;
-    const logoHtml = (a.avatar_url||a.photo_url)
-      ? `<img src="${a.avatar_url||a.photo_url}" alt="${a.name}" onerror="this.parentNode.innerHTML='<div class=\\'developer-card-logo-ph\\'>${(a.initials||a.name[0]||'M')}</div>'">`
-      : `<div class="developer-card-logo-ph">${a.initials||a.name[0]||'M'}</div>`;
-    return `<div class="developer-card" onclick="_openDeveloperModal(${JSON.stringify(a.id)})">
-      <div class="developer-card-logo">${logoHtml}</div>
-      <div class="developer-card-body">
-        <div class="developer-card-name">${a.name}</div>
-        <div class="developer-card-tag">${a.title||'ผู้พัฒนาโครงการ'}</div>
-        <div class="developer-card-count"><i class="fas fa-building"></i> ${propCount} โครงการ</div>
-      </div>
-    </div>`;
-  }).join('');
+}
+
+/* ── onclick ผู้พัฒนาใน home section ── */
+function _openHomeDev(devId){
+  // ลองหาจาก cache ก่อน
+  var dev = _homeDevCache.find(function(d){ return String(d.id)===String(devId); });
+  if(dev){
+    showListingsPage();
+    setTimeout(function(){
+      var lsKw = document.getElementById('ls-kw');
+      if(lsKw){ lsKw.value = dev.name; }
+      if(typeof listingsInlineSearch==='function') listingsInlineSearch();
+      else if(typeof renderListingsPage==='function') renderListingsPage();
+    }, 150);
+  } else {
+    // fallback: ไปหน้า developers แล้ว filter
+    showPage('developers');
+  }
 }
 
 /* ── Render: ตัวแทนแนะนำ ── */
@@ -34923,30 +34967,39 @@ function _goDevelopersAll(){ showPage('developers'); }
 })();
 
 /* ── Render ทุก sections พร้อมกัน (เรียกหลัง data ready) ── */
-function renderHomeBonusSections(){
-  renderProjectsSec();
-  renderDevelopersSec();
+async function renderHomeBonusSections(){
+  // โครงการ + ผู้พัฒนา ดึงจาก Supabase โดยตรง (async)
+  await Promise.all([
+    renderProjectsSec(),
+    renderDevelopersSec()
+  ]);
+  // ตัวแทนแนะนำ ยังใช้ข้อมูล agents ใน memory
   renderFeaturedAgentsSec();
 }
 
 // Hook เข้า data-ready callback
 (function(){
+  var _rendered = false;
+  function _runOnce(){
+    if(_rendered) return;
+    _rendered = true;
+    renderHomeBonusSections();
+  }
   var _origRenderAll = window.renderAll;
   if(typeof _origRenderAll === 'function'){
     window.renderAll = function(){
       _origRenderAll.apply(this,arguments);
-      setTimeout(renderHomeBonusSections, 400);
+      setTimeout(_runOnce, 300);
     };
   }
-  // fallback: รันเมื่อ props พร้อม
-  var _check = setInterval(function(){
-    if(typeof props!=='undefined' && props.length > 0){
-      clearInterval(_check);
-      setTimeout(renderHomeBonusSections, 300);
-    }
-  }, 800);
+  // เรียกทันทีเมื่อ DOM พร้อม — ไม่ต้องรอ props เพราะ projects/developers ดึงแยกต่างหาก
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded', function(){ setTimeout(_runOnce, 500); });
+  } else {
+    setTimeout(_runOnce, 500);
+  }
   // hard timeout fallback
-  setTimeout(function(){ clearInterval(_check); renderHomeBonusSections(); }, 8000);
+  setTimeout(_runOnce, 6000);
 })();
 
 // Expose สำหรับ external call / debug
