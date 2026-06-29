@@ -20159,19 +20159,7 @@ function openAllModal(type){
   const m=$('all-modal'),t=$('all-title2'),b=$('all-body');
   let title='',data=[];
   window._modalCurrentType = type;
-  // ถ้าเปิด rec หรือ new ตรงๆ (ไม่ใช่ restore จาก viewall) ให้ clear parent type
-  if(type==='rec'||type==='new') window._allModalParentType = null;
-  if(type==='rec'){
-    title=ui('modal.rec.title');
-    data = props.filter(p=>p.isRec);
-    if(!data.length) data = sortListings([...props],'default').slice(0,20);
-  }
-  else if(type==='new'){
-    title=ui('modal.new.title');
-    data = props.filter(p=>p.isNew);
-    if(!data.length) data = sortListings([...props],'newest').slice(0,20);
-  }
-  else if(type==='all'){
+  if(type==='all'){
     title=ui('sec.all');
     // ใช้ allFiltered ถ้ามี filter ใช้งานอยู่ (เพื่อให้ modal แสดงผลตรงกับ filter ปัจจุบัน)
     const hasActiveFilter = allFiltered && allFiltered.length > 0 && allFiltered.length < props.length;
@@ -26454,8 +26442,6 @@ const I18N_DICT = {
   'sec.blog':       {th:'บทความน่ารู้',  en:'Blog & News',   cn:'博客与资讯', ja:'ブログ・ニュース'},
   'sec.port':       {th:'ผลงาน',          en:'Portfolio',     cn:'案例展示',   ja:'実績'},
   /* ── MODAL POPUP ── */
-  'modal.rec.title':  {th:'🔥 ยอดนิยม',       en:'🔥 Hot Properties', cn:'🔥 热门房源',  ja:'🔥 人気物件'},
-  'modal.new.title':  {th:'✨ มาใหม่ล่าสุด',   en:'✨ Latest Listings', cn:'✨ 最新房源',   ja:'✨ 最新物件'},
   'modal.srv.title':  {th:'บริการทั้งหมด',    en:'All Services',      cn:'全部服务',    ja:'全サービス'},
   'modal.blog.title': {th:'บทความทั้งหมด',    en:'All Articles',      cn:'全部文章',    ja:'全記事'},
   'modal.found':      {th:'พบ',               en:'Found',             cn:'找到',       ja:''},
