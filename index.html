@@ -1,236 +1,337 @@
-<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SMART QC</title>
-<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<!DOCTYPE html>
+<html lang="th"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SMART QC — ตรวจงานติดตั้ง</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <style>
-:root{--b:#0b6e4f;--bg:#f4f6f5;--t:#1a2321;--m:#6b7773;--r:#c0392b}
-*{box-sizing:border-box}body{margin:0;font:16px system-ui,"Noto Sans Thai",sans-serif;background:var(--bg);color:var(--t);padding-bottom:70px}
-header{background:var(--b);color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:5}
-.demo{background:#f1c40f;color:#000;font-size:12px;padding:2px 8px;border-radius:9px;margin-left:8px}
-main{max-width:900px;margin:auto;padding:12px}.card{background:#fff;border-radius:12px;padding:14px;margin:10px 0;box-shadow:0 1px 3px #0002}
-.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}.m{color:var(--m);font-size:14px}
-.chip{display:inline-block;padding:2px 10px;border-radius:12px;font-size:13px;background:#e0e6e3}.chip.w{background:#fde7c8}.chip.o{background:#cdeedd}.chip.f{background:#f7d4d0}
-button,input,select,textarea{font:inherit;padding:12px;border-radius:10px;border:1px solid #bcc7c3;width:100%;margin:4px 0}
-button{background:var(--b);color:#fff;border:0;min-height:48px;cursor:pointer}button.s{background:#e0e6e3;color:var(--t)}button.d{background:var(--r)}
-nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:#fff;border-top:1px solid #ccc;z-index:4}nav a{flex:1;text-align:center;padding:10px 0;font-size:13px;cursor:pointer}nav a.on{color:var(--b);font-weight:700}
-.toast{position:fixed;top:60px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 16px;border-radius:10px;z-index:30;max-width:90%}
-@media(min-width:900px){body{padding-left:180px}nav{top:0;bottom:auto;right:auto;width:180px;flex-direction:column;border:0;border-right:1px solid #ccc;padding-top:60px}nav a{text-align:left;padding:14px 20px;font-size:15px}header{margin-left:-180px;padding-left:196px}}
-nav a{font-size:11px;line-height:1.3}nav a br{display:block}
-@media(min-width:900px){nav br{display:none}}
-.pg{position:fixed;left:-99999px;top:0;width:1123px;height:794px;background:#fff;color:#000;font:12px Sarabun,sans-serif;padding:22px 28px;box-sizing:border-box;overflow:hidden}.pg.pt{width:794px;height:1123px}
-.pg .hd{display:flex;gap:14px;align-items:center;margin-bottom:8px}.pg .hd img{height:78px}.pg .tb{width:100%;border-collapse:collapse;margin-top:8px}.pg .tb th,.pg .tb td{border:1px solid #222;padding:2px 4px;height:25px;vertical-align:middle}.pg .tb th{background:#eee;font-weight:400}.pg .c{text-align:center}.pg .sm{font-size:10px}
-.pg .sgs{display:flex;justify-content:space-around;margin-top:22px}.pg .sg{text-align:center;min-width:200px;font-size:13px}.pg .sg img{height:54px;display:block;margin:auto}.pg .sg:before{content:"";display:block;border-top:1px dotted #000;margin:0 10px 4px}
-.pg .ft{position:absolute;left:28px;right:28px;bottom:14px;display:flex;justify-content:space-between;font-size:11px}
-.pg .gr{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px}.pg .gr figure{margin:0}.pg .gr img{width:100%;height:290px;object-fit:contain;background:#eee}.pg .gr.one{grid-template-columns:1fr}.pg .gr.one img{height:600px}
-.pg .yb{background:#ff0;border:1px solid #222;text-align:center;font-weight:700;font-size:20px;margin-top:8px}.pg .dr{height:170px}.pg .dr img{max-width:100%;max-height:78px;margin:1px}
+:root{--g:#1f6b3a;--o:#e8731a;--bg:#f3f5f2;--card:#fff;--ink:#1c2420;--mut:#66726b;--line:#d9dfda;--red:#c62828;--ok:#2e7d32}
+*{box-sizing:border-box}body{margin:0;font:16px/1.5 Sarabun,system-ui,sans-serif;background:var(--bg);color:var(--ink);padding-bottom:76px}
+header{background:var(--g);color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:5}
+header b{font-size:18px}header small{opacity:.85}
+main{max-width:860px;margin:0 auto;padding:14px}
+nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);display:flex;z-index:5}
+nav a{flex:1;text-align:center;padding:10px 2px;font-size:12px;color:var(--mut);text-decoration:none;min-height:56px}
+nav a.on{color:var(--g);font-weight:700;border-top:3px solid var(--o)}nav a span{display:block;font-size:20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px;margin:0 0 12px}
+h2{margin:6px 0 12px;font-size:20px}h3{margin:0 0 6px;font-size:17px}
+button,.btn{font:inherit;min-height:46px;padding:8px 16px;border-radius:8px;border:1px solid var(--g);background:var(--g);color:#fff;cursor:pointer}
+button.sec{background:#fff;color:var(--g)}button.red{background:var(--red);border-color:var(--red)}button.org{background:var(--o);border-color:var(--o)}
+button:disabled{opacity:.5}
+input,select,textarea{font:inherit;width:100%;min-height:46px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;margin:2px 0 8px}
+label{font-size:14px;color:var(--mut)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.row>*{flex:1}.row>button{flex:0 0 auto}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.stat{border-left:5px solid var(--g);background:#fff;padding:10px 12px;border-radius:6px;border-top:1px solid var(--line);border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+.stat b{font-size:28px;display:block}.stat.w{border-left-color:var(--o)}.stat.r{border-left-color:var(--red)}
+.pill{display:inline-block;padding:2px 10px;border-radius:99px;font-size:13px;background:#e5ebe7;color:var(--ink)}
+.pill.WAITING_INSPECTION,.pill.WAITING_REINSPECTION,.pill.WAITING_APPROVAL{background:#fff1dd;color:#a35200}
+.pill.CORRECTION_REQUIRED,.pill.REJECTED,.pill.major{background:#fde4e4;color:var(--red)}
+.pill.APPROVED,.pill.closed{background:#dff3e3;color:var(--ok)}.pill.INSPECTING{background:#dfeaf8;color:#1b4f8f}
+.item{border-top:1px solid var(--line);padding:10px 0}.item:first-child{border-top:0}
+.pf{display:flex;gap:8px}.pf button{flex:1}.pf .p.on{background:var(--ok);color:#fff;border-color:var(--ok)}.pf .f.on{background:var(--red);color:#fff;border-color:var(--red)}
+.pf button:not(.on){background:#fff;color:var(--ink);border-color:var(--line)}
+.thumbs{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0}.thumb{position:relative;width:92px;height:92px;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:#eee;cursor:pointer}
+.thumb img,.thumb svg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:20;display:flex;align-items:center;justify-content:center;padding:10px}
+.modal>div{background:#fff;border-radius:10px;padding:12px;width:100%;max-width:720px;max-height:96vh;overflow:auto}
+.tools{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}.tools button{min-height:40px;padding:4px 10px}.tools .on{background:var(--o);border-color:var(--o);color:#fff}
+svg.ed{width:100%;touch-action:none;background:#222;border-radius:6px}
+canvas.sig{width:100%;height:180px;border:1px dashed var(--mut);border-radius:8px;touch-action:none;background:#fff}
+#toast{position:fixed;top:64px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 16px;border-radius:8px;z-index:30;display:none;max-width:90%}
+.muted{color:var(--mut);font-size:14px}.hide{display:none}
+.doc{background:#fff;padding:14mm;font-size:12px;line-height:1.4}.doc table{border-collapse:collapse;width:100%}.doc td,.doc th{border:1px solid #333;padding:4px 6px;vertical-align:top}
+.doc .ph{width:80px;height:80px;object-fit:cover;margin:2px;border:1px solid #999}.doc .sg{height:50px}
+@media print{header,nav,.noprint,#toast{display:none!important}body{background:#fff;padding:0}main{padding:0;max-width:none}.doc{padding:0}@page{size:A4;margin:12mm}.pg{counter-increment:pg}}
 </style></head><body>
-<header><div><b>SMART QC</b><span id="dm"></span></div><div id="hu"></div></header><main id="app"></main><nav id="nav"></nav>
+<header><div><b>SMART QC</b><br><small id="who"></small></div><button class="sec" id="lo" onclick="logout()" style="display:none;min-height:36px">ออกจากระบบ</button></header>
+<main id="app">กำลังโหลด…</main><nav id="nav" style="display:none"></nav><div id="toast"></div>
 <script>
-const SUPABASE_URL='https://oanyvtudtdlhmynicjvw.supabase.co',SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9hbnl2dHVkdGRsaG15bmljanZ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEyMTQzNTcsImV4cCI6MjEwNjc5MDM1N30.PNsEfCQ6kj2Y-03J0VCcw2VqtLozi2bA2TMenN3nGPw';
-const MAX_ITEMS=5; // ค่าสูงสุดที่ฝั่ง DB คุม (system_settings.max_items, ไม่เกิน 10)
-const DEMO=SUPABASE_URL.startsWith('YOUR_');
-const sb=DEMO?null:supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
-const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const ST={DRAFT:'ร่าง',WAITING_INSPECTION:'รอตรวจ',INSPECTING:'กำลังตรวจ',CORRECTION_REQUIRED:'ต้องแก้ไข',FAILED:'ไม่ผ่าน (ครั้งก่อน)',WAITING_APPROVAL:'รออนุมัติ',APPROVED:'อนุมัติแล้ว'};
-const ME={FACTORY:'โรงงาน',SITE:'ไซต์งานติดตั้ง',ONLINE:'ตรวจออนไลน์'};
-const RL={manufacturer:'ผู้ผลิต',installer:'ผู้ติดตั้ง',inspector:'ผู้ตรวจ',approver:'ผู้อนุมัติ',visitor:'ผู้เยี่ยมชม',admin:'แอดมิน'};
-const blank=()=>({pid:'',vid:'',method:'FACTORY',when:'',note:'',items:[{name:'',model:'',qty:1,note:'',f:[]}]});
-let S={user:null,role:null,prof:null,view:'home',meta:{projects:[],forms:[]},list:[],cur:null,res:[],filter:'',draft:null};
-try{S.draft=JSON.parse(localStorage.qcDraft||'null')}catch(e){}
-S.draft=S.draft||blank();S.draft.items.forEach(i=>i.f=[]);
-const saveDraft=()=>localStorage.qcDraft=JSON.stringify(S.draft,(k,v)=>k==='f'?undefined:v);
-const mk=(c,n,l,o={})=>({vid:'v'+c,code:c,name:n,...o,cl:l.map((x,k)=>({id:c+k,label:x}))});
-const D=JSON.parse(localStorage.qcDemo||'null')||{p:[{id:'p1',code:'PJ69.074',name:'งานโคราช'}],f:[mk('FR-INS-ME-028','แบบฟอร์มการตรวจเช็คแผ่นตะแกรงถังอบ',['ความหนา','ความสูง','เส้นรอบรูป','ระยะรูตะแกรง']),mk('FR-INS-ME-024','แบบฟอร์มการตรวจสอบงานติดตั้งระบบท่อส่งข้าว',['องศาท่อ','ความคดงอท่อ','การจับยึด','จุดรั่ว,รอยต่อ','จุดค้ำยัน','อัตราการไหล','งานสี/ความเรียบร้อย'])],i:[],r:[],d:[],doc:[],seq:{}};
-const dsave=()=>localStorage.qcDemo=JSON.stringify(D),nx=k=>D.seq[k]=(D.seq[k]||0)+1,uid=()=>'x'+Date.now()+Math.random().toString(36).slice(2,6);
-const toast=m=>{const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.append(t);setTimeout(()=>t.remove(),3500)};
-async function run(f,ok){try{await f();ok&&toast(ok);return true}catch(e){console.error(e);const m=e.message||'';toast(m.includes('QC:')?m.split('QC:')[1]:m.includes('row-level')?'ไม่มีสิทธิ์ดำเนินการ':'เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง');return false}}
-const comp=f=>new Promise(r=>{const im=new Image();im.onload=()=>{const k=Math.min(1,1280/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=im.width*k;c.height=im.height*k;c.getContext('2d').drawImage(im,0,0,c.width,c.height);c.toBlob(r,'image/jpeg',.8)};im.src=URL.createObjectURL(f)});
-function sign(){return new Promise(res=>{const m=document.createElement('div');m.style='position:fixed;inset:0;background:#000a;z-index:20;display:flex;align-items:center;justify-content:center';m.innerHTML='<div class=card style="width:92%;max-width:420px"><b>ลงลายมือชื่อ</b><canvas width=380 height=160 style="border:1px dashed #888;width:100%;touch-action:none;background:#fff"></canvas><button class=s id=sc>ล้าง</button><button id=so>ยืนยัน</button><button class=s id=sx>ยกเลิก</button></div>';document.body.append(m);const c=m.querySelector('canvas'),x=c.getContext('2d');x.lineWidth=2;let dn=0,has=0;const p=e=>{const r=c.getBoundingClientRect();return[(e.clientX-r.left)*c.width/r.width,(e.clientY-r.top)*c.height/r.height]};c.onpointerdown=e=>{dn=1;x.beginPath();x.moveTo(...p(e))};c.onpointermove=e=>{if(dn){x.lineTo(...p(e));x.stroke();has=1}};c.onpointerup=()=>dn=0;m.querySelector('#sc').onclick=()=>{x.clearRect(0,0,380,160);has=0};m.querySelector('#sx').onclick=()=>{m.remove();res(null)};m.querySelector('#so').onclick=()=>{if(!has)return toast('กรุณาเซ็นชื่อ');const d=c.toDataURL();m.remove();res(d)}})}
+// ===== ตั้งค่า: ใส่ค่าจาก Supabase > Project Settings > API (ใช้ anon key เท่านั้น) =====
+const SUPABASE_URL='https://qrocqqsnrfvlqoimpgii.supabase.co', SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyb2NxcXNucmZ2bHFvaW1wZ2lpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzMDE1NjcsImV4cCI6MjEwNjg3NzU2N30.lIEeTabuUqHhBg--PCBkWWP5mHTD2dtdI5bMpij_GBM';
+// =========================================================================================
+const ST={DRAFT:'ร่าง',WAITING_INSPECTION:'รอตรวจ',INSPECTING:'กำลังตรวจ',CORRECTION_REQUIRED:'ต้องแก้ไข',WAITING_REINSPECTION:'รอตรวจซ้ำ',WAITING_APPROVAL:'รออนุมัติ',APPROVED:'อนุมัติแล้ว',REJECTED:'ไม่อนุมัติ'};
+const RL={installer:'ผู้ผลิต/ผู้ติดตั้ง',inspector:'ผู้ตรวจสอบ',approver:'ผู้อนุมัติ',visitor:'ผู้เข้าชม',admin:'ผู้ดูแลระบบ'};
+const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let sb,me=null,urlCache={};
+const q=async p=>{const r=await p;if(r.error){toast(r.error.message);throw r.error}return r.data};
+function toast(m){const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(t.t);t.t=setTimeout(()=>t.style.display='none',3500)}
+const W=()=>['installer','inspector','approver','admin'].includes(me?.role),R=r=>me?.role===r||me?.role==='admin';
+const fmt=d=>d?new Date(d).toLocaleString('th-TH',{dateStyle:'short',timeStyle:'short'}):'';
+async function audit(action,entity,id,detail){await sb.from('audit_logs').insert({actor:me.id,action,entity,entity_id:String(id||''),detail:detail||null})}
+async function notifyRole(role,message,link){const{data}=await sb.from('profiles').select('id').eq('role',role).eq('status','active');if(data?.length)await sb.from('notifications').insert(data.map(u=>({user_id:u.id,message,link})))}
+async function url(path){if(urlCache[path])return urlCache[path];const{data}=await sb.storage.from('evidence').createSignedUrl(path,3600);return urlCache[path]=data?.signedUrl}
+async function compress(file,max=1600){const bm=await createImageBitmap(file);const k=Math.min(1,max/Math.max(bm.width,bm.height));const c=document.createElement('canvas');c.width=bm.width*k;c.height=bm.height*k;c.getContext('2d').drawImage(bm,0,0,c.width,c.height);return new Promise(r=>c.toBlob(r,'image/jpeg',.85))}
+function pick(){return new Promise(res=>{const i=document.createElement('input');i.type='file';i.accept='image/*';i.onchange=()=>res(i.files[0]);i.click()})}
 
-// ===== data layer (Supabase หรือ DEMO ในเครื่อง) =====
-const fm=i=>S.meta.forms.find(f=>f.vid===i.vid)||{cl:[],code:'?',name:'?'};
-function drpc(n,a){const i=D.i.find(x=>x.id===a.p_id),f=i&&fm(i),pc=i&&D.p.find(p=>p.id===i.pid).code;
- if(n==='submit_correction'){const d=D.d.find(x=>x.id===a.p_defect);if(!(a.p_note||'').trim())throw Error('QC: กรุณาอธิบายการแก้ไข');d.status='CORRECTED';d.correction_note=a.p_note}
- else if(n==='start_inspection')i.status='INSPECTING';
- else if(n==='finalize_inspection'){const R=D.r.filter(r=>r.inspection_id===i.id);if(i.items.some(it=>f.cl.some(c=>!R.find(r=>r.item_id===it.id&&r.checklist_id===c.id&&r.result))))throw Error('QC: ผลตรวจยังไม่ครบทุกรายการ');const fl=R.filter(r=>r.result==='FAIL');if(fl.some(r=>!(r.comment||'').trim()))throw Error('QC: ข้อที่ไม่ผ่านต้องระบุเหตุผล');i.sig=1;fl.forEach(r=>D.d.push({id:uid(),inspection_id:i.id,number:'FR-INS-ME-004-'+pc+'-'+String(nx('D'+pc)).padStart(3,'0'),description:f.cl.find(c=>c.id===r.checklist_id).label+': '+r.comment,status:'OPEN'}));i.status=fl.length?'CORRECTION_REQUIRED':'WAITING_APPROVAL'}
- else if(n==='approve_inspection'){if(!a.p_ok){if(!(a.p_comment||'').trim())throw Error('QC: ไม่อนุมัติต้องระบุเหตุผล');i.status='INSPECTING'}else{i.status='APPROVED';D.doc.push({id:uid(),inspection_id:i.id,document_number:f.code+'-'+pc+'-'+String(nx('DOC'+f.code+pc)).padStart(3,'0'),status:'APPROVED'});D.d.filter(d=>D.i.find(x=>x.id===d.inspection_id).number===i.number).forEach(d=>d.status='CLOSED')}}
- else if(n==='resubmit_inspection'){if(D.d.some(d=>d.inspection_id===i.id&&d.status==='OPEN'))throw Error('QC: ยังมี Defect ที่ไม่ได้แก้ไข');i.status='FAILED';D.d.filter(d=>d.inspection_id===i.id).forEach(d=>d.status='REINSPECTION_REQUIRED');const id=uid();D.i.push({...i,id,attempt:i.attempt+1,status:'WAITING_INSPECTION',items:i.items.map(t=>({...t,id:uid()}))})}
- dsave()}
-const api={
- async meta(){if(DEMO)return{projects:D.p,forms:D.f};
-  const[p,f]=await Promise.all([sb.from('projects').select('*').order('code'),sb.from('form_versions').select('id,item_fields,forms!inner(code,name,kind,signer_label,model_label,has_standard,qty_unit),form_checklists(id,sort,label,source_review)').eq('is_active',true)]);if(p.error||f.error)throw p.error||f.error;
-  return{projects:p.data,forms:f.data.filter(x=>x.forms.kind==='inspection').map(x=>({vid:x.id,code:x.forms.code,name:x.forms.name,fields:x.item_fields||[],signer:x.forms.signer_label,ml:x.forms.model_label,std:x.forms.has_standard,qu:x.forms.qty_unit,cl:x.form_checklists.sort((a,b)=>a.sort-b.sort).map(c=>({id:c.id,label:c.label,review:c.source_review}))})).sort((a,b)=>a.code.localeCompare(b.code))}},
- async list(){if(DEMO)return D.i.map(x=>({...x,project:D.p.find(p=>p.id===x.pid),defects:D.d.filter(d=>d.inspection_id===x.id)})).reverse();
-  const{data,error}=await sb.from('inspections').select('id,number,status,attempt,method,note,requested_at,created_at,project_id,form_version_id,projects(code,name),companies(name),inspection_items(*),defects(*)').order('created_at',{ascending:false}).limit(50);if(error)throw error;
-  return data.map(x=>({...x,vid:x.form_version_id,project:x.projects,company:x.companies,items:(x.inspection_items||[]).sort((a,b)=>a.sort-b.sort)}))},
- async res(id){if(DEMO)return D.r.filter(r=>r.inspection_id===id);const{data,error}=await sb.from('inspection_checklist_results').select('*').eq('inspection_id',id);if(error)throw error;return data},
- async setRes(iid,item_id,checklist_id,p){if(DEMO){let r=D.r.find(r=>r.item_id===item_id&&r.checklist_id===checklist_id);if(!r)D.r.push(r={inspection_id:iid,item_id,checklist_id});Object.assign(r,p);return dsave()}
-  const{error}=await sb.from('inspection_checklist_results').upsert({inspection_id:iid,item_id,checklist_id,inspected_by:S.user.id,...p},{onConflict:'item_id,checklist_id'});if(error)throw error},
- async rpc(n,a){if(DEMO)return drpc(n,a);const{data,error}=await sb.rpc(n,a);if(error)throw error;return data},
- async docs(){if(DEMO)return D.doc;const{data,error}=await sb.from('documents').select('*').order('created_at',{ascending:false}).limit(50);if(error)throw error;return data},
- async create(d){const n=d.items.length;
-  if(DEMO){const id=uid(),y=new Date().getFullYear();D.i.push({id,number:'INS-'+y+'-'+String(nx('INS'+y)).padStart(4,'0'),status:'WAITING_INSPECTION',attempt:1,pid:d.pid,vid:d.vid,method:d.method,when:d.when,note:d.note,items:d.items.map(t=>({id:uid(),name:t.name,model:t.model,qty:t.qty,note:t.note,extra:t.extra||{},photos:t.f.length}))});(D.sg=D.sg||[]).push({inspection_id:id,action:'SUBMITTED',image:d.sig,signed_at:new Date().toISOString()});return dsave()}
-  const{data:i,error}=await sb.from('inspections').insert({project_id:d.pid,form_version_id:d.vid,company_id:S.prof.company_id,submitted_by:S.user.id,method:d.method,requested_at:d.when||null,note:d.note}).select().single();if(error)throw error;
-  const{data:its,error:e2}=await sb.from('inspection_items').insert(d.items.map((t,k)=>({inspection_id:i.id,sort:k+1,name:t.name,model:t.model,qty:t.qty,note:t.note,extra:t.extra||{}}))).select();if(e2)throw e2;
-  its.sort((a,b)=>a.sort-b.sort);
-  for(let k=0;k<n;k++)for(const f of d.items[k].f){const b=await comp(f),path=i.id+'/'+its[k].id+'/'+Date.now()+Math.random().toString(36).slice(2,6)+'.jpg';
-   let up;for(let t=0;t<3;t++){up=await sb.storage.from('inspection-photos').upload(path,b,{contentType:'image/jpeg'});if(!up.error)break}if(up.error)throw up.error;
-   await sb.from('inspection_media').insert({inspection_id:i.id,item_id:its[k].id,uploaded_by:S.user.id,category:'SUBMISSION',storage_path:path,original_filename:f.name,mime_type:'image/jpeg',file_size:b.size})}
-  for(const b of S.dw||[]){const p=i.id+'/'+uid()+'.jpg',u=await sb.storage.from('drawings').upload(p,b,{contentType:'image/jpeg'});if(u.error)throw u.error;const{error:e3}=await sb.from('inspection_drawings').insert({inspection_id:i.id,uploaded_by:S.user.id,storage_path:p});if(e3)throw e3}
-  d.sig&&await api.rpc('add_submit_sig',{p_id:i.id,p_sig:d.sig});await api.rpc('submit_inspection',{p_id:i.id});S.dw=[]}};
+// ===== Auth =====
+async function boot(){
+  if(!SUPABASE_URL||!SUPABASE_ANON_KEY){$('#app').innerHTML='<div class="card"><h2>ยังไม่ได้ตั้งค่า</h2>เปิดไฟล์นี้ แล้วใส่ <b>SUPABASE_URL</b> และ <b>SUPABASE_ANON_KEY</b> ที่ส่วนต้นของ &lt;script&gt;</div>';return}
+  sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+  sb.auth.onAuthStateChange((e,s)=>{if(e==='SIGNED_OUT'){me=null;route()}});
+  const{data:{session}}=await sb.auth.getSession();
+  if(session)await loadMe();route();
+}
+async function loadMe(){const{data}=await sb.from('profiles').select('*').eq('id',(await sb.auth.getUser()).data.user.id).single();me=data}
+function loginView(){
+  $('#nav').style.display='none';$('#lo').style.display='none';$('#who').textContent='';
+  $('#app').innerHTML=`<div class="card"><h2>เข้าสู่ระบบ / สมัครสมาชิก</h2>
+  <label>อีเมล</label><input id="em" type="email" autocomplete="email"><label>รหัสผ่าน (อย่างน้อย 6 ตัว)</label><input id="pw" type="password" autocomplete="current-password">
+  <label>ชื่อ-นามสกุล (เฉพาะสมัครใหม่)</label><input id="fn">
+  <div class="row"><button onclick="signIn()">เข้าสู่ระบบ</button><button class="sec" onclick="signUp()">สมัครสมาชิก</button><button class="sec" onclick="google()">Google</button></div>
+  <p class="muted">ผู้สมัครใหม่จะมีสถานะ "รออนุมัติ" จนกว่าผู้ดูแลระบบจะอนุมัติ</p></div>`}
+async function signIn(){const{error}=await sb.auth.signInWithPassword({email:$('#em').value,password:$('#pw').value});if(error)return toast('เข้าสู่ระบบไม่สำเร็จ: '+error.message);await loadMe();route()}
+async function signUp(){const{error}=await sb.auth.signUp({email:$('#em').value,password:$('#pw').value,options:{data:{full_name:$('#fn').value}}});if(error)return toast(error.message);toast('สมัครแล้ว (ถ้าเปิดยืนยันอีเมล ให้ตรวจอีเมลก่อน) แล้วรอผู้ดูแลอนุมัติ');await loadMe();route()}
+async function google(){const{error}=await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.href.split('#')[0]}});if(error)toast(error.message)}
+async function logout(){await sb.auth.signOut();location.hash='';}
 
-// ===== views =====
-const ext=()=>['manufacturer','installer'].includes(S.role),isIns=()=>['inspector','admin'].includes(S.role),isApp=()=>['approver','admin'].includes(S.role);
-const chip=s=>`<span class="chip ${s==='APPROVED'?'o':s==='CORRECTION_REQUIRED'||s==='FAILED'?'f':'w'}">${ST[s]||s}</span>`;
-const card=i=>`<div class=card onclick="open_('${i.id}')" style="cursor:pointer"><b>${esc(fm(i).code)}</b> ${chip(i.status)}<div>${esc(i.project?.code)} ${esc(i.project?.name)}</div><div class=m>${esc(i.number||'ฉบับร่าง')} · Attempt ${i.attempt} · ${ME[i.method]||''} · ${i.items.length} รายการ</div></div>`;
-const V={
- home(){const c=s=>S.list.filter(i=>s.includes(i.status)).length;
-  return`<div class=g>${[['รอตรวจ',c(['WAITING_INSPECTION'])],['กำลังตรวจ',c(['INSPECTING'])],['ต้องแก้ไข',c(['CORRECTION_REQUIRED'])],['รออนุมัติ',c(['WAITING_APPROVAL'])],['อนุมัติแล้ว',c(['APPROVED'])],['Defect เปิดอยู่',S.list.reduce((n,i)=>n+i.defects.filter(d=>d.status==='OPEN').length,0)]].map(x=>`<div class=card><div class=m>${x[0]}</div><b style="font-size:28px">${x[1]}</b></div>`).join('')}</div>${ext()?'<button onclick="go(\'new\')">+ แจ้งตรวจ</button>':''}<h3>ล่าสุด</h3>${S.list.slice(0,5).map(card).join('')||'<div class="card m">ยังไม่มีรายการ</div>'}`},
- list(){const L=S.list.filter(i=>!S.filter||i.status===S.filter);return`<select onchange="S.filter=this.value;render()"><option value="">ทุกสถานะ</option>${Object.keys(ST).map(k=>`<option value=${k} ${S.filter===k?'selected':''}>${ST[k]}</option>`)}</select>${L.map(card).join('')||'<div class="card m">ไม่พบรายการ</div>'}`},
- new(){const d=S.draft,f=S.meta.forms.find(x=>x.vid===d.vid);
-  return`<div class=card><b>ข้อมูลการตรวจ</b><select onchange="up('pid',this.value)"><option value="">เลือกโครงการ</option>${S.meta.projects.map(p=>`<option value="${p.id}" ${d.pid===p.id?'selected':''}>${esc(p.code)} — ${esc(p.name)}</option>`)}</select>
-  <select onchange="up('vid',this.value);render()"><option value="">เลือกแบบฟอร์ม</option>${S.meta.forms.map(x=>`<option value="${x.vid}" ${d.vid===x.vid?'selected':''}>${esc(x.code)} ${esc(x.name)}</option>`)}</select>
-  ${f?`<div class=m>เช็คลิสต์: ${f.cl.map(c=>esc(c.label)).join(' · ')}</div>`:''}
-  <select onchange="up('method',this.value)">${Object.keys(ME).map(k=>`<option value=${k} ${d.method===k?'selected':''}>${ME[k]}</option>`)}</select>
-  <input type=datetime-local value="${esc(d.when)}" onchange="up('when',this.value)"><textarea placeholder="หมายเหตุทั่วไป" oninput="up('note',this.value)">${esc(d.note)}</textarea></div>
-  ${d.items.map((t,n)=>`<div class=card><b>รายการ ${n+1} / ${d.items.length}</b>${d.items.length>1?`<button class="s" onclick="rm(${n})">ลบรายการนี้</button>`:''}<input placeholder="รายการ เช่น ตะแกรงถังอบ A-01" value="${esc(t.name)}" oninput="upi(${n},'name',this.value)"><input placeholder="รุ่น/แบบ/ตำแหน่ง" value="${esc(t.model)}" oninput="upi(${n},'model',this.value)">${xf(n,t,f)}<input placeholder="หมายเหตุ" value="${esc(t.note)}" oninput="upi(${n},'note',this.value)">
-  <label class=m>📷 รูปหลักฐาน (${t.f.length} รูป)<input type=file accept="image/*" capture=environment multiple onchange="addF(${n},this.files)"></label></div>`).join('')}
-  <div class=card><b>แบบ (Drawing)</b><div class=m>เลือกภาพแบบ แล้ววงกลม/วาด/ไฮไลท์จุดติดตั้ง (หากเป็น PDF ให้แคปเป็นภาพก่อน)</div><input type=file accept="image/*" onchange="addD(this.files[0]);this.value=''"><div class=m>แนบแล้ว ${S.dw.length} ภาพ</div></div><button class=s onclick="add()" ${d.items.length>=MAX_ITEMS?'disabled':''}>+ เพิ่มรายการ (${d.items.length}/${MAX_ITEMS})</button><button onclick="submit()">ส่งแจ้งตรวจ</button><div class=m>ฉบับร่างบันทึกอัตโนมัติ (รูปภาพต้องเลือกใหม่หากรีเฟรชหน้า)</div>`},
- detail(){const i=S.cur,f=fm(i),r=S.res,edit=isIns()&&i.status==='INSPECTING',A=[];
-  if(isIns()&&i.status==='WAITING_INSPECTION')A.push(['start','เริ่มตรวจ','']);if(edit)A.push(['fin','ส่งผลตรวจ + เซ็น','']);
-  if(isApp()&&i.status==='WAITING_APPROVAL')A.push(['ok','อนุมัติ + เซ็น',''],['no','ไม่อนุมัติ','d']);
-  if(ext()&&i.status==='CORRECTION_REQUIRED'&&i.defects.length&&i.defects.every(d=>d.status!=='OPEN'))A.push(['re','แจ้งตรวจซ้ำ','']);
-  return`<button class=s onclick="go('list')">← กลับ</button><div class=card><b>${esc(f.code)}</b> ${chip(i.status)}<div>${esc(f.name)}</div><div class=m>${esc(i.number||'')} · Attempt ${i.attempt} · ${esc(i.project?.code)}</div></div>
-  ${i.defects.map(d=>`<div class="card" style="border-left:4px solid var(--r)"><b>${esc(d.number)}</b> <span class=chip>${d.status}</span><div>${esc(d.description)}</div>${d.correction_note?`<div class=m>แก้ไข: ${esc(d.correction_note)}</div>`:''}${ext()&&d.status==='OPEN'&&i.status==='CORRECTION_REQUIRED'?`<textarea id="c_${d.id}" placeholder="อธิบายการแก้ไข"></textarea><button onclick="corr('${d.id}')">ส่งการแก้ไข</button>`:''}</div>`).join('')}
-  ${i.items.map((t,n)=>`<div class=card><b>${n+1}. ${esc(t.name)}</b><div class=m>${esc(t.model)} · จำนวน ${t.qty??1}${t.note?' · '+esc(t.note):''}</div>${f.cl.map(c=>{const x=r.find(q=>q.item_id===t.id&&q.checklist_id===c.id)||{};return`<div style="border-top:1px solid #eee;padding:6px 0">${esc(c.label)}${c.review?' <span class=chip>SOURCE_REVIEW_REQUIRED</span>':''}${edit?`<div class=g><button class="${x.result==='PASS'?'':'s'}" onclick="setR('${t.id}','${c.id}','PASS')">ผ่าน</button><button class="${x.result==='FAIL'?'d':'s'}" onclick="setR('${t.id}','${c.id}','FAIL')">ไม่ผ่าน</button></div>${x.result==='FAIL'?`<textarea placeholder="เหตุผล (จำเป็น)" onchange="cm('${t.id}','${c.id}',this.value)">${esc(x.comment)}</textarea>`:''}`:` <span class="chip ${x.result==='FAIL'?'f':x.result?'o':''}">${x.result==='PASS'?'ผ่าน':x.result==='FAIL'?'ไม่ผ่าน':'-'}</span> ${esc(x.comment)}`}</div>`}).join('')}</div>`).join('')}
-  ${A.map(a=>`<button class="${a[2]}" onclick="act('${a[0]}')">${a[1]}</button>`).join('')}`},
- docs:()=>`<div class="card m">เอกสารที่อนุมัติแล้วถูกล็อก — การสร้างไฟล์ PDF จากแม่แบบ ISO ยังไม่รวมในเวอร์ชันนี้ (ต้องวัดพิกัดแม่แบบก่อน)</div>${S.docs.map(d=>`<div class=card><b>${esc(d.document_number)}</b> <span class="chip o">${d.status}</span></div>`).join('')||'<div class="card m">ยังไม่มีเอกสาร</div>'}`};
-// ===== actions =====
-window.up=(k,v)=>{S.draft[k]=v;saveDraft()};window.upi=(n,k,v)=>{S.draft.items[n][k]=v;saveDraft()};
-window.add=()=>{S.draft.items.length<MAX_ITEMS&&S.draft.items.push({name:'',model:'',qty:1,note:'',f:[]});saveDraft();render()};
-window.rm=n=>{S.draft.items.splice(n,1);saveDraft();render()};window.addF=(n,fs)=>{S.draft.items[n].f.push(...fs);render()};
-window.submit=async()=>{const d=S.draft,er=[];if(!d.pid)er.push('โครงการ');if(!d.vid)er.push('แบบฟอร์ม');d.items.forEach((t,n)=>{if(!t.name.trim())er.push('ชื่อรายการที่ '+(n+1))});if(er.length)return toast('ยังไม่ครบ: '+er.join(', '));
- const np=d.items.filter(t=>!t.f.length).length;if(np&&!confirm(np+' รายการยังไม่มีรูปหลักฐาน ส่งต่อหรือไม่?'))return;
- const sg=await sign();if(!sg)return;if(await run(()=>api.create({...d,sig:sg}),'ส่งแจ้งตรวจแล้ว')){S.draft=blank();localStorage.removeItem('qcDraft');go('list')}};
-window.open_=async id=>{S.cur=S.list.find(i=>i.id===id);await run(async()=>S.res=await api.res(id));S.view='detail';render()};
-window.setR=async(it,cl,v)=>{const i=S.cur;let x=S.res.find(q=>q.item_id===it&&q.checklist_id===cl);if(!x)S.res.push(x={item_id:it,checklist_id:cl});x.result=v;render();await run(()=>api.setRes(i.id,it,cl,{result:v}))};
-window.cm=async(it,cl,v)=>{const x=S.res.find(q=>q.item_id===it&&q.checklist_id===cl);x.comment=v;await run(()=>api.setRes(S.cur.id,it,cl,{comment:v}))};
-window.corr=async id=>{const n=$('#c_'+id).value;if(await run(()=>api.rpc('submit_correction',{p_defect:id,p_note:n}),'ส่งการแก้ไขแล้ว'))await go('list',S.cur.id)};
-window.act=async k=>{const i=S.cur;let r;
- if(k==='start')r=await run(()=>api.rpc('start_inspection',{p_id:i.id}),'เริ่มตรวจแล้ว');
- else if(k==='re')r=await run(()=>api.rpc('resubmit_inspection',{p_id:i.id}),'แจ้งตรวจซ้ำแล้ว');
- else{let c=null;if(k==='no'){c=prompt('เหตุผลที่ไม่อนุมัติ (จำเป็น)');if(!c)return}const sg=k==='no'?null:await sign();if(k!=='no'&&!sg)return;
-  r=await run(()=>api.rpc(k==='fin'?'finalize_inspection':'approve_inspection',k==='fin'?{p_id:i.id,p_sig:sg}:{p_id:i.id,p_ok:k==='ok',p_comment:c,p_sig:sg}),'บันทึกแล้ว')}
- if(r)go('list')};
-async function go(v,keep){S.view=v;if(v!=='new'){await run(async()=>{S.list=await api.list();if(v==='docs')S.docs=await api.docs()})}render()}
-window.go=go;
-function render(){const a=$('#app');$('#dm').innerHTML=DEMO?'<span class=demo>DEMO MODE — ข้อมูลในเครื่องนี้เท่านั้น</span>':'';
- if(!S.user){$('#nav').innerHTML='';$('#hu').innerHTML='';a.innerHTML=`<div class=card><b>เข้าสู่ระบบ</b>${DEMO?`<select id=lr>${Object.keys(RL).map(k=>`<option value=${k}>${RL[k]}</option>`)}</select><button onclick="login()">เข้าใช้งาน (เดโม)</button>`:`<input id=em type=email placeholder="อีเมล"><input id=pw type=password placeholder="รหัสผ่าน"><button onclick="login()">เข้าสู่ระบบ</button><button class=s onclick="signup()">สมัครใช้งาน</button>`}</div>`;return}
- $('#hu').innerHTML=`${esc(RL[S.role])} <a onclick="logout()" style="cursor:pointer;text-decoration:underline">ออก</a>`;
- const ub=S.nt.some(n=>!n.read)&&S.view!=='notif'?' •':'',N=[['home','🏠<br> หน้าหลัก'],ext()&&['new','📋<br> แจ้งตรวจ'],['list',ext()?'📑<br> รายการ':'🔍<br> คิวตรวจ'],['docs','📄<br> เอกสาร'],['kb','📚<br> คลัง'],['notif','🔔<br> แจ้งเตือน'+ub],['set','⚙️<br> ตั้งค่า']].filter(Boolean);
- $('#nav').innerHTML=N.map(n=>`<a class="${S.view===n[0]?'on':''}" onclick="go('${n[0]}')">${n[1]}</a>`).join('');
- a.innerHTML=V[S.view]()}
-async function boot(u,role){S.user=u;S.role=role;await run(async()=>{if(!DEMO){const{data}=await sb.from('profiles').select('*').eq('id',u.id).single();S.prof=data;S.role=data.role}S.meta=await api.meta()});rt();go('home')}
-window.login=async()=>{if(DEMO)return boot({id:'demo'},$('#lr').value);const{data,error}=await sb.auth.signInWithPassword({email:$('#em').value,password:$('#pw').value});if(error)return toast('อีเมลหรือรหัสผ่านไม่ถูกต้อง');boot(data.user)};
-window.signup=async()=>{const{error}=await sb.auth.signUp({email:$('#em').value,password:$('#pw').value});toast(error?'สมัครไม่สำเร็จ':'สมัครแล้ว (หากเปิดยืนยันอีเมล โปรดตรวจอีเมล) — แอดมินต้องกำหนดบทบาทและโครงการให้')};
-window.logout=async()=>{if(!DEMO)await sb.auth.signOut();S.user=null;S.ch&&sb.removeChannel(S.ch);S.ch=null;render()};
-window.addEventListener('online',()=>toast('กลับมาออนไลน์แล้ว'));window.addEventListener('offline',()=>toast('ออฟไลน์ — ฉบับร่างยังถูกเก็บในเครื่อง'));
-const LOGO="data:image/jpeg;base64,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";
-// ===== V2: ฟิลด์เพิ่มเติมต่อฟอร์ม · ลายเซ็นผู้ส่ง · รูปผู้ตรวจ · วาดบนแบบ · PDF ตามฟอร์ม ISO · เอกสาร/คลัง/แจ้งเตือน/ตั้งค่า =====
-S.dw=[];S.media=[];S.drw=[];S.sg=[];S.nt=[];S.kb=[];
-[['FR-INS-ME-028',{signer:'ผู้ประกอบ'}],['FR-INS-ME-024',{ml:'แบบ/ตำแหน่ง'}]].forEach(([c,o])=>Object.assign(D.f.find(f=>f.code===c)||{},o));
-if(!D.f.find(f=>f.code==='FR-INS-ME-007'))D.f.push(mk('FR-INS-ME-007','แบบฟอร์มการตรวจสอบงานติดตั้งกระพ้อลำเลียง',['เช็คระดับ-ดิ่ง','เช็คระบบส่งกำลัง','เช็คน้ำมันเกียร์','ระยะห่างลูกกระพ้อ','ประกอบสายพาน','จุดยึดซอง','งานสี/ความเรียบร้อย'],{fields:[{k:'hp',l:'แรงม้า (hp)'},{k:'h',l:'สูง (m)'}],qu:'ต้น'}));
-const CAT={SUBMISSION:'รูปส่งตรวจ',INSPECTOR:'รูปผู้ตรวจ',DEFECT_AFTER:'รูปหลังแก้ไข'},DS={APPROVED:'อนุมัติแล้ว',GENERATED:'ผลตรวจ/Defect'},SGN={SUBMITTED:'ส่งแจ้งตรวจ',INSPECTED:'ผู้ตรวจเซ็น',APPROVED:'ผู้อนุมัติเซ็น'};
-const TH=d=>d?new Date(d).toLocaleDateString('th-TH',{day:'2-digit',month:'2-digit',year:'numeric'}):'';
-const u2d=u=>fetch(u).then(r=>r.blob()).then(b=>new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result);f.readAsDataURL(b)}));
-async function surl(bk,ps){if(!ps.length)return{};const{data,error}=await sb.storage.from(bk).createSignedUrls(ps,3600);if(error)throw error;return Object.fromEntries(data.map(x=>[x.path,x.signedUrl]))}
-const hq=f=>!!(f.qu||f.qu==='');
-Object.assign(api,{
- async media(id){if(DEMO)return[];const{data,error}=await sb.from('inspection_media').select('*').eq('inspection_id',id);if(error)throw error;const m=await surl('inspection-photos',data.map(x=>x.storage_path));return data.map(x=>({...x,url:m[x.storage_path]}))},
- async drawings(id){if(DEMO)return[];const{data,error}=await sb.from('inspection_drawings').select('*').eq('inspection_id',id);if(error)throw error;const m=await surl('drawings',data.map(x=>x.storage_path));return data.map(x=>({...x,url:m[x.storage_path]}))},
- async sigs(id){if(DEMO)return(D.sg||[]).filter(s=>s.inspection_id===id);const{data,error}=await sb.from('signatures').select('*').eq('inspection_id',id).order('signed_at');if(error)throw error;return data},
- async docOf(id){if(DEMO)return D.doc.find(d=>d.inspection_id===id)?.document_number;const{data}=await sb.from('documents').select('document_number').eq('inspection_id',id).maybeSingle();return data?.document_number},
- async docs(){if(DEMO)return D.doc.map(d=>({...d,inspections:D.i.find(i=>i.id===d.inspection_id)}));const{data,error}=await sb.from('documents').select('*,inspections(number,attempt,projects(code,name),form_versions(forms(code,name)))').order('created_at',{ascending:false}).limit(100);if(error)throw error;return data},
- async notifs(){if(DEMO)return[];const{data,error}=await sb.from('notifications').select('*').order('created_at',{ascending:false}).limit(50);if(error)throw error;return data},
- async kb(){if(DEMO)return[];const{data,error}=await sb.from('knowledge_items').select('*').order('created_at',{ascending:false});if(error)throw error;return data}});
-async function upPh(iid,it,f,cat,df){const b=await comp(f),p=iid+'/'+(it||'x')+'/'+uid()+'.jpg',u=await sb.storage.from('inspection-photos').upload(p,b,{contentType:'image/jpeg'});if(u.error)throw u.error;const{error}=await sb.from('inspection_media').insert({inspection_id:iid,item_id:it,uploaded_by:S.user.id,category:cat,storage_path:p,original_filename:f.name,mime_type:'image/jpeg',file_size:b.size,defect_id:df||null});if(error)throw error}
-const phUp=(it,fs,cat,df)=>{if(DEMO)return toast('โหมดเดโมไม่รองรับอัปโหลดรูป — ต่อ Supabase เพื่อใช้งานจริง');return run(async()=>{for(const f of fs)await upPh(S.cur.id,it,f,cat,df);S.media=await api.media(S.cur.id)},'อัปโหลดรูปแล้ว').then(render)};
-window.ipho=(it,fs)=>phUp(it,fs,'INSPECTOR');window.daf=(d,it,fs)=>phUp(it,fs,'DEFECT_AFTER',d);
-window.upx=(n,k,v)=>{const t=S.draft.items[n];(t.extra=t.extra||{})[k]=v;saveDraft()};
-const xf=(n,t,f)=>f?(f.fields||[]).map(x=>`<input placeholder="${esc(x.l)}" value="${esc((t.extra||{})[x.k]||'')}" oninput="upx(${n},'${x.k}',this.value)">`).join('')+(hq(f)?`<input type=number min=1 placeholder="จำนวน${f.qu?' ('+esc(f.qu)+')':''}" value="${t.qty}" oninput="upi(${n},'qty',+this.value)">`:''):'';
-// ----- วาด/วงกลม/ไฮไลท์บนแบบ -----
-function annot(file){return new Promise(res=>{const im=new Image();im.onload=()=>{const k=Math.min(1,1400/Math.max(im.width,im.height)),W=im.width*k,H=im.height*k,m=document.createElement('div');m.style='position:fixed;inset:0;background:#000d;z-index:20;overflow:auto;padding:8px';
- m.innerHTML=`<div style="background:#fff;padding:8px;border-radius:12px;max-width:1000px;margin:auto"><div class=g><button class=s id=t1>✏️ ปากกา</button><button class=s id=t2>⭕ วงกลม</button><button class=s id=t3>🖍 ไฮไลท์</button><button class=s id=un>↩ ย้อน</button></div><canvas width=${W} height=${H} style="width:100%;touch-action:none"></canvas><button id=ok>บันทึกแบบ</button><button class=s id=cx>ยกเลิก</button></div>`;document.body.append(m);
- const c=m.querySelector('canvas'),x=c.getContext('2d');let tool=1,st=[],cur=null;
- const draw=()=>{x.drawImage(im,0,0,W,H);[...st,cur].filter(Boolean).forEach(s=>{x.beginPath();x.lineCap='round';x.strokeStyle=s.t===3?'rgba(255,225,0,.45)':'#e11';x.lineWidth=s.t===3?22:4;if(s.t===2){const[a,b]=s.p[0],[e,f]=s.p[s.p.length-1];x.ellipse((a+e)/2,(b+f)/2,Math.abs(e-a)/2||1,Math.abs(f-b)/2||1,0,0,7)}else s.p.forEach((q,n)=>n?x.lineTo(...q):x.moveTo(...q));x.stroke()})};
- const p=e=>{const r=c.getBoundingClientRect();return[(e.clientX-r.left)*W/r.width,(e.clientY-r.top)*H/r.height]};
- c.onpointerdown=e=>{cur={t:tool,p:[p(e)]}};c.onpointermove=e=>{if(!cur)return;tool===2?cur.p[1]=p(e):cur.p.push(p(e));draw()};c.onpointerup=()=>{cur&&st.push(cur);cur=null;draw()};
- [1,2,3].forEach(n=>m.querySelector('#t'+n).onclick=()=>tool=n);m.querySelector('#un').onclick=()=>{st.pop();draw()};m.querySelector('#cx').onclick=()=>{m.remove();res(null)};m.querySelector('#ok').onclick=()=>c.toBlob(b=>{m.remove();res(b)},'image/jpeg',.85);draw()};im.src=URL.createObjectURL(file)})}
-window.addD=async f=>{if(!f)return;const b=await annot(f);if(b){S.dw.push(b);render()}};
-// ----- PDF ตามรูปแบบฟอร์ม -----
-const hd=(i,t)=>`<div class=hd><img src="${LOGO}"><div><b style="font-size:20px">บริษัท เจริญโภคภัณฑ์วิศวกรรม จำกัด</b><div style="font-size:16px"><b>${esc(t)}</b></div><div>โครงการ: ${esc(i.project?.code)} ${esc(i.project?.name)} &nbsp;&nbsp; บริษัท: ${esc(i.company?.name||'')} &nbsp;&nbsp; วันที่: ${TH(i.requested_at||i.when||i.created_at)}</div></div></div>`;
-const ft=(f,no,pg)=>`<div class=ft><span>${f.code}</span><span>${esc(no||'')}</span><span>${pg||'เอกสารแนบ'}</span></div>`;
-function cover(i,f,R,SG,no){const cl=f.cl,fl=f.fields||[],q=hq(f),sg=a=>SG.filter(s=>s.action===a).pop()||{},
- sb_=(l,a)=>{const s=sg(a);return`<div class=sg>${s.image?`<img src="${s.image}">`:'<div style="height:54px"></div>'}<div>${l}</div><div class=sm>${s.signed_at?TH(s.signed_at):'....../....../......'}</div></div>`},
- rows=[...Array(13)].map((_,n)=>{const t=i.items[n],rs=t?cl.map(c=>R.find(x=>x.item_id===t.id&&x.checklist_id===c.id)||{}):[],rm=t?[t.note,...cl.map((c,k)=>rs[k].result==='FAIL'?c.label+': '+(rs[k].comment||''):'')].filter(Boolean).join(' / '):'';
-  return`<tr><td class=c>${t?n+1:''}</td><td>${t?esc(t.name):''}</td><td>${t?esc(t.model):''}</td>${fl.map(x=>`<td class=c>${t?esc((t.extra||{})[x.k]||''):''}</td>`).join('')}${q?`<td class=c>${t?t.qty??'':''}</td>`:''}${cl.map((c,k)=>['PASS','FAIL'].map(v=>`<td class=c>${rs[k]?.result===v?'✓':''}</td>`).join('')).join('')}<td class=sm>${esc(rm)}</td></tr>`}).join('');
- return`${hd(i,f.name)}<table class=tb><tr><th rowspan=2>ลำดับ</th><th rowspan=2>รายการ</th><th rowspan=2>${f.ml||'รุ่น/แบบ/ตำแหน่ง'}</th>${fl.map(x=>`<th rowspan=2>${esc(x.l)}</th>`).join('')}${q?`<th rowspan=2>จำนวน${f.qu?' ('+f.qu+')':''}</th>`:''}${cl.map(c=>`<th colspan=2>${esc(c.label)}</th>`).join('')}<th rowspan=2>หมายเหตุ</th></tr><tr>${cl.map(()=>'<th>ผ่าน</th><th>ไม่ผ่าน</th>').join('')}</tr>${rows}</table>
- <div class=sgs>${sb_(f.signer||'ผู้ติดตั้ง','SUBMITTED')}${sb_('ผู้ตรวจสอบ','INSPECTED')}${sb_('ผู้อนุมัติ','APPROVED')}</div>${f.std?'<div style="margin-top:6px"><b><u>มาตรฐานงานตรวจสอบ</u></b></div>':''}${ft(f,no,'1/1')}`}
-const photoP=(i,f,t,ims,one)=>`${hd(i,t)}<div class="gr${one?' one':''}">${ims.map(m=>`<figure><img src="${m.d}"><figcaption>${esc(m.cap)}</figcaption></figure>`).join('')}</div>${ft(f)}`;
-function defectP(i,f,ds,M,SG,no){const s=SG.filter(x=>x.action==='INSPECTED').pop()||{},im=a=>a.slice(0,2).map(m=>`<img src="${m.d}">`).join('');
- return`<div class=hd><img src="${LOGO}"><div><b style="font-size:20px">บริษัท เจริญโภคภัณฑ์วิศวกรรม จำกัด</b><div class=sm>97 ถนนเย็นจิต แขวงทุ่งวัดดอน เขตสาทร กรุงเทพฯ 10120</div></div></div><div class=yb>บันทึก</div>
- <table class=tb style="margin:0"><tr><td style="width:60%">ถึง : ${esc(i.company?.name||'')}</td><td>เลขที่ : ${esc(no)}</td></tr><tr><td>โครงการ : ${esc(i.project?.code)} ${esc(i.project?.name)}</td><td>วันที่ : ${TH(new Date())}</td></tr><tr><td colspan=2>เรื่อง : แจ้งแก้ไขงานตรวจ ${f.code} ${esc(f.name)} (${esc(i.number||'')})</td></tr></table>
- <table class=tb style="height:760px"><tr style="height:24px"><th>ลำดับ</th><th>รูปถ่ายก่อนการแก้ไข</th><th>รายละเอียดงาน</th><th>รูปถ่ายหลังการแก้ไข</th><th>หมายเหตุ</th></tr>${[0,1,2,3].map(n=>{const d=ds[n];if(!d)return'<tr><td></td><td></td><td></td><td></td><td></td></tr>';const b=M.filter(m=>m.d&&m.item_id===d.item_id&&m.category==='INSPECTOR'),a=M.filter(m=>m.d&&m.defect_id===d.id);return`<tr class=dr><td class=c>${n+1}</td><td class=c>${im(b)}</td><td>${esc(d.description)}</td><td class=c>${im(a)}</td><td class=sm>${esc(d.correction_note||'')}</td></tr>`}).join('')}</table>
- <div class=sgs style="justify-content:flex-end"><div class=sg>${s.image?`<img src="${s.image}">`:''}<div>ผู้บันทึก</div><div class=sm>${s.signed_at?TH(s.signed_at):'....../....../......'}</div></div></div><div class=ft><span>FR-INS-ME-004</span><span></span><span>1/1</span></div>`}
-async function buildPdf(id,docNo){await document.fonts.load('12px Sarabun');
- const i=(await api.list()).find(x=>x.id===id),f=fm(i),[R,M,DW,SG]=await Promise.all([api.res(id),api.media(id),api.drawings(id),api.sigs(id)]);
- await Promise.all([...M,...DW].map(async m=>{m.d=await u2d(m.url).catch(()=>null)}));
- let pdf;const snap=async(h,land)=>{const w=document.createElement('div');w.className='pg'+(land?'':' pt');w.innerHTML=h;document.body.append(w);const c=await html2canvas(w,{scale:2,backgroundColor:'#fff'});w.remove();const jp=window.jspdf.jsPDF;if(!pdf)pdf=new jp({orientation:land?'l':'p',unit:'mm',format:'a4'});else pdf.addPage('a4',land?'l':'p');pdf.addImage(c.toDataURL('image/jpeg',.88),'JPEG',0,0,land?297:210,land?210:297)};
- await snap(cover(i,f,R,SG,docNo),1);
- const cap=m=>{const n=i.items.findIndex(t=>t.id===m.item_id);return n<0?'':'รายการ '+(n+1)+': '+i.items[n].name};
- for(const[c,t]of[['SUBMISSION','รูปภาพส่งตรวจ'],['INSPECTOR','รูปภาพตรวจสอบ']]){const a=M.filter(m=>m.category===c&&m.d).map(m=>({d:m.d,cap:cap(m)}));for(let k=0;k<a.length;k+=6)await snap(photoP(i,f,t,a.slice(k,k+6)),1)}
- for(const w of DW.filter(x=>x.d))await snap(photoP(i,f,'แบบ (Drawing)',[{d:w.d,cap:'แบบ/ตำแหน่งติดตั้ง'}],1),1);
- for(let k=0;k<i.defects.length;k+=4){const ds=i.defects.slice(k,k+4);await snap(defectP(i,f,ds,M,SG,ds[0].number),0)}
- return{blob:pdf.output('blob'),name:(docNo||i.number||'QC')+'.pdf'}}
-const dlb=p=>{const a=document.createElement('a');a.href=URL.createObjectURL(p.blob);a.download=p.name;a.click()};
-async function finishDoc(n){const dn=(n.status==='APPROVED'?await api.docOf(n.id):n.defects[0]?.number)||'',p=await buildPdf(n.id,dn);if(DEMO)return dlb(p);const path=n.id+'/'+(dn||n.number)+'.pdf',u=await sb.storage.from('documents').upload(path,p.blob,{contentType:'application/pdf'});if(u.error)throw u.error;await api.rpc('attach_document',{p_insp:n.id,p_path:path,p_number:dn||null})}
-// ----- views -----
-V.detail=()=>{const i=S.cur,f=fm(i),r=S.res,edit=isIns()&&i.status==='INSPECTING',A=[],img=m=>`<a href="${m.url}" target=_blank><img src="${m.url}" title="${CAT[m.category]||''}" style="width:64px;height:64px;object-fit:cover;border-radius:8px;margin:2px;border:2px solid ${m.category==='INSPECTOR'?'#0b6e4f':'#ddd'}"></a>`,cam=(fn,lb)=>`<label class=m>📷 ${lb}<input type=file accept="image/*" capture=environment multiple onchange="${fn}(this.files)"></label>`;
- if(isIns()&&i.status==='WAITING_INSPECTION')A.push(['start','เริ่มตรวจ','']);if(edit)A.push(['fin','ส่งผลตรวจ + เซ็น','']);
- if(isApp()&&i.status==='WAITING_APPROVAL')A.push(['ok','อนุมัติ + เซ็น',''],['no','ไม่อนุมัติ','d']);
- if(ext()&&i.status==='CORRECTION_REQUIRED'&&i.defects.length&&i.defects.every(d=>d.status!=='OPEN'))A.push(['re','แจ้งตรวจซ้ำ','']);
- if(i.status!=='DRAFT')A.push(['pdf','📄 ดูตัวอย่าง/ดาวน์โหลด PDF','s']);
- return`<button class=s onclick="go('list')">← กลับ</button><div class=card><b>${esc(f.code)}</b> ${chip(i.status)}<div>${esc(f.name)}</div><div class=m>${esc(i.number||'')} · Attempt ${i.attempt} · ${esc(i.project?.code)} · ${ME[i.method]||''}${i.requested_at?' · นัดตรวจ '+TH(i.requested_at):''}</div>${S.drw.length?'<div class=m>แบบ (Drawing)</div>'+S.drw.map(img).join(''):''}</div>
- ${i.defects.map(d=>`<div class=card style="border-left:4px solid var(--r)"><b>${esc(d.number)}</b> <span class=chip>${d.status}</span><div>${esc(d.description)}</div>${d.correction_note?`<div class=m>แก้ไข: ${esc(d.correction_note)}</div>`:''}${S.media.filter(m=>m.defect_id===d.id).map(img).join('')}${ext()&&d.status==='OPEN'&&i.status==='CORRECTION_REQUIRED'?`${cam(`daf.bind(0,'${d.id}','${d.item_id}')`,'รูปหลังแก้ไข')}<textarea id="c_${d.id}" placeholder="อธิบายการแก้ไข"></textarea><button onclick="corr('${d.id}')">ส่งการแก้ไข</button>`:''}${isIns()&&d.correction_note?`<button class=s onclick="tokb('${d.id}')">📚 เก็บเข้าคลังความรู้</button>`:''}</div>`).join('')}
- ${i.items.map((t,n)=>`<div class=card><b>${n+1}. ${esc(t.name)}</b><div class=m>${esc(t.model)}${(f.fields||[]).map(x=>' · '+esc(x.l)+' '+esc((t.extra||{})[x.k]||'-')).join('')}${hq(f)?' · จำนวน '+(t.qty??1):''}${t.note?' · '+esc(t.note):''}</div><div>${S.media.filter(m=>m.item_id===t.id&&m.category!=='DEFECT_AFTER').map(img).join('')}</div>${edit?cam(`ipho.bind(0,'${t.id}')`,'เพิ่มรูปตรวจ'):''}${f.cl.map(c=>{const x=r.find(q=>q.item_id===t.id&&q.checklist_id===c.id)||{};return`<div style="border-top:1px solid #eee;padding:6px 0">${esc(c.label)}${c.review?' <span class=chip>SOURCE_REVIEW_REQUIRED</span>':''}${edit?`<div class=g><button class="${x.result==='PASS'?'':'s'}" onclick="setR('${t.id}','${c.id}','PASS')">ผ่าน</button><button class="${x.result==='FAIL'?'d':'s'}" onclick="setR('${t.id}','${c.id}','FAIL')">ไม่ผ่าน</button></div>${x.result==='FAIL'?`<textarea placeholder="เหตุผล (จำเป็น)" onchange="cm('${t.id}','${c.id}',this.value)">${esc(x.comment)}</textarea>`:''}`:` <span class="chip ${x.result==='FAIL'?'f':x.result?'o':''}">${x.result==='PASS'?'ผ่าน':x.result==='FAIL'?'ไม่ผ่าน':'-'}</span> ${esc(x.comment)}`}</div>`}).join('')}</div>`).join('')}
- ${A.map(a=>`<button class="${a[2]}" onclick="act('${a[0]}')">${a[1]}</button>`).join('')}
- <div class=card><b>ประวัติ</b>${S.sg.map(s=>`<div class=m>${SGN[s.action]||esc(String(s.action).slice(0,60))} · ${new Date(s.signed_at).toLocaleString('th-TH')}</div>`).join('')||'<div class=m>-</div>'}</div>`};
-V.docs=()=>{const g={};S.docs.forEach(d=>{const p=d.inspections?.projects||d.inspections?.project;(g[p?.code||'-']=g[p?.code||'-']||[]).push(d)});
- return Object.keys(g).map(k=>`<h3>${esc(k)}</h3>`+g[k].map(d=>{const fo=d.inspections?.form_versions?.forms||(d.inspections&&fm(d.inspections));return`<div class=card><b>${esc(d.document_number)}</b> <span class="chip ${d.status==='APPROVED'?'o':'w'}">${DS[d.status]||d.status}</span><div class=m>${esc(fo?.name||'')} · Attempt ${d.inspections?.attempt||1}</div>${d.storage_path?`<div class=g><button onclick="dl('${d.storage_path}')">ดาวน์โหลด</button><button class=s onclick="sh('${d.storage_path}')">แชร์ (Line/อีเมล)</button></div>`:'<div class=m>ยังไม่มีไฟล์ PDF (DEMO: ดาวน์โหลดทันทีหลังอนุมัติ)</div>'}</div>`}).join('')).join('')||'<div class="card m">ยังไม่มีเอกสาร</div>'};
-const sUrl=(p,dn)=>sb.storage.from('documents').createSignedUrl(p,dn?300:604800,dn?{download:true}:undefined).then(r=>{if(r.error)throw r.error;return r.data.signedUrl});
-window.dl=p=>run(async()=>{location.href=await sUrl(p,1)});
-window.sh=p=>run(async()=>{const u=await sUrl(p);navigator.share?await navigator.share({title:'เอกสาร QC',url:u}):(await navigator.clipboard.writeText(u),toast('คัดลอกลิงก์แล้ว (ใช้ได้ 7 วัน)'))});
-V.kb=()=>S.kb.map(k=>`<div class=card><b>${esc(k.title)}</b> <span class=chip>${esc(k.category||'')}</span><div>อาการ: ${esc(k.symptom)}</div><div>การแก้ไข: ${esc(k.correction||'-')}</div></div>`).join('')||'<div class="card m">ยังไม่มีเรื่องในคลังความรู้</div>';
-window.tokb=id=>DEMO?toast('DEMO ไม่รองรับ'):run(async()=>{const d=S.cur.defects.find(x=>x.id===id),{error}=await sb.from('knowledge_items').insert({title:d.number,category:fm(S.cur).code,symptom:d.description,correction:d.correction_note,defect_id:id,published:true,created_by:S.user.id});if(error)throw error},'เพิ่มเข้าคลังความรู้แล้ว');
-V.notif=()=>S.nt.map(n=>`<div class=card onclick="${n.inspection_id?`open_('${n.inspection_id}')`:''}" style="${n.read?'':'border-left:4px solid var(--b)'}">${esc(n.message)}<div class=m>${new Date(n.created_at).toLocaleString('th-TH')}</div></div>`).join('')||'<div class="card m">ไม่มีการแจ้งเตือน</div>';
-V.set=()=>`<div class=card><b>โปรไฟล์</b><input id=fn value="${esc(S.prof?.full_name||'')}" placeholder="ชื่อ-สกุล"><div class=m>บทบาท: ${RL[S.role]}</div><button onclick="svp()">บันทึกโปรไฟล์</button><button class=d onclick="logout()">ออกจากระบบ</button></div><div class="card m">จัดการโครงการ/แบบฟอร์ม/ผู้ใช้: ใช้ Supabase Table Editor (หน้า Admin ในแอปอยู่ในแผนถัดไป)</div>`;
-window.svp=()=>run(async()=>{if(!DEMO){const{error}=await sb.from('profiles').update({full_name:$('#fn').value}).eq('id',S.user.id);if(error)throw error}},'บันทึกแล้ว');
-// ----- actions -----
-window.open_=async id=>{S.cur=S.list.find(i=>i.id===id);if(!S.cur)return toast('ไม่พบรายการ');await run(async()=>{[S.res,S.media,S.drw,S.sg]=await Promise.all([api.res(id),api.media(id),api.drawings(id),api.sigs(id)])});S.view='detail';render()};
-window.act=async k=>{const i=S.cur;let r,sg=null;
- if(k==='pdf')return void await run(async()=>{toast('กำลังสร้าง PDF…');dlb(await buildPdf(i.id,await api.docOf(i.id)))});
- if(k==='start')r=await run(()=>api.rpc('start_inspection',{p_id:i.id}),'เริ่มตรวจแล้ว');
- else if(k==='re')r=await run(()=>api.rpc('resubmit_inspection',{p_id:i.id}),'แจ้งตรวจซ้ำแล้ว');
- else{let c=null;if(k==='no'){c=prompt('เหตุผลที่ไม่อนุมัติ (จำเป็น)');if(!c)return}else{sg=await sign();if(!sg)return}
-  r=await run(()=>api.rpc(k==='fin'?'finalize_inspection':'approve_inspection',k==='fin'?{p_id:i.id,p_sig:sg}:{p_id:i.id,p_ok:k==='ok',p_comment:c,p_sig:sg}),'บันทึกแล้ว');
-  if(r&&DEMO&&sg){(D.sg=D.sg||[]).push({inspection_id:i.id,action:k==='fin'?'INSPECTED':'APPROVED',image:sg,signed_at:new Date().toISOString()});dsave()}
-  if(r&&(k==='ok'||k==='fin'))await run(async()=>{const n=(await api.list()).find(x=>x.id===i.id);if(k==='ok'||n.status==='CORRECTION_REQUIRED'){toast('กำลังสร้างเอกสาร PDF…');await finishDoc(n)}},'สร้างเอกสาร PDF แล้ว')}
- if(r)go('list')};
-go=async function(v){S.view=v;if(!['new','set'].includes(v))await run(async()=>{S.list=await api.list();if(v==='docs')S.docs=await api.docs();if(v==='kb')S.kb=await api.kb()});
- await run(async()=>{S.nt=await api.notifs();if(v==='notif'&&!DEMO&&S.nt.some(n=>!n.read))await sb.from('notifications').update({read:true}).eq('read',false)});render()};window.go=go;
-function rt(){if(DEMO||S.ch)return;S.ch=sb.channel('nt').on('postgres_changes',{event:'INSERT',schema:'public',table:'notifications',filter:'user_id=eq.'+S.user.id},p=>{toast('🔔 '+p.new.message);S.nt=[p.new,...S.nt];render()}).subscribe()}
+// ===== Router =====
+const NAV=[['dash','📊','ภาพรวม'],['inspections','📋','งานตรวจ'],['new','➕','ตรวจใหม่'],['defects','⚠️','Defect'],['docs','📄','เอกสาร'],['notifs','🔔','แจ้งเตือน'],['settings','⚙️','ตั้งค่า']];
+async function route(){
+  if(!sb)return;if(!me)return loginView();
+  $('#who').textContent=`${me.full_name||me.email} · ${RL[me.role]}`;$('#lo').style.display='';
+  if(me.status!=='active'){$('#nav').style.display='none';$('#app').innerHTML=`<div class="card"><h2>${me.status==='pending'?'รอผู้ดูแลระบบอนุมัติ':'บัญชีถูกระงับ'}</h2>กรุณาติดต่อผู้ดูแลระบบ</div>`;return}
+  const[p,a]=(location.hash.slice(2)||'dash').split('/');
+  const nav=NAV.slice();if(me.role==='admin')nav.push(['admin','🛠️','Admin']);
+  $('#nav').style.display='flex';$('#nav').innerHTML=nav.map(n=>`<a href="#/${n[0]}" class="${n[0]===p||(p==='i'&&n[0]==='inspections')?'on':''}"><span>${n[1]}</span>${n[2]}</a>`).join('');
+  $('#app').innerHTML='กำลังโหลด…';
+  try{await({dash,inspections,new:newInsp,i:detail,defects,docs,notifs,settings,admin,projects}[p]||dash)(a)}catch(e){console.error(e);$('#app').innerHTML='<div class="card">เกิดข้อผิดพลาด: '+esc(e.message)+'</div>'}
+}
+window.addEventListener('hashchange',route);
 
-(async()=>{if(!DEMO){const{data}=await sb.auth.getSession();if(data.session)return boot(data.session.user)}render()})();
+// ===== Dashboard / Projects =====
+async function dash(){
+  const[ins,def,pr]=await Promise.all([q(sb.from('inspections').select('status')),q(sb.from('defects').select('severity,status')),q(sb.from('projects').select('id'))]);
+  const c=s=>ins.filter(i=>i.status===s).length,od=def.filter(d=>d.status!=='closed');
+  const S=(l,n,k='')=>`<div class="stat ${k}"><b>${n}</b>${l}</div>`;
+  $('#app').innerHTML=`<h2>ภาพรวม</h2><div class="grid">${S('โครงการ',pr.length)}${S('งานตรวจทั้งหมด',ins.length)}${S('รอตรวจ',c('WAITING_INSPECTION'),'w')}${S('ต้องแก้ไข',c('CORRECTION_REQUIRED'),'r')}${S('รอตรวจซ้ำ',c('WAITING_REINSPECTION'),'w')}${S('รออนุมัติ',c('WAITING_APPROVAL'),'w')}${S('อนุมัติแล้ว',c('APPROVED'))}${S('Major ค้างอยู่',od.filter(d=>d.severity==='major').length,'r')}${S('Minor ค้างอยู่',od.filter(d=>d.severity==='minor').length,'w')}</div>
+  <p><a href="#/projects">จัดการโครงการ →</a></p>`}
+async function projects(){
+  const pr=await q(sb.from('projects').select('*').order('code'));
+  $('#app').innerHTML=`<h2>โครงการ</h2>`+pr.map(p=>`<div class="card"><h3>${esc(p.code)} ${esc(p.name)}</h3><span class="muted">${esc(p.client||'')}</span></div>`).join('')+(me.role==='admin'?'<p class="muted">เพิ่ม/แก้โครงการที่หน้า Admin</p>':'')}
+
+// ===== Inspections list / new =====
+async function inspections(){
+  const d=await q(sb.from('inspections').select('id,doc_no,status,created_at,projects(code),equipment(code,name)').order('created_at',{ascending:false}).limit(100));
+  $('#app').innerHTML=`<h2>งานตรวจ</h2>`+(d.map(i=>`<a href="#/i/${i.id}" style="text-decoration:none;color:inherit"><div class="card"><div class="row"><b>${esc(i.doc_no)}</b><span class="pill ${i.status}" style="flex:0">${ST[i.status]}</span></div><span class="muted">${esc(i.projects?.code)} · ${esc(i.equipment?.code||'-')} ${esc(i.equipment?.name||'')} · ${fmt(i.created_at)}</span></div></a>`).join('')||'<div class="card muted">ยังไม่มีงานตรวจ</div>')}
+async function newInsp(){
+  if(!W())return $('#app').innerHTML='<div class="card">บทบาทผู้เข้าชมสร้างงานตรวจไม่ได้</div>';
+  const[pr,fm]=await Promise.all([q(sb.from('projects').select('*').eq('active',true).order('code')),q(sb.from('form_template_versions').select('id,version,equipment_fields,form_templates(code,name,active)').eq('status','published'))]);
+  const forms=fm.filter(f=>f.form_templates.active);
+  $('#app').innerHTML=`<h2>สร้างงานตรวจ</h2><div class="card">
+  <label>1. โครงการ</label><select id="np" onchange="loadEq()">${pr.map(p=>`<option value="${p.id}">${esc(p.code)} ${esc(p.name)}</option>`).join('')}</select>
+  <label>2. แบบฟอร์ม</label><select id="nf" onchange="eqFields()">${forms.map(f=>`<option value="${f.id}" data-f='${esc(JSON.stringify(f.equipment_fields))}'>${esc(f.form_templates.code)} ${esc(f.form_templates.name)}</option>`).join('')}</select>
+  <label>3. อุปกรณ์</label><select id="ne" onchange="eqFill()"></select>
+  <div id="eqf"></div>
+  <button onclick="createInsp()" style="width:100%">เริ่มตรวจ</button></div>`;
+  window._forms=forms;await loadEq();eqFields();
+}
+async function loadEq(){window._eq=await q(sb.from('equipment').select('*').eq('project_id',$('#np').value).order('code'));$('#ne').innerHTML='<option value="">➕ อุปกรณ์ใหม่</option>'+_eq.map(e=>`<option value="${e.id}">${esc(e.code)} ${esc(e.name||'')}</option>`).join('');eqFill()}
+function eqFields(){const f=JSON.parse($('#nf').selectedOptions[0].dataset.f||'[]');
+  $('#eqf').innerHTML=`<label>รหัสอุปกรณ์ (Code)</label><input id="e_code"><label>ชื่อ</label><input id="e_name"><label>Model</label><input id="e_model"><label>ตำแหน่ง (Position)</label><input id="e_pos"><label>รายละเอียด</label><input id="e_detail">`+f.filter(x=>!['model','pos','item'].includes(x.k)).map(x=>`<label>${esc(x.l)}</label><input data-x="${esc(x.k)}" data-l="${esc(x.l)}">`).join('');eqFill()}
+function eqFill(){const e=_eq?.find(x=>x.id===$('#ne').value);const set=(i,v)=>{const el=$('#'+i);if(el){el.value=v||'';el.readOnly=!!e}};set('e_code',e?.code);set('e_name',e?.name);set('e_model',e?.model);set('e_pos',e?.position);set('e_detail',e?.detail)}
+async function createInsp(){
+  const pid=$('#np').value,vid=$('#nf').value;if(!pid||!vid)return toast('เลือกโครงการและแบบฟอร์ม');
+  let eid=$('#ne').value;
+  if(!eid){const code=$('#e_code').value.trim();if(!code)return toast('กรอกรหัสอุปกรณ์');
+    const e=await q(sb.from('equipment').insert({project_id:pid,code,name:$('#e_name').value,model:$('#e_model').value,position:$('#e_pos').value,detail:$('#e_detail').value}).select().single());eid=e.id}
+  const xd={};document.querySelectorAll('#eqf [data-x]').forEach(i=>{if(i.value)xd[i.dataset.l]=i.value});
+  const v=_forms.find(f=>f.id===vid),pj=(await q(sb.from('projects').select('code').eq('id',pid).single())).code;
+  const pre=`${v.form_templates.code}-${pj}-`;const{count}=await sb.from('inspections').select('id',{count:'exact',head:true}).like('doc_no',pre+'%');
+  const doc_no=pre+String((count||0)+1).padStart(3,'0');
+  const ins=await q(sb.from('inspections').insert({doc_no,project_id:pid,version_id:vid,equipment_id:eid,equipment_data:xd,created_by:me.id}).select().single());
+  const items=await q(sb.from('checklist_items').select('*').eq('version_id',vid).order('sort'));
+  await q(sb.from('inspection_items').insert(items.map(i=>({inspection_id:ins.id,checklist_item_id:i.id,sort:i.sort,title:i.title}))));
+  await sb.from('equipment_history').insert({equipment_id:eid,inspection_id:ins.id,note:'ตรวจตาม '+doc_no,by:me.id});
+  await audit('create_inspection','inspection',ins.id,{doc_no});location.hash='#/i/'+ins.id}
+
+// ===== Inspection detail =====
+async function detail(id){
+  const[ins,items,defs,evs,sigs]=await Promise.all([
+    q(sb.from('inspections').select('*,projects(code,name),equipment(*),form_template_versions(version,form_templates(code,name))').eq('id',id).single()),
+    q(sb.from('inspection_items').select('*').eq('inspection_id',id).order('sort')),
+    q(sb.from('defects').select('*,defect_corrections(*)').eq('inspection_id',id).order('created_at')),
+    q(sb.from('evidence').select('*,evidence_annotations(shapes)').eq('inspection_id',id).order('at')),
+    q(sb.from('signatures').select('*').eq('inspection_id',id).order('at'))]);
+  window._cur={ins,items,defs,evs,sigs};
+  const s=ins.status,edit=(s==='DRAFT'&&W())||(s==='INSPECTING'&&R('inspector'));
+  const th=(e)=>`<div class="thumb" onclick="markup('${e.id}')"><img data-p="${esc(e.path)}" alt="">${e.evidence_annotations?.length?`<svg viewBox="0 0 ${e.evidence_annotations.at(-1).shapes.w} ${e.evidence_annotations.at(-1).shapes.h}" preserveAspectRatio="xMidYMid slice">${shapesSVG(e.evidence_annotations.at(-1).shapes.list)}</svg>`:''}</div>`;
+  $('#app').innerHTML=`<a href="#/inspections">← กลับ</a><div class="card"><div class="row"><h2 style="margin:0">${esc(ins.doc_no)}</h2><span class="pill ${s}" style="flex:0">${ST[s]}</span></div>
+  <div class="muted">${esc(ins.projects.code)} ${esc(ins.projects.name)}<br>${esc(ins.form_template_versions.form_templates.name)} (v${ins.form_template_versions.version})<br>อุปกรณ์: ${esc(ins.equipment?.code)} ${esc(ins.equipment?.name||'')} ${esc(ins.equipment?.model||'')} ${esc(ins.equipment?.position||'')}${Object.entries(ins.equipment_data||{}).map(([k,v])=>` · ${esc(k)}: ${esc(v)}`).join('')}</div></div>
+  <div class="card"><h3>รายการตรวจ</h3>${items.map(it=>{const d=defs.find(d=>d.inspection_item_id===it.id);return`<div class="item"><b>${it.sort}. ${esc(it.title)}</b>
+   ${edit?`<div class="pf"><button class="p ${it.result==='pass'?'on':''}" onclick="setRes('${it.id}','pass')">✓ ผ่าน</button><button class="f ${it.result==='fail'?'on':''}" onclick="setRes('${it.id}','fail')">✗ ไม่ผ่าน</button></div>
+   <input placeholder="หมายเหตุ" value="${esc(it.remark)}" onchange="setRemark('${it.id}',this.value)">`:`<div>${it.result==='pass'?'<span class="pill APPROVED">ผ่าน</span>':it.result==='fail'?'<span class="pill major">ไม่ผ่าน</span>':'<span class="pill">ยังไม่ตรวจ</span>'} ${esc(it.remark||'')}</div>`}
+   <div class="thumbs">${evs.filter(e=>e.inspection_item_id===it.id&&e.kind==='photo').map(th).join('')}${edit?`<button class="sec" onclick="addPhoto('${it.id}')">📷 เพิ่มรูป</button>`:''}</div>
+   <div class="muted">${it.checked_at?`${fmt(it.checked_at)}`:''}</div>${d?`<span class="pill ${d.severity}">Defect ${d.severity==='major'?'Major':'Minor'} · ${d.status==='open'?'เปิด':d.status==='corrected'?'แก้แล้ว':'ปิด'}</span>`:''}</div>`}).join('')}</div>
+  ${defs.length?`<div class="card"><h3>Defect (${defs.length})</h3>${defs.map(d=>defectCard(d,ins,evs,items,th)).join('')}</div>`:''}
+  <div class="card"><h3>ลายเซ็น</h3>${sigs.map(g=>`<div class="row"><img src="${g.image}" style="height:50px;flex:0"><span class="muted">${esc(g.signer_name)} (${RL[g.role]}) · ${esc(g.purpose)} · ${fmt(g.at)}</span></div>`).join('')||'<span class="muted">ยังไม่มี</span>'}</div>
+  <div class="card" id="act">${actions(ins,items,defs)}</div>`;
+  hydrate();
+}
+function defectCard(d,ins,evs,items,th){
+  const it=items.find(i=>i.id===d.inspection_item_id),s=ins.status;
+  const before=evs.filter(e=>e.inspection_item_id===d.inspection_item_id&&e.kind==='photo'),after=evs.filter(e=>e.defect_id===d.id);
+  const canFix=s==='CORRECTION_REQUIRED'&&d.status==='open'&&W(),canRe=s==='WAITING_REINSPECTION'&&d.status==='corrected'&&R('inspector');
+  return`<div class="item"><b>${esc(it?.title)}</b> <span class="pill ${d.severity}">${d.severity==='major'?'Major':'Minor'}</span> <span class="pill ${d.status==='closed'?'closed':''}">${d.status==='open'?'เปิด':d.status==='corrected'?'แก้แล้ว รอตรวจซ้ำ':'ปิด'}</span>
+  ${R('inspector')&&s==='INSPECTING'?`<select onchange="upd('defects','${d.id}',{severity:this.value})"><option value="minor" ${d.severity==='minor'?'selected':''}>Minor</option><option value="major" ${d.severity==='major'?'selected':''}>Major</option></select><input placeholder="รายละเอียด Defect" value="${esc(d.detail)}" onchange="upd('defects','${d.id}',{detail:this.value})">`:`<div>${esc(d.detail||'')}</div>`}
+  <div class="muted">รูปก่อนแก้ไข</div><div class="thumbs">${before.map(th).join('')||'-'}</div>
+  <div class="muted">รูปหลังแก้ไข</div><div class="thumbs">${after.map(th).join('')}${canFix?`<button class="sec" onclick="addPhoto(null,'${d.id}')">📷 รูปหลังแก้ไข</button>`:''}</div>
+  ${(d.defect_corrections||[]).sort((a,b)=>a.at<b.at?-1:1).map(c=>`<div class="muted">• ${c.kind==='correction'?'แก้ไข':'ตรวจซ้ำ'+(c.passed?' (ผ่าน)':' (ไม่ผ่าน)')}: ${esc(c.note||'')} · ${fmt(c.at)}</div>`).join('')}
+  ${canFix?`<input id="cn${d.id}" placeholder="บันทึกการแก้ไข"><button class="org" onclick="correct('${d.id}')">บันทึกว่าแก้ไขแล้ว</button>`:''}
+  ${canRe?`<input id="rn${d.id}" placeholder="หมายเหตุตรวจซ้ำ"><div class="pf"><button class="p on" onclick="reinspect('${d.id}',true)">ผ่าน</button><button class="f on" onclick="reinspect('${d.id}',false)">ไม่ผ่าน</button></div>`:''}</div>`}
+function actions(ins,items,defs){
+  const s=ins.status,b=(t,f,c='')=>`<button class="${c}" style="width:100%;margin:4px 0" onclick="${f}">${t}</button>`;let h='';
+  if(s==='DRAFT'&&W())h+=b('ส่งตรวจ (ต้องเซ็นชื่อ)',"submitInsp()");
+  if(s==='WAITING_INSPECTION'&&R('inspector'))h+=b('เริ่มตรวจ',"setStatus('INSPECTING')");
+  if(s==='INSPECTING'&&R('inspector'))h+=b('ตรวจเสร็จ (ต้องเซ็นชื่อ)',"finishInsp()");
+  if(s==='CORRECTION_REQUIRED'&&W()){const left=defs.filter(d=>d.status==='open').length;h+=left?`<span class="muted">เหลือ Defect ที่ต้องแก้ ${left} รายการ</span>`:b('ส่งตรวจซ้ำ',"setStatus('WAITING_REINSPECTION')")}
+  if(s==='WAITING_REINSPECTION'&&R('inspector')&&!defs.some(d=>d.status==='corrected'))h+=b('สรุปผลตรวจซ้ำ',"afterReinspect()");
+  if(s==='WAITING_APPROVAL'&&R('approver'))h+=b('อนุมัติ (ต้องเซ็นชื่อ)',"approve()")+b('ไม่อนุมัติ',"reject()",'red');
+  if(s==='APPROVED')h+=b('ดูเอกสาร','location.hash=\'#/docs\'','sec');
+  return h||'<span class="muted">ไม่มีการดำเนินการที่ทำได้ในสถานะนี้</span>'}
+async function hydrate(){document.querySelectorAll('img[data-p]').forEach(async i=>{i.src=await url(i.dataset.p)})}
+async function upd(t,id,v){await q(sb.from(t).update(v).eq('id',id))}
+async function setRemark(id,v){await upd('inspection_items',id,{remark:v})}
+async function setRes(id,r){
+  const{ins,items,defs}=_cur,it=items.find(i=>i.id===id);
+  await q(sb.from('inspection_items').update({result:r,checked_by:me.id,checked_at:new Date().toISOString()}).eq('id',id));
+  await sb.from('inspection_results').insert({inspection_item_id:id,result:r,remark:it.remark,by:me.id});
+  const d=defs.find(d=>d.inspection_item_id===id);
+  if(r==='fail'&&!d)await q(sb.from('defects').insert({project_id:ins.project_id,inspection_id:ins.id,inspection_item_id:id,equipment_id:ins.equipment_id,detail:it.title+(it.remark?' — '+it.remark:''),reported_by:me.id}));
+  if(r==='pass'&&d&&d.status==='open'&&!(d.defect_corrections||[]).length)await q(sb.from('defects').delete().eq('id',d.id));
+  detail(ins.id)}
+async function addPhoto(itemId,defectId){
+  const f=await pick();if(!f)return;const{ins,defs}=_cur;toast('กำลังอัปโหลด…');
+  const blob=await compress(f),path=`${ins.id}/${crypto.randomUUID()}.jpg`;
+  const{error}=await sb.storage.from('evidence').upload(path,blob,{contentType:'image/jpeg'});if(error)return toast(error.message);
+  const d=defectId&&defs.find(x=>x.id===defectId);
+  await q(sb.from('evidence').insert({inspection_id:ins.id,inspection_item_id:itemId||d?.inspection_item_id,defect_id:defectId||null,kind:defectId?'after':'photo',path,uploaded_by:me.id}));
+  detail(ins.id)}
+async function setStatus(s,extra){const{ins}=_cur;await q(sb.from('inspections').update({status:s,updated_at:new Date().toISOString()}).eq('id',ins.id));await audit('status:'+s,'inspection',ins.id,extra);
+  const map={WAITING_INSPECTION:['inspector','มีงานรอตรวจ '+ins.doc_no],WAITING_APPROVAL:['approver','มีงานรออนุมัติ '+ins.doc_no],CORRECTION_REQUIRED:['installer','ต้องแก้ไข Defect '+ins.doc_no],WAITING_REINSPECTION:['inspector','รอตรวจซ้ำ '+ins.doc_no]};
+  if(map[s])await notifyRole(map[s][0],map[s][1],'#/i/'+ins.id);detail(ins.id)}
+async function sign(purpose){
+  return new Promise(res=>{const m=document.createElement('div');m.className='modal';m.innerHTML=`<div><h3>ลายเซ็น — ${esc(purpose)}</h3><canvas class="sig" id="sg"></canvas><div class="row"><button class="sec" id="sc">ล้าง</button><button class="sec" id="sx">ยกเลิก</button><button id="so">ยืนยัน</button></div></div>`;document.body.append(m);
+  const c=m.querySelector('#sg');c.width=c.clientWidth*2;c.height=360;const x=c.getContext('2d');x.lineWidth=4;x.lineCap='round';let dr=false,dirty=false;
+  const pt=e=>{const r=c.getBoundingClientRect();return[(e.clientX-r.left)*c.width/r.width,(e.clientY-r.top)*c.height/r.height]};
+  c.onpointerdown=e=>{dr=true;c.setPointerCapture(e.pointerId);x.beginPath();x.moveTo(...pt(e))};c.onpointermove=e=>{if(dr){x.lineTo(...pt(e));x.stroke();dirty=true}};c.onpointerup=()=>dr=false;
+  m.querySelector('#sc').onclick=()=>{x.clearRect(0,0,c.width,c.height);dirty=false};m.querySelector('#sx').onclick=()=>{m.remove();res(null)};
+  m.querySelector('#so').onclick=async()=>{if(!dirty)return toast('กรุณาเซ็นชื่อ');const img=c.toDataURL('image/png');m.remove();
+   await q(sb.from('signatures').insert({inspection_id:_cur.ins.id,signer:me.id,signer_name:me.full_name||me.email,role:me.role,purpose,image:img}));res(img)}})}
+async function submitInsp(){const{items}=_cur;if(items.some(i=>!i.result))return toast('ตรวจให้ครบทุกรายการก่อนส่ง');if(!await sign('ส่งตรวจ'))return;await setStatus('WAITING_INSPECTION')}
+async function finishInsp(){const{items,defs}=_cur;if(items.some(i=>!i.result))return toast('ตรวจให้ครบทุกรายการก่อน');if(!await sign('ผลการตรวจ'))return;await setStatus(defs.some(d=>d.status==='open')?'CORRECTION_REQUIRED':'WAITING_APPROVAL')}
+async function correct(id){await q(sb.from('defect_corrections').insert({defect_id:id,kind:'correction',note:$('#cn'+id).value,by:me.id}));await upd('defects',id,{status:'corrected'});await audit('correct','defect',id);detail(_cur.ins.id)}
+async function reinspect(id,ok){await q(sb.from('defect_corrections').insert({defect_id:id,kind:'reinspection',passed:ok,note:$('#rn'+id).value,by:me.id}));await upd('defects',id,{status:ok?'closed':'open'});await audit('reinspect','defect',id,{ok});detail(_cur.ins.id)}
+async function afterReinspect(){const d=await q(sb.from('defects').select('status').eq('inspection_id',_cur.ins.id));await setStatus(d.some(x=>x.status==='open')?'CORRECTION_REQUIRED':'WAITING_APPROVAL')}
+async function reject(){const n=prompt('เหตุผลที่ไม่อนุมัติ');if(n===null)return;await setStatus('REJECTED',{reason:n})}
+async function approve(){
+  if(!await sign('อนุมัติเอกสาร'))return;const{ins}=_cur;
+  const snap=await snapshot(ins.id);let doc=(await q(sb.from('documents').select('*').eq('inspection_id',ins.id)))[0];
+  if(!doc)doc=await q(sb.from('documents').insert({inspection_id:ins.id,doc_no:ins.doc_no,current_rev:0}).select().single());
+  await q(sb.from('document_versions').insert({document_id:doc.id,rev:doc.current_rev,snapshot:snap,locked:true,created_by:me.id}));
+  await setStatus('APPROVED')}
+async function snapshot(id){const[ins,items,defs,evs,sigs]=await Promise.all([q(sb.from('inspections').select('*,projects(code,name,client),equipment(*),form_template_versions(version,form_templates(code,name,company))').eq('id',id).single()),q(sb.from('inspection_items').select('*').eq('inspection_id',id).order('sort')),q(sb.from('defects').select('*,defect_corrections(*)').eq('inspection_id',id)),q(sb.from('evidence').select('id,inspection_item_id,defect_id,kind,path,evidence_annotations(shapes)').eq('inspection_id',id)),q(sb.from('signatures').select('*').eq('inspection_id',id).order('at'))]);return{ins,items,defs,evs,sigs,at:new Date().toISOString()}}
+
+// ===== Markup (SVG annotation; ต้นฉบับไม่ถูกแก้) =====
+function shapesSVG(l){return l.map(s=>{const c=`stroke="${s.c}" stroke-width="${s.w}" fill="none" stroke-linecap="round"`;
+  if(s.t==='pen')return`<polyline points="${s.p.map(p=>p.join(',')).join(' ')}" ${c}/>`;
+  if(s.t==='line')return`<line x1="${s.a[0]}" y1="${s.a[1]}" x2="${s.b[0]}" y2="${s.b[1]}" ${c}/>`;
+  if(s.t==='hl')return`<line x1="${s.a[0]}" y1="${s.a[1]}" x2="${s.b[0]}" y2="${s.b[1]}" stroke="#ffeb3b" stroke-opacity=".5" stroke-width="${s.w*6}" stroke-linecap="round"/>`;
+  if(s.t==='circle'){const rx=Math.abs(s.b[0]-s.a[0])/2,ry=Math.abs(s.b[1]-s.a[1])/2;return`<ellipse cx="${(s.a[0]+s.b[0])/2}" cy="${(s.a[1]+s.b[1])/2}" rx="${rx}" ry="${ry}" ${c}/>`}
+  if(s.t==='arrow'){const[x1,y1]=s.a,[x2,y2]=s.b,a=Math.atan2(y2-y1,x2-x1),L=s.w*5;return`<g ${c}><line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/><polyline points="${x2-L*Math.cos(a-.5)},${y2-L*Math.sin(a-.5)} ${x2},${y2} ${x2-L*Math.cos(a+.5)},${y2-L*Math.sin(a+.5)}"/></g>`}
+  if(s.t==='text')return`<text x="${s.a[0]}" y="${s.a[1]}" fill="${s.c}" font-size="${s.w*6}" font-weight="700" font-family="Sarabun,sans-serif">${esc(s.s)}</text>`;return''}).join('')}
+async function markup(evId){
+  const e=_cur.evs.find(x=>x.id===evId),u=await url(e.path),bm=await createImageBitmap(await (await fetch(u)).blob());
+  const prev=e.evidence_annotations?.at(-1)?.shapes?.list||[];let list=JSON.parse(JSON.stringify(prev)),redo=[],tool='circle',cur=null;
+  const W_=bm.width,H_=bm.height,sw=Math.max(W_,H_)/180,ro=!(R('inspector')||(W()&&_cur.ins.status==='DRAFT'));
+  const m=document.createElement('div');m.className='modal';
+  m.innerHTML=`<div><div class="tools">${ro?'':['circle:○ วงกลม','arrow:➚ ลูกศร','line:／ เส้น','hl:▬ ไฮไลต์','pen:✎ ปากกา','text:T ข้อความ'].map(t=>`<button class="${t.startsWith('circle')?'on':''}" data-t="${t.split(':')[0]}">${t.split(':')[1]}</button>`).join('')}${ro?'':'<input type="color" id="mc" value="#ff2d2d" style="width:46px;padding:2px;margin:0">'}</div>
+  <svg class="ed" viewBox="0 0 ${W_} ${H_}"><image href="${u}" width="${W_}" height="${H_}"/><g id="sh"></g></svg>
+  <div class="row" style="margin-top:8px">${ro?'':'<button class="sec" id="mu">↶ ย้อน</button><button class="sec" id="mr">↷ ทำซ้ำ</button><button class="sec" id="mc2">ลบทั้งหมด</button><button id="ms">บันทึก</button>'}<button class="sec" id="mx">ปิด</button></div></div>`;
+  document.body.append(m);const svg=m.querySelector('svg'),g=m.querySelector('#sh'),draw=()=>g.innerHTML=shapesSVG(cur?[...list,cur]:list);draw();
+  const pt=ev=>{const p=svg.createSVGPoint();p.x=ev.clientX;p.y=ev.clientY;const r=p.matrixTransform(svg.getScreenCTM().inverse());return[Math.round(r.x),Math.round(r.y)]};
+  m.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{tool=b.dataset.t;m.querySelectorAll('[data-t]').forEach(x=>x.classList.toggle('on',x===b))});
+  if(!ro){svg.onpointerdown=ev=>{const c=m.querySelector('#mc').value,p=pt(ev);if(tool==='text'){const s=prompt('ข้อความ');if(s){list.push({t:'text',a:p,s,c,w:sw});redo=[];draw()}return}
+    svg.setPointerCapture(ev.pointerId);cur=tool==='pen'?{t:'pen',p:[p],c,w:sw}:{t:tool,a:p,b:p,c,w:sw}};
+  svg.onpointermove=ev=>{if(!cur)return;const p=pt(ev);if(cur.t==='pen')cur.p.push(p);else cur.b=p;draw()};
+  svg.onpointerup=()=>{if(cur){list.push(cur);cur=null;redo=[];draw()}};
+  m.querySelector('#mu').onclick=()=>{if(list.length){redo.push(list.pop());draw()}};m.querySelector('#mr').onclick=()=>{if(redo.length){list.push(redo.pop());draw()}};
+  m.querySelector('#mc2').onclick=()=>{redo=[];list=[];draw()};
+  m.querySelector('#ms').onclick=async()=>{await q(sb.from('evidence_annotations').insert({evidence_id:evId,shapes:{w:W_,h:H_,list},by:me.id}));m.remove();detail(_cur.ins.id)}}
+  m.querySelector('#mx').onclick=()=>m.remove()}
+
+// ===== Defects / Docs / Notifs / Settings =====
+async function defects(){
+  const d=await q(sb.from('defects').select('*,inspections(id,doc_no,status),inspection_items(title)').order('created_at',{ascending:false}).limit(100));
+  const f=location.hash.includes('re')?d.filter(x=>x.status==='corrected'):d;
+  $('#app').innerHTML=`<h2>Defect</h2><div class="row"><button class="${f===d?'':'sec'}" onclick="location.hash='#/defects'">ทั้งหมด</button><button class="${f===d?'sec':''}" onclick="location.hash='#/defects/re'">รอตรวจซ้ำ (Reinspection)</button></div><br>`+(f.map(x=>`<a href="#/i/${x.inspections.id}" style="text-decoration:none;color:inherit"><div class="card"><b>${esc(x.inspections.doc_no)}</b> <span class="pill ${x.severity}">${x.severity==='major'?'Major':'Minor'}</span> <span class="pill ${x.status==='closed'?'closed':''}">${x.status==='open'?'เปิด':x.status==='corrected'?'แก้แล้ว':'ปิด'}</span><br>${esc(x.inspection_items?.title||'')}<div class="muted">${esc(x.detail||'')}</div></div></a>`).join('')||'<div class="card muted">ไม่มีรายการ</div>')}
+async function docs(a){
+  if(a)return docView(a);
+  const d=await q(sb.from('documents').select('id,doc_no,current_rev,document_versions(id,rev,locked,created_at)').order('created_at',{ascending:false}));
+  $('#app').innerHTML=`<h2>เอกสาร</h2>`+(d.map(x=>`<div class="card"><b>${esc(x.doc_no)}</b>${x.document_versions.sort((a,b)=>b.rev-a.rev).map(v=>`<div class="row"><span>Rev ${v.rev} ${v.locked?'🔒':'(แก้ไขได้)'} <span class="muted">${fmt(v.created_at)}</span></span><button class="sec" onclick="location.hash='#/docs/${v.id}'">เปิด</button></div>`).join('')}${R('approver')?`<button class="org" onclick="newRev('${x.id}')">สร้าง Revision ใหม่</button>`:''}</div>`).join('')||'<div class="card muted">เอกสารจะถูกสร้างเมื่ออนุมัติงานตรวจ</div>')}
+async function newRev(did){const doc=await q(sb.from('documents').select('*').eq('id',did).single());const snap=await snapshot(doc.inspection_id),r=doc.current_rev+1;
+  await q(sb.from('document_versions').insert({document_id:did,rev:r,snapshot:snap,locked:false,created_by:me.id}));await upd('documents',did,{current_rev:r});await audit('new_revision','document',did,{rev:r});route()}
+async function lockRev(id){await upd('document_versions',id,{locked:true});await audit('lock_revision','document_version',id);route()}
+async function docView(vid){
+  const v=await q(sb.from('document_versions').select('*,documents(doc_no)').eq('id',vid).single()),s=v.snapshot,I=s.ins,fm=I.form_template_versions.form_templates;
+  const ph=async(list)=>(await Promise.all(list.map(async e=>`<img class="ph" src="${await url(e.path)}">`))).join('');
+  const rows=await Promise.all(s.items.map(async it=>{const d=s.defs.find(x=>x.inspection_item_id===it.id);return`<tr><td>${it.sort}</td><td>${esc(it.title)}</td><td>${it.result==='pass'?'ผ่าน':it.result==='fail'?'ไม่ผ่าน':'-'}</td><td>${esc(it.remark||'')}</td><td>${await ph(s.evs.filter(e=>e.inspection_item_id===it.id&&e.kind==='photo'))}</td></tr>`}));
+  const drows=await Promise.all(s.defs.map(async(d,i)=>`<tr><td>${i+1}</td><td>${esc(d.detail||'')} (${d.severity})</td><td>${await ph(s.evs.filter(e=>e.inspection_item_id===d.inspection_item_id&&e.kind==='photo'))}</td><td>${await ph(s.evs.filter(e=>e.defect_id===d.id))}</td><td>${(d.defect_corrections||[]).map(c=>esc(c.note||'')).join('<br>')}</td></tr>`));
+  const sg=r=>s.sigs.filter(x=>x.role===r).slice(-1).map(x=>`<img class="sg" src="${x.image}"><br>${esc(x.signer_name)}<br>${fmt(x.at)}`).join('')||'<br><br>';
+  $('#app').innerHTML=`<div class="row noprint"><button class="sec" onclick="location.hash='#/docs'">← กลับ</button><button onclick="window.print()">พิมพ์ / บันทึก PDF</button>${!v.locked&&R('approver')?`<button class="org" onclick="lockRev('${v.id}')">ล็อก Revision</button>`:''}</div><br>
+  <div class="doc"><div style="text-align:center"><b>${esc(fm.company||'บริษัท เจริญโภคภัณฑ์วิศวกรรม จำกัด')}</b><br><b>${esc(fm.name)}</b></div><br>
+  <table><tr><td>โครงการ: ${esc(I.projects.code)} ${esc(I.projects.name)}</td><td>เลขที่เอกสาร: ${esc(I.doc_no)}</td></tr><tr><td>Revision: ${v.rev} ${v.locked?'(ล็อกแล้ว)':''}</td><td>วันที่: ${fmt(s.at)}</td></tr>
+  <tr><td colspan="2">อุปกรณ์: ${esc(I.equipment?.code)} ${esc(I.equipment?.name||'')} ${esc(I.equipment?.model||'')} ${esc(I.equipment?.position||'')} ${Object.entries(I.equipment_data||{}).map(([k,x])=>esc(k)+': '+esc(x)).join(' · ')}</td></tr></table><br>
+  <table><tr><th>#</th><th>รายการ</th><th>ผลตรวจ</th><th>หมายเหตุ</th><th>รูปภาพ</th></tr>${rows.join('')}</table>
+  ${s.defs.length?`<br><b>Defect (FR-INS-ME-004)</b><table><tr><th>#</th><th>รายละเอียด</th><th>ก่อนแก้ไข</th><th>หลังแก้ไข</th><th>การแก้ไข</th></tr>${drows.join('')}</table>`:''}
+  <br><table style="text-align:center"><tr><th>ผู้แก้ไข (ผู้ผลิต/ติดตั้ง)</th><th>ผู้ตรวจสอบ</th><th>ผู้อนุมัติ</th></tr><tr><td>${sg('installer')}</td><td>${sg('inspector')}</td><td>${sg('approver')}</td></tr></table>
+  <p style="text-align:right">${esc(fm.code)} · หน้า 1/1 (พิมพ์แล้วเลขหน้าตามเบราว์เซอร์)</p></div>`}
+async function notifs(){
+  const n=await q(sb.from('notifications').select('*').eq('user_id',me.id).order('at',{ascending:false}).limit(50));
+  $('#app').innerHTML=`<h2>แจ้งเตือน</h2>`+(n.map(x=>`<div class="card" style="${x.read?'opacity:.6':''}"><a href="${esc(x.link||'#/notifs')}" onclick="sb.from('notifications').update({read:true}).eq('id','${x.id}')">${esc(x.message)}</a><div class="muted">${fmt(x.at)}</div></div>`).join('')||'<div class="card muted">ไม่มีแจ้งเตือน</div>')}
+async function settings(){$('#app').innerHTML=`<h2>ตั้งค่า</h2><div class="card"><b>${esc(me.full_name||'')}</b><br>${esc(me.email)}<br>บทบาท: ${RL[me.role]}<br><span class="muted">บทบาทเปลี่ยนได้โดยผู้ดูแลระบบเท่านั้น</span></div><div class="card"><a href="#/projects">โครงการทั้งหมด</a></div>`}
+
+// ===== Admin =====
+async function admin(tab='users'){
+  if(me.role!=='admin')return $('#app').innerHTML='<div class="card">เฉพาะผู้ดูแลระบบ</div>';
+  const T=['users:ผู้ใช้','projects:โครงการ','forms:แบบฟอร์ม','equipment:อุปกรณ์','audit:Audit Log'];
+  const head=`<h2>Admin</h2><div class="row">${T.map(t=>`<button class="${t.split(':')[0]===tab?'':'sec'}" onclick="location.hash='#/admin/${t.split(':')[0]}'">${t.split(':')[1]}</button>`).join('')}</div><br>`;let h='';
+  if(tab==='users'){const u=await q(sb.from('profiles').select('*').order('created_at',{ascending:false}));
+    h=u.map(x=>`<div class="card"><b>${esc(x.full_name||'')}</b> <span class="muted">${esc(x.email)}</span><div class="row"><select onchange="adm('profiles','${x.id}',{role:this.value})">${Object.keys(RL).map(r=>`<option value="${r}" ${x.role===r?'selected':''}>${RL[r]}</option>`).join('')}</select><select onchange="adm('profiles','${x.id}',{status:this.value})">${['pending:รออนุมัติ','active:ใช้งาน','disabled:ระงับ'].map(s=>`<option value="${s.split(':')[0]}" ${x.status===s.split(':')[0]?'selected':''}>${s.split(':')[1]}</option>`).join('')}</select></div></div>`).join('')}
+  if(tab==='projects'){const p=await q(sb.from('projects').select('*').order('code')),u=await q(sb.from('profiles').select('id,full_name,email').eq('status','active')),pm=await q(sb.from('project_members').select('*'));
+    h=`<div class="card"><h3>เพิ่มโครงการ</h3><input id="pc" placeholder="รหัส เช่น PJ68/074"><input id="pn" placeholder="ชื่อโครงการ"><input id="pcl" placeholder="ลูกค้า/บริษัท"><button onclick="addProject()">เพิ่ม</button></div>`+p.map(x=>`<div class="card"><input value="${esc(x.name)}" onchange="adm('projects','${x.id}',{name:this.value})"><b>${esc(x.code)}</b> <label><input type="checkbox" style="width:auto;min-height:0" ${x.active?'checked':''} onchange="adm('projects','${x.id}',{active:this.checked})"> เปิดใช้งาน</label>
+    <div class="muted">สมาชิก: ${pm.filter(m=>m.project_id===x.id).map(m=>esc(u.find(y=>y.id===m.user_id)?.full_name||'')+` <a href="#" onclick="delMember('${x.id}','${m.user_id}');return false">✕</a>`).join(', ')||'-'}</div>
+    <select onchange="addMember('${x.id}',this.value)"><option value="">+ เพิ่มสมาชิก</option>${u.map(y=>`<option value="${y.id}">${esc(y.full_name||y.email)}</option>`).join('')}</select></div>`).join('')}
+  if(tab==='forms'){const f=await q(sb.from('form_templates').select('*,form_template_versions(id,version,status,equipment_fields)').order('code'));
+    h=`<div class="card"><h3>สร้างแบบฟอร์มใหม่</h3><input id="fc" placeholder="รหัส เช่น FR-INS-ME-009"><input id="fnm" placeholder="ชื่อแบบฟอร์ม"><label>ฟิลด์รายละเอียดอุปกรณ์เพิ่มเติม (คั่นด้วย ,)</label><input id="ff" placeholder="แรงม้า (hp), ยาว (m), จำนวน"><button onclick="addForm()">สร้าง (Draft v1)</button></div>`+f.map(x=>`<div class="card"><input value="${esc(x.name)}" onchange="adm('form_templates','${x.id}',{name:this.value})"><b>${esc(x.code)}</b> · ${x.form_template_versions.sort((a,b)=>a.version-b.version).map(v=>`<a href="#" onclick="editVer('${v.id}');return false">v${v.version} ${v.status}</a>`).join(' | ')}</div>`).join('')}
+  if(tab==='equipment'){const e=await q(sb.from('equipment').select('*,projects(code)').order('code'));
+    h=e.map(x=>`<div class="card"><b>${esc(x.projects?.code)} · ${esc(x.code)}</b><input value="${esc(x.name||'')}" placeholder="ชื่อ" onchange="adm('equipment','${x.id}',{name:this.value})"><div class="row"><input value="${esc(x.model||'')}" placeholder="Model" onchange="adm('equipment','${x.id}',{model:this.value})"><input value="${esc(x.position||'')}" placeholder="Position" onchange="adm('equipment','${x.id}',{position:this.value})"></div></div>`).join('')||'ไม่มีอุปกรณ์'}
+  if(tab==='audit'){const a=await q(sb.from('audit_logs').select('*,profiles(full_name,email)').order('at',{ascending:false}).limit(100));h=a.map(x=>`<div class="card"><b>${esc(x.action)}</b> ${esc(x.entity||'')}<div class="muted">${esc(x.profiles?.full_name||x.profiles?.email||'')} · ${fmt(x.at)}</div></div>`).join('')}
+  $('#app').innerHTML=head+h}
+async function adm(t,id,v){await q(sb.from(t).update(v).eq('id',id));await audit('admin_update:'+t,t,id,v);toast('บันทึกแล้ว')}
+async function addProject(){await q(sb.from('projects').insert({code:$('#pc').value,name:$('#pn').value,client:$('#pcl').value,created_by:me.id}));await audit('create_project','project',$('#pc').value);admin('projects')}
+async function addMember(p,u){if(!u)return;await q(sb.from('project_members').insert({project_id:p,user_id:u}));admin('projects')}
+async function delMember(p,u){await q(sb.from('project_members').delete().eq('project_id',p).eq('user_id',u));admin('projects')}
+async function addForm(){const code=$('#fc').value.trim(),name=$('#fnm').value.trim();if(!code||!name)return toast('กรอกรหัสและชื่อ');
+  const f=$('#ff').value.split(',').map(s=>s.trim()).filter(Boolean),fields=[{k:'item',l:'รายการ'},{k:'model',l:'รุ่น'},{k:'pos',l:'ตำแหน่ง'},...f.map((l,i)=>({k:'x'+i,l}))];
+  const t=await q(sb.from('form_templates').insert({code,name}).select().single());const v=await q(sb.from('form_template_versions').insert({template_id:t.id,version:1,equipment_fields:fields}).select().single());await audit('create_form','form_template',t.id);editVer(v.id)}
+async function editVer(id){
+  const v=await q(sb.from('form_template_versions').select('*,form_templates(code,name)').eq('id',id).single()),it=await q(sb.from('checklist_items').select('*').eq('version_id',id).order('sort')),d=v.status==='draft';
+  const m=document.createElement('div');m.className='modal';
+  m.innerHTML=`<div><h3>${esc(v.form_templates.code)} v${v.version} (${v.status})</h3>${d?'':'<p class="muted">Version ที่ publish แล้วแก้ไม่ได้ — กด "สร้าง Draft ใหม่" เพื่อแก้ (งานที่ตรวจไปแล้วไม่เปลี่ยน)</p>'}
+  ${it.map((x,i)=>`<div class="row"><span style="flex:0">${i+1}</span><input value="${esc(x.title)}" ${d?'':'disabled'} onchange="adm('checklist_items','${x.id}',{title:this.value})">${d?`<button class="sec" onclick="mv('${id}','${x.id}',-1)">↑</button><button class="sec" onclick="mv('${id}','${x.id}',1)">↓</button><button class="red" onclick="delItem('${id}','${x.id}')">ลบ</button>`:''}</div>`).join('')}
+  ${d?`<div class="row"><input id="ni" placeholder="หัวข้อตรวจใหม่"><button onclick="addItem('${id}',${it.length+1})">เพิ่ม</button></div><button class="org" style="width:100%" onclick="publish('${id}','${v.template_id}')">Publish Version นี้</button>`:`<button class="org" style="width:100%" onclick="newDraft('${id}')">สร้าง Draft ใหม่จาก v${v.version}</button>`}
+  <button class="sec" style="width:100%;margin-top:6px" onclick="this.closest('.modal').remove();admin('forms')">ปิด</button></div>`;document.body.append(m)}
+function reopen(id){document.querySelector('.modal')?.remove();editVer(id)}
+async function addItem(v,n){const t=$('#ni').value.trim();if(!t)return;await q(sb.from('checklist_items').insert({version_id:v,sort:n,title:t}));reopen(v)}
+async function delItem(v,id){await q(sb.from('checklist_items').delete().eq('id',id));reopen(v)}
+async function mv(v,id,dir){const it=await q(sb.from('checklist_items').select('*').eq('version_id',v).order('sort')),i=it.findIndex(x=>x.id===id),j=i+dir;if(j<0||j>=it.length)return;
+  const a=it[i],b=it[j];await q(sb.from('checklist_items').update({sort:-1}).eq('id',a.id));await q(sb.from('checklist_items').update({sort:a.sort}).eq('id',b.id));await q(sb.from('checklist_items').update({sort:b.sort}).eq('id',a.id));reopen(v)}
+async function publish(v,t){if(!confirm('Publish แล้วจะแก้ Version นี้ไม่ได้ และ Version เดิมจะถูกเก็บถาวร'))return;
+  await q(sb.from('form_template_versions').update({status:'archived'}).eq('template_id',t).eq('status','published'));await q(sb.from('form_template_versions').update({status:'published',published_at:new Date().toISOString()}).eq('id',v));await audit('publish_form','form_template_version',v);document.querySelector('.modal')?.remove();admin('forms')}
+async function newDraft(v){const o=await q(sb.from('form_template_versions').select('*').eq('id',v).single()),all=await q(sb.from('form_template_versions').select('version,status').eq('template_id',o.template_id));
+  if(all.some(x=>x.status==='draft'))return toast('มี Draft อยู่แล้ว');const items=await q(sb.from('checklist_items').select('*').eq('version_id',v).order('sort'));
+  const n=await q(sb.from('form_template_versions').insert({template_id:o.template_id,version:Math.max(...all.map(x=>x.version))+1,equipment_fields:o.equipment_fields}).select().single());
+  await q(sb.from('checklist_items').insert(items.map(i=>({version_id:n.id,sort:i.sort,title:i.title}))));reopen(n.id)}
+boot();
 </script></body></html>
