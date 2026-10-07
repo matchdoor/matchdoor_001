@@ -1,337 +1,872 @@
 <!DOCTYPE html>
-<html lang="th"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SMART QC — ตรวจงานติดตั้ง</title>
-<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>SmartQC - Quality Inspection System</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
 <style>
-:root{--g:#1f6b3a;--o:#e8731a;--bg:#f3f5f2;--card:#fff;--ink:#1c2420;--mut:#66726b;--line:#d9dfda;--red:#c62828;--ok:#2e7d32}
-*{box-sizing:border-box}body{margin:0;font:16px/1.5 Sarabun,system-ui,sans-serif;background:var(--bg);color:var(--ink);padding-bottom:76px}
-header{background:var(--g);color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:5}
-header b{font-size:18px}header small{opacity:.85}
-main{max-width:860px;margin:0 auto;padding:14px}
-nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);display:flex;z-index:5}
-nav a{flex:1;text-align:center;padding:10px 2px;font-size:12px;color:var(--mut);text-decoration:none;min-height:56px}
-nav a.on{color:var(--g);font-weight:700;border-top:3px solid var(--o)}nav a span{display:block;font-size:20px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px;margin:0 0 12px}
-h2{margin:6px 0 12px;font-size:20px}h3{margin:0 0 6px;font-size:17px}
-button,.btn{font:inherit;min-height:46px;padding:8px 16px;border-radius:8px;border:1px solid var(--g);background:var(--g);color:#fff;cursor:pointer}
-button.sec{background:#fff;color:var(--g)}button.red{background:var(--red);border-color:var(--red)}button.org{background:var(--o);border-color:var(--o)}
-button:disabled{opacity:.5}
-input,select,textarea{font:inherit;width:100%;min-height:46px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;margin:2px 0 8px}
-label{font-size:14px;color:var(--mut)}
-.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.row>*{flex:1}.row>button{flex:0 0 auto}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
-.stat{border-left:5px solid var(--g);background:#fff;padding:10px 12px;border-radius:6px;border-top:1px solid var(--line);border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
-.stat b{font-size:28px;display:block}.stat.w{border-left-color:var(--o)}.stat.r{border-left-color:var(--red)}
-.pill{display:inline-block;padding:2px 10px;border-radius:99px;font-size:13px;background:#e5ebe7;color:var(--ink)}
-.pill.WAITING_INSPECTION,.pill.WAITING_REINSPECTION,.pill.WAITING_APPROVAL{background:#fff1dd;color:#a35200}
-.pill.CORRECTION_REQUIRED,.pill.REJECTED,.pill.major{background:#fde4e4;color:var(--red)}
-.pill.APPROVED,.pill.closed{background:#dff3e3;color:var(--ok)}.pill.INSPECTING{background:#dfeaf8;color:#1b4f8f}
-.item{border-top:1px solid var(--line);padding:10px 0}.item:first-child{border-top:0}
-.pf{display:flex;gap:8px}.pf button{flex:1}.pf .p.on{background:var(--ok);color:#fff;border-color:var(--ok)}.pf .f.on{background:var(--red);color:#fff;border-color:var(--red)}
-.pf button:not(.on){background:#fff;color:var(--ink);border-color:var(--line)}
-.thumbs{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0}.thumb{position:relative;width:92px;height:92px;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:#eee;cursor:pointer}
-.thumb img,.thumb svg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:20;display:flex;align-items:center;justify-content:center;padding:10px}
-.modal>div{background:#fff;border-radius:10px;padding:12px;width:100%;max-width:720px;max-height:96vh;overflow:auto}
-.tools{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}.tools button{min-height:40px;padding:4px 10px}.tools .on{background:var(--o);border-color:var(--o);color:#fff}
-svg.ed{width:100%;touch-action:none;background:#222;border-radius:6px}
-canvas.sig{width:100%;height:180px;border:1px dashed var(--mut);border-radius:8px;touch-action:none;background:#fff}
-#toast{position:fixed;top:64px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 16px;border-radius:8px;z-index:30;display:none;max-width:90%}
-.muted{color:var(--mut);font-size:14px}.hide{display:none}
-.doc{background:#fff;padding:14mm;font-size:12px;line-height:1.4}.doc table{border-collapse:collapse;width:100%}.doc td,.doc th{border:1px solid #333;padding:4px 6px;vertical-align:top}
-.doc .ph{width:80px;height:80px;object-fit:cover;margin:2px;border:1px solid #999}.doc .sg{height:50px}
-@media print{header,nav,.noprint,#toast{display:none!important}body{background:#fff;padding:0}main{padding:0;max-width:none}.doc{padding:0}@page{size:A4;margin:12mm}.pg{counter-increment:pg}}
-</style></head><body>
-<header><div><b>SMART QC</b><br><small id="who"></small></div><button class="sec" id="lo" onclick="logout()" style="display:none;min-height:36px">ออกจากระบบ</button></header>
-<main id="app">กำลังโหลด…</main><nav id="nav" style="display:none"></nav><div id="toast"></div>
+:root{
+  --blue:#2563eb; --blue-dark:#1e40af; --green:#16a34a; --red:#dc2626;
+  --amber:#d97706; --gray-50:#f8fafc; --gray-100:#f1f5f9; --gray-200:#e2e8f0;
+  --gray-400:#94a3b8; --gray-600:#475569; --gray-800:#1e293b; --gray-900:#0f172a;
+  --radius:14px;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Sarabun,Tahoma,sans-serif;background:var(--gray-100);color:var(--gray-900);}
+#app{max-width:520px;margin:0 auto;min-height:100vh;background:var(--gray-50);padding-bottom:90px;position:relative;}
+a{color:inherit;text-decoration:none;}
+button{font-family:inherit;cursor:pointer;}
+.topbar{position:sticky;top:0;z-index:20;background:var(--blue);color:#fff;padding:14px 16px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 8px rgba(0,0,0,.1);}
+.topbar .back{font-size:22px;background:none;border:none;color:#fff;padding:4px 8px;border-radius:8px;}
+.topbar .back:active{background:rgba(255,255,255,.2);}
+.topbar h1{font-size:17px;margin:0;flex:1;font-weight:700;}
+.topbar .sub{font-size:12px;opacity:.85;margin-top:1px;}
+.page{padding:16px;}
+.card{background:#fff;border-radius:var(--radius);padding:16px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06);}
+.card:active{transform:scale(.995);}
+.proj-card{display:flex;justify-content:space-between;align-items:center;}
+.proj-code{color:var(--blue);font-weight:700;font-size:14px;}
+.proj-name{font-size:16px;font-weight:600;margin-top:2px;}
+.chev{color:var(--gray-400);font-size:20px;}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.stat{background:#fff;border-radius:var(--radius);padding:14px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.06);}
+.stat .num{font-size:26px;font-weight:800;}
+.stat .lbl{font-size:12px;color:var(--gray-600);margin-top:2px;}
+.stat.pass .num{color:var(--green);}
+.stat.fail .num{color:var(--red);}
+.stat.pending .num{color:var(--amber);}
+.stat.defect .num{color:var(--red);}
+.actions-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.action-btn{background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);padding:16px 10px;text-align:center;font-weight:700;font-size:14px;color:var(--blue-dark);}
+.action-btn .ic{font-size:22px;display:block;margin-bottom:4px;}
+.doc-card{margin-bottom:10px;}
+.doc-code{font-family:monospace;font-size:12px;color:var(--blue);font-weight:700;}
+.doc-name{font-size:15px;font-weight:600;margin-top:3px;}
+.badge{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;margin-top:6px;}
+.badge.draft{background:#e2e8f0;color:#475569;}
+.badge.in_progress{background:#fef3c7;color:#92400e;}
+.badge.completed{background:#dcfce7;color:#166534;}
+.progress-row{margin-top:8px;}
+.progress-bar{background:var(--gray-200);border-radius:10px;height:8px;overflow:hidden;}
+.progress-fill{background:var(--blue);height:100%;border-radius:10px;transition:width .3s;}
+.progress-txt{font-size:12px;color:var(--gray-600);margin-top:4px;}
+.item-row{display:flex;justify-content:space-between;align-items:center;padding:14px 4px;border-bottom:1px solid var(--gray-200);}
+.item-row:last-child{border-bottom:none;}
+.item-num{width:26px;height:26px;border-radius:50%;background:var(--gray-200);color:var(--gray-600);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
+.item-num.pass{background:var(--green);color:#fff;}
+.item-num.fail{background:var(--red);color:#fff;}
+.item-info{flex:1;padding:0 10px;}
+.item-name{font-size:15px;font-weight:600;}
+.item-score{font-size:12px;color:var(--gray-600);}
+.section-title{font-size:14px;font-weight:700;color:var(--gray-600);margin:18px 0 8px;text-transform:uppercase;letter-spacing:.03em;}
+.field-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--gray-100);}
+.field-label{font-size:15px;font-weight:600;}
+.pf-btns{display:flex;gap:6px;}
+.pf-btn{padding:8px 14px;border-radius:10px;border:2px solid var(--gray-200);background:#fff;font-weight:700;font-size:13px;}
+.pf-btn.pass.active{background:var(--green);border-color:var(--green);color:#fff;}
+.pf-btn.fail.active{background:var(--red);border-color:var(--red);color:#fff;}
+.stars{display:flex;gap:6px;font-size:32px;justify-content:center;padding:10px 0;}
+.star{color:var(--gray-200);cursor:pointer;}
+.star.filled{color:#f59e0b;}
+textarea,input[type=text]{width:100%;border:1px solid var(--gray-200);border-radius:10px;padding:10px;font-size:15px;font-family:inherit;resize:vertical;}
+.photo-actions{display:flex;gap:8px;margin-top:10px;}
+.photo-actions label,.photo-actions button{flex:1;background:var(--blue);color:#fff;border:none;border-radius:10px;padding:12px;font-weight:700;font-size:14px;text-align:center;}
+.photo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px;}
+.photo-thumb{position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;background:var(--gray-200);}
+.photo-thumb img{width:100%;height:100%;object-fit:cover;}
+.photo-thumb .rm{position:absolute;top:2px;right:2px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:12px;line-height:1;}
+.footer-nav{position:fixed;bottom:0;left:0;right:0;max-width:520px;margin:0 auto;background:#fff;border-top:1px solid var(--gray-200);display:flex;padding:10px 14px;gap:10px;box-shadow:0 -2px 8px rgba(0,0,0,.06);}
+.nav-btn{flex:1;padding:14px;border-radius:12px;border:none;font-weight:700;font-size:15px;}
+.nav-btn.secondary{background:var(--gray-200);color:var(--gray-800);}
+.nav-btn.primary{background:var(--blue);color:#fff;}
+.nav-btn:disabled{opacity:.4;}
+.empty{text-align:center;padding:40px 20px;color:var(--gray-600);}
+.empty .ic{font-size:40px;margin-bottom:10px;}
+.fail-banner{background:#fef2f2;border:1px solid #fecaca;color:#991b1b;border-radius:10px;padding:10px 12px;font-size:13px;font-weight:600;margin-top:10px;}
+.hist-item{padding:12px 0;border-bottom:1px solid var(--gray-100);}
+.hist-date{font-size:12px;color:var(--gray-600);}
+.hist-doc{font-family:monospace;font-size:12px;color:var(--blue);margin-top:2px;}
+.hist-action{font-size:14px;font-weight:600;margin-top:2px;}
+.res-pass{color:var(--green);font-weight:700;}
+.res-fail{color:var(--red);font-weight:700;}
+.def-card .status{float:right;}
+.status-pill{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;}
+.status-pill.open{background:#fee2e2;color:#991b1b;}
+.status-pill.in_progress{background:#fef3c7;color:#92400e;}
+.status-pill.fixed{background:#dbeafe;color:#1e40af;}
+.status-pill.verified,.status-pill.closed{background:#dcfce7;color:#166534;}
+.sig-pad-wrap{border:1px dashed var(--gray-400);border-radius:10px;background:#fff;}
+canvas.sigpad{width:100%;height:150px;touch-action:none;}
+.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:var(--gray-900);color:#fff;padding:10px 18px;border-radius:30px;font-size:13px;z-index:50;opacity:0;transition:opacity .25s;pointer-events:none;}
+.toast.show{opacity:1;}
+.spinner{width:34px;height:34px;border:3px solid var(--gray-200);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;margin:40px auto;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.pdf-btn-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
+.pdf-btn-grid button{background:var(--blue);color:#fff;border:none;border-radius:12px;padding:14px;font-weight:700;font-size:14px;}
+.pdf-btn-grid button.alt{background:#fff;color:var(--blue);border:2px solid var(--blue);}
+.field-group{margin-top:14px;}
+.autosave-note{font-size:11px;color:var(--gray-400);text-align:center;margin-top:6px;}
+.link-file{display:flex;align-items:center;gap:8px;background:var(--gray-100);border-radius:10px;padding:10px 12px;margin-top:8px;font-size:14px;}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="toast" id="toast"></div>
+
 <script>
-// ===== ตั้งค่า: ใส่ค่าจาก Supabase > Project Settings > API (ใช้ anon key เท่านั้น) =====
-const SUPABASE_URL='https://qrocqqsnrfvlqoimpgii.supabase.co', SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyb2NxcXNucmZ2bHFvaW1wZ2lpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzMDE1NjcsImV4cCI6MjEwNjg3NzU2N30.lIEeTabuUqHhBg--PCBkWWP5mHTD2dtdI5bMpij_GBM';
-// =========================================================================================
-const ST={DRAFT:'ร่าง',WAITING_INSPECTION:'รอตรวจ',INSPECTING:'กำลังตรวจ',CORRECTION_REQUIRED:'ต้องแก้ไข',WAITING_REINSPECTION:'รอตรวจซ้ำ',WAITING_APPROVAL:'รออนุมัติ',APPROVED:'อนุมัติแล้ว',REJECTED:'ไม่อนุมัติ'};
-const RL={installer:'ผู้ผลิต/ผู้ติดตั้ง',inspector:'ผู้ตรวจสอบ',approver:'ผู้อนุมัติ',visitor:'ผู้เข้าชม',admin:'ผู้ดูแลระบบ'};
-const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let sb,me=null,urlCache={};
-const q=async p=>{const r=await p;if(r.error){toast(r.error.message);throw r.error}return r.data};
-function toast(m){const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(t.t);t.t=setTimeout(()=>t.style.display='none',3500)}
-const W=()=>['installer','inspector','approver','admin'].includes(me?.role),R=r=>me?.role===r||me?.role==='admin';
-const fmt=d=>d?new Date(d).toLocaleString('th-TH',{dateStyle:'short',timeStyle:'short'}):'';
-async function audit(action,entity,id,detail){await sb.from('audit_logs').insert({actor:me.id,action,entity,entity_id:String(id||''),detail:detail||null})}
-async function notifyRole(role,message,link){const{data}=await sb.from('profiles').select('id').eq('role',role).eq('status','active');if(data?.length)await sb.from('notifications').insert(data.map(u=>({user_id:u.id,message,link})))}
-async function url(path){if(urlCache[path])return urlCache[path];const{data}=await sb.storage.from('evidence').createSignedUrl(path,3600);return urlCache[path]=data?.signedUrl}
-async function compress(file,max=1600){const bm=await createImageBitmap(file);const k=Math.min(1,max/Math.max(bm.width,bm.height));const c=document.createElement('canvas');c.width=bm.width*k;c.height=bm.height*k;c.getContext('2d').drawImage(bm,0,0,c.width,c.height);return new Promise(r=>c.toBlob(r,'image/jpeg',.85))}
-function pick(){return new Promise(res=>{const i=document.createElement('input');i.type='file';i.accept='image/*';i.onchange=()=>res(i.files[0]);i.click()})}
+// ============================================================
+// CONFIG — แก้ 2 ค่านี้ให้เป็นของโปรเจกต์ Supabase ของคุณ
+// ============================================================
+const SUPABASE_URL = "https://tisshukqkeejmmokvoss.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRpc3NodWtxa2Vlam1tb2t2b3NzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzMzQ3MDgsImV4cCI6MjEwNjkxMDcwOH0.onYYx-c4MH8HOnDyIngEy-M43GTHQiQLGD4looHAv7U";
+const BUCKET = "smartqc";
 
-// ===== Auth =====
-async function boot(){
-  if(!SUPABASE_URL||!SUPABASE_ANON_KEY){$('#app').innerHTML='<div class="card"><h2>ยังไม่ได้ตั้งค่า</h2>เปิดไฟล์นี้ แล้วใส่ <b>SUPABASE_URL</b> และ <b>SUPABASE_ANON_KEY</b> ที่ส่วนต้นของ &lt;script&gt;</div>';return}
-  sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
-  sb.auth.onAuthStateChange((e,s)=>{if(e==='SIGNED_OUT'){me=null;route()}});
-  const{data:{session}}=await sb.auth.getSession();
-  if(session)await loadMe();route();
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ============================================================
+// TINY ROUTER + STATE
+// ============================================================
+const app = document.getElementById("app");
+
+function toast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toast._t);
+  toast._t = setTimeout(()=>t.classList.remove("show"), 1800);
 }
-async function loadMe(){const{data}=await sb.from('profiles').select('*').eq('id',(await sb.auth.getUser()).data.user.id).single();me=data}
-function loginView(){
-  $('#nav').style.display='none';$('#lo').style.display='none';$('#who').textContent='';
-  $('#app').innerHTML=`<div class="card"><h2>เข้าสู่ระบบ / สมัครสมาชิก</h2>
-  <label>อีเมล</label><input id="em" type="email" autocomplete="email"><label>รหัสผ่าน (อย่างน้อย 6 ตัว)</label><input id="pw" type="password" autocomplete="current-password">
-  <label>ชื่อ-นามสกุล (เฉพาะสมัครใหม่)</label><input id="fn">
-  <div class="row"><button onclick="signIn()">เข้าสู่ระบบ</button><button class="sec" onclick="signUp()">สมัครสมาชิก</button><button class="sec" onclick="google()">Google</button></div>
-  <p class="muted">ผู้สมัครใหม่จะมีสถานะ "รออนุมัติ" จนกว่าผู้ดูแลระบบจะอนุมัติ</p></div>`}
-async function signIn(){const{error}=await sb.auth.signInWithPassword({email:$('#em').value,password:$('#pw').value});if(error)return toast('เข้าสู่ระบบไม่สำเร็จ: '+error.message);await loadMe();route()}
-async function signUp(){const{error}=await sb.auth.signUp({email:$('#em').value,password:$('#pw').value,options:{data:{full_name:$('#fn').value}}});if(error)return toast(error.message);toast('สมัครแล้ว (ถ้าเปิดยืนยันอีเมล ให้ตรวจอีเมลก่อน) แล้วรอผู้ดูแลอนุมัติ');await loadMe();route()}
-async function google(){const{error}=await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.href.split('#')[0]}});if(error)toast(error.message)}
-async function logout(){await sb.auth.signOut();location.hash='';}
 
-// ===== Router =====
-const NAV=[['dash','📊','ภาพรวม'],['inspections','📋','งานตรวจ'],['new','➕','ตรวจใหม่'],['defects','⚠️','Defect'],['docs','📄','เอกสาร'],['notifs','🔔','แจ้งเตือน'],['settings','⚙️','ตั้งค่า']];
-async function route(){
-  if(!sb)return;if(!me)return loginView();
-  $('#who').textContent=`${me.full_name||me.email} · ${RL[me.role]}`;$('#lo').style.display='';
-  if(me.status!=='active'){$('#nav').style.display='none';$('#app').innerHTML=`<div class="card"><h2>${me.status==='pending'?'รอผู้ดูแลระบบอนุมัติ':'บัญชีถูกระงับ'}</h2>กรุณาติดต่อผู้ดูแลระบบ</div>`;return}
-  const[p,a]=(location.hash.slice(2)||'dash').split('/');
-  const nav=NAV.slice();if(me.role==='admin')nav.push(['admin','🛠️','Admin']);
-  $('#nav').style.display='flex';$('#nav').innerHTML=nav.map(n=>`<a href="#/${n[0]}" class="${n[0]===p||(p==='i'&&n[0]==='inspections')?'on':''}"><span>${n[1]}</span>${n[2]}</a>`).join('');
-  $('#app').innerHTML='กำลังโหลด…';
-  try{await({dash,inspections,new:newInsp,i:detail,defects,docs,notifs,settings,admin,projects}[p]||dash)(a)}catch(e){console.error(e);$('#app').innerHTML='<div class="card">เกิดข้อผิดพลาด: '+esc(e.message)+'</div>'}
+function esc(s){ return (s==null?'':String(s)).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function nav(hash){ location.hash = hash; }
+window.addEventListener("hashchange", render);
+window.addEventListener("DOMContentLoaded", render);
+
+function parseHash(){
+  const h = location.hash.slice(1) || "/";
+  const parts = h.split("/").filter(Boolean);
+  return parts;
 }
-window.addEventListener('hashchange',route);
 
-// ===== Dashboard / Projects =====
-async function dash(){
-  const[ins,def,pr]=await Promise.all([q(sb.from('inspections').select('status')),q(sb.from('defects').select('severity,status')),q(sb.from('projects').select('id'))]);
-  const c=s=>ins.filter(i=>i.status===s).length,od=def.filter(d=>d.status!=='closed');
-  const S=(l,n,k='')=>`<div class="stat ${k}"><b>${n}</b>${l}</div>`;
-  $('#app').innerHTML=`<h2>ภาพรวม</h2><div class="grid">${S('โครงการ',pr.length)}${S('งานตรวจทั้งหมด',ins.length)}${S('รอตรวจ',c('WAITING_INSPECTION'),'w')}${S('ต้องแก้ไข',c('CORRECTION_REQUIRED'),'r')}${S('รอตรวจซ้ำ',c('WAITING_REINSPECTION'),'w')}${S('รออนุมัติ',c('WAITING_APPROVAL'),'w')}${S('อนุมัติแล้ว',c('APPROVED'))}${S('Major ค้างอยู่',od.filter(d=>d.severity==='major').length,'r')}${S('Minor ค้างอยู่',od.filter(d=>d.severity==='minor').length,'w')}</div>
-  <p><a href="#/projects">จัดการโครงการ →</a></p>`}
-async function projects(){
-  const pr=await q(sb.from('projects').select('*').order('code'));
-  $('#app').innerHTML=`<h2>โครงการ</h2>`+pr.map(p=>`<div class="card"><h3>${esc(p.code)} ${esc(p.name)}</h3><span class="muted">${esc(p.client||'')}</span></div>`).join('')+(me.role==='admin'?'<p class="muted">เพิ่ม/แก้โครงการที่หน้า Admin</p>':'')}
-
-// ===== Inspections list / new =====
-async function inspections(){
-  const d=await q(sb.from('inspections').select('id,doc_no,status,created_at,projects(code),equipment(code,name)').order('created_at',{ascending:false}).limit(100));
-  $('#app').innerHTML=`<h2>งานตรวจ</h2>`+(d.map(i=>`<a href="#/i/${i.id}" style="text-decoration:none;color:inherit"><div class="card"><div class="row"><b>${esc(i.doc_no)}</b><span class="pill ${i.status}" style="flex:0">${ST[i.status]}</span></div><span class="muted">${esc(i.projects?.code)} · ${esc(i.equipment?.code||'-')} ${esc(i.equipment?.name||'')} · ${fmt(i.created_at)}</span></div></a>`).join('')||'<div class="card muted">ยังไม่มีงานตรวจ</div>')}
-async function newInsp(){
-  if(!W())return $('#app').innerHTML='<div class="card">บทบาทผู้เข้าชมสร้างงานตรวจไม่ได้</div>';
-  const[pr,fm]=await Promise.all([q(sb.from('projects').select('*').eq('active',true).order('code')),q(sb.from('form_template_versions').select('id,version,equipment_fields,form_templates(code,name,active)').eq('status','published'))]);
-  const forms=fm.filter(f=>f.form_templates.active);
-  $('#app').innerHTML=`<h2>สร้างงานตรวจ</h2><div class="card">
-  <label>1. โครงการ</label><select id="np" onchange="loadEq()">${pr.map(p=>`<option value="${p.id}">${esc(p.code)} ${esc(p.name)}</option>`).join('')}</select>
-  <label>2. แบบฟอร์ม</label><select id="nf" onchange="eqFields()">${forms.map(f=>`<option value="${f.id}" data-f='${esc(JSON.stringify(f.equipment_fields))}'>${esc(f.form_templates.code)} ${esc(f.form_templates.name)}</option>`).join('')}</select>
-  <label>3. อุปกรณ์</label><select id="ne" onchange="eqFill()"></select>
-  <div id="eqf"></div>
-  <button onclick="createInsp()" style="width:100%">เริ่มตรวจ</button></div>`;
-  window._forms=forms;await loadEq();eqFields();
+async function render(){
+  const parts = parseHash();
+  window.scrollTo(0,0);
+  try{
+    if(parts.length===0) return renderHome();
+    if(parts[0]==="project" && parts[2]==="documents") return renderDocuments(parts[1]);
+    if(parts[0]==="project" && parts[2]==="defects") return renderProjectDefects(parts[1]);
+    if(parts[0]==="project" && parts[2]==="history") return renderHistory(parts[1]);
+    if(parts[0]==="project") return renderDashboard(parts[1]);
+    if(parts[0]==="document" && parts[2]==="item") return renderInspectionItem(parts[1], parts[3]);
+    if(parts[0]==="document" && parts[2]==="pdf") return renderPdfScreen(parts[1]);
+    if(parts[0]==="document" && parts[2]==="files") return renderDocFiles(parts[1]);
+    if(parts[0]==="document") return renderDocumentDetail(parts[1]);
+    if(parts[0]==="defect") return renderDefectDetail(parts[1]);
+    return renderHome();
+  }catch(err){
+    console.error(err);
+    app.innerHTML = `<div class="page"><div class="empty"><div class="ic">⚠️</div><b>เกิดข้อผิดพลาด</b><br><span style="font-size:12px">${esc(err.message||err)}</span></div></div>`;
+  }
 }
-async function loadEq(){window._eq=await q(sb.from('equipment').select('*').eq('project_id',$('#np').value).order('code'));$('#ne').innerHTML='<option value="">➕ อุปกรณ์ใหม่</option>'+_eq.map(e=>`<option value="${e.id}">${esc(e.code)} ${esc(e.name||'')}</option>`).join('');eqFill()}
-function eqFields(){const f=JSON.parse($('#nf').selectedOptions[0].dataset.f||'[]');
-  $('#eqf').innerHTML=`<label>รหัสอุปกรณ์ (Code)</label><input id="e_code"><label>ชื่อ</label><input id="e_name"><label>Model</label><input id="e_model"><label>ตำแหน่ง (Position)</label><input id="e_pos"><label>รายละเอียด</label><input id="e_detail">`+f.filter(x=>!['model','pos','item'].includes(x.k)).map(x=>`<label>${esc(x.l)}</label><input data-x="${esc(x.k)}" data-l="${esc(x.l)}">`).join('');eqFill()}
-function eqFill(){const e=_eq?.find(x=>x.id===$('#ne').value);const set=(i,v)=>{const el=$('#'+i);if(el){el.value=v||'';el.readOnly=!!e}};set('e_code',e?.code);set('e_name',e?.name);set('e_model',e?.model);set('e_pos',e?.position);set('e_detail',e?.detail)}
-async function createInsp(){
-  const pid=$('#np').value,vid=$('#nf').value;if(!pid||!vid)return toast('เลือกโครงการและแบบฟอร์ม');
-  let eid=$('#ne').value;
-  if(!eid){const code=$('#e_code').value.trim();if(!code)return toast('กรอกรหัสอุปกรณ์');
-    const e=await q(sb.from('equipment').insert({project_id:pid,code,name:$('#e_name').value,model:$('#e_model').value,position:$('#e_pos').value,detail:$('#e_detail').value}).select().single());eid=e.id}
-  const xd={};document.querySelectorAll('#eqf [data-x]').forEach(i=>{if(i.value)xd[i.dataset.l]=i.value});
-  const v=_forms.find(f=>f.id===vid),pj=(await q(sb.from('projects').select('code').eq('id',pid).single())).code;
-  const pre=`${v.form_templates.code}-${pj}-`;const{count}=await sb.from('inspections').select('id',{count:'exact',head:true}).like('doc_no',pre+'%');
-  const doc_no=pre+String((count||0)+1).padStart(3,'0');
-  const ins=await q(sb.from('inspections').insert({doc_no,project_id:pid,version_id:vid,equipment_id:eid,equipment_data:xd,created_by:me.id}).select().single());
-  const items=await q(sb.from('checklist_items').select('*').eq('version_id',vid).order('sort'));
-  await q(sb.from('inspection_items').insert(items.map(i=>({inspection_id:ins.id,checklist_item_id:i.id,sort:i.sort,title:i.title}))));
-  await sb.from('equipment_history').insert({equipment_id:eid,inspection_id:ins.id,note:'ตรวจตาม '+doc_no,by:me.id});
-  await audit('create_inspection','inspection',ins.id,{doc_no});location.hash='#/i/'+ins.id}
 
-// ===== Inspection detail =====
-async function detail(id){
-  const[ins,items,defs,evs,sigs]=await Promise.all([
-    q(sb.from('inspections').select('*,projects(code,name),equipment(*),form_template_versions(version,form_templates(code,name))').eq('id',id).single()),
-    q(sb.from('inspection_items').select('*').eq('inspection_id',id).order('sort')),
-    q(sb.from('defects').select('*,defect_corrections(*)').eq('inspection_id',id).order('created_at')),
-    q(sb.from('evidence').select('*,evidence_annotations(shapes)').eq('inspection_id',id).order('at')),
-    q(sb.from('signatures').select('*').eq('inspection_id',id).order('at'))]);
-  window._cur={ins,items,defs,evs,sigs};
-  const s=ins.status,edit=(s==='DRAFT'&&W())||(s==='INSPECTING'&&R('inspector'));
-  const th=(e)=>`<div class="thumb" onclick="markup('${e.id}')"><img data-p="${esc(e.path)}" alt="">${e.evidence_annotations?.length?`<svg viewBox="0 0 ${e.evidence_annotations.at(-1).shapes.w} ${e.evidence_annotations.at(-1).shapes.h}" preserveAspectRatio="xMidYMid slice">${shapesSVG(e.evidence_annotations.at(-1).shapes.list)}</svg>`:''}</div>`;
-  $('#app').innerHTML=`<a href="#/inspections">← กลับ</a><div class="card"><div class="row"><h2 style="margin:0">${esc(ins.doc_no)}</h2><span class="pill ${s}" style="flex:0">${ST[s]}</span></div>
-  <div class="muted">${esc(ins.projects.code)} ${esc(ins.projects.name)}<br>${esc(ins.form_template_versions.form_templates.name)} (v${ins.form_template_versions.version})<br>อุปกรณ์: ${esc(ins.equipment?.code)} ${esc(ins.equipment?.name||'')} ${esc(ins.equipment?.model||'')} ${esc(ins.equipment?.position||'')}${Object.entries(ins.equipment_data||{}).map(([k,v])=>` · ${esc(k)}: ${esc(v)}`).join('')}</div></div>
-  <div class="card"><h3>รายการตรวจ</h3>${items.map(it=>{const d=defs.find(d=>d.inspection_item_id===it.id);return`<div class="item"><b>${it.sort}. ${esc(it.title)}</b>
-   ${edit?`<div class="pf"><button class="p ${it.result==='pass'?'on':''}" onclick="setRes('${it.id}','pass')">✓ ผ่าน</button><button class="f ${it.result==='fail'?'on':''}" onclick="setRes('${it.id}','fail')">✗ ไม่ผ่าน</button></div>
-   <input placeholder="หมายเหตุ" value="${esc(it.remark)}" onchange="setRemark('${it.id}',this.value)">`:`<div>${it.result==='pass'?'<span class="pill APPROVED">ผ่าน</span>':it.result==='fail'?'<span class="pill major">ไม่ผ่าน</span>':'<span class="pill">ยังไม่ตรวจ</span>'} ${esc(it.remark||'')}</div>`}
-   <div class="thumbs">${evs.filter(e=>e.inspection_item_id===it.id&&e.kind==='photo').map(th).join('')}${edit?`<button class="sec" onclick="addPhoto('${it.id}')">📷 เพิ่มรูป</button>`:''}</div>
-   <div class="muted">${it.checked_at?`${fmt(it.checked_at)}`:''}</div>${d?`<span class="pill ${d.severity}">Defect ${d.severity==='major'?'Major':'Minor'} · ${d.status==='open'?'เปิด':d.status==='corrected'?'แก้แล้ว':'ปิด'}</span>`:''}</div>`}).join('')}</div>
-  ${defs.length?`<div class="card"><h3>Defect (${defs.length})</h3>${defs.map(d=>defectCard(d,ins,evs,items,th)).join('')}</div>`:''}
-  <div class="card"><h3>ลายเซ็น</h3>${sigs.map(g=>`<div class="row"><img src="${g.image}" style="height:50px;flex:0"><span class="muted">${esc(g.signer_name)} (${RL[g.role]}) · ${esc(g.purpose)} · ${fmt(g.at)}</span></div>`).join('')||'<span class="muted">ยังไม่มี</span>'}</div>
-  <div class="card" id="act">${actions(ins,items,defs)}</div>`;
-  hydrate();
+function topbar(title, sub, backHash){
+  return `<div class="topbar">
+    ${backHash?`<button class="back" onclick="nav('${backHash}')">‹</button>`:''}
+    <div><h1>${esc(title)}</h1>${sub?`<div class="sub">${esc(sub)}</div>`:''}</div>
+  </div>`;
 }
-function defectCard(d,ins,evs,items,th){
-  const it=items.find(i=>i.id===d.inspection_item_id),s=ins.status;
-  const before=evs.filter(e=>e.inspection_item_id===d.inspection_item_id&&e.kind==='photo'),after=evs.filter(e=>e.defect_id===d.id);
-  const canFix=s==='CORRECTION_REQUIRED'&&d.status==='open'&&W(),canRe=s==='WAITING_REINSPECTION'&&d.status==='corrected'&&R('inspector');
-  return`<div class="item"><b>${esc(it?.title)}</b> <span class="pill ${d.severity}">${d.severity==='major'?'Major':'Minor'}</span> <span class="pill ${d.status==='closed'?'closed':''}">${d.status==='open'?'เปิด':d.status==='corrected'?'แก้แล้ว รอตรวจซ้ำ':'ปิด'}</span>
-  ${R('inspector')&&s==='INSPECTING'?`<select onchange="upd('defects','${d.id}',{severity:this.value})"><option value="minor" ${d.severity==='minor'?'selected':''}>Minor</option><option value="major" ${d.severity==='major'?'selected':''}>Major</option></select><input placeholder="รายละเอียด Defect" value="${esc(d.detail)}" onchange="upd('defects','${d.id}',{detail:this.value})">`:`<div>${esc(d.detail||'')}</div>`}
-  <div class="muted">รูปก่อนแก้ไข</div><div class="thumbs">${before.map(th).join('')||'-'}</div>
-  <div class="muted">รูปหลังแก้ไข</div><div class="thumbs">${after.map(th).join('')}${canFix?`<button class="sec" onclick="addPhoto(null,'${d.id}')">📷 รูปหลังแก้ไข</button>`:''}</div>
-  ${(d.defect_corrections||[]).sort((a,b)=>a.at<b.at?-1:1).map(c=>`<div class="muted">• ${c.kind==='correction'?'แก้ไข':'ตรวจซ้ำ'+(c.passed?' (ผ่าน)':' (ไม่ผ่าน)')}: ${esc(c.note||'')} · ${fmt(c.at)}</div>`).join('')}
-  ${canFix?`<input id="cn${d.id}" placeholder="บันทึกการแก้ไข"><button class="org" onclick="correct('${d.id}')">บันทึกว่าแก้ไขแล้ว</button>`:''}
-  ${canRe?`<input id="rn${d.id}" placeholder="หมายเหตุตรวจซ้ำ"><div class="pf"><button class="p on" onclick="reinspect('${d.id}',true)">ผ่าน</button><button class="f on" onclick="reinspect('${d.id}',false)">ไม่ผ่าน</button></div>`:''}</div>`}
-function actions(ins,items,defs){
-  const s=ins.status,b=(t,f,c='')=>`<button class="${c}" style="width:100%;margin:4px 0" onclick="${f}">${t}</button>`;let h='';
-  if(s==='DRAFT'&&W())h+=b('ส่งตรวจ (ต้องเซ็นชื่อ)',"submitInsp()");
-  if(s==='WAITING_INSPECTION'&&R('inspector'))h+=b('เริ่มตรวจ',"setStatus('INSPECTING')");
-  if(s==='INSPECTING'&&R('inspector'))h+=b('ตรวจเสร็จ (ต้องเซ็นชื่อ)',"finishInsp()");
-  if(s==='CORRECTION_REQUIRED'&&W()){const left=defs.filter(d=>d.status==='open').length;h+=left?`<span class="muted">เหลือ Defect ที่ต้องแก้ ${left} รายการ</span>`:b('ส่งตรวจซ้ำ',"setStatus('WAITING_REINSPECTION')")}
-  if(s==='WAITING_REINSPECTION'&&R('inspector')&&!defs.some(d=>d.status==='corrected'))h+=b('สรุปผลตรวจซ้ำ',"afterReinspect()");
-  if(s==='WAITING_APPROVAL'&&R('approver'))h+=b('อนุมัติ (ต้องเซ็นชื่อ)',"approve()")+b('ไม่อนุมัติ',"reject()",'red');
-  if(s==='APPROVED')h+=b('ดูเอกสาร','location.hash=\'#/docs\'','sec');
-  return h||'<span class="muted">ไม่มีการดำเนินการที่ทำได้ในสถานะนี้</span>'}
-async function hydrate(){document.querySelectorAll('img[data-p]').forEach(async i=>{i.src=await url(i.dataset.p)})}
-async function upd(t,id,v){await q(sb.from(t).update(v).eq('id',id))}
-async function setRemark(id,v){await upd('inspection_items',id,{remark:v})}
-async function setRes(id,r){
-  const{ins,items,defs}=_cur,it=items.find(i=>i.id===id);
-  await q(sb.from('inspection_items').update({result:r,checked_by:me.id,checked_at:new Date().toISOString()}).eq('id',id));
-  await sb.from('inspection_results').insert({inspection_item_id:id,result:r,remark:it.remark,by:me.id});
-  const d=defs.find(d=>d.inspection_item_id===id);
-  if(r==='fail'&&!d)await q(sb.from('defects').insert({project_id:ins.project_id,inspection_id:ins.id,inspection_item_id:id,equipment_id:ins.equipment_id,detail:it.title+(it.remark?' — '+it.remark:''),reported_by:me.id}));
-  if(r==='pass'&&d&&d.status==='open'&&!(d.defect_corrections||[]).length)await q(sb.from('defects').delete().eq('id',d.id));
-  detail(ins.id)}
-async function addPhoto(itemId,defectId){
-  const f=await pick();if(!f)return;const{ins,defs}=_cur;toast('กำลังอัปโหลด…');
-  const blob=await compress(f),path=`${ins.id}/${crypto.randomUUID()}.jpg`;
-  const{error}=await sb.storage.from('evidence').upload(path,blob,{contentType:'image/jpeg'});if(error)return toast(error.message);
-  const d=defectId&&defs.find(x=>x.id===defectId);
-  await q(sb.from('evidence').insert({inspection_id:ins.id,inspection_item_id:itemId||d?.inspection_item_id,defect_id:defectId||null,kind:defectId?'after':'photo',path,uploaded_by:me.id}));
-  detail(ins.id)}
-async function setStatus(s,extra){const{ins}=_cur;await q(sb.from('inspections').update({status:s,updated_at:new Date().toISOString()}).eq('id',ins.id));await audit('status:'+s,'inspection',ins.id,extra);
-  const map={WAITING_INSPECTION:['inspector','มีงานรอตรวจ '+ins.doc_no],WAITING_APPROVAL:['approver','มีงานรออนุมัติ '+ins.doc_no],CORRECTION_REQUIRED:['installer','ต้องแก้ไข Defect '+ins.doc_no],WAITING_REINSPECTION:['inspector','รอตรวจซ้ำ '+ins.doc_no]};
-  if(map[s])await notifyRole(map[s][0],map[s][1],'#/i/'+ins.id);detail(ins.id)}
-async function sign(purpose){
-  return new Promise(res=>{const m=document.createElement('div');m.className='modal';m.innerHTML=`<div><h3>ลายเซ็น — ${esc(purpose)}</h3><canvas class="sig" id="sg"></canvas><div class="row"><button class="sec" id="sc">ล้าง</button><button class="sec" id="sx">ยกเลิก</button><button id="so">ยืนยัน</button></div></div>`;document.body.append(m);
-  const c=m.querySelector('#sg');c.width=c.clientWidth*2;c.height=360;const x=c.getContext('2d');x.lineWidth=4;x.lineCap='round';let dr=false,dirty=false;
-  const pt=e=>{const r=c.getBoundingClientRect();return[(e.clientX-r.left)*c.width/r.width,(e.clientY-r.top)*c.height/r.height]};
-  c.onpointerdown=e=>{dr=true;c.setPointerCapture(e.pointerId);x.beginPath();x.moveTo(...pt(e))};c.onpointermove=e=>{if(dr){x.lineTo(...pt(e));x.stroke();dirty=true}};c.onpointerup=()=>dr=false;
-  m.querySelector('#sc').onclick=()=>{x.clearRect(0,0,c.width,c.height);dirty=false};m.querySelector('#sx').onclick=()=>{m.remove();res(null)};
-  m.querySelector('#so').onclick=async()=>{if(!dirty)return toast('กรุณาเซ็นชื่อ');const img=c.toDataURL('image/png');m.remove();
-   await q(sb.from('signatures').insert({inspection_id:_cur.ins.id,signer:me.id,signer_name:me.full_name||me.email,role:me.role,purpose,image:img}));res(img)}})}
-async function submitInsp(){const{items}=_cur;if(items.some(i=>!i.result))return toast('ตรวจให้ครบทุกรายการก่อนส่ง');if(!await sign('ส่งตรวจ'))return;await setStatus('WAITING_INSPECTION')}
-async function finishInsp(){const{items,defs}=_cur;if(items.some(i=>!i.result))return toast('ตรวจให้ครบทุกรายการก่อน');if(!await sign('ผลการตรวจ'))return;await setStatus(defs.some(d=>d.status==='open')?'CORRECTION_REQUIRED':'WAITING_APPROVAL')}
-async function correct(id){await q(sb.from('defect_corrections').insert({defect_id:id,kind:'correction',note:$('#cn'+id).value,by:me.id}));await upd('defects',id,{status:'corrected'});await audit('correct','defect',id);detail(_cur.ins.id)}
-async function reinspect(id,ok){await q(sb.from('defect_corrections').insert({defect_id:id,kind:'reinspection',passed:ok,note:$('#rn'+id).value,by:me.id}));await upd('defects',id,{status:ok?'closed':'open'});await audit('reinspect','defect',id,{ok});detail(_cur.ins.id)}
-async function afterReinspect(){const d=await q(sb.from('defects').select('status').eq('inspection_id',_cur.ins.id));await setStatus(d.some(x=>x.status==='open')?'CORRECTION_REQUIRED':'WAITING_APPROVAL')}
-async function reject(){const n=prompt('เหตุผลที่ไม่อนุมัติ');if(n===null)return;await setStatus('REJECTED',{reason:n})}
-async function approve(){
-  if(!await sign('อนุมัติเอกสาร'))return;const{ins}=_cur;
-  const snap=await snapshot(ins.id);let doc=(await q(sb.from('documents').select('*').eq('inspection_id',ins.id)))[0];
-  if(!doc)doc=await q(sb.from('documents').insert({inspection_id:ins.id,doc_no:ins.doc_no,current_rev:0}).select().single());
-  await q(sb.from('document_versions').insert({document_id:doc.id,rev:doc.current_rev,snapshot:snap,locked:true,created_by:me.id}));
-  await setStatus('APPROVED')}
-async function snapshot(id){const[ins,items,defs,evs,sigs]=await Promise.all([q(sb.from('inspections').select('*,projects(code,name,client),equipment(*),form_template_versions(version,form_templates(code,name,company))').eq('id',id).single()),q(sb.from('inspection_items').select('*').eq('inspection_id',id).order('sort')),q(sb.from('defects').select('*,defect_corrections(*)').eq('inspection_id',id)),q(sb.from('evidence').select('id,inspection_item_id,defect_id,kind,path,evidence_annotations(shapes)').eq('inspection_id',id)),q(sb.from('signatures').select('*').eq('inspection_id',id).order('at'))]);return{ins,items,defs,evs,sigs,at:new Date().toISOString()}}
 
-// ===== Markup (SVG annotation; ต้นฉบับไม่ถูกแก้) =====
-function shapesSVG(l){return l.map(s=>{const c=`stroke="${s.c}" stroke-width="${s.w}" fill="none" stroke-linecap="round"`;
-  if(s.t==='pen')return`<polyline points="${s.p.map(p=>p.join(',')).join(' ')}" ${c}/>`;
-  if(s.t==='line')return`<line x1="${s.a[0]}" y1="${s.a[1]}" x2="${s.b[0]}" y2="${s.b[1]}" ${c}/>`;
-  if(s.t==='hl')return`<line x1="${s.a[0]}" y1="${s.a[1]}" x2="${s.b[0]}" y2="${s.b[1]}" stroke="#ffeb3b" stroke-opacity=".5" stroke-width="${s.w*6}" stroke-linecap="round"/>`;
-  if(s.t==='circle'){const rx=Math.abs(s.b[0]-s.a[0])/2,ry=Math.abs(s.b[1]-s.a[1])/2;return`<ellipse cx="${(s.a[0]+s.b[0])/2}" cy="${(s.a[1]+s.b[1])/2}" rx="${rx}" ry="${ry}" ${c}/>`}
-  if(s.t==='arrow'){const[x1,y1]=s.a,[x2,y2]=s.b,a=Math.atan2(y2-y1,x2-x1),L=s.w*5;return`<g ${c}><line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/><polyline points="${x2-L*Math.cos(a-.5)},${y2-L*Math.sin(a-.5)} ${x2},${y2} ${x2-L*Math.cos(a+.5)},${y2-L*Math.sin(a+.5)}"/></g>`}
-  if(s.t==='text')return`<text x="${s.a[0]}" y="${s.a[1]}" fill="${s.c}" font-size="${s.w*6}" font-weight="700" font-family="Sarabun,sans-serif">${esc(s.s)}</text>`;return''}).join('')}
-async function markup(evId){
-  const e=_cur.evs.find(x=>x.id===evId),u=await url(e.path),bm=await createImageBitmap(await (await fetch(u)).blob());
-  const prev=e.evidence_annotations?.at(-1)?.shapes?.list||[];let list=JSON.parse(JSON.stringify(prev)),redo=[],tool='circle',cur=null;
-  const W_=bm.width,H_=bm.height,sw=Math.max(W_,H_)/180,ro=!(R('inspector')||(W()&&_cur.ins.status==='DRAFT'));
-  const m=document.createElement('div');m.className='modal';
-  m.innerHTML=`<div><div class="tools">${ro?'':['circle:○ วงกลม','arrow:➚ ลูกศร','line:／ เส้น','hl:▬ ไฮไลต์','pen:✎ ปากกา','text:T ข้อความ'].map(t=>`<button class="${t.startsWith('circle')?'on':''}" data-t="${t.split(':')[0]}">${t.split(':')[1]}</button>`).join('')}${ro?'':'<input type="color" id="mc" value="#ff2d2d" style="width:46px;padding:2px;margin:0">'}</div>
-  <svg class="ed" viewBox="0 0 ${W_} ${H_}"><image href="${u}" width="${W_}" height="${H_}"/><g id="sh"></g></svg>
-  <div class="row" style="margin-top:8px">${ro?'':'<button class="sec" id="mu">↶ ย้อน</button><button class="sec" id="mr">↷ ทำซ้ำ</button><button class="sec" id="mc2">ลบทั้งหมด</button><button id="ms">บันทึก</button>'}<button class="sec" id="mx">ปิด</button></div></div>`;
-  document.body.append(m);const svg=m.querySelector('svg'),g=m.querySelector('#sh'),draw=()=>g.innerHTML=shapesSVG(cur?[...list,cur]:list);draw();
-  const pt=ev=>{const p=svg.createSVGPoint();p.x=ev.clientX;p.y=ev.clientY;const r=p.matrixTransform(svg.getScreenCTM().inverse());return[Math.round(r.x),Math.round(r.y)]};
-  m.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{tool=b.dataset.t;m.querySelectorAll('[data-t]').forEach(x=>x.classList.toggle('on',x===b))});
-  if(!ro){svg.onpointerdown=ev=>{const c=m.querySelector('#mc').value,p=pt(ev);if(tool==='text'){const s=prompt('ข้อความ');if(s){list.push({t:'text',a:p,s,c,w:sw});redo=[];draw()}return}
-    svg.setPointerCapture(ev.pointerId);cur=tool==='pen'?{t:'pen',p:[p],c,w:sw}:{t:tool,a:p,b:p,c,w:sw}};
-  svg.onpointermove=ev=>{if(!cur)return;const p=pt(ev);if(cur.t==='pen')cur.p.push(p);else cur.b=p;draw()};
-  svg.onpointerup=()=>{if(cur){list.push(cur);cur=null;redo=[];draw()}};
-  m.querySelector('#mu').onclick=()=>{if(list.length){redo.push(list.pop());draw()}};m.querySelector('#mr').onclick=()=>{if(redo.length){list.push(redo.pop());draw()}};
-  m.querySelector('#mc2').onclick=()=>{redo=[];list=[];draw()};
-  m.querySelector('#ms').onclick=async()=>{await q(sb.from('evidence_annotations').insert({evidence_id:evId,shapes:{w:W_,h:H_,list},by:me.id}));m.remove();detail(_cur.ins.id)}}
-  m.querySelector('#mx').onclick=()=>m.remove()}
+// ============================================================
+// HOME — Project list
+// ============================================================
+async function renderHome(){
+  app.innerHTML = topbar("SmartQC","Quality Inspection System") + `<div class="page" id="list"><div class="spinner"></div></div>`;
+  const { data, error } = await sb.from("projects").select("*").order("created_at");
+  if(error) throw error;
+  const el = document.getElementById("list");
+  if(!data.length){ el.innerHTML = `<div class="empty"><div class="ic">📁</div>ยังไม่มีโครงการ</div>`; return; }
+  el.innerHTML = data.map(p=>`
+    <a class="card proj-card" href="#/project/${p.id}">
+      <div><div class="proj-code">${esc(p.code)}</div><div class="proj-name">${esc(p.name)}</div></div>
+      <div class="chev">›</div>
+    </a>`).join("");
+}
 
-// ===== Defects / Docs / Notifs / Settings =====
-async function defects(){
-  const d=await q(sb.from('defects').select('*,inspections(id,doc_no,status),inspection_items(title)').order('created_at',{ascending:false}).limit(100));
-  const f=location.hash.includes('re')?d.filter(x=>x.status==='corrected'):d;
-  $('#app').innerHTML=`<h2>Defect</h2><div class="row"><button class="${f===d?'':'sec'}" onclick="location.hash='#/defects'">ทั้งหมด</button><button class="${f===d?'sec':''}" onclick="location.hash='#/defects/re'">รอตรวจซ้ำ (Reinspection)</button></div><br>`+(f.map(x=>`<a href="#/i/${x.inspections.id}" style="text-decoration:none;color:inherit"><div class="card"><b>${esc(x.inspections.doc_no)}</b> <span class="pill ${x.severity}">${x.severity==='major'?'Major':'Minor'}</span> <span class="pill ${x.status==='closed'?'closed':''}">${x.status==='open'?'เปิด':x.status==='corrected'?'แก้แล้ว':'ปิด'}</span><br>${esc(x.inspection_items?.title||'')}<div class="muted">${esc(x.detail||'')}</div></div></a>`).join('')||'<div class="card muted">ไม่มีรายการ</div>')}
-async function docs(a){
-  if(a)return docView(a);
-  const d=await q(sb.from('documents').select('id,doc_no,current_rev,document_versions(id,rev,locked,created_at)').order('created_at',{ascending:false}));
-  $('#app').innerHTML=`<h2>เอกสาร</h2>`+(d.map(x=>`<div class="card"><b>${esc(x.doc_no)}</b>${x.document_versions.sort((a,b)=>b.rev-a.rev).map(v=>`<div class="row"><span>Rev ${v.rev} ${v.locked?'🔒':'(แก้ไขได้)'} <span class="muted">${fmt(v.created_at)}</span></span><button class="sec" onclick="location.hash='#/docs/${v.id}'">เปิด</button></div>`).join('')}${R('approver')?`<button class="org" onclick="newRev('${x.id}')">สร้าง Revision ใหม่</button>`:''}</div>`).join('')||'<div class="card muted">เอกสารจะถูกสร้างเมื่ออนุมัติงานตรวจ</div>')}
-async function newRev(did){const doc=await q(sb.from('documents').select('*').eq('id',did).single());const snap=await snapshot(doc.inspection_id),r=doc.current_rev+1;
-  await q(sb.from('document_versions').insert({document_id:did,rev:r,snapshot:snap,locked:false,created_by:me.id}));await upd('documents',did,{current_rev:r});await audit('new_revision','document',did,{rev:r});route()}
-async function lockRev(id){await upd('document_versions',id,{locked:true});await audit('lock_revision','document_version',id);route()}
-async function docView(vid){
-  const v=await q(sb.from('document_versions').select('*,documents(doc_no)').eq('id',vid).single()),s=v.snapshot,I=s.ins,fm=I.form_template_versions.form_templates;
-  const ph=async(list)=>(await Promise.all(list.map(async e=>`<img class="ph" src="${await url(e.path)}">`))).join('');
-  const rows=await Promise.all(s.items.map(async it=>{const d=s.defs.find(x=>x.inspection_item_id===it.id);return`<tr><td>${it.sort}</td><td>${esc(it.title)}</td><td>${it.result==='pass'?'ผ่าน':it.result==='fail'?'ไม่ผ่าน':'-'}</td><td>${esc(it.remark||'')}</td><td>${await ph(s.evs.filter(e=>e.inspection_item_id===it.id&&e.kind==='photo'))}</td></tr>`}));
-  const drows=await Promise.all(s.defs.map(async(d,i)=>`<tr><td>${i+1}</td><td>${esc(d.detail||'')} (${d.severity})</td><td>${await ph(s.evs.filter(e=>e.inspection_item_id===d.inspection_item_id&&e.kind==='photo'))}</td><td>${await ph(s.evs.filter(e=>e.defect_id===d.id))}</td><td>${(d.defect_corrections||[]).map(c=>esc(c.note||'')).join('<br>')}</td></tr>`));
-  const sg=r=>s.sigs.filter(x=>x.role===r).slice(-1).map(x=>`<img class="sg" src="${x.image}"><br>${esc(x.signer_name)}<br>${fmt(x.at)}`).join('')||'<br><br>';
-  $('#app').innerHTML=`<div class="row noprint"><button class="sec" onclick="location.hash='#/docs'">← กลับ</button><button onclick="window.print()">พิมพ์ / บันทึก PDF</button>${!v.locked&&R('approver')?`<button class="org" onclick="lockRev('${v.id}')">ล็อก Revision</button>`:''}</div><br>
-  <div class="doc"><div style="text-align:center"><b>${esc(fm.company||'บริษัท เจริญโภคภัณฑ์วิศวกรรม จำกัด')}</b><br><b>${esc(fm.name)}</b></div><br>
-  <table><tr><td>โครงการ: ${esc(I.projects.code)} ${esc(I.projects.name)}</td><td>เลขที่เอกสาร: ${esc(I.doc_no)}</td></tr><tr><td>Revision: ${v.rev} ${v.locked?'(ล็อกแล้ว)':''}</td><td>วันที่: ${fmt(s.at)}</td></tr>
-  <tr><td colspan="2">อุปกรณ์: ${esc(I.equipment?.code)} ${esc(I.equipment?.name||'')} ${esc(I.equipment?.model||'')} ${esc(I.equipment?.position||'')} ${Object.entries(I.equipment_data||{}).map(([k,x])=>esc(k)+': '+esc(x)).join(' · ')}</td></tr></table><br>
-  <table><tr><th>#</th><th>รายการ</th><th>ผลตรวจ</th><th>หมายเหตุ</th><th>รูปภาพ</th></tr>${rows.join('')}</table>
-  ${s.defs.length?`<br><b>Defect (FR-INS-ME-004)</b><table><tr><th>#</th><th>รายละเอียด</th><th>ก่อนแก้ไข</th><th>หลังแก้ไข</th><th>การแก้ไข</th></tr>${drows.join('')}</table>`:''}
-  <br><table style="text-align:center"><tr><th>ผู้แก้ไข (ผู้ผลิต/ติดตั้ง)</th><th>ผู้ตรวจสอบ</th><th>ผู้อนุมัติ</th></tr><tr><td>${sg('installer')}</td><td>${sg('inspector')}</td><td>${sg('approver')}</td></tr></table>
-  <p style="text-align:right">${esc(fm.code)} · หน้า 1/1 (พิมพ์แล้วเลขหน้าตามเบราว์เซอร์)</p></div>`}
-async function notifs(){
-  const n=await q(sb.from('notifications').select('*').eq('user_id',me.id).order('at',{ascending:false}).limit(50));
-  $('#app').innerHTML=`<h2>แจ้งเตือน</h2>`+(n.map(x=>`<div class="card" style="${x.read?'opacity:.6':''}"><a href="${esc(x.link||'#/notifs')}" onclick="sb.from('notifications').update({read:true}).eq('id','${x.id}')">${esc(x.message)}</a><div class="muted">${fmt(x.at)}</div></div>`).join('')||'<div class="card muted">ไม่มีแจ้งเตือน</div>')}
-async function settings(){$('#app').innerHTML=`<h2>ตั้งค่า</h2><div class="card"><b>${esc(me.full_name||'')}</b><br>${esc(me.email)}<br>บทบาท: ${RL[me.role]}<br><span class="muted">บทบาทเปลี่ยนได้โดยผู้ดูแลระบบเท่านั้น</span></div><div class="card"><a href="#/projects">โครงการทั้งหมด</a></div>`}
+// ============================================================
+// PROJECT DASHBOARD
+// ============================================================
+async function renderDashboard(projectId){
+  app.innerHTML = topbar("โครงการ","",'/') + `<div class="page" id="dash"><div class="spinner"></div></div>`;
+  const { data: proj } = await sb.from("projects").select("*").eq("id", projectId).single();
+  const { data: docs } = await sb.from("documents").select("id,status").eq("project_id", projectId);
+  const { data: prog } = await sb.from("v_document_progress").select("*").eq("project_id", projectId);
+  const { data: defects } = await sb.from("defects").select("id,status,document_id").in("document_id", (docs||[]).map(d=>d.id).length?(docs||[]).map(d=>d.id):['00000000-0000-0000-0000-000000000000']);
 
-// ===== Admin =====
-async function admin(tab='users'){
-  if(me.role!=='admin')return $('#app').innerHTML='<div class="card">เฉพาะผู้ดูแลระบบ</div>';
-  const T=['users:ผู้ใช้','projects:โครงการ','forms:แบบฟอร์ม','equipment:อุปกรณ์','audit:Audit Log'];
-  const head=`<h2>Admin</h2><div class="row">${T.map(t=>`<button class="${t.split(':')[0]===tab?'':'sec'}" onclick="location.hash='#/admin/${t.split(':')[0]}'">${t.split(':')[1]}</button>`).join('')}</div><br>`;let h='';
-  if(tab==='users'){const u=await q(sb.from('profiles').select('*').order('created_at',{ascending:false}));
-    h=u.map(x=>`<div class="card"><b>${esc(x.full_name||'')}</b> <span class="muted">${esc(x.email)}</span><div class="row"><select onchange="adm('profiles','${x.id}',{role:this.value})">${Object.keys(RL).map(r=>`<option value="${r}" ${x.role===r?'selected':''}>${RL[r]}</option>`).join('')}</select><select onchange="adm('profiles','${x.id}',{status:this.value})">${['pending:รออนุมัติ','active:ใช้งาน','disabled:ระงับ'].map(s=>`<option value="${s.split(':')[0]}" ${x.status===s.split(':')[0]?'selected':''}>${s.split(':')[1]}</option>`).join('')}</select></div></div>`).join('')}
-  if(tab==='projects'){const p=await q(sb.from('projects').select('*').order('code')),u=await q(sb.from('profiles').select('id,full_name,email').eq('status','active')),pm=await q(sb.from('project_members').select('*'));
-    h=`<div class="card"><h3>เพิ่มโครงการ</h3><input id="pc" placeholder="รหัส เช่น PJ68/074"><input id="pn" placeholder="ชื่อโครงการ"><input id="pcl" placeholder="ลูกค้า/บริษัท"><button onclick="addProject()">เพิ่ม</button></div>`+p.map(x=>`<div class="card"><input value="${esc(x.name)}" onchange="adm('projects','${x.id}',{name:this.value})"><b>${esc(x.code)}</b> <label><input type="checkbox" style="width:auto;min-height:0" ${x.active?'checked':''} onchange="adm('projects','${x.id}',{active:this.checked})"> เปิดใช้งาน</label>
-    <div class="muted">สมาชิก: ${pm.filter(m=>m.project_id===x.id).map(m=>esc(u.find(y=>y.id===m.user_id)?.full_name||'')+` <a href="#" onclick="delMember('${x.id}','${m.user_id}');return false">✕</a>`).join(', ')||'-'}</div>
-    <select onchange="addMember('${x.id}',this.value)"><option value="">+ เพิ่มสมาชิก</option>${u.map(y=>`<option value="${y.id}">${esc(y.full_name||y.email)}</option>`).join('')}</select></div>`).join('')}
-  if(tab==='forms'){const f=await q(sb.from('form_templates').select('*,form_template_versions(id,version,status,equipment_fields)').order('code'));
-    h=`<div class="card"><h3>สร้างแบบฟอร์มใหม่</h3><input id="fc" placeholder="รหัส เช่น FR-INS-ME-009"><input id="fnm" placeholder="ชื่อแบบฟอร์ม"><label>ฟิลด์รายละเอียดอุปกรณ์เพิ่มเติม (คั่นด้วย ,)</label><input id="ff" placeholder="แรงม้า (hp), ยาว (m), จำนวน"><button onclick="addForm()">สร้าง (Draft v1)</button></div>`+f.map(x=>`<div class="card"><input value="${esc(x.name)}" onchange="adm('form_templates','${x.id}',{name:this.value})"><b>${esc(x.code)}</b> · ${x.form_template_versions.sort((a,b)=>a.version-b.version).map(v=>`<a href="#" onclick="editVer('${v.id}');return false">v${v.version} ${v.status}</a>`).join(' | ')}</div>`).join('')}
-  if(tab==='equipment'){const e=await q(sb.from('equipment').select('*,projects(code)').order('code'));
-    h=e.map(x=>`<div class="card"><b>${esc(x.projects?.code)} · ${esc(x.code)}</b><input value="${esc(x.name||'')}" placeholder="ชื่อ" onchange="adm('equipment','${x.id}',{name:this.value})"><div class="row"><input value="${esc(x.model||'')}" placeholder="Model" onchange="adm('equipment','${x.id}',{model:this.value})"><input value="${esc(x.position||'')}" placeholder="Position" onchange="adm('equipment','${x.id}',{position:this.value})"></div></div>`).join('')||'ไม่มีอุปกรณ์'}
-  if(tab==='audit'){const a=await q(sb.from('audit_logs').select('*,profiles(full_name,email)').order('at',{ascending:false}).limit(100));h=a.map(x=>`<div class="card"><b>${esc(x.action)}</b> ${esc(x.entity||'')}<div class="muted">${esc(x.profiles?.full_name||x.profiles?.email||'')} · ${fmt(x.at)}</div></div>`).join('')}
-  $('#app').innerHTML=head+h}
-async function adm(t,id,v){await q(sb.from(t).update(v).eq('id',id));await audit('admin_update:'+t,t,id,v);toast('บันทึกแล้ว')}
-async function addProject(){await q(sb.from('projects').insert({code:$('#pc').value,name:$('#pn').value,client:$('#pcl').value,created_by:me.id}));await audit('create_project','project',$('#pc').value);admin('projects')}
-async function addMember(p,u){if(!u)return;await q(sb.from('project_members').insert({project_id:p,user_id:u}));admin('projects')}
-async function delMember(p,u){await q(sb.from('project_members').delete().eq('project_id',p).eq('user_id',u));admin('projects')}
-async function addForm(){const code=$('#fc').value.trim(),name=$('#fnm').value.trim();if(!code||!name)return toast('กรอกรหัสและชื่อ');
-  const f=$('#ff').value.split(',').map(s=>s.trim()).filter(Boolean),fields=[{k:'item',l:'รายการ'},{k:'model',l:'รุ่น'},{k:'pos',l:'ตำแหน่ง'},...f.map((l,i)=>({k:'x'+i,l}))];
-  const t=await q(sb.from('form_templates').insert({code,name}).select().single());const v=await q(sb.from('form_template_versions').insert({template_id:t.id,version:1,equipment_fields:fields}).select().single());await audit('create_form','form_template',t.id);editVer(v.id)}
-async function editVer(id){
-  const v=await q(sb.from('form_template_versions').select('*,form_templates(code,name)').eq('id',id).single()),it=await q(sb.from('checklist_items').select('*').eq('version_id',id).order('sort')),d=v.status==='draft';
-  const m=document.createElement('div');m.className='modal';
-  m.innerHTML=`<div><h3>${esc(v.form_templates.code)} v${v.version} (${v.status})</h3>${d?'':'<p class="muted">Version ที่ publish แล้วแก้ไม่ได้ — กด "สร้าง Draft ใหม่" เพื่อแก้ (งานที่ตรวจไปแล้วไม่เปลี่ยน)</p>'}
-  ${it.map((x,i)=>`<div class="row"><span style="flex:0">${i+1}</span><input value="${esc(x.title)}" ${d?'':'disabled'} onchange="adm('checklist_items','${x.id}',{title:this.value})">${d?`<button class="sec" onclick="mv('${id}','${x.id}',-1)">↑</button><button class="sec" onclick="mv('${id}','${x.id}',1)">↓</button><button class="red" onclick="delItem('${id}','${x.id}')">ลบ</button>`:''}</div>`).join('')}
-  ${d?`<div class="row"><input id="ni" placeholder="หัวข้อตรวจใหม่"><button onclick="addItem('${id}',${it.length+1})">เพิ่ม</button></div><button class="org" style="width:100%" onclick="publish('${id}','${v.template_id}')">Publish Version นี้</button>`:`<button class="org" style="width:100%" onclick="newDraft('${id}')">สร้าง Draft ใหม่จาก v${v.version}</button>`}
-  <button class="sec" style="width:100%;margin-top:6px" onclick="this.closest('.modal').remove();admin('forms')">ปิด</button></div>`;document.body.append(m)}
-function reopen(id){document.querySelector('.modal')?.remove();editVer(id)}
-async function addItem(v,n){const t=$('#ni').value.trim();if(!t)return;await q(sb.from('checklist_items').insert({version_id:v,sort:n,title:t}));reopen(v)}
-async function delItem(v,id){await q(sb.from('checklist_items').delete().eq('id',id));reopen(v)}
-async function mv(v,id,dir){const it=await q(sb.from('checklist_items').select('*').eq('version_id',v).order('sort')),i=it.findIndex(x=>x.id===id),j=i+dir;if(j<0||j>=it.length)return;
-  const a=it[i],b=it[j];await q(sb.from('checklist_items').update({sort:-1}).eq('id',a.id));await q(sb.from('checklist_items').update({sort:a.sort}).eq('id',b.id));await q(sb.from('checklist_items').update({sort:b.sort}).eq('id',a.id));reopen(v)}
-async function publish(v,t){if(!confirm('Publish แล้วจะแก้ Version นี้ไม่ได้ และ Version เดิมจะถูกเก็บถาวร'))return;
-  await q(sb.from('form_template_versions').update({status:'archived'}).eq('template_id',t).eq('status','published'));await q(sb.from('form_template_versions').update({status:'published',published_at:new Date().toISOString()}).eq('id',v));await audit('publish_form','form_template_version',v);document.querySelector('.modal')?.remove();admin('forms')}
-async function newDraft(v){const o=await q(sb.from('form_template_versions').select('*').eq('id',v).single()),all=await q(sb.from('form_template_versions').select('version,status').eq('template_id',o.template_id));
-  if(all.some(x=>x.status==='draft'))return toast('มี Draft อยู่แล้ว');const items=await q(sb.from('checklist_items').select('*').eq('version_id',v).order('sort'));
-  const n=await q(sb.from('form_template_versions').insert({template_id:o.template_id,version:Math.max(...all.map(x=>x.version))+1,equipment_fields:o.equipment_fields}).select().single());
-  await q(sb.from('checklist_items').insert(items.map(i=>({version_id:n.id,sort:i.sort,title:i.title}))));reopen(n.id)}
-boot();
-</script></body></html>
+  const totalItems = (prog||[]).reduce((s,p)=>s+Number(p.total_items||0),0);
+  const checked = (prog||[]).reduce((s,p)=>s+Number(p.checked_items||0),0);
+  const pass = (prog||[]).reduce((s,p)=>s+Number(p.pass_items||0),0);
+  const fail = (prog||[]).reduce((s,p)=>s+Number(p.fail_items||0),0);
+  const pending = totalItems - checked;
+  const openDefects = (defects||[]).filter(d=>!['closed','verified'].includes(d.status)).length;
+
+  app.querySelector(".topbar > div").innerHTML = `<h1>${esc(proj.name)}</h1><div class="sub">${esc(proj.code)}</div>`;
+
+  document.getElementById("dash").innerHTML = `
+    <div class="stat-grid">
+      <div class="stat"><div class="num">${totalItems}</div><div class="lbl">ตรวจทั้งหมด</div></div>
+      <div class="stat pass"><div class="num">${pass}</div><div class="lbl">ผ่าน</div></div>
+      <div class="stat fail"><div class="num">${fail}</div><div class="lbl">ไม่ผ่าน</div></div>
+      <div class="stat pending"><div class="num">${pending}</div><div class="lbl">รอตรวจ</div></div>
+    </div>
+    <div class="stat defect" style="margin-bottom:14px;"><div class="num">${openDefects}</div><div class="lbl">Defect ค้าง</div></div>
+    <div class="actions-grid">
+      <a class="action-btn" href="#/project/${projectId}/documents"><span class="ic">📋</span>เอกสารตรวจสอบ</a>
+      <a class="action-btn" href="#/project/${projectId}/defects"><span class="ic">🛠️</span>Defect</a>
+      <a class="action-btn" href="#/project/${projectId}/history"><span class="ic">🕒</span>ประวัติ</a>
+      <a class="action-btn" href="#/project/${projectId}/documents"><span class="ic">📄</span>สร้าง PDF</a>
+    </div>`;
+}
+
+// ============================================================
+// DOCUMENT LIST
+// ============================================================
+async function renderDocuments(projectId){
+  app.innerHTML = topbar("เอกสารตรวจสอบ","",`#/project/${projectId}`) + `<div class="page" id="list"><div class="spinner"></div></div>`;
+  const { data: proj } = await sb.from("projects").select("*").eq("id", projectId).single();
+  app.querySelector(".topbar > div").innerHTML = `<h1>เอกสารตรวจสอบ</h1><div class="sub">${esc(proj.code)}</div>`;
+
+  const { data: docs, error } = await sb.from("documents")
+    .select("id,document_code,status,template_id,checklist_templates(name)")
+    .eq("project_id", projectId).order("document_code");
+  if(error) throw error;
+  const { data: prog } = await sb.from("v_document_progress").select("*").eq("project_id", projectId);
+  const progMap = {}; (prog||[]).forEach(p=>progMap[p.document_id]=p);
+
+  const el = document.getElementById("list");
+  if(!docs.length){ el.innerHTML = `<div class="empty"><div class="ic">📄</div>ยังไม่มีเอกสาร</div>`; return; }
+  el.innerHTML = docs.map(d=>{
+    const p = progMap[d.id] || {total_items:0,checked_items:0};
+    const pct = p.total_items ? Math.round((p.checked_items/p.total_items)*100) : 0;
+    return `<a class="card doc-card" href="#/document/${d.id}">
+      <div class="doc-code">${esc(d.document_code)}</div>
+      <div class="doc-name">${esc(d.checklist_templates?.name || '')}</div>
+      <span class="badge ${d.status}">${statusTh(d.status)}</span>
+      <div class="progress-row">
+        <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+        <div class="progress-txt">ตรวจแล้ว ${p.checked_items||0} / ${p.total_items||0} (${pct}%)</div>
+      </div>
+    </a>`;
+  }).join("");
+}
+function statusTh(s){ return {draft:"ร่าง",in_progress:"กำลังตรวจ",completed:"เสร็จสิ้น"}[s] || s; }
+
+// ============================================================
+// DOCUMENT DETAIL — item checklist
+// ============================================================
+async function renderDocumentDetail(documentId){
+  app.innerHTML = topbar("รายละเอียดเอกสาร","",'#/') + `<div class="page" id="body"><div class="spinner"></div></div>`;
+  const { data: doc } = await sb.from("documents")
+    .select("*, checklist_templates(name,code), projects(id,code,name)").eq("id", documentId).single();
+  if(!doc) throw new Error("ไม่พบเอกสาร");
+  app.querySelector(".back").setAttribute("onclick", `nav('#/project/${doc.projects.id}/documents')`);
+  app.querySelector(".topbar > div").innerHTML = `<h1>${esc(doc.document_code)}</h1><div class="sub">${esc(doc.projects.code)}</div>`;
+
+  const { data: items } = await sb.from("checklist_template_items").select("*").eq("template_id", doc.template_id).order("sort_order");
+  // latest inspection for this doc (create if none)
+  let { data: insp } = await sb.from("inspections").select("*").eq("document_id", documentId).order("created_at",{ascending:false}).limit(1);
+  let inspection = insp && insp[0];
+  if(!inspection){
+    const { data: newInsp, error } = await sb.from("inspections").insert({document_id: documentId}).select().single();
+    if(error) throw error;
+    inspection = newInsp;
+  }
+  const { data: results } = await sb.from("inspection_results").select("*").eq("inspection_id", inspection.id);
+  const resMap = {}; (results||[]).forEach(r=>resMap[r.template_item_id]=r);
+  const checkedCount = Object.values(resMap).filter(r=>r.status==='pass'||r.status==='fail').length;
+  const pct = items.length ? Math.round((checkedCount/items.length)*100) : 0;
+
+  document.getElementById("body").innerHTML = `
+    <div class="card">
+      <div style="font-weight:700;font-size:15px">${esc(doc.checklist_templates.name)}</div>
+      <div class="progress-row">
+        <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+        <div class="progress-txt">ตรวจแล้ว ${checkedCount} / ${items.length} (${pct}%)</div>
+      </div>
+      <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
+        <a class="action-btn" style="flex:1" href="#/document/${documentId}/files"><span class="ic">📎</span>เอกสารต้นฉบับ</a>
+        <a class="action-btn" style="flex:1" href="#/document/${documentId}/pdf"><span class="ic">🖨️</span>สร้าง PDF</a>
+      </div>
+    </div>
+    <div class="section-title">รายการตรวจสอบ</div>
+    <div class="card" style="padding:6px 12px;">
+      ${items.map((it,idx)=>{
+        const r = resMap[it.id];
+        const st = r ? r.status : 'pending';
+        return `<div class="item-row" onclick="nav('#/document/${documentId}/item/${it.id}')">
+          <div class="item-num ${st}">${idx+1}</div>
+          <div class="item-info">
+            <div class="item-name">${esc(it.name)}</div>
+            <div class="item-score">${r && r.score!=null ? '★'.repeat(r.score)+'☆'.repeat(5-r.score)+' · '+(st==='pass'?'ผ่าน':st==='fail'?'ไม่ผ่าน':'') : 'ยังไม่ตรวจ'}</div>
+          </div>
+          <div class="chev">›</div>
+        </div>`;
+      }).join("")}
+    </div>`;
+}
+
+// ============================================================
+// DOCUMENT ORIGINAL FILES
+// ============================================================
+async function renderDocFiles(documentId){
+  app.innerHTML = topbar("เอกสารต้นฉบับ","",`#/document/${documentId}`) + `<div class="page" id="body"><div class="spinner"></div></div>`;
+  const { data: files } = await sb.from("document_files").select("*").eq("document_id", documentId).order("uploaded_at",{ascending:false});
+  const body = document.getElementById("body");
+  body.innerHTML = `
+    <div class="card">
+      <label style="display:block;background:var(--blue);color:#fff;text-align:center;padding:12px;border-radius:10px;font-weight:700;">
+        + อัปโหลดไฟล์ (PDF/รูป)
+        <input type="file" id="fileInput" accept="application/pdf,image/*" style="display:none">
+      </label>
+    </div>
+    <div id="fileList">
+      ${(files||[]).map(f=>`<div class="link-file"><span>📄</span><span style="flex:1">${esc(f.file_name||'ไฟล์')}</span><a href="${publicUrl(f.storage_path)}" target="_blank">เปิด</a></div>`).join("") || '<div class="empty">ยังไม่มีไฟล์</div>'}
+    </div>`;
+  document.getElementById("fileInput").addEventListener("change", async (e)=>{
+    const file = e.target.files[0]; if(!file) return;
+    toast("กำลังอัปโหลด...");
+    const path = `docfiles/${documentId}/${Date.now()}_${file.name}`;
+    const { error } = await sb.storage.from(BUCKET).upload(path, file);
+    if(error){ toast("อัปโหลดไม่สำเร็จ"); return; }
+    await sb.from("document_files").insert({document_id: documentId, storage_path: path, file_name: file.name});
+    toast("อัปโหลดสำเร็จ");
+    renderDocFiles(documentId);
+  });
+}
+function publicUrl(path){ return sb.storage.from(BUCKET).getPublicUrl(path).data.publicUrl; }
+
+// ============================================================
+// INSPECTION ITEM SCREEN
+// ============================================================
+async function renderInspectionItem(documentId, itemId){
+  app.innerHTML = topbar("กำลังโหลด...","",`#/document/${documentId}`) + `<div class="page" id="body"><div class="spinner"></div></div>`;
+
+  const { data: doc } = await sb.from("documents").select("*, projects(code), checklist_templates(name,code)").eq("id", documentId).single();
+  const { data: items } = await sb.from("checklist_template_items").select("*").eq("template_id", doc.template_id).order("sort_order");
+  const idx = items.findIndex(i=>i.id===itemId);
+  const item = items[idx];
+  if(!item) throw new Error("ไม่พบรายการตรวจ");
+  const { data: fields } = await sb.from("checklist_template_fields").select("*").eq("template_item_id", itemId).order("sort_order");
+
+  let { data: insp } = await sb.from("inspections").select("*").eq("document_id", documentId).order("created_at",{ascending:false}).limit(1);
+  const inspection = insp[0];
+
+  let { data: result } = await sb.from("inspection_results").select("*").eq("inspection_id", inspection.id).eq("template_item_id", itemId).maybeSingle();
+  if(!result){
+    const { data: newRes, error } = await sb.from("inspection_results").insert({inspection_id: inspection.id, template_item_id: itemId, status:'pending'}).select().single();
+    if(error) throw error;
+    result = newRes;
+  }
+  const { data: fieldResults } = await sb.from("checklist_results").select("*").eq("inspection_result_id", result.id);
+  const fieldMap = {}; (fieldResults||[]).forEach(f=>fieldMap[f.template_field_id]=f.passed);
+
+  const { data: photos } = await sb.from("photos").select("*").eq("inspection_result_id", result.id).eq("kind","inspection");
+
+  app.querySelector(".topbar > div").innerHTML = `<h1>${esc(doc.checklist_templates.code)}</h1><div class="sub">${esc(doc.projects.code)}</div>`;
+  app.querySelector(".back").setAttribute("onclick", `nav('#/document/${documentId}')`);
+
+  let score = result.score || 0;
+  let note = result.note || "";
+  let localFieldState = {...fieldMap};
+  let localPhotos = photos || [];
+
+  const body = document.getElementById("body");
+  function renderBody(){
+    body.innerHTML = `
+      <div class="card">
+        <div style="font-weight:700;font-size:12px;color:var(--gray-600)">${esc(doc.checklist_templates.name)}</div>
+        <div style="font-size:14px;color:var(--gray-600);margin-top:6px;">รายการ ${idx+1} / ${items.length}</div>
+        <div class="progress-bar" style="margin-top:6px;"><div class="progress-fill" style="width:${Math.round(((idx+1)/items.length)*100)}%"></div></div>
+        <div style="font-size:20px;font-weight:800;margin-top:12px;">${esc(item.name)}</div>
+      </div>
+
+      <div class="card">
+        <div class="section-title" style="margin-top:0">Checklist</div>
+        ${fields.map(f=>`
+          <div class="field-row">
+            <div class="field-label">${esc(f.label)}</div>
+            <div class="pf-btns">
+              <button class="pf-btn pass ${localFieldState[f.id]===true?'active':''}" onclick="window.__setField('${f.id}',true)">ผ่าน</button>
+              <button class="pf-btn fail ${localFieldState[f.id]===false?'active':''}" onclick="window.__setField('${f.id}',false)">ไม่ผ่าน</button>
+            </div>
+          </div>`).join("")}
+      </div>
+
+      <div class="card">
+        <div class="section-title" style="margin-top:0">คะแนน</div>
+        <div class="stars" id="starsRow">
+          ${[1,2,3,4,5].map(n=>`<span class="star ${n<=score?'filled':''}" data-n="${n}" onclick="window.__setScore(${n})">★</span>`).join("")}
+        </div>
+        ${score>0 && score<3 ? `<div class="fail-banner">⚠️ คะแนนต่ำกว่า 3 ระบบจะสร้าง Defect อัตโนมัติเมื่อบันทึก</div>` : ''}
+      </div>
+
+      <div class="card">
+        <div class="section-title" style="margin-top:0">หมายเหตุ</div>
+        <textarea id="noteBox" rows="3" placeholder="เขียนรายละเอียดเพิ่มเติม...">${esc(note)}</textarea>
+      </div>
+
+      <div class="card">
+        <div class="section-title" style="margin-top:0">รูปภาพ</div>
+        <div class="photo-actions">
+          <label>📷 ถ่ายรูป<input type="file" accept="image/*" capture="environment" id="camInput" style="display:none"></label>
+          <label>🖼️ เพิ่มรูป<input type="file" accept="image/*" multiple id="galInput" style="display:none"></label>
+        </div>
+        <div class="photo-grid" id="photoGrid">
+          ${localPhotos.map(p=>`<div class="photo-thumb"><img src="${publicUrl(p.storage_path)}"><button class="rm" onclick="window.__removePhoto('${p.id}')">✕</button></div>`).join("")}
+        </div>
+      </div>
+      <div class="autosave-note">บันทึกอัตโนมัติเมื่อกดถัดไป/ก่อนหน้า</div>
+    `;
+    document.getElementById("noteBox").addEventListener("input", e=> note = e.target.value);
+    document.getElementById("camInput").addEventListener("change", e=>uploadPhotos(e.target.files));
+    document.getElementById("galInput").addEventListener("change", e=>uploadPhotos(e.target.files));
+  }
+
+  window.__setField = (fieldId, val)=>{ localFieldState[fieldId]=val; renderBody(); };
+  window.__setScore = (n)=>{ score = n; renderBody(); };
+  window.__removePhoto = async (photoId)=>{
+    const p = localPhotos.find(x=>x.id===photoId);
+    if(p) await sb.storage.from(BUCKET).remove([p.storage_path]);
+    await sb.from("photos").delete().eq("id", photoId);
+    localPhotos = localPhotos.filter(x=>x.id!==photoId);
+    renderBody();
+  };
+
+  async function compressImage(file){
+    return new Promise((resolve)=>{
+      const img = new Image();
+      const reader = new FileReader();
+      reader.onload = e => img.src = e.target.result;
+      img.onload = () => {
+        const maxDim = 1600;
+        let {width, height} = img;
+        if(width>maxDim || height>maxDim){
+          const ratio = Math.min(maxDim/width, maxDim/height);
+          width = Math.round(width*ratio); height = Math.round(height*ratio);
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width=width; canvas.height=height;
+        canvas.getContext("2d").drawImage(img,0,0,width,height);
+        canvas.toBlob(blob=>resolve(blob), "image/jpeg", 0.8);
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function uploadPhotos(fileList){
+    toast("กำลังอัปโหลดรูป...");
+    for(const file of fileList){
+      const blob = await compressImage(file);
+      const path = `inspection/${result.id}/${Date.now()}_${Math.random().toString(36).slice(2,7)}.jpg`;
+      const { error } = await sb.storage.from(BUCKET).upload(path, blob, {contentType:'image/jpeg'});
+      if(error){ toast("อัปโหลดไม่สำเร็จ"); continue; }
+      const { data: newPhoto } = await sb.from("photos").insert({inspection_result_id: result.id, storage_path: path, kind:'inspection'}).select().single();
+      localPhotos.push(newPhoto);
+    }
+    toast("อัปโหลดสำเร็จ");
+    renderBody();
+  }
+
+  renderBody();
+
+  // footer nav
+  const footer = document.createElement("div");
+  footer.className = "footer-nav";
+  footer.innerHTML = `
+    <button class="nav-btn secondary" id="prevBtn" ${idx===0?'disabled':''}>← ก่อนหน้า</button>
+    <button class="nav-btn primary" id="nextBtn">${idx===items.length-1?'บันทึก & เสร็จสิ้น':'บันทึก & ถัดไป →'}</button>
+  `;
+  app.appendChild(footer);
+
+  async function saveResult(){
+    const anyFieldFail = Object.values(localFieldState).some(v=>v===false);
+    const anyFieldSet = Object.keys(localFieldState).length>0;
+    let status = 'pending';
+    if(score>0) status = score>=3 ? 'pass' : 'fail';
+    else if(anyFieldSet) status = anyFieldFail ? 'fail' : (Object.keys(localFieldState).length===fields.length ? 'pass' : 'pending');
+
+    await sb.from("inspection_results").update({score: score||null, status, note, updated_at: new Date().toISOString()}).eq("id", result.id);
+
+    for(const f of fields){
+      if(f.id in localFieldState){
+        await sb.from("checklist_results").upsert({inspection_result_id: result.id, template_field_id: f.id, passed: localFieldState[f.id]}, {onConflict:'inspection_result_id,template_field_id'});
+      }
+    }
+
+    // log activity
+    await sb.from("activity_logs").insert({
+      project_id: doc.project_id, document_id: documentId, item_name: item.name,
+      action: 'ตรวจสอบ', result: status==='pass'?'PASS':status==='fail'?'FAIL':null
+    });
+
+    // auto defect on fail
+    if(status==='fail'){
+      const { data: existingDefect } = await sb.from("defects").select("id").eq("inspection_result_id", result.id).eq("status","open").maybeSingle();
+      if(!existingDefect){
+        const { count } = await sb.from("defects").select("*",{count:'exact',head:true});
+        const defectNo = 'DEF-' + String((count||0)+1).padStart(4,'0');
+        const { data: defect } = await sb.from("defects").insert({
+          defect_no: defectNo, inspection_result_id: result.id, document_id: documentId,
+          description: `${item.name} - คะแนน ${score||0}/5`, score_at_fail: score||0, status:'open'
+        }).select().single();
+        // link current photos as "before" defect evidence too
+        for(const p of localPhotos){
+          await sb.from("photos").update({defect_id: defect.id}).eq("id", p.id);
+        }
+        toast(`สร้าง Defect ${defectNo} อัตโนมัติ`);
+      }
+    } else if(status==='pass'){
+      // auto-verify open defects tied to this result on pass (re-inspection success)
+      await sb.from("defects").update({status:'verified'}).eq("inspection_result_id", result.id).in("status",['open','in_progress','fixed']);
+    }
+  }
+
+  document.getElementById("nextBtn").addEventListener("click", async ()=>{
+    document.getElementById("nextBtn").textContent = "กำลังบันทึก...";
+    await saveResult();
+    if(idx < items.length-1){
+      nav(`#/document/${documentId}/item/${items[idx+1].id}`);
+    } else {
+      // check if all items done
+      const { data: allResults } = await sb.from("inspection_results").select("status").eq("inspection_id", inspection.id);
+      const allDone = allResults.length===items.length && allResults.every(r=>r.status==='pass'||r.status==='fail');
+      if(allDone){
+        await sb.from("inspections").update({status:'completed'}).eq("id", inspection.id);
+        await sb.from("documents").update({status:'completed'}).eq("id", documentId);
+      } else {
+        await sb.from("documents").update({status:'in_progress'}).eq("id", documentId);
+      }
+      toast("บันทึกครบทุกรายการแล้ว");
+      nav(`#/document/${documentId}`);
+    }
+  });
+  if(idx>0) document.getElementById("prevBtn").addEventListener("click", async ()=>{
+    await saveResult();
+    nav(`#/document/${documentId}/item/${items[idx-1].id}`);
+  });
+}
+
+// ============================================================
+// PROJECT DEFECTS LIST
+// ============================================================
+async function renderProjectDefects(projectId){
+  app.innerHTML = topbar("Defect","",`#/project/${projectId}`) + `<div class="page" id="body"><div class="spinner"></div></div>`;
+  const { data: docs } = await sb.from("documents").select("id,document_code").eq("project_id", projectId);
+  const docIds = (docs||[]).map(d=>d.id);
+  const docMap = {}; (docs||[]).forEach(d=>docMap[d.id]=d.document_code);
+  const { data: defects } = docIds.length
+    ? await sb.from("defects").select("*").in("document_id", docIds).order("created_at",{ascending:false})
+    : {data:[]};
+
+  const body = document.getElementById("body");
+  if(!defects.length){ body.innerHTML = `<div class="empty"><div class="ic">✅</div>ไม่มี Defect</div>`; return; }
+  body.innerHTML = defects.map(d=>`
+    <a class="card def-card" href="#/defect/${d.id}">
+      <span class="status status-pill ${d.status}">${defStatusTh(d.status)}</span>
+      <div class="doc-code">${d.defect_no}</div>
+      <div class="doc-name">${esc(d.description||'')}</div>
+      <div style="font-size:12px;color:var(--gray-600);margin-top:4px;">${esc(docMap[d.document_id]||'')}</div>
+    </a>`).join("");
+}
+function defStatusTh(s){ return {open:'เปิด',in_progress:'กำลังแก้ไข',fixed:'แก้ไขแล้ว',verified:'ตรวจซ้ำผ่าน',closed:'ปิดงาน'}[s]||s; }
+
+// ============================================================
+// DEFECT DETAIL
+// ============================================================
+async function renderDefectDetail(defectId){
+  app.innerHTML = topbar("Defect","",'#/') + `<div class="page" id="body"><div class="spinner"></div></div>`;
+  const { data: defect } = await sb.from("defects").select("*, documents(id,document_code,project_id,projects(code,name))").eq("id", defectId).single();
+  if(!defect) throw new Error("ไม่พบ Defect");
+  app.querySelector(".back").setAttribute("onclick", `nav('#/project/${defect.documents.project_id}/defects')`);
+  app.querySelector(".topbar > div").innerHTML = `<h1>${defect.defect_no}</h1><div class="sub">${esc(defect.documents.document_code)}</div>`;
+
+  const { data: result } = await sb.from("inspection_results").select("*, checklist_template_items(name)").eq("id", defect.inspection_result_id).single();
+  const { data: beforePhotos } = await sb.from("photos").select("*").eq("defect_id", defectId).eq("kind","defect");
+  const { data: corrections } = await sb.from("defect_corrections").select("*").eq("defect_id", defectId).order("created_at",{ascending:false});
+  let correctionPhotosMap = {};
+  for(const c of (corrections||[])){
+    const { data: ph } = await sb.from("photos").select("*").eq("correction_id", c.id);
+    correctionPhotosMap[c.id] = ph || [];
+  }
+
+  const body = document.getElementById("body");
+  body.innerHTML = `
+    <div class="card">
+      <span class="status-pill ${defect.status}">${defStatusTh(defect.status)}</span>
+      <div style="font-weight:700;font-size:16px;margin-top:8px;">${esc(result.checklist_template_items.name)}</div>
+      <div style="font-size:14px;color:var(--gray-600);margin-top:4px;">คะแนนที่พบ: ${defect.score_at_fail}/5</div>
+      <div style="font-size:14px;margin-top:8px;">${esc(defect.description||'')}</div>
+      <div class="section-title">รูปก่อนแก้ไข</div>
+      <div class="photo-grid">${beforePhotos.map(p=>`<div class="photo-thumb"><img src="${publicUrl(p.storage_path)}"></div>`).join("") || '<span style="font-size:13px;color:var(--gray-400)">ไม่มีรูป</span>'}</div>
+    </div>
+
+    <div class="card">
+      <div class="section-title" style="margin-top:0">บันทึกการแก้ไข</div>
+      <textarea id="fixNote" rows="3" placeholder="เช่น เชื่อมเสริมบริเวณรอยต่อและทาสีกันสนิมใหม่"></textarea>
+      <div class="photo-actions">
+        <label>📷 ถ่ายรูปหลังแก้ไข<input type="file" accept="image/*" capture="environment" multiple id="fixPhotos" style="display:none"></label>
+      </div>
+      <div class="photo-grid" id="newFixPhotos"></div>
+      <button class="nav-btn primary" style="width:100%;margin-top:12px;" id="saveFixBtn">บันทึกการแก้ไข</button>
+    </div>
+
+    ${defect.status!=='closed' ? `
+    <div class="card">
+      <button class="nav-btn primary" style="width:100%;" onclick="nav('#/document/${defect.documents.id}/item/${result.template_item_id}')">🔄 ตรวจซ้ำ (Re-inspection)</button>
+    </div>` : ''}
+
+    <div class="section-title">ประวัติการแก้ไข</div>
+    ${(corrections||[]).map(c=>`
+      <div class="card">
+        <div style="font-size:12px;color:var(--gray-600)">${new Date(c.created_at).toLocaleString('th-TH')}</div>
+        <div style="margin-top:4px;">${esc(c.detail||'')}</div>
+        <div class="photo-grid">${(correctionPhotosMap[c.id]||[]).map(p=>`<div class="photo-thumb"><img src="${publicUrl(p.storage_path)}"></div>`).join("")}</div>
+      </div>`).join("") || '<div class="empty" style="padding:16px;">ยังไม่มีการแก้ไข</div>'}
+  `;
+
+  let pendingFiles = [];
+  document.getElementById("fixPhotos").addEventListener("change", (e)=>{
+    pendingFiles = Array.from(e.target.files);
+    document.getElementById("newFixPhotos").innerHTML = pendingFiles.map(f=>`<div class="photo-thumb"><img src="${URL.createObjectURL(f)}"></div>`).join("");
+  });
+
+  document.getElementById("saveFixBtn").addEventListener("click", async ()=>{
+    const detail = document.getElementById("fixNote").value;
+    if(!detail && pendingFiles.length===0){ toast("กรุณาใส่รายละเอียดหรือรูปภาพ"); return; }
+    toast("กำลังบันทึก...");
+    const { data: correction } = await sb.from("defect_corrections").insert({defect_id: defectId, detail}).select().single();
+    for(const file of pendingFiles){
+      const path = `correction/${correction.id}/${Date.now()}_${Math.random().toString(36).slice(2,7)}.jpg`;
+      const { error } = await sb.storage.from(BUCKET).upload(path, file);
+      if(!error) await sb.from("photos").insert({correction_id: correction.id, storage_path: path, kind:'correction'});
+    }
+    await sb.from("defects").update({status:'fixed'}).eq("id", defectId);
+    await sb.from("activity_logs").insert({project_id: defect.documents.project_id, document_id: defect.documents.id, item_name: result.checklist_template_items.name, action:'แก้ไข Defect', result: null});
+    toast("บันทึกสำเร็จ");
+    renderDefectDetail(defectId);
+  });
+}
+
+// ============================================================
+// HISTORY
+// ============================================================
+async function renderHistory(projectId){
+  app.innerHTML = topbar("ประวัติ","",`#/project/${projectId}`) + `<div class="page" id="body"><div class="spinner"></div></div>`;
+  const { data: logs } = await sb.from("activity_logs").select("*, documents(document_code)").eq("project_id", projectId).order("created_at",{ascending:false}).limit(100);
+  const body = document.getElementById("body");
+  if(!logs || !logs.length){ body.innerHTML = `<div class="empty"><div class="ic">🕒</div>ยังไม่มีประวัติ</div>`; return; }
+  body.innerHTML = `<div class="card" style="padding:6px 14px;">` + logs.map(l=>`
+    <div class="hist-item">
+      <div class="hist-date">${new Date(l.created_at).toLocaleString('th-TH')}</div>
+      <div class="hist-doc">${esc(l.documents?.document_code||'')}</div>
+      <div class="hist-action">${esc(l.item_name||'')} — ${esc(l.action)} ${l.result?`<span class="${l.result==='PASS'?'res-pass':'res-fail'}">${l.result}</span>`:''}</div>
+    </div>`).join("") + `</div>`;
+}
+
+// ============================================================
+// PDF GENERATION SCREEN
+// ============================================================
+async function renderPdfScreen(documentId){
+  app.innerHTML = topbar("สร้าง PDF","",`#/document/${documentId}`) + `<div class="page" id="body"><div class="spinner"></div></div>`;
+  const { data: doc } = await sb.from("documents").select("*, projects(code,name), checklist_templates(name,code)").eq("id", documentId).single();
+  const body = document.getElementById("body");
+  body.innerHTML = `
+    <div class="card">
+      <div style="font-weight:700;">${esc(doc.document_code)}</div>
+      <div style="font-size:14px;color:var(--gray-600);margin-top:4px;">${esc(doc.checklist_templates.name)}</div>
+    </div>
+    <div class="card">
+      <div class="section-title" style="margin-top:0">ลงชื่อ</div>
+      <div style="font-size:13px;font-weight:600;margin-bottom:4px;">ผู้ตรวจสอบ</div>
+      <div class="sig-pad-wrap"><canvas class="sigpad" id="sig1"></canvas></div>
+      <button class="nav-btn secondary" style="width:100%;margin-top:6px;" onclick="window.__clearSig(1)">ล้างลายเซ็น</button>
+      <input type="text" id="inspectorName" placeholder="ชื่อผู้ตรวจสอบ" style="margin-top:8px;">
+
+      <div style="font-size:13px;font-weight:600;margin:14px 0 4px;">ผู้อนุมัติ</div>
+      <div class="sig-pad-wrap"><canvas class="sigpad" id="sig2"></canvas></div>
+      <button class="nav-btn secondary" style="width:100%;margin-top:6px;" onclick="window.__clearSig(2)">ล้างลายเซ็น</button>
+      <input type="text" id="approverName" placeholder="ชื่อผู้อนุมัติ" style="margin-top:8px;">
+    </div>
+    <div class="pdf-btn-grid">
+      <button id="genBtn">📄 สร้าง PDF</button>
+    </div>
+    <div id="pdfResult"></div>
+  `;
+
+  function setupPad(id){
+    const canvas = document.getElementById(id);
+    const ratio = Math.max(window.devicePixelRatio||1,1);
+    canvas.width = canvas.offsetWidth * ratio;
+    canvas.height = canvas.offsetHeight * ratio;
+    canvas.getContext("2d").scale(ratio,ratio);
+    return new SignaturePad(canvas, {backgroundColor:'rgb(255,255,255)'});
+  }
+  const pad1 = setupPad("sig1");
+  const pad2 = setupPad("sig2");
+  window.__clearSig = (n)=> (n===1?pad1:pad2).clear();
+
+  document.getElementById("genBtn").addEventListener("click", async ()=>{
+    document.getElementById("genBtn").textContent = "กำลังสร้าง...";
+    try{
+      await generatePdf(documentId, doc, pad1, pad2,
+        document.getElementById("inspectorName").value,
+        document.getElementById("approverName").value);
+    }catch(e){ console.error(e); toast("สร้าง PDF ไม่สำเร็จ: "+e.message); }
+    document.getElementById("genBtn").textContent = "📄 สร้าง PDF";
+  });
+}
+
+async function generatePdf(documentId, doc, pad1, pad2, inspectorName, approverName){
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF({unit:'pt', format:'a4'});
+  const pageW = pdf.internal.pageSize.getWidth();
+  let y = 40;
+  const marginX = 40;
+
+  pdf.setFontSize(18); pdf.text("SmartQC - Inspection Report", marginX, y); y+=24;
+  pdf.setFontSize(11);
+  pdf.text(`Project: ${doc.projects.code}  ${doc.projects.name}`, marginX, y); y+=16;
+  pdf.text(`Document: ${doc.document_code}`, marginX, y); y+=16;
+  pdf.text(`Title: ${doc.checklist_templates.name}`, marginX, y); y+=16;
+  pdf.text(`Date: ${new Date().toLocaleDateString('en-GB')}`, marginX, y); y+=24;
+
+  const { data: items } = await sb.from("checklist_template_items").select("*").eq("template_id", doc.template_id).order("sort_order");
+  const { data: insp } = await sb.from("inspections").select("*").eq("document_id", documentId).order("created_at",{ascending:false}).limit(1);
+  const inspection = insp[0];
+  const { data: results } = await sb.from("inspection_results").select("*").eq("inspection_id", inspection.id);
+  const resMap = {}; (results||[]).forEach(r=>resMap[r.template_item_id]=r);
+
+  pdf.setFontSize(13); pdf.text("Checklist Results", marginX, y); y+=18;
+  pdf.setFontSize(10);
+  for(const it of items){
+    const r = resMap[it.id];
+    if(y > 760){ pdf.addPage(); y=40; }
+    const statusTxt = r ? (r.status==='pass'?'PASS':r.status==='fail'?'FAIL':'-') : '-';
+    pdf.text(`${it.name}  |  Score: ${r&&r.score!=null?r.score:'-'}/5  |  ${statusTxt}`, marginX, y);
+    y += 14;
+    if(r && r.note){ pdf.setTextColor(90); pdf.text(`Note: ${r.note}`, marginX+10, y); y+=14; pdf.setTextColor(0); }
+  }
+  y += 10;
+
+  // photos
+  for(const it of items){
+    const r = resMap[it.id];
+    if(!r) continue;
+    const { data: photos } = await sb.from("photos").select("*").eq("inspection_result_id", r.id).eq("kind","inspection");
+    if(!photos || !photos.length) continue;
+    if(y > 700){ pdf.addPage(); y=40; }
+    pdf.setFontSize(11); pdf.text(`Photos: ${it.name}`, marginX, y); y+=10;
+    let x = marginX;
+    const imgSize = 110;
+    for(const p of photos){
+      try{
+        const dataUrl = await imgToDataUrl(publicUrl(p.storage_path));
+        if(x + imgSize > pageW - marginX){ x = marginX; y += imgSize + 10; }
+        if(y + imgSize > 780){ pdf.addPage(); y=40; x=marginX; }
+        pdf.addImage(dataUrl, 'JPEG', x, y, imgSize, imgSize);
+        x += imgSize + 10;
+      }catch(e){ console.warn("img fail", e); }
+    }
+    y += imgSize + 20;
+  }
+
+  // defects
+  const { data: defects } = await sb.from("defects").select("*, inspection_results(template_item_id, checklist_template_items(name))").eq("document_id", documentId);
+  if(defects && defects.length){
+    if(y > 700){ pdf.addPage(); y=40; }
+    pdf.setFontSize(13); pdf.text("Defects", marginX, y); y+=18; pdf.setFontSize(10);
+    for(const d of defects){
+      if(y > 760){ pdf.addPage(); y=40; }
+      pdf.text(`${d.defect_no} - ${d.inspection_results?.checklist_template_items?.name||''} - Status: ${d.status}`, marginX, y); y+=14;
+      if(d.description){ pdf.text(`  ${d.description}`, marginX, y); y+=14; }
+    }
+  }
+
+  // signatures
+  if(y > 650){ pdf.addPage(); y=40; }
+  y += 20;
+  pdf.setFontSize(13); pdf.text("Signatures", marginX, y); y+=20;
+  const sigW = 200, sigH = 70;
+  if(!pad1.isEmpty()){ pdf.addImage(pad1.toDataURL(), 'PNG', marginX, y, sigW, sigH); }
+  if(!pad2.isEmpty()){ pdf.addImage(pad2.toDataURL(), 'PNG', marginX + 250, y, sigW, sigH); }
+  y += sigH + 12;
+  pdf.setFontSize(10);
+  pdf.text(`Inspector: ${inspectorName||'____________________'}`, marginX, y);
+  pdf.text(`Approver: ${approverName||'____________________'}`, marginX+250, y);
+
+  // save signature images to storage + inspection record
+  try{
+    if(!pad1.isEmpty()){
+      const blob1 = await (await fetch(pad1.toDataURL())).blob();
+      const path1 = `signatures/${inspection.id}_inspector_${Date.now()}.png`;
+      await sb.storage.from(BUCKET).upload(path1, blob1, {contentType:'image/png'});
+      await sb.from("signatures").insert({inspection_id: inspection.id, role:'inspector', storage_path: path1});
+    }
+    if(!pad2.isEmpty()){
+      const blob2 = await (await fetch(pad2.toDataURL())).blob();
+      const path2 = `signatures/${inspection.id}_approver_${Date.now()}.png`;
+      await sb.storage.from(BUCKET).upload(path2, blob2, {contentType:'image/png'});
+      await sb.from("signatures").insert({inspection_id: inspection.id, role:'approver', storage_path: path2});
+    }
+    await sb.from("inspections").update({inspector_name: inspectorName, approver_name: approverName}).eq("id", inspection.id);
+  }catch(e){ console.warn("sig save fail", e); }
+
+  const fileName = doc.document_code.replace(/\//g,'-') + '.pdf';
+  const blob = pdf.output('blob');
+  const blobUrl = URL.createObjectURL(blob);
+
+  document.getElementById("pdfResult").innerHTML = `
+    <div class="card">
+      <div style="font-weight:700;margin-bottom:10px;">✅ สร้าง PDF สำเร็จ</div>
+      <div class="pdf-btn-grid">
+        <button onclick="window.open('${blobUrl}','_blank')">👁️ เปิด PDF</button>
+        <button class="alt" id="dlBtn">⬇️ ดาวน์โหลด</button>
+        <button class="alt" onclick="window.print()">🖨️ Print</button>
+        <button class="alt" id="shareBtn">📤 Share</button>
+      </div>
+    </div>`;
+  document.getElementById("dlBtn").addEventListener("click", ()=>{
+    const a = document.createElement('a'); a.href = blobUrl; a.download = fileName; a.click();
+  });
+  document.getElementById("shareBtn").addEventListener("click", async ()=>{
+    if(navigator.share && navigator.canShare){
+      const file = new File([blob], fileName, {type:'application/pdf'});
+      if(navigator.canShare({files:[file]})){
+        try{ await navigator.share({files:[file], title: fileName}); return; }catch(e){}
+      }
+    }
+    const a = document.createElement('a'); a.href = blobUrl; a.download = fileName; a.click();
+    toast("อุปกรณ์นี้ไม่รองรับ Share — ดาวน์โหลดแทน");
+  });
+  toast("สร้าง PDF สำเร็จ");
+}
+
+function imgToDataUrl(url){
+  return new Promise((resolve,reject)=>{
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = ()=>{
+      const canvas = document.createElement("canvas");
+      canvas.width = img.width; canvas.height = img.height;
+      canvas.getContext("2d").drawImage(img,0,0);
+      resolve(canvas.toDataURL("image/jpeg", 0.85));
+    };
+    img.onerror = reject;
+    img.src = url;
+  });
+}
+</script>
+</body>
+</html>
