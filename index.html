@@ -1,1622 +1,188 @@
 <!DOCTYPE html>
-<html lang="th">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ระบบตรวจงานติดตั้งเครื่องจักร</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    :root {
-      --primary: #2c3e50;
-      --secondary: #e74c3c;
-      --success: #27ae60;
-      --warning: #f39c12;
-      --info: #3498db;
-      --light: #ecf0f1;
-      --dark: #2c3e50;
-      --border-color: #bdc3c7;
-    }
-
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
-      color: var(--dark);
-    }
-
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-
-    /* Auth Page */
-    .auth-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 20px;
-    }
-
-    .auth-box {
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-      padding: 40px;
-      width: 100%;
-      max-width: 400px;
-    }
-
-    .auth-box h1 {
-      text-align: center;
-      color: var(--primary);
-      margin-bottom: 30px;
-      font-size: 24px;
-    }
-
-    .form-group {
-      margin-bottom: 15px;
-    }
-
-    .form-group label {
-      display: block;
-      margin-bottom: 5px;
-      color: var(--primary);
-      font-weight: 500;
-    }
-
-    input, select, textarea {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid var(--border-color);
-      border-radius: 5px;
-      font-size: 14px;
-      font-family: inherit;
-    }
-
-    input:focus, select:focus, textarea:focus {
-      outline: none;
-      border-color: var(--info);
-      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
-    }
-
-    button {
-      background: var(--info);
-      color: white;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 500;
-      transition: background 0.3s;
-      width: 100%;
-    }
-
-    button:hover {
-      background: #2980b9;
-    }
-
-    button.secondary {
-      background: var(--secondary);
-      margin-top: 10px;
-    }
-
-    button.secondary:hover {
-      background: #c0392b;
-    }
-
-    /* Header */
-    .header {
-      background: white;
-      padding: 15px 20px;
-      border-radius: 10px;
-      margin-bottom: 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-
-    .header h1 {
-      color: var(--primary);
-      font-size: 20px;
-    }
-
-    .header-right {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-
-    .user-info {
-      color: var(--dark);
-      font-size: 14px;
-    }
-
-    /* Main Layout */
-    .app {
-      display: none;
-    }
-
-    .app.active {
-      display: block;
-    }
-
-    .sidebar {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 10px;
-      margin-bottom: 20px;
-      background: white;
-      padding: 15px;
-      border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-
-    .sidebar button {
-      padding: 12px 15px;
-      text-align: left;
-      background: var(--light);
-      color: var(--dark);
-      border: 2px solid transparent;
-      transition: all 0.3s;
-    }
-
-    .sidebar button:hover,
-    .sidebar button.active {
-      background: var(--info);
-      color: white;
-      border-color: var(--info);
-    }
-
-    /* Page Content */
-    .page {
-      display: none;
-      background: white;
-      border-radius: 10px;
-      padding: 30px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    }
-
-    .page.active {
-      display: block;
-    }
-
-    .page h2 {
-      color: var(--primary);
-      margin-bottom: 20px;
-      font-size: 22px;
-    }
-
-    /* Dashboard */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 15px;
-      margin-bottom: 30px;
-    }
-
-    .stat-card {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 20px;
-      border-radius: 10px;
-      text-align: center;
-    }
-
-    .stat-card h3 {
-      font-size: 14px;
-      margin-bottom: 10px;
-      opacity: 0.9;
-    }
-
-    .stat-card .number {
-      font-size: 32px;
-      font-weight: bold;
-    }
-
-    .stat-card.waiting {
-      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    }
-
-    .stat-card.correction {
-      background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-    }
-
-    .stat-card.approved {
-      background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
-    }
-
-    /* Forms */
-    .form-section {
-      margin-bottom: 25px;
-      padding: 20px;
-      background: var(--light);
-      border-radius: 8px;
-      border-left: 4px solid var(--info);
-    }
-
-    .form-section h3 {
-      color: var(--primary);
-      margin-bottom: 15px;
-      font-size: 16px;
-    }
-
-    .form-row {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 15px;
-      margin-bottom: 15px;
-    }
-
-    .checkbox-group {
-      display: flex;
-      gap: 15px;
-      margin-top: 10px;
-      flex-wrap: wrap;
-    }
-
-    .checkbox-group label {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-      margin: 0;
-    }
-
-    .checkbox-group input[type="radio"],
-    .checkbox-group input[type="checkbox"] {
-      width: auto;
-      cursor: pointer;
-    }
-
-    /* Checklist */
-    .checklist-item {
-      background: white;
-      padding: 15px;
-      border-radius: 8px;
-      margin-bottom: 10px;
-      border-left: 4px solid var(--light);
-    }
-
-    .checklist-item.pass {
-      border-left-color: var(--success);
-      background: #f0fdf4;
-    }
-
-    .checklist-item.fail {
-      border-left-color: var(--secondary);
-      background: #fef2f2;
-    }
-
-    .checklist-item h4 {
-      color: var(--primary);
-      margin-bottom: 10px;
-      font-size: 15px;
-    }
-
-    .checklist-result {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-
-    .checklist-result label {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      cursor: pointer;
-      margin: 0;
-    }
-
-    /* Image Upload */
-    .image-section {
-      margin-top: 15px;
-    }
-
-    .image-upload {
-      border: 2px dashed var(--border-color);
-      border-radius: 8px;
-      padding: 20px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.3s;
-      background: var(--light);
-    }
-
-    .image-upload:hover {
-      border-color: var(--info);
-      background: #e8f4f8;
-    }
-
-    .image-upload input[type="file"] {
-      display: none;
-    }
-
-    .preview-container {
-      margin-top: 15px;
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      gap: 10px;
-    }
-
-    .preview-image {
-      position: relative;
-      border-radius: 8px;
-      overflow: hidden;
-      background: var(--light);
-      aspect-ratio: 1;
-    }
-
-    .preview-image img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .preview-image .tools {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: rgba(0,0,0,0.7);
-      padding: 8px;
-      display: flex;
-      gap: 8px;
-      justify-content: center;
-    }
-
-    .preview-image button {
-      padding: 5px 10px;
-      font-size: 12px;
-      background: var(--info);
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    /* Table */
-    .data-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-      font-size: 14px;
-    }
-
-    .data-table th {
-      background: var(--primary);
-      color: white;
-      padding: 12px;
-      text-align: left;
-      font-weight: 600;
-    }
-
-    .data-table td {
-      padding: 12px;
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    .data-table tr:hover {
-      background: var(--light);
-    }
-
-    .status-badge {
-      display: inline-block;
-      padding: 5px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-      text-transform: uppercase;
-    }
-
-    .status-badge.draft {
-      background: #e8e8e8;
-      color: #333;
-    }
-
-    .status-badge.waiting {
-      background: #fff3cd;
-      color: #856404;
-    }
-
-    .status-badge.approved {
-      background: #d4edda;
-      color: #155724;
-    }
-
-    .status-badge.rejected {
-      background: #f8d7da;
-      color: #721c24;
-    }
-
-    /* Modal */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0,0,0,0.5);
-      z-index: 1000;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-    }
-
-    .modal.active {
-      display: flex;
-    }
-
-    .modal-content {
-      background: white;
-      border-radius: 10px;
-      padding: 30px;
-      width: 100%;
-      max-width: 500px;
-      max-height: 90vh;
-      overflow-y: auto;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-    }
-
-    .modal-header {
-      font-size: 18px;
-      font-weight: bold;
-      color: var(--primary);
-      margin-bottom: 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .close-modal {
-      background: none;
-      border: none;
-      font-size: 24px;
-      cursor: pointer;
-      color: var(--dark);
-      width: auto;
-      padding: 0;
-    }
-
-    /* Signature Canvas */
-    #signatureCanvas {
-      border: 1px solid var(--border-color);
-      cursor: crosshair;
-      margin: 10px 0;
-      border-radius: 5px;
-    }
-
-    /* Admin Panel */
-    .admin-section {
-      margin-bottom: 30px;
-    }
-
-    .admin-section h3 {
-      background: var(--primary);
-      color: white;
-      padding: 15px;
-      border-radius: 5px;
-      margin-bottom: 15px;
-      cursor: pointer;
-    }
-
-    .admin-section-content {
-      display: none;
-      padding: 20px;
-      background: var(--light);
-      border-radius: 5px;
-    }
-
-    .admin-section-content.active {
-      display: block;
-    }
-
-    .user-list,
-    .project-list {
-      margin-top: 20px;
-    }
-
-    .user-item,
-    .project-item {
-      background: white;
-      padding: 15px;
-      border-radius: 5px;
-      margin-bottom: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .user-item .actions,
-    .project-item .actions {
-      display: flex;
-      gap: 10px;
-    }
-
-    .user-item button,
-    .project-item button {
-      padding: 5px 15px;
-      font-size: 12px;
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      .sidebar {
-        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-      }
-
-      .stats-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .form-row {
-        grid-template-columns: 1fr;
-      }
-
-      .data-table {
-        font-size: 12px;
-      }
-
-      .data-table th,
-      .data-table td {
-        padding: 8px;
-      }
-
-      .header {
-        flex-direction: column;
-        gap: 10px;
-      }
-
-      .page {
-        padding: 15px;
-      }
-    }
-
-    .success-message {
-      background: #d4edda;
-      color: #155724;
-      padding: 15px;
-      border-radius: 5px;
-      margin-bottom: 15px;
-      border-left: 4px solid var(--success);
-    }
-
-    .error-message {
-      background: #f8d7da;
-      color: #721c24;
-      padding: 15px;
-      border-radius: 5px;
-      margin-bottom: 15px;
-      border-left: 4px solid var(--secondary);
-    }
-  </style>
-</head>
-<body>
-
-<!-- Auth Page -->
-<div id="authPage" class="auth-container">
-  <div class="auth-box">
-    <h1>ระบบตรวจงานติดตั้ง</h1>
-    
-    <div id="loginTab">
-      <div class="form-group">
-        <label>อีเมล</label>
-        <input type="email" id="loginEmail" placeholder="user@example.com">
-      </div>
-      <div class="form-group">
-        <label>รหัสผ่าน</label>
-        <input type="password" id="loginPassword" placeholder="••••••••">
-      </div>
-      <button onclick="handleLogin()">เข้าสู่ระบบ</button>
-      <button class="secondary" onclick="toggleAuthTab()">สมัครสมาชิก</button>
-    </div>
-
-    <div id="signupTab" style="display: none;">
-      <div class="form-group">
-        <label>ชื่อ-นามสกุล</label>
-        <input type="text" id="signupName" placeholder="จอห์น ดู">
-      </div>
-      <div class="form-group">
-        <label>อีเมล</label>
-        <input type="email" id="signupEmail" placeholder="user@example.com">
-      </div>
-      <div class="form-group">
-        <label>รหัสผ่าน</label>
-        <input type="password" id="signupPassword" placeholder="••••••••">
-      </div>
-      <button onclick="handleSignup()">สมัครสมาชิก</button>
-      <button class="secondary" onclick="toggleAuthTab()">เข้าสู่ระบบ</button>
-    </div>
-
-    <div id="authMessage" style="margin-top: 20px;"></div>
-  </div>
-</div>
-
-<!-- Main App -->
-<div id="app" class="app">
-  <div class="container">
-    <div class="header">
-      <h1>📋 ระบบตรวจงานติดตั้งเครื่องจักร</h1>
-      <div class="header-right">
-        <div class="user-info">
-          <div id="currentUser"></div>
-          <div id="currentRole" style="font-size: 12px; margin-top: 3px;"></div>
-        </div>
-        <button onclick="handleLogout()" style="width: auto; padding: 8px 15px;">ออกจากระบบ</button>
-      </div>
-    </div>
-
-    <!-- Navigation -->
-    <div class="sidebar" id="navButtons"></div>
-
-    <!-- Dashboard Page -->
-    <div id="dashboardPage" class="page active">
-      <h2>แดชบอร์ด</h2>
-      <div class="stats-grid" id="statsGrid"></div>
-      <div>
-        <h3 style="color: var(--primary); margin-bottom: 15px;">การตรวจเสียบล่าสุด</h3>
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>โครงการ</th>
-              <th>แบบฟอร์ม</th>
-              <th>อุปกรณ์</th>
-              <th>สถานะ</th>
-              <th>วันที่</th>
-            </tr>
-          </thead>
-          <tbody id="recentInspections"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Projects Page -->
-    <div id="projectsPage" class="page">
-      <h2>โครงการ</h2>
-      <button onclick="openProjectModal()" style="margin-bottom: 20px;">+ เพิ่มโครงการใหม่</button>
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>ชื่อโครงการ</th>
-            <th>บริษัท</th>
-            <th>สถานะ</th>
-            <th>การดำเนิน</th>
-          </tr>
-        </thead>
-        <tbody id="projectsList"></tbody>
-      </table>
-    </div>
-
-    <!-- Inspection Page -->
-    <div id="inspectionPage" class="page">
-      <h2>สร้างการตรวจสอบใหม่</h2>
-      
-      <div class="form-section">
-        <h3>ข้อมูลทั่วไป</h3>
-        <div class="form-row">
-          <div class="form-group">
-            <label>เลือกโครงการ</label>
-            <select id="inspectionProject" onchange="updateInspectionForms()">
-              <option value="">-- เลือกโครงการ --</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>เลือกแบบฟอร์ม</label>
-            <select id="inspectionForm" onchange="updateInspectionChecklist()">
-              <option value="">-- เลือกแบบฟอร์ม --</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <div class="form-section">
-        <h3>อุปกรณ์</h3>
-        <div id="equipmentSection">
-          <button onclick="toggleEquipmentForm()" style="margin-bottom: 15px;">+ เพิ่มอุปกรณ์ใหม่</button>
-          <div id="equipmentForm" style="display: none; padding: 15px; background: white; border-radius: 5px; margin-bottom: 15px;">
-            <div class="form-row">
-              <div class="form-group">
-                <label>รหัสอุปกรณ์</label>
-                <input type="text" id="equipmentCode">
-              </div>
-              <div class="form-group">
-                <label>ชื่ออุปกรณ์</label>
-                <input type="text" id="equipmentName">
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label>รุ่น</label>
-                <input type="text" id="equipmentModel">
-              </div>
-              <div class="form-group">
-                <label>ตำแหน่ง</label>
-                <input type="text" id="equipmentPosition">
-              </div>
-            </div>
-            <button onclick="saveEquipment()" style="margin-right: 10px;">บันทึก</button>
-            <button onclick="toggleEquipmentForm()" style="background: #ccc; color: #333;">ยกเลิก</button>
-          </div>
-          <select id="existingEquipment" style="margin-bottom: 15px;">
-            <option value="">-- เลือกอุปกรณ์ที่มีอยู่ --</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="form-section">
-        <h3>รายการตรวจสอบ</h3>
-        <div id="checklistContainer"></div>
-      </div>
-
-      <button onclick="submitInspection()" style="margin-top: 20px; background: var(--success); width: 100%;">
-        ส่งการตรวจสอบ
-      </button>
-
-      <div id="inspectionMessage" style="margin-top: 20px;"></div>
-    </div>
-
-    <!-- Inspections List Page -->
-    <div id="inspectionsPage" class="page">
-      <h2>รายการตรวจสอบ</h2>
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>โครงการ</th>
-            <th>แบบฟอร์ม</th>
-            <th>สถานะ</th>
-            <th>วันที่</th>
-            <th>การดำเนิน</th>
-          </tr>
-        </thead>
-        <tbody id="inspectionsList"></tbody>
-      </table>
-    </div>
-
-    <!-- Defects Page -->
-    <div id="defectsPage" class="page">
-      <h2>ข้อบกพร่อง</h2>
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>หมายเลข</th>
-            <th>โครงการ</th>
-            <th>ความรุนแรง</th>
-            <th>สถานะ</th>
-            <th>วันที่</th>
-            <th>การดำเนิน</th>
-          </tr>
-        </thead>
-        <tbody id="defectsList"></tbody>
-      </table>
-    </div>
-
-    <!-- Documents Page -->
-    <div id="documentsPage" class="page">
-      <h2>เอกสาร</h2>
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>หมายเลขเอกสาร</th>
-            <th>โครงการ</th>
-            <th>สถานะ</th>
-            <th>ฉบับแก้ไข</th>
-            <th>วันที่</th>
-            <th>การดำเนิน</th>
-          </tr>
-        </thead>
-        <tbody id="documentsList"></tbody>
-      </table>
-    </div>
-
-    <!-- Admin Page -->
-    <div id="adminPage" class="page">
-      <h2>จัดการระบบ</h2>
-
-      <div class="admin-section">
-        <h3 onclick="toggleAdminSection(this)">👥 จัดการผู้ใช้</h3>
-        <div class="admin-section-content">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>อีเมล</th>
-                <th>ชื่อ</th>
-                <th>บทบาท</th>
-                <th>สถานะ</th>
-                <th>การดำเนิน</th>
-              </tr>
-            </thead>
-            <tbody id="adminUsersList"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="admin-section">
-        <h3 onclick="toggleAdminSection(this)">📋 จัดการแบบฟอร์ม</h3>
-        <div class="admin-section-content">
-          <button onclick="openFormModal()" style="margin-bottom: 20px;">+ เพิ่มแบบฟอร์มใหม่</button>
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>รหัส</th>
-                <th>ชื่อ</th>
-                <th>สถานะ</th>
-                <th>การดำเนิน</th>
-              </tr>
-            </thead>
-            <tbody id="adminFormsList"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="admin-section">
-        <h3 onclick="toggleAdminSection(this)">📊 บันทึกการตรวจสอบ</h3>
-        <div class="admin-section-content">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>ผู้ใช้</th>
-                <th>การดำเนิน</th>
-                <th>ตาราง</th>
-                <th>วันที่/เวลา</th>
-              </tr>
-            </thead>
-            <tbody id="auditLogsList"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Modals -->
-<div id="projectModal" class="modal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <span>เพิ่มโครงการใหม่</span>
-      <button class="close-modal" onclick="closeProjectModal()">×</button>
-    </div>
-    <div class="form-group">
-      <label>ชื่อโครงการ</label>
-      <input type="text" id="projectName">
-    </div>
-    <div class="form-group">
-      <label>ชื่อบริษัท</label>
-      <input type="text" id="projectCompany">
-    </div>
-    <div class="form-group">
-      <label>คำอธิบาย</label>
-      <textarea id="projectDescription" rows="4"></textarea>
-    </div>
-    <button onclick="saveProject()">บันทึก</button>
-  </div>
-</div>
-
-<div id="signatureModal" class="modal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <span>ลงนามด้วยลายเซ็น</span>
-      <button class="close-modal" onclick="closeSignatureModal()">×</button>
-    </div>
-    <p style="font-size: 12px; color: #666; margin-bottom: 15px;">ลงนามด้านล่างด้วยเมาส์หรือนิ้ว</p>
-    <canvas id="signatureCanvas" width="400" height="200" style="border: 1px solid #ddd; border-radius: 5px;"></canvas>
-    <div style="margin-top: 15px; display: flex; gap: 10px;">
-      <button onclick="clearSignature()">ล้างลายเซ็น</button>
-      <button onclick="saveSignature()" style="flex: 1; background: var(--success);">บันทึกลายเซ็น</button>
-    </div>
-  </div>
-</div>
-
-<div id="formModal" class="modal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <span>เพิ่มแบบฟอร์มใหม่</span>
-      <button class="close-modal" onclick="closeFormModal()">×</button>
-    </div>
-    <div class="form-group">
-      <label>รหัสแบบฟอร์ม</label>
-      <input type="text" id="formCode">
-    </div>
-    <div class="form-group">
-      <label>ชื่อแบบฟอร์ม</label>
-      <input type="text" id="formName">
-    </div>
-    <div class="form-group">
-      <label>คำอธิบาย</label>
-      <textarea id="formDescription" rows="4"></textarea>
-    </div>
-    <button onclick="saveForm()">บันทึก</button>
-  </div>
-</div>
-
+<html lang="th"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>SMART QC · ระบบตรวจสอบงานติดตั้ง</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{--bg:#f4f6fa;--c:#fff;--t:#0f172a;--m:#64748b;--b:#e2e8f0;--p:#0b7a3e;--p2:#e8f5ee;--r:14px}
+[data-theme=dark]{--bg:#0b1220;--c:#131c2e;--t:#e5edf7;--m:#94a3b8;--b:#25314a;--p:#34d17c;--p2:#12301f}
+*{box-sizing:border-box}body{margin:0;font:15px/1.5 Sarabun,system-ui,sans-serif;background:var(--bg);color:var(--t)}
+.app{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+nav{background:var(--c);border-right:1px solid var(--b);padding:16px 10px;position:sticky;top:0;height:100vh}
+.brand{display:flex;gap:8px;align-items:center;padding:4px 10px 16px;font-size:18px}.brand img{width:34px}
+nav a{display:flex;gap:10px;align-items:center;padding:11px 12px;border-radius:10px;color:var(--t);text-decoration:none;margin-bottom:2px}
+nav a.on{background:var(--p2);color:var(--p);font-weight:700}
+main{padding:18px;max-width:1080px;width:100%;margin:auto;padding-bottom:96px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.bell{position:relative;text-decoration:none;font-size:22px}.bell i{position:absolute;top:-4px;right:-8px;background:#dc2626;color:#fff;font:700 11px/1 Sarabun;padding:3px 5px;border-radius:9px}
+.card{background:var(--c);border:1px solid var(--b);border-radius:var(--r);padding:16px;margin-bottom:14px}
+h2{margin:4px 0 12px;font-size:20px}h3{margin:0 0 10px;font-size:16px}.m{color:var(--m);font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px}
+.kpi{background:var(--c);border:1px solid var(--b);border-radius:var(--r);padding:12px;text-decoration:none;color:var(--t)}.kpi b{display:block;font-size:26px}
+.pill{color:#fff;border-radius:20px;padding:2px 10px;font-size:12px;white-space:nowrap}
+.bar{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:13px}.bar>span:first-child{width:46%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bar>div{flex:1;background:var(--b);border-radius:6px;height:14px;display:flex;overflow:hidden}
+input,select,textarea{width:100%;padding:11px;border:1px solid var(--b);border-radius:10px;background:var(--c);color:var(--t);font:inherit;margin:3px 0 8px}
+label{font-size:13px;color:var(--m)}
+.b{border:1px solid var(--b);background:var(--c);color:var(--t);padding:10px 14px;border-radius:10px;font:600 14px Sarabun;cursor:pointer}.b.p{background:var(--p);color:#fff;border-color:var(--p)}.b.d{background:#dc2626;color:#fff;border-color:#dc2626}.b.on{background:var(--p2);border-color:var(--p);color:var(--p)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.row>*{flex:1}
+.steps{display:flex;gap:6px;margin-bottom:14px}.steps i{flex:1;height:6px;border-radius:4px;background:var(--b)}.steps i.on{background:var(--p)}
+.fc{display:block;width:100%;text-align:left;margin-bottom:8px}.fc small{color:var(--m);font-weight:400}
+.ph{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0}.ph img,.add{width:84px;height:84px;object-fit:cover;border-radius:10px;border:1px solid var(--b)}.add{background:var(--p2);color:var(--p);font-size:24px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ck{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--b)}.ck>div{display:flex;gap:6px}
+.pf{padding:8px 12px;border-radius:9px;border:1px solid var(--b);background:var(--c);color:var(--t);font:600 13px Sarabun}.pf.ok{background:#16a34a;color:#fff}.pf.no{background:#dc2626;color:#fff}
+.fl{display:flex;gap:6px}.fl select{width:100px}
+.pad{width:100%;height:140px;border:2px dashed var(--m);border-radius:12px;background:#fff;touch-action:none}
+.ov{position:fixed;inset:0;background:#000a;z-index:50;display:flex;align-items:center;justify-content:center;padding:12px}.mb{background:var(--c);border-radius:var(--r);padding:12px;max-width:760px;width:100%;max-height:92vh;overflow:auto}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#111;color:#fff;padding:10px 16px;border-radius:10px;z-index:99}
+.li{display:block;text-decoration:none;color:var(--t)}.li .m{display:flex;gap:8px;justify-content:space-between}
+.tabs{display:flex;gap:6px;overflow:auto;margin-bottom:12px}.tabs .b{white-space:nowrap}
+.warn{background:#fef2f2;border:1px solid #fecaca;color:#991b1b;padding:10px;border-radius:10px;margin-bottom:12px}
+.entry{max-width:440px;margin:6vh auto;padding:16px}.entry img{width:84px;display:block;margin:auto}
+.pg{background:#fff;color:#111;font:12px/1.35 Sarabun,sans-serif;padding:26px 34px;position:relative;overflow:hidden}
+.pg .hd{display:flex;align-items:center;gap:14px;border-bottom:2px solid #0b7a3e;padding-bottom:8px;margin-bottom:8px}.pg .hd img{width:58px}.pg .hd div{flex:1;text-align:center}.pg .hd b{font-size:17px;display:block}
+.pg .bx{border:1px solid #333;padding:4px 10px;font-size:11px}.pg table{width:100%;border-collapse:collapse;table-layout:fixed;margin:8px 0}
+.pg th,.pg td{border:1px solid #333;padding:3px 4px;text-align:center;font-size:10.5px;word-break:break-word}.pg th{background:#e8f5ee}.pg td.l{text-align:left}.pg td{height:40px}.pg td.x{color:#c00;font-weight:700}
+.pg .sgs{display:flex;gap:14px;margin-top:10px}.pg .sg{flex:1;border:1px solid #333;text-align:center;padding:6px;font-size:11px}.pg .si{height:58px}.pg .si img{max-height:56px;max-width:100%}
+.pg .ft{position:absolute;left:34px;right:34px;bottom:14px;display:flex;justify-content:space-between;font-size:10px;color:#444}
+.pg .eg{display:grid;grid-template-columns:1fr 1fr;gap:14px}.pg .eg h4{margin:0 0 4px;font-size:12px;background:#e8f5ee;padding:3px 6px}.pg .im{display:grid;grid-template-columns:1fr 1fr;gap:6px}.pg .im div{border:1px solid #bbb;display:flex;align-items:center;justify-content:center;background:#fafafa}.pg .im img{max-width:100%;max-height:100%;object-fit:contain}
+@media(max-width:800px){.app{display:block}nav{position:fixed;bottom:0;left:0;right:0;top:auto;height:auto;display:flex;padding:4px;z-index:20;border-top:1px solid var(--b);border-right:0}nav a{flex:1;flex-direction:column;font-size:11px;gap:0;padding:6px 2px;text-align:center}.brand{display:none}main{padding:12px;padding-bottom:90px}}
+</style></head><body><div id="app"></div>
 <script>
-  // Supabase Configuration
-  const SUPABASE_URL = 'https://tisshukqkeejmmokvoss.supabase.co';
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRpc3NodWtxa2Vlam1tb2t2b3NzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzMzQ3MDgsImV4cCI6MjEwNjkxMDcwOH0.onYYx-c4MH8HOnDyIngEy-M43GTHQiQLGD4looHAv7U';
-  
-  let supabase = null;
-  let currentUser = null;
-  let currentRole = null;
-  let currentProject = null;
-
-  // Initialize Supabase
-  async function initSupabase() {
-    const { createClient } = window.supabase;
-    supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    
-    // Check if user is logged in
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      currentUser = user;
-      await loadUserProfile();
-      showApp();
-    }
-  }
-
-  // Authentication
-  async function handleLogin() {
-    const email = document.getElementById('loginEmail').value;
-    const password = document.getElementById('loginPassword').value;
-    
-    if (!email || !password) {
-      showAuthMessage('กรุณากรอกอีเมลและรหัสผ่าน', 'error');
-      return;
-    }
-
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
-      showAuthMessage('เข้าสู่ระบบไม่สำเร็จ: ' + error.message, 'error');
-    } else {
-      currentUser = data.user;
-      await loadUserProfile();
-      showApp();
-    }
-  }
-
-  async function handleSignup() {
-    const name = document.getElementById('signupName').value;
-    const email = document.getElementById('signupEmail').value;
-    const password = document.getElementById('signupPassword').value;
-    
-    if (!name || !email || !password) {
-      showAuthMessage('กรุณากรอกข้อมูลให้ครบถ้วน', 'error');
-      return;
-    }
-
-    const { data, error: signupError } = await supabase.auth.signUp({ email, password });
-    if (signupError) {
-      showAuthMessage('สมัครสมาชิกไม่สำเร็จ: ' + signupError.message, 'error');
-    } else {
-      // Create profile
-      await supabase.from('profiles').insert({
-        id: data.user.id,
-        email: email,
-        full_name: name,
-        status: 'pending'
-      });
-      showAuthMessage('สมัครสมาชิกสำเร็จ รอการอนุมัติจากแอดมิน', 'success');
-      document.getElementById('signupName').value = '';
-      document.getElementById('signupEmail').value = '';
-      document.getElementById('signupPassword').value = '';
-    }
-  }
-
-  async function handleLogout() {
-    await supabase.auth.signOut();
-    currentUser = null;
-    currentRole = null;
-    hideApp();
-  }
-
-  async function loadUserProfile() {
-    const { data } = await supabase
-      .from('profiles')
-      .select('*, roles(name)')
-      .eq('id', currentUser.id)
-      .single();
-    
-    if (data) {
-      currentRole = data.roles?.name || 'visitor';
-      document.getElementById('currentUser').textContent = data.full_name || data.email;
-      document.getElementById('currentRole').textContent = data.roles?.name || 'ผู้เข้าชม';
-      loadNavigation();
-      await loadDashboard();
-    }
-  }
-
-  function loadNavigation() {
-    const navButtons = document.getElementById('navButtons');
-    navButtons.innerHTML = '';
-    
-    const buttons = [
-      { id: 'dashboardPage', label: '📊 แดชบอร์ด' },
-      { id: 'projectsPage', label: '📁 โครงการ' },
-    ];
-
-    if (['manufacturer', 'inspector', 'approver'].includes(currentRole)) {
-      buttons.push({ id: 'inspectionPage', label: '📋 สร้างตรวจสอบ' });
-      buttons.push({ id: 'inspectionsPage', label: '📝 รายการตรวจสอบ' });
-      buttons.push({ id: 'defectsPage', label: '⚠️ ข้อบกพร่อง' });
-      buttons.push({ id: 'documentsPage', label: '📄 เอกสาร' });
-    }
-
-    if (currentRole === 'admin') {
-      buttons.push({ id: 'adminPage', label: '⚙️ จัดการระบบ' });
-    }
-
-    buttons.forEach(btn => {
-      const button = document.createElement('button');
-      button.textContent = btn.label;
-      button.onclick = () => showPage(btn.id);
-      navButtons.appendChild(button);
-    });
-  }
-
-  // Page Navigation
-  function showPage(pageId) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById(pageId).classList.add('active');
-    
-    document.querySelectorAll('.sidebar button').forEach(btn => btn.classList.remove('active'));
-    event.target.classList.add('active');
-  }
-
-  function showApp() {
-    document.getElementById('authPage').style.display = 'none';
-    document.getElementById('app').classList.add('active');
-  }
-
-  function hideApp() {
-    document.getElementById('app').classList.remove('active');
-    document.getElementById('authPage').style.display = 'flex';
-    clearAuthForm();
-  }
-
-  function toggleAuthTab() {
-    const loginTab = document.getElementById('loginTab');
-    const signupTab = document.getElementById('signupTab');
-    loginTab.style.display = loginTab.style.display === 'none' ? 'block' : 'none';
-    signupTab.style.display = signupTab.style.display === 'none' ? 'block' : 'none';
-  }
-
-  function showAuthMessage(message, type) {
-    const element = document.getElementById('authMessage');
-    element.innerHTML = `<div class="${type}-message">${message}</div>`;
-  }
-
-  function clearAuthForm() {
-    document.getElementById('loginEmail').value = '';
-    document.getElementById('loginPassword').value = '';
-    document.getElementById('signupName').value = '';
-    document.getElementById('signupEmail').value = '';
-    document.getElementById('signupPassword').value = '';
-    document.getElementById('authMessage').innerHTML = '';
-  }
-
-  // Dashboard
-  async function loadDashboard() {
-    // Load stats
-    const { data: allInspections } = await supabase.from('inspections').select('status');
-    const { data: allDefects } = await supabase.from('defects').select('status, severity');
-    
-    const stats = {
-      total_inspections: allInspections?.length || 0,
-      waiting: allInspections?.filter(i => i.status === 'WAITING_INSPECTION').length || 0,
-      correction: allInspections?.filter(i => i.status === 'CORRECTION_REQUIRED').length || 0,
-      approved: allInspections?.filter(i => i.status === 'APPROVED').length || 0,
-      major_defects: allDefects?.filter(d => d.severity === 'Major').length || 0,
-      minor_defects: allDefects?.filter(d => d.severity === 'Minor').length || 0,
-    };
-
-    const statsGrid = document.getElementById('statsGrid');
-    statsGrid.innerHTML = `
-      <div class="stat-card">
-        <h3>ทั้งหมด</h3>
-        <div class="number">${stats.total_inspections}</div>
-      </div>
-      <div class="stat-card waiting">
-        <h3>รอตรวจสอบ</h3>
-        <div class="number">${stats.waiting}</div>
-      </div>
-      <div class="stat-card correction">
-        <h3>ต้องแก้ไข</h3>
-        <div class="number">${stats.correction}</div>
-      </div>
-      <div class="stat-card approved">
-        <h3>อนุมัติแล้ว</h3>
-        <div class="number">${stats.approved}</div>
-      </div>
-      <div class="stat-card">
-        <h3>ข้อบกพร่อง Major</h3>
-        <div class="number">${stats.major_defects}</div>
-      </div>
-    `;
-
-    // Load recent inspections
-    const { data: recentInspections } = await supabase
-      .from('inspections')
-      .select(`
-        id, status, created_at,
-        projects(name),
-        form_templates(code),
-        equipment(name)
-      `)
-      .order('created_at', { ascending: false })
-      .limit(5);
-
-    const tbody = document.getElementById('recentInspections');
-    tbody.innerHTML = recentInspections?.map(inspection => `
-      <tr>
-        <td>${inspection.projects?.name || '-'}</td>
-        <td>${inspection.form_templates?.code || '-'}</td>
-        <td>${inspection.equipment?.name || '-'}</td>
-        <td><span class="status-badge ${inspection.status.toLowerCase()}">${inspection.status}</span></td>
-        <td>${new Date(inspection.created_at).toLocaleDateString('th-TH')}</td>
-      </tr>
-    `).join('') || '<tr><td colspan="5" style="text-align: center; padding: 20px;">ไม่มีข้อมูล</td></tr>';
-  }
-
-  // Projects
-  async function loadProjects() {
-    const { data } = await supabase.from('projects').select('*').order('created_at', { ascending: false });
-    const tbody = document.getElementById('projectsList');
-    tbody.innerHTML = data?.map(p => `
-      <tr>
-        <td>${p.name}</td>
-        <td>${p.company_name || '-'}</td>
-        <td><span class="status-badge ${p.status.toLowerCase()}">${p.status}</span></td>
-        <td>
-          <button onclick="editProject('${p.id}')" style="padding: 5px 10px; font-size: 12px;">แก้ไข</button>
-          <button onclick="deleteProject('${p.id}')" style="padding: 5px 10px; font-size: 12px; background: var(--secondary);">ลบ</button>
-        </td>
-      </tr>
-    `).join('') || '<tr><td colspan="4" style="text-align: center; padding: 20px;">ไม่มีโครงการ</td></tr>';
-  }
-
-  async function saveProject() {
-    const name = document.getElementById('projectName').value;
-    const company = document.getElementById('projectCompany').value;
-    const description = document.getElementById('projectDescription').value;
-
-    if (!name) {
-      alert('กรุณากรอกชื่อโครงการ');
-      return;
-    }
-
-    await supabase.from('projects').insert({
-      name, company_name: company, description, created_by: currentUser.id
-    });
-
-    closeProjectModal();
-    await loadProjects();
-  }
-
-  function openProjectModal() {
-    document.getElementById('projectModal').classList.add('active');
-  }
-
-  function closeProjectModal() {
-    document.getElementById('projectModal').classList.remove('active');
-    document.getElementById('projectName').value = '';
-    document.getElementById('projectCompany').value = '';
-    document.getElementById('projectDescription').value = '';
-  }
-
-  async function deleteProject(id) {
-    if (confirm('คุณต้องการลบโครงการนี้หรือไม่?')) {
-      await supabase.from('projects').delete().eq('id', id);
-      await loadProjects();
-    }
-  }
-
-  // Forms
-  async function loadForms() {
-    const { data } = await supabase.from('form_templates').select('*').order('code');
-    
-    // Populate form selector
-    const inspectionForm = document.getElementById('inspectionForm');
-    inspectionForm.innerHTML = '<option value="">-- เลือกแบบฟอร์ม --</option>';
-    data?.forEach(form => {
-      const option = document.createElement('option');
-      option.value = form.id;
-      option.textContent = `${form.code} - ${form.name}`;
-      inspectionForm.appendChild(option);
-    });
-
-    // Admin forms list
-    const tbody = document.getElementById('adminFormsList');
-    tbody.innerHTML = data?.map(f => `
-      <tr>
-        <td>${f.code}</td>
-        <td>${f.name}</td>
-        <td><span class="status-badge ${f.status.toLowerCase()}">${f.status}</span></td>
-        <td>
-          <button onclick="editForm('${f.id}')" style="padding: 5px 10px; font-size: 12px;">แก้ไข</button>
-        </td>
-      </tr>
-    `).join('');
-  }
-
-  async function saveForm() {
-    const code = document.getElementById('formCode').value;
-    const name = document.getElementById('formName').value;
-    const description = document.getElementById('formDescription').value;
-
-    if (!code || !name) {
-      alert('กรุณากรอกรหัสและชื่อแบบฟอร์ม');
-      return;
-    }
-
-    await supabase.from('form_templates').insert({
-      code, name, description, created_by: currentUser.id
-    });
-
-    closeFormModal();
-    await loadForms();
-  }
-
-  function openFormModal() {
-    document.getElementById('formModal').classList.add('active');
-  }
-
-  function closeFormModal() {
-    document.getElementById('formModal').classList.remove('active');
-    document.getElementById('formCode').value = '';
-    document.getElementById('formName').value = '';
-    document.getElementById('formDescription').value = '';
-  }
-
-  // Inspection
-  async function updateInspectionForms() {
-    const projectId = document.getElementById('inspectionProject').value;
-    currentProject = projectId;
-    if (projectId) await loadProjectEquipment();
-  }
-
-  async function updateInspectionChecklist() {
-    const formId = document.getElementById('inspectionForm').value;
-    if (!formId) return;
-
-    const { data: checklist } = await supabase
-      .from('checklist_items')
-      .select('*')
-      .eq('form_template_id', formId)
-      .order('sequence');
-
-    const container = document.getElementById('checklistContainer');
-    container.innerHTML = checklist?.map(item => `
-      <div class="checklist-item">
-        <h4>${item.sequence}. ${item.title}</h4>
-        <div class="checklist-result">
-          <label>
-            <input type="radio" name="result_${item.id}" value="pass" onchange="updateChecklistClass(this)">
-            ✓ ผ่าน
-          </label>
-          <label>
-            <input type="radio" name="result_${item.id}" value="fail" onchange="updateChecklistClass(this)">
-            ✗ ไม่ผ่าน
-          </label>
-        </div>
-        <div style="margin-top: 10px;">
-          <textarea placeholder="หมายเหตุ" id="remark_${item.id}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px;"></textarea>
-        </div>
-        <div class="image-section">
-          <div class="image-upload" onclick="triggerImageUpload('${item.id}')">
-            📷 คลิกเพื่ออัปโหลดรูปภาพ
-            <input type="file" id="image_${item.id}" accept="image/*" onchange="handleImageUpload('${item.id}', event)">
-          </div>
-          <div class="preview-container" id="preview_${item.id}"></div>
-        </div>
-      </div>
-    `).join('') || '<p>ไม่มีรายการตรวจสอบ</p>';
-  }
-
-  async function loadProjectEquipment() {
-    const { data } = await supabase
-      .from('equipment')
-      .select('*')
-      .eq('project_id', currentProject)
-      .order('created_at', { ascending: false });
-
-    const select = document.getElementById('existingEquipment');
-    select.innerHTML = '<option value="">-- เลือกอุปกรณ์ที่มีอยู่ --</option>';
-    data?.forEach(eq => {
-      const option = document.createElement('option');
-      option.value = eq.id;
-      option.textContent = `${eq.code} - ${eq.name} (${eq.position || 'ไม่ระบุ'})`;
-      select.appendChild(option);
-    });
-  }
-
-  function toggleEquipmentForm() {
-    document.getElementById('equipmentForm').style.display = 
-      document.getElementById('equipmentForm').style.display === 'none' ? 'block' : 'none';
-  }
-
-  async function saveEquipment() {
-    const { data } = await supabase.from('equipment').insert({
-      project_id: currentProject,
-      code: document.getElementById('equipmentCode').value,
-      name: document.getElementById('equipmentName').value,
-      model: document.getElementById('equipmentModel').value,
-      position: document.getElementById('equipmentPosition').value,
-    });
-
-    document.getElementById('equipmentCode').value = '';
-    document.getElementById('equipmentName').value = '';
-    document.getElementById('equipmentModel').value = '';
-    document.getElementById('equipmentPosition').value = '';
-    
-    toggleEquipmentForm();
-    await loadProjectEquipment();
-  }
-
-  function triggerImageUpload(itemId) {
-    document.getElementById(`image_${itemId}`).click();
-  }
-
-  async function handleImageUpload(itemId, event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      const preview = document.getElementById(`preview_${itemId}`);
-      const div = document.createElement('div');
-      div.className = 'preview-image';
-      div.innerHTML = `
-        <img src="${e.target.result}" alt="preview">
-        <div class="tools">
-          <button onclick="annotateImage(this)">🎨 โครงเครื่อง</button>
-          <button onclick="removeImage(this)">🗑️ ลบ</button>
-        </div>
-      `;
-      preview.appendChild(div);
-    };
-    reader.readAsDataURL(file);
-  }
-
-  function updateChecklistClass(input) {
-    const checklistItem = input.closest('.checklist-item');
-    checklistItem.classList.remove('pass', 'fail');
-    if (input.value === 'pass') {
-      checklistItem.classList.add('pass');
-    } else if (input.value === 'fail') {
-      checklistItem.classList.add('fail');
-    }
-  }
-
-  function annotateImage(button) {
-    alert('คุณสมบัติโครงเครื่องภาพ (กำลังพัฒนา)');
-  }
-
-  function removeImage(button) {
-    button.closest('.preview-image').remove();
-  }
-
-  async function submitInspection() {
-    const projectId = document.getElementById('inspectionProject').value;
-    const formId = document.getElementById('inspectionForm').value;
-    const equipmentId = document.getElementById('existingEquipment').value;
-
-    if (!projectId || !formId || !equipmentId) {
-      showMessage('inspectionMessage', 'กรุณากรอกข้อมูลทั้งหมด', 'error');
-      return;
-    }
-
-    // Create inspection
-    const { data: inspection } = await supabase
-      .from('inspections')
-      .insert({
-        project_id: projectId,
-        form_template_id: formId,
-        equipment_id: equipmentId,
-        status: 'WAITING_INSPECTION',
-        submitted_by: currentUser.id,
-        submitted_at: new Date().toISOString()
-      })
-      .select();
-
-    showMessage('inspectionMessage', 'ส่งการตรวจสอบสำเร็จ', 'success');
-    setTimeout(() => {
-      document.getElementById('inspectionProject').value = '';
-      document.getElementById('inspectionForm').value = '';
-      document.getElementById('existingEquipment').value = '';
-      document.getElementById('checklistContainer').innerHTML = '';
-    }, 2000);
-  }
-
-  // Utilities
-  function showMessage(elementId, message, type) {
-    const element = document.getElementById(elementId);
-    element.innerHTML = `<div class="${type}-message">${message}</div>`;
-    setTimeout(() => {
-      element.innerHTML = '';
-    }, 3000);
-  }
-
-  function toggleAdminSection(element) {
-    const content = element.nextElementSibling;
-    content.classList.toggle('active');
-  }
-
-  // Load admin data
-  async function loadAdminData() {
-    // Users
-    const { data: users } = await supabase
-      .from('profiles')
-      .select('*, roles(name)')
-      .order('created_at', { ascending: false });
-
-    const usersList = document.getElementById('adminUsersList');
-    usersList.innerHTML = users?.map(u => `
-      <tr>
-        <td>${u.email}</td>
-        <td>${u.full_name || '-'}</td>
-        <td>${u.roles?.name || 'ไม่ระบุ'}</td>
-        <td><span class="status-badge">${u.status}</span></td>
-        <td>
-          <button onclick="approveUser('${u.id}')" style="padding: 5px 10px; font-size: 12px;">อนุมัติ</button>
-        </td>
-      </tr>
-    `).join('');
-
-    // Audit logs
-    const { data: logs } = await supabase
-      .from('audit_logs')
-      .select('*, profiles(full_name)')
-      .order('created_at', { ascending: false })
-      .limit(20);
-
-    const logsList = document.getElementById('auditLogsList');
-    logsList.innerHTML = logs?.map(log => `
-      <tr>
-        <td>${log.profiles?.full_name || '-'}</td>
-        <td>${log.action}</td>
-        <td>${log.table_name}</td>
-        <td>${new Date(log.created_at).toLocaleDateString('th-TH')}</td>
-      </tr>
-    `).join('');
-  }
-
-  async function approveUser(userId) {
-    await supabase
-      .from('profiles')
-      .update({ status: 'active' })
-      .eq('id', userId);
-    
-    await loadAdminData();
-  }
-
-  async function loadInspections() {
-    const { data } = await supabase
-      .from('inspections')
-      .select(`
-        id, status, created_at,
-        projects(name),
-        form_templates(code),
-        equipment(name)
-      `)
-      .order('created_at', { ascending: false });
-
-    const tbody = document.getElementById('inspectionsList');
-    tbody.innerHTML = data?.map(i => `
-      <tr>
-        <td>${i.projects?.name || '-'}</td>
-        <td>${i.form_templates?.code || '-'}</td>
-        <td><span class="status-badge ${i.status.toLowerCase()}">${i.status}</span></td>
-        <td>${new Date(i.created_at).toLocaleDateString('th-TH')}</td>
-        <td>
-          <button onclick="viewInspection('${i.id}')" style="padding: 5px 10px; font-size: 12px;">ดู</button>
-        </td>
-      </tr>
-    `).join('');
-  }
-
-  async function loadDefects() {
-    const { data } = await supabase
-      .from('defects')
-      .select(`
-        id, severity, status, created_at,
-        projects(name)
-      `)
-      .order('created_at', { ascending: false });
-
-    const tbody = document.getElementById('defectsList');
-    tbody.innerHTML = data?.map(d => `
-      <tr>
-        <td>#${d.id.substring(0, 8)}</td>
-        <td>${d.projects?.name || '-'}</td>
-        <td>${d.severity}</td>
-        <td><span class="status-badge">${d.status}</span></td>
-        <td>${new Date(d.created_at).toLocaleDateString('th-TH')}</td>
-        <td>
-          <button onclick="viewDefect('${d.id}')" style="padding: 5px 10px; font-size: 12px;">ดู</button>
-        </td>
-      </tr>
-    `).join('');
-  }
-
-  function viewInspection(id) {
-    alert(`ดูรายละเอียดการตรวจสอบ: ${id}`);
-  }
-
-  function viewDefect(id) {
-    alert(`ดูรายละเอียดข้อบกพร่อง: ${id}`);
-  }
-
-  // Signature
-  let signatureCanvas, signatureCtx;
-  let isDrawing = false;
-
-  function initSignatureCanvas() {
-    signatureCanvas = document.getElementById('signatureCanvas');
-    signatureCtx = signatureCanvas.getContext('2d');
-    
-    signatureCanvas.addEventListener('mousedown', () => { isDrawing = true; });
-    signatureCanvas.addEventListener('mouseup', () => { isDrawing = false; });
-    signatureCanvas.addEventListener('mousemove', drawSignature);
-    
-    signatureCanvas.addEventListener('touchstart', () => { isDrawing = true; });
-    signatureCanvas.addEventListener('touchend', () => { isDrawing = false; });
-    signatureCanvas.addEventListener('touchmove', (e) => {
-      e.preventDefault();
-      const touch = e.touches[0];
-      const mouseEvent = new MouseEvent('mousemove', {
-        clientX: touch.clientX,
-        clientY: touch.clientY
-      });
-      signatureCanvas.dispatchEvent(mouseEvent);
-    });
-  }
-
-  function drawSignature(e) {
-    if (!isDrawing) return;
-    
-    const rect = signatureCanvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    
-    signatureCtx.lineWidth = 2;
-    signatureCtx.lineCap = 'round';
-    signatureCtx.strokeStyle = '#333';
-    signatureCtx.lineTo(x, y);
-    signatureCtx.stroke();
-  }
-
-  function clearSignature() {
-    signatureCtx.clearRect(0, 0, signatureCanvas.width, signatureCanvas.height);
-  }
-
-  function saveSignature() {
-    const imageData = signatureCanvas.toDataURL('image/png');
-    console.log('ลายเซ็นบันทึก:', imageData);
-    closeSignatureModal();
-  }
-
-  function openSignatureModal() {
-    document.getElementById('signatureModal').classList.add('active');
-    setTimeout(initSignatureCanvas, 100);
-  }
-
-  function closeSignatureModal() {
-    document.getElementById('signatureModal').classList.remove('active');
-  }
-
-  // Init
-  document.addEventListener('DOMContentLoaded', async () => {
-    await initSupabase();
-  });
-</script>
-
-</body>
-</html>
+const FORMS=[{"code":"FR-INS-ME-006","title":"แบบฟอร์มการตรวจสอบงานประกอบโครงสร้างรับเครื่องจักร","s":"งานประกอบโครงสร้างรับเครื่องจักร","x":[],"c":[["asm","งานประกอบ"],["weld","งานเชื่อม"],["level","ระดับน้ำ"],["paint","งานสี/ความเรียบร้อย"]]},{"code":"FR-INS-ME-007","title":"แบบฟอร์มตรวจเช็คกระพ้อลำเลียง","s":"กระพ้อลำเลียง","x":["hp","h","qty"],"c":[["level","เช็คระดับ-ดิ่ง"],["drive","เช็คระบบส่งกำลัง"],["oil","เช็คน้ำมันเกียร์"],["gap","ระยะห่างลูกกระพ้อ"],["belt","ประกอบสายพาน"],["mount","จุดยึดซอง"],["paint","งานสี/ความเรียบร้อย"]]},{"code":"FR-INS-ME-008","title":"แบบฟอร์มตรวจเช็คสายพานลำเลียง Belt Conveyer","s":"สายพานลำเลียง","x":["hp","len","qty"],"c":[["level","เช็คระดับ-คดเอียง"],["drive","เช็คระบบส่งกำลัง"],["oil","เช็คน้ำมันเกียร์"],["gap","ระยะห่างลูกกลิ้ง"],["belt","ประกอบสายพาน"],["mount","จุดยึด"],["paint","งานสี/ความเรียบร้อย"]]},{"code":"FR-INS-ME-009","title":"แบบฟอร์มการตรวจสอบงานติดตั้งเครื่องจักรถังพัก/ถังบรรจุ (Machine-Storage-Bin)","s":"ถังพัก/ถังบรรจุ","x":["hp","qty"],"c":[["level","เช็คระดับ"],["mount","จุดยึด"],["asm","ประกอบอุปกรณ์"],["paint","งานสี/ความเรียบร้อย"]]},{"code":"FR-INS-ME-018","title":"แบบฟอร์มตรวจเช็ค Change valve","s":"Change valve","x":[],"c":[["link","ตำแหน่งแขนลิงค์"],["base","ฐานยึดกระบอกลม"],["height","ระยะความสูงบังใบ"],["gap","ระยะห่างใบกับผนัง"],["move","การเคลื่อนไหวของใบเปลี่ยนทิศทาง"],["cyl","การเคลื่อนที่ด้วยกระบอกลม"],["paint","งานสี/ความเรียบร้อย"]]},{"code":"FR-INS-ME-019","title":"แบบฟอร์มตรวจเช็ค Shutter","s":"Shutter","x":[],"c":[["gap","ระยะแผ่นบังใบกับตัวใบ"],["slide","การเลื่อนสไลด์เข้า-ออก"],["bearing","ระยะห่างของลูกปืน"],["stroke","ระยะยืดกระบอกลม"],["cyl","การเคลื่อนที่โดยกระบอกลม"],["paint","งานสี/ความเรียบร้อย"]]},{"code":"FR-INS-ME-020","title":"แบบฟอร์มตรวจเช็ค Divider","s":"Divider","x":["qty"],"c":[["weld","รอยเชื่อม"],["bolt","การยึดน็อต"],["pivot","จุดหมุน/การเลื่อนขึ้นลง"],["vib","การสั่น"],["spring","การยุบตัวของสปริง"],["paint","งานสี/ความเรียบร้อย"]]},{"code":"FR-INS-ME-021","title":"แบบฟอร์มตรวจเช็ค Control tank","s":"Control tank","x":["qty"],"c":[["weld","รอยเชื่อม"],["flat","ความเรียบของพื้นผิว"],["glass","ระยะติดตั้งช่องกระจก"],["inside","ภายในถังโดยรวม"],["bolt","การยึดน็อตสกรู"],["paint","งานสี/ความเรียบร้อย"]]},{"code":"FR-INS-ME-022","title":"แบบฟอร์มตรวจเช็ค CYCLONE","s":"Cyclone","x":["qty"],"c":[["weld","รอยเชื่อม"],["flat","ความเรียบของพื้นผิว"],["flange","ระยะรูเจาะหน้าแปลน"],["bolt","การยึดน็อตสกรู"],["paint","งานสี/ความเรียบร้อย"]]},{"code":"FR-INS-ME-023","title":"แบบฟอร์มตรวจเช็คโซ่ลำเลียง Chain Conveyer check sheet","s":"โซ่ลำเลียง","x":["hp","len","qty"],"c":[["level","เช็คระดับ-คดเอียง"],["drive","เช็คระบบส่งกำลัง"],["oil","เช็คน้ำมันเกียร์"],["tension","ความตึง"],["chain","ประกอบตัวโซ่"],["mount","จุดยึด"],["paint","งานสี/ความเรียบร้อย"]]},{"code":"FR-INS-ME-024","title":"แบบฟอร์มตรวจเช็คงานติดตั้งระบบท่อส่งข้าว","s":"ท่อส่งข้าว","x":[],"c":[["angle","องศาท่อ"],["bend","ความคดงอท่อ"],["grip","การจับยึด"],["leak","จุดรั่ว,รอยต่อ"],["support","จุดค้ำยัน"],["flow","อัตราการไหล"],["paint","งานสี/ความเรียบร้อย"]]},{"code":"FR-INS-ME-025","title":"แบบฟอร์มตรวจเช็คงานติดตั้งระบบท่อฝุ่น","s":"ท่อฝุ่น","x":[],"c":[["angle","องศาท่อ"],["bend","ความคดงอท่อ"],["grip","การจับยึด"],["leak","จุดรั่ว,รอยต่อ"],["support","จุดค้ำยัน"],["flow","อัตราการไหล"],["paint","งานสี/ความเรียบร้อย"]]},{"code":"FR-INS-ME-026","title":"แบบฟอร์มตรวจเช็คงานติดตั้งระบบท่อนิวแมติกส์","s":"ท่อนิวแมติกส์","x":[],"c":[["angle","องศาท่อ"],["bend","ความคดงอท่อ"],["grip","การจับยึด"],["leak","จุดรั่ว,รอยต่อ"],["support","จุดค้ำยัน"],["flow","อัตราการไหล"],["paint","งานสี/ความเรียบร้อย"]]},{"code":"FR-INS-ME-027","title":"แบบฟอร์มตรวจเช็คงานติดตั้งระบบท่อน้ำ","s":"ท่อน้ำ","x":[],"c":[["angle","องศาท่อ"],["bend","ความคดงอท่อ"],["grip","การจับยึด"],["leak","จุดรั่ว,รอยต่อ"],["support","จุดค้ำยัน"],["flow","อัตราการไหล"],["paint","งานสี/ความเรียบร้อย"]]},{"code":"FR-INS-ME-028","title":"แบบฟอร์มตรวจเช็คตะแกรงถังอบ","s":"ตะแกรงถังอบ","x":[],"c":[["thick","ความหนา"],["height","ความสูง"],["perim","เส้นรอบรูป"],["hole","ระยะรูตะแกรง"]]}],LOGO='data:image/png;base64,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';
+const XF={hp:'แรงม้า (hp)',len:'ยาว (m)',h:'สูง (m)',qty:'จำนวน'};
+const ST={draft:['Draft','#64748b'],pending:['รอตรวจสอบ','#d97706'],needs_fix:['ต้องแก้ไข','#dc2626'],fix_review:['รอตรวจสอบการแก้ไข','#7c3aed'],pending_approval:['รออนุมัติ','#2563eb'],approved:['อนุมัติแล้ว','#16a34a']};
+const ROLES={installer:'ผู้ผลิต/ผู้ติดตั้ง',inspector:'ผู้ตรวจสอบ',approver:'ผู้อนุมัติ',visitor:'Visitor',admin:'Admin'};
+const NT={pending:['inspector'],needs_fix:['installer'],fix_review:['inspector'],pending_approval:['approver'],approved:['installer','inspector']};
+const $=s=>document.querySelector(s),uid=()=>crypto.randomUUID(),now=()=>new Date().toISOString();
+const h=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let S={projects:[],equipment_catalog:[],inspections:[],defects:[],status_log:[],notifications:[],settings:{max_items:10,max_photos:6,paper:'a4',company:'บริษัท เจริญโภคภัณฑ์วิศวกรรม จำกัด'}},me=JSON.parse(localStorage.me||'null'),sb=null,W=null,I=null;
+const can=r=>me.role==r||me.role=='admin',proj=id=>S.projects.find(p=>p.id==id)||{},frm=c=>FORMS.find(f=>f.code==c)||{c:[],x:[]};
+const fmt=d=>d?new Date(d).toLocaleString('th-TH',{dateStyle:'medium',timeStyle:'short'}):'-',fd=d=>d?new Date(d).toLocaleDateString('th-TH'):'';
+const pill=s=>`<span class=pill style="background:${ST[s][1]}">${ST[s][0]}</span>`;
+const toast=t=>{const e=document.createElement('div');e.className='toast';e.textContent=t;document.body.appendChild(e);setTimeout(()=>e.remove(),2600)};
+/* ---------- data layer: IndexedDB (demo) or Supabase ---------- */
+const idb=()=>new Promise(r=>{const q=indexedDB.open('smartqc',1);q.onupgradeneeded=()=>q.result.createObjectStore('k');q.onsuccess=()=>r(q.result)});
+const kv=async(m,v)=>{const d=await idb();return new Promise(r=>{const t=d.transaction('k','readwrite').objectStore('k'),q=m=='get'?t.get('s'):t.put(v,'s');q.onsuccess=()=>r(q.result)})};
+const persist=()=>kv('set',S);
+async function up(v){if(typeof v!='string'||!v.startsWith('data:image'))return v;const b=await (await fetch(v)).blob(),p=uid()+'.'+(v.includes('png')?'png':'jpg');await sb.storage.from('qc-files').upload(p,b,{contentType:b.type});return sb.storage.from('qc-files').getPublicUrl(p).data.publicUrl}
+async function deep(o){if(Array.isArray(o)){for(let i=0;i<o.length;i++)o[i]=await deep(o[i]);return o}if(o&&typeof o=='object'){for(const k in o)o[k]=await deep(o[k]);return o}return up(o)}
+async function save(c,row){const a=S[c],i=a.findIndex(x=>x.id==row.id);if(c=='inspections')row.updated_at=now();i<0?a.unshift(row):a[i]=row;if(sb){try{await deep(row);const{error}=await sb.from(c).upsert(row);if(error)throw error}catch(e){toast('Cloud: '+e.message)}}await persist()}
+async function saveSet(){if(sb)await sb.from('app_settings').upsert({key:'main',value:S.settings});await persist()}
+async function mv(i,to,note,role,sig){const from=i.status;i.status=to;i.sigs=i.sigs||{};if(sig)i.sigs[role]={img:sig,name:me.name,at:now()};
+await save('status_log',{id:uid(),inspection_id:i.id,from_status:from,to_status:to,actor_id:me.id,actor_name:me.name,actor_role:me.role,note:note||'',created_at:now()});
+for(const r of NT[to]||[])await save('notifications',{id:uid(),to_role:r,inspection_id:i.id,text:`${i.doc_no} → ${ST[to][0]}`,read:false,created_at:now()});await save('inspections',i)}
+/* ---------- UI helpers ---------- */
+function modal(x){const m=document.createElement('div');m.className='ov';m.innerHTML=`<div class=mb>${x}<button class=b style="width:100%;margin-top:8px" onclick="this.closest('.ov').remove()">ปิด</button></div>`;document.body.appendChild(m);return m}
+const closeAll=()=>document.querySelectorAll('.ov').forEach(x=>x.remove());
+const comp=f=>new Promise(r=>{const i=new Image();i.onload=()=>{const k=Math.min(1,1280/Math.max(i.width,i.height)),c=document.createElement('canvas');c.width=i.width*k;c.height=i.height*k;c.getContext('2d').drawImage(i,0,0,c.width,c.height);r(c.toDataURL('image/jpeg',.78))};i.src=URL.createObjectURL(f)});
+const P={};function initPads(){document.querySelectorAll('canvas.pad').forEach(c=>{const r=c.getBoundingClientRect();c.width=r.width*2;c.height=r.height*2;const x=c.getContext('2d');x.lineWidth=4;x.lineCap='round';x.strokeStyle='#111';P[c.id]={c,d:0};let on=0;const pt=e=>{const b=c.getBoundingClientRect();return[(e.clientX-b.left)*2,(e.clientY-b.top)*2]};c.onpointerdown=e=>{on=1;c.setPointerCapture(e.pointerId);x.beginPath();x.moveTo(...pt(e))};c.onpointermove=e=>{if(on){x.lineTo(...pt(e));x.stroke();P[c.id].d=1}};c.onpointerup=()=>on=0})}
+const clr=id=>{const c=P[id].c;c.getContext('2d').clearRect(0,0,c.width,c.height);P[id].d=0},sigData=id=>P[id]&&P[id].d?P[id].c.toDataURL('image/png'):null;
+const padH=l=>`<label>${l}</label><canvas class=pad id=sg></canvas><button class=b onclick="clr('sg')">ล้างลายเซ็น</button>`;
+function annotate(src,cb){const m=modal(`<canvas id=an style="width:100%;touch-action:none;border-radius:8px"></canvas><div class=row><button class="b on" id=t1>✏️ ปากกา</button><button class=b id=t2>⭕ วงกลม</button><button class=b id=un>↩︎ ย้อน</button><button class="b p" id=ok>เสร็จ</button></div>`);
+const im=new Image();im.onload=()=>{const c=m.querySelector('#an'),x=c.getContext('2d');c.width=im.width;c.height=im.height;const L=[],lw=Math.max(5,im.width/150);let tool='pen',cur=null;
+const draw=()=>{x.drawImage(im,0,0);x.strokeStyle='#ff1f1f';x.lineWidth=lw;x.lineCap=x.lineJoin='round';[...L,cur].filter(Boolean).forEach(s=>{x.beginPath();if(s.t=='pen')s.p.forEach((q,i)=>i?x.lineTo(...q):x.moveTo(...q));else{const[a,b]=s.p;x.ellipse((a[0]+b[0])/2,(a[1]+b[1])/2,Math.abs(b[0]-a[0])/2||1,Math.abs(b[1]-a[1])/2||1,0,0,7)}x.stroke()})};
+const pt=e=>{const r=c.getBoundingClientRect();return[(e.clientX-r.left)*c.width/r.width,(e.clientY-r.top)*c.height/r.height]};
+c.onpointerdown=e=>{c.setPointerCapture(e.pointerId);const p=pt(e);cur={t:tool,p:[p,p]}};c.onpointermove=e=>{if(!cur)return;const p=pt(e);cur.t=='pen'?cur.p.push(p):cur.p[1]=p;draw()};c.onpointerup=()=>{if(cur)L.push(cur);cur=null;draw()};
+const tg=t=>{tool=t;m.querySelector('#t1').className='b'+(t=='pen'?' on':'');m.querySelector('#t2').className='b'+(t=='ell'?' on':'')};m.querySelector('#t1').onclick=()=>tg('pen');m.querySelector('#t2').onclick=()=>tg('ell');m.querySelector('#un').onclick=()=>{L.pop();draw()};m.querySelector('#ok').onclick=()=>{cb(c.toDataURL('image/jpeg',.85));m.remove()};draw()};im.src=src}
+const O={W:()=>W,I:()=>I},arr=(o,i,k)=>{const it=O[o]().items[i];return k=='dwg'?(it.eq.dwg||=[]):(it[k]||=[])};
+function photoBox(o,i,k,ro){const a=arr(o,i,k),mx=S.settings.max_photos;return `<div class=ph>${a.map((s,j)=>`<img src="${s}" onclick="thumb('${o}',${i},'${k}',${j},${!!ro})">`).join('')}${!ro&&a.length<mx?`<button class=add onclick="addPh('${o}',${i},'${k}')">＋<small>${a.length}/${mx}</small></button>`:''}</div>`}
+function addPh(o,i,k){const f=document.createElement('input');f.type='file';f.accept='image/*';f.multiple=k=='photos';f.onchange=async()=>{for(const x of f.files){const d=await comp(x);if(k=='photos')arr(o,i,k).push(d);else return annotate(d,u=>{arr(o,i,k).push(u);persist();render()})}persist();render()};f.click()}
+function thumb(o,i,k,j,ro){modal(`<img src="${arr(o,i,k)[j]}" style="width:100%;border-radius:8px">${ro?'':`<div class=row><button class=b onclick="closeAll();annotate(arr('${o}',${i},'${k}')[${j}],u=>{arr('${o}',${i},'${k}')[${j}]=u;persist();render()})">✏️ วงกลม / ไฮไลต์</button><button class="b d" onclick="arr('${o}',${i},'${k}').splice(${j},1);persist();closeAll();render()">🗑 ลบ</button></div>`}`)}
+const strip=a=>`<div class=ph>${(a||[]).map(s=>`<img src="${s}" onclick="modal('<img src=&quot;${s.startsWith('data')?'':s}&quot; style=width:100%>')">`).join('')||'<span class=m>ไม่มีรูป</span>'}</div>`;
+const deny=()=>`<div class=card>บทบาทของคุณไม่มีสิทธิ์ใช้งานส่วนนี้</div>`;
+/* ---------- entry / router ---------- */
+function entryHtml(){return `<div class=entry><img src="${LOGO}"><h2 style="text-align:center">SMART QC</h2><p class=m style="text-align:center">ระบบตรวจสอบงานติดตั้งออนไลน์ (MVP · เข้าใช้งานได้โดยไม่ต้อง Login)</p><div class=card><label>ชื่อ-นามสกุล</label><input id=en placeholder="ชื่อของคุณ"><label>บริษัท</label><input id=ec placeholder="บริษัท"><label>เลือกบทบาท</label><select id=er>${Object.entries(ROLES).map(([k,v])=>`<option value=${k}>${v}</option>`).join('')}</select><button class="b p" style="width:100%" onclick="enter()">เข้าใช้งาน</button></div></div>`}
+function enter(){const n=$('#en').value.trim();if(!n)return toast('กรุณากรอกชื่อ');me={id:uid(),name:n,company:$('#ec').value,role:$('#er').value,email:''};localStorage.me=JSON.stringify(me);location.hash='#/home';render()}
+const R=()=>location.hash.slice(2).split('/');
+async function render(){const A=$('#app');if(!me){A.innerHTML=entryHtml();return}const[p,id]=R(),pg=p||'home',fn={home,new:wiz,status,docs,settings,insp,notif}[pg]||home,n=S.notifications.filter(x=>x.to_role==me.role&&!x.read).length,hl=pg=='insp'?'status':pg;
+A.innerHTML=`<div class=app><nav><div class=brand><img src="${LOGO}"><b>SMART QC</b></div>${[['home','🏠','หน้าหลัก'],['new','📝','ส่งตรวจ'],['status','📋','สถานะ'],['docs','📁','เอกสาร'],['settings','⚙️','ตั้งค่า']].map(([k,i,l])=>`<a href="#/${k}" class="${hl==k?'on':''}">${i}<span>${l}</span></a>`).join('')}</nav><main><div class=top><span class=m>${h(me.name)} · ${ROLES[me.role]}${sb?' · ☁️':' · โหมดทดลอง'}</span><a href="#/notif" class=bell>🔔${n?`<i>${n}</i>`:''}</a></div>${fn(id)}</main></div>`;initPads()}
+window.onhashchange=()=>{render();scrollTo(0,0)};
+/* ---------- 1 dashboard ---------- */
+function home(){const ps=S.projects.filter(p=>p.active!==false),pid=sessionStorage.pid||ps[0]?.id,L=S.inspections.filter(i=>i.project_id==pid&&(i.status!='draft'||i.created_by==me.id)),D=S.defects.filter(d=>d.project_id==pid),cnt=s=>L.filter(i=>i.status==s).length,mx=Math.max(1,...Object.keys(ST).map(cnt)),g={};
+D.forEach(d=>{const k=d.check_label+' · '+(frm(d.form_code).s||d.form_code);(g[k]||=[0,0])[d.severity=='major'?0:1]++});
+const top=Object.entries(g).sort((a,b)=>b[1][0]*3+b[1][1]-(a[1][0]*3+a[1][1])).slice(0,8),tm=Math.max(1,...top.map(t=>t[1][0]+t[1][1])),ap=L.filter(i=>i.status=='approved'),avg=ap.length?(ap.reduce((s,i)=>s+(new Date(i.updated_at)-new Date(i.created_at)),0)/ap.length/36e5).toFixed(1):'-';
+return `<h2>Dashboard โครงการ</h2><select onchange="sessionStorage.pid=this.value;render()">${ps.map(p=>`<option value=${p.id} ${p.id==pid?'selected':''}>${h(p.code)} ${h(p.name)}</option>`).join('')}</select>
+<div class=grid><a class=kpi href="#/status" onclick="sessionStorage.st='all'">ใบตรวจทั้งหมด<b>${L.length}</b></a><a class=kpi href="#/status" onclick="sessionStorage.st='pending'">รอตรวจสอบ<b style="color:#d97706">${cnt('pending')+cnt('fix_review')}</b></a><a class=kpi href="#/status" onclick="sessionStorage.st='needs_fix'">ต้องแก้ไข<b style="color:#dc2626">${cnt('needs_fix')}</b></a><a class=kpi href="#/status" onclick="sessionStorage.st='approved'">อนุมัติแล้ว<b style="color:#16a34a">${cnt('approved')}</b></a><div class=kpi>Defect (Major/Minor)<b>${D.filter(d=>d.severity=='major').length}/${D.filter(d=>d.severity!='major').length}</b></div><div class=kpi>เวลาเฉลี่ยจนอนุมัติ (ชม.)<b>${avg}</b></div></div>
+<div class=card><h3>สถานะการตรวจสอบ</h3>${Object.keys(ST).map(s=>`<div class=bar><span>${ST[s][0]}</span><div><i style="width:${cnt(s)/mx*100}%;background:${ST[s][1]}"></i></div><b>${cnt(s)}</b></div>`).join('')}</div>
+<div class=card><h3>Top Defect งานติดตั้ง <span class=m>🟥 Major 🟧 Minor</span></h3>${top.map(([k,v])=>`<div class=bar><span>${h(k)}</span><div><i style="width:${v[0]/tm*100}%;background:#dc2626"></i><i style="width:${v[1]/tm*100}%;background:#f59e0b"></i></div><b>${v[0]+v[1]}</b></div>`).join('')||'<span class=m>ยังไม่มีข้อมูล Defect</span>'}</div>
+<div class=card><h3>ล่าสุด</h3>${L.slice(0,5).map(card).join('')||'<span class=m>ยังไม่มีใบตรวจ</span>'}</div>`}
+const card=i=>`<a class="card li" href="#/insp/${i.id}"><div class=m><b style="color:var(--t)">${h(i.doc_no||'(ร่าง)')}</b>${pill(i.status)}</div><div>${h(frm(i.form_code).s||i.form_code)} · ${i.items?.length||0} รายการ</div><div class=m>${h(proj(i.project_id).code)} · ${fmt(i.updated_at||i.created_at)}</div></a>`;
+/* ---------- 2 submit wizard (installer) ---------- */
+function newW(){W={id:uid(),doc_no:'',project_id:sessionStorage.pid||S.projects[0]?.id,form_code:'',status:'draft',round:1,inspect_at:'',created_by:me.id,installer_name:me.name,items:[],sigs:{},_s:0}}
+const blank=()=>({eq:{},photos:[],res:{},sev:{},notes:{},ipics:[],remark:''});
+function pickF(c){W.form_code=c;if(!W.items.length)W.items.push(blank());W._s=1;render()}
+const eq=(i,k,v)=>W.items[i].eq[k]=v;
+function useEq(i,id){const q=S.equipment_catalog.find(x=>x.id==id);if(!q)return;Object.assign(W.items[i].eq,{name:q.name,model:q.model,pos:q.pos,drawing:q.drawing,...q.extra});render()}
+function addIt(){if(W.items.length>=S.settings.max_items)return toast(`ส่งตรวจได้ไม่เกิน ${S.settings.max_items} รายการ/ใบ`);W.items.push(blank());render()}
+function wgo(n){if(n==2&&W.items.some(t=>!t.eq.name))return toast('กรอกรายการ/Code อุปกรณ์ให้ครบ');W._s=n;render()}
+function wiz(){if(!can('installer'))return deny();if(!W)newW();const s=W._s,f=frm(W.form_code),dots=`<div class=steps>${[0,1,2,3].map(n=>`<i class="${n<=s?'on':''}"></i>`).join('')}</div>`;
+if(s==0)return `<h2>ส่งตรวจสอบ</h2>${dots}<div class=card><label>1) เลือกโครงการ</label><select onchange="W.project_id=this.value">${S.projects.filter(p=>p.active!==false).map(p=>`<option value=${p.id} ${p.id==W.project_id?'selected':''}>${h(p.code)} ${h(p.name)}</option>`).join('')}</select></div><label>2) เลือกรายการตรวจสอบ</label>${FORMS.map(x=>`<button class="b fc" onclick="pickF('${x.code}')"><b>${x.code}</b> ${h(x.s)}<br><small>${x.c.map(c=>c[1]).join(' · ')}</small></button>`).join('')}`;
+const hist=S.equipment_catalog.filter(q=>q.project_id==W.project_id&&q.form_code==W.form_code).sort((a,b)=>b.use_count-a.use_count);
+if(s==1)return `<h2>รายละเอียดอุปกรณ์</h2><p class=m>${f.code} ${h(f.s)} · ไม่เกิน ${S.settings.max_items} รายการ · ระบบจำประวัติอุปกรณ์ให้อัตโนมัติ</p>${dots}${W.items.map((it,i)=>`<div class=card><div class=m><b>อุปกรณ์ #${i+1}</b>${W.items.length>1?`<a href="#" onclick="W.items.splice(${i},1);render();return false" style="color:#dc2626">ลบ</a>`:''}</div>${hist.length?`<select onchange="useEq(${i},this.value)"><option value="">📋 เลือกจากประวัติที่เคยกรอก (${hist.length})</option>${hist.map(q=>`<option value=${q.id}>${h(q.name)} ${h(q.model)} ${h(q.pos)}</option>`).join('')}</select>`:''}
+<label>รายการ / Code / ชื่ออุปกรณ์ *</label><input value="${h(it.eq.name)}" onchange="eq(${i},'name',this.value)"><label>รุ่น</label><input value="${h(it.eq.model)}" onchange="eq(${i},'model',this.value)"><label>ตำแหน่ง</label><input value="${h(it.eq.pos)}" onchange="eq(${i},'pos',this.value)"><label>เลขที่แบบ</label><input value="${h(it.eq.drawing)}" onchange="eq(${i},'drawing',this.value)">${f.x.map(k=>`<label>${XF[k]}</label><input value="${h(it.eq[k])}" onchange="eq(${i},'${k}',this.value)">`).join('')}<label>อัปโหลดแบบ (วงกลม/ไฮไลต์ได้)</label>${photoBox('W',i,'dwg')}</div>`).join('')}<div class=row><button class=b onclick="addIt()">＋ เพิ่มอุปกรณ์</button></div><div class=row><button class=b onclick="wgo(0)">← กลับ</button><button class="b p" onclick="wgo(2)">ถัดไป: รูปส่งตรวจ →</button></div>`;
+if(s==2)return `<h2>รูปภาพส่งตรวจ</h2><p class=m>ถ่าย/อัปโหลดรูปการติดตั้งตามรายการตรวจสอบ ทีละอุปกรณ์ (หลายมุมได้)</p>${dots}${W.items.map((it,i)=>`<div class=card><b>#${i+1} ${h(it.eq.name)}</b><div class=m>${f.c.map(c=>c[1]).join(' · ')}</div>${photoBox('W',i,'photos')}</div>`).join('')}<div class=row><button class=b onclick="wgo(1)">← กลับ</button><button class="b p" onclick="wgo(3)">ถัดไป: สรุปและส่ง →</button></div>`;
+return `<h2>ตรวจทานและส่งตรวจ</h2>${dots}<div class=card><b>${f.code} ${h(f.s)}</b><div class=m>${h(proj(W.project_id).code)} · ${W.items.length} อุปกรณ์ · ${W.items.reduce((n,t)=>n+t.photos.length,0)} รูป</div>${W.items.map((t,i)=>`<div>#${i+1} ${h(t.eq.name)} <span class=m>(${t.photos.length} รูป)</span></div>`).join('')}</div><div class=card><label>วัน-เวลาที่ขอตรวจ (เลือกจากปฏิทิน)</label><input type=datetime-local value="${W.inspect_at}" onchange="W.inspect_at=this.value">${padH('ลายเซ็นผู้ผลิต/ผู้ติดตั้ง')}</div><div class=row><button class=b onclick="wgo(2)">← กลับ</button><button class=b onclick="sub(true)">💾 บันทึก Draft</button><button class="b p" onclick="sub(false)">ส่งตรวจสอบ</button></div>`}
+async function remember(x){const f=frm(x.form_code);for(const it of x.items){const e=it.eq,q=S.equipment_catalog.find(z=>z.project_id==x.project_id&&z.form_code==x.form_code&&z.name==e.name);await save('equipment_catalog',{id:q?.id||uid(),project_id:x.project_id,form_code:x.form_code,name:e.name,model:e.model||'',pos:e.pos||'',drawing:e.drawing||'',extra:Object.fromEntries(f.x.map(k=>[k,e[k]||''])),use_count:(q?.use_count||0)+1,last_used:now(),created_by:me.id})}}
+async function sub(draft){const s=sigData('sg');if(!draft){if(W.items.some(t=>!t.eq.name))return toast('กรอกรายการ/Code อุปกรณ์ให้ครบ');if(W.items.some(t=>!t.photos.length))return toast('อัปโหลดรูปส่งตรวจให้ครบทุกอุปกรณ์');if(!W.inspect_at)return toast('เลือกวัน-เวลาตรวจ');if(!s)return toast('กรุณาเซ็นชื่อ')}
+const row={...W};delete row._s;row.inspect_at=W.inspect_at||null;if(!row.doc_no)row.doc_no=`${W.form_code}-${proj(W.project_id).code}-${String(S.inspections.filter(x=>x.form_code==W.form_code&&x.project_id==W.project_id).length+1).padStart(3,'0')}`;
+await remember(row);if(draft)await save('inspections',row);else await mv(row,'pending','','installer',s);W=null;toast(draft?'บันทึก Draft แล้ว':'ส่งตรวจสอบแล้ว');location.hash='#/insp/'+row.id}
+/* ---------- 3 status + detail ---------- */
+function status(){const t=sessionStorage.st||'all',L=S.inspections.filter(i=>i.status!='draft'||i.created_by==me.id),F=t=='all'?L:L.filter(i=>i.status==t);
+return `<h2>สถานะ</h2><div class=tabs>${['all',...Object.keys(ST)].map(s=>`<button class="b ${t==s?'on':''}" onclick="sessionStorage.st='${s}';render()">${s=='all'?'ทั้งหมด':ST[s][0]} (${s=='all'?L.length:L.filter(i=>i.status==s).length})</button>`).join('')}</div>${F.map(card).join('')||'<div class="card m">ไม่มีรายการ</div>'}`}
+function insp(id){I=S.inspections.find(x=>x.id==id);if(!I)return deny();const f=frm(I.form_code),L=S.status_log.filter(l=>l.inspection_id==I.id).sort((a,b)=>a.created_at<b.created_at?-1:1),D=S.defects.filter(d=>d.inspection_id==I.id),open=D.filter(d=>d.status=='open'),ed=can('inspector')&&['pending','fix_review'].includes(I.status),last=L[L.length-1];
+let act='';
+if(ed)act=`<div class=card><h3>สรุปผลตรวจ</h3>${padH('ลายเซ็นผู้ตรวจสอบ')}<div class=row><button class="b p" onclick="decide()">ยืนยันผลตรวจ</button></div><p class=m>มีข้อไม่ผ่าน → ออกเอกสาร Defect (FR-INS-ME-004) อัตโนมัติ · ผ่านทั้งหมด → ส่งผู้อนุมัติ</p></div>`;
+if(I.status=='needs_fix'&&can('installer'))act=`<div class=card><h3>แก้ไขข้อบกพร่อง (${open.length})</h3>${open.map(d=>`<div class=card><b>${h(d.check_label)}</b> <span class=pill style="background:${d.severity=='major'?'#dc2626':'#f59e0b'}">${d.severity}</span> <span class=m>${h(d.equipment_name)}</span><div>${h(d.description)}</div><div class=ph>${d.photo_before?`<img src="${d.photo_before}">`:''}${d.photo_after?`<img src="${d.photo_after}">`:`<button class=add onclick="defPh('${d.id}')">＋<small>หลังแก้ไข</small></button>`}</div><input placeholder="สาเหตุ/วิธีแก้ไข (เก็บเป็นคลังความรู้)" value="${h(d.fix_note)}" onchange="defNote('${d.id}',this.value)"></div>`).join('')}<button class="b p" style="width:100%" onclick="fixSub()">ส่งตรวจสอบการแก้ไข</button></div>`;
+if(I.status=='pending_approval'&&can('approver'))act=`<div class=card><h3>พิจารณาอนุมัติ</h3>${padH('ลายเซ็นผู้อนุมัติ')}<div class=row><button class="b d" onclick="appr(false)">ไม่อนุมัติ</button><button class="b p" onclick="appr(true)">อนุมัติ</button></div></div>`;
+if(I.status=='draft'&&I.created_by==me.id)act=`<div class=row><button class="b p" onclick="W=JSON.parse(JSON.stringify(I));W._s=1;location.hash='#/new'">✏️ แก้ไข / ส่งตรวจ</button></div>`;
+return `<a href="#/status" class=m>← กลับ</a><div class=card><div class=m><b style="color:var(--t);font-size:17px">${h(I.doc_no)}</b>${pill(I.status)}</div><div>${f.code} ${h(f.s)}</div><div class=m>${h(proj(I.project_id).code)} ${h(proj(I.project_id).name)} · ตรวจ ${fmt(I.inspect_at)} · รอบที่ ${I.round}</div><div class=row><button class=b onclick="pdfDoc('${I.id}','insp')">📄 PDF ใบตรวจ</button>${D.length?`<button class=b onclick="pdfDoc('${I.id}','def')">⚠️ PDF Defect</button>`:''}<button class=b onclick="pdfDoc('${I.id}','insp',1)">📤 แชร์</button></div></div>
+${I.status=='needs_fix'&&last?.note?`<div class=warn><b>หมายเหตุ:</b> ${h(last.note)}</div>`:''}
+${I.items.map((it,i)=>`<div class=card><b>#${i+1} ${h(it.eq.name)}</b> <span class=m>${[it.eq.model,it.eq.pos,it.eq.drawing,...f.x.map(k=>it.eq[k]&&XF[k]+': '+it.eq[k])].filter(Boolean).map(h).join(' · ')}</span><div class=m>รูปจากผู้ติดตั้ง</div>${strip(it.photos)}${(it.eq.dwg||[]).length?`<div class=m>แบบ</div>${strip(it.eq.dwg)}`:''}
+${f.c.map(([k,l])=>{const v=it.res[k];return `<div class=ck><span>${l}</span>${ed?`<div><button class="pf ${v=='pass'?'ok':''}" onclick="chk(${i},'${k}','pass')">ผ่าน</button><button class="pf ${v=='fail'?'no':''}" onclick="chk(${i},'${k}','fail')">ไม่ผ่าน</button></div>`:`<b style="color:${v=='pass'?'#16a34a':v=='fail'?'#dc2626':'var(--m)'}">${v=='pass'?'✓ ผ่าน':v=='fail'?'✗ ไม่ผ่าน':'-'}</b>`}</div>${v=='fail'?(ed?`<div class=fl><select onchange="it_s(${i},'${k}',this.value)"><option value=minor ${it.sev[k]!='major'?'selected':''}>Minor</option><option value=major ${it.sev[k]=='major'?'selected':''}>Major</option></select><input placeholder="รายละเอียดข้อบกพร่อง" value="${h(it.notes[k])}" onchange="it_n(${i},'${k}',this.value)"></div>`:`<div class=m>${it.sev[k]} · ${h(it.notes[k])}</div>`):''}`}).join('')}
+<div class=m>รูปตรวจสอบ (ไฮไลต์)</div>${photoBox('I',i,'ipics',!ed)}${ed?`<input placeholder="หมายเหตุ" value="${h(it.remark)}" onchange="I.items[${i}].remark=this.value;persist()">`:it.remark?`<div class=m>หมายเหตุ: ${h(it.remark)}</div>`:''}</div>`).join('')}${act}
+<div class=card><h3>ประวัติสถานะ</h3>${L.map(l=>`<div class=m>• ${fmt(l.created_at)} — ${ST[l.to_status][0]} · ${h(l.actor_name)} (${ROLES[l.actor_role]})${l.note?' · '+h(l.note):''}</div>`).join('')||'<span class=m>-</span>'}</div>`}
+const chk=(i,k,v)=>{I.items[i].res[k]=v;persist();render()},it_s=(i,k,v)=>{I.items[i].sev[k]=v;persist()},it_n=(i,k,v)=>{I.items[i].notes[k]=v;persist()};
+const defNo=()=>`FR-INS-ME-004-${proj(I.project_id).code}-${String(S.inspections.filter(x=>x.defect_no&&x.project_id==I.project_id).length+1).padStart(3,'0')}`;
+async function decide(){const s=sigData('sg');if(!s)return toast('กรุณาเซ็นชื่อ');const f=frm(I.form_code);let fails=0;
+for(const[i,it]of I.items.entries())for(const[k,l]of f.c){if(!it.res[k])return toast(`ยังไม่ได้ตรวจ: #${i+1} ${l}`);const id=`${I.id}:${i}:${k}`,ex=S.defects.find(d=>d.id==id);
+if(it.res[k]=='fail'){fails++;await save('defects',{...(ex||{created_at:now()}),id,inspection_id:I.id,project_id:I.project_id,form_code:I.form_code,item_seq:i+1,equipment_name:it.eq.name,check_key:k,check_label:l,severity:it.sev[k]||'minor',description:it.notes[k]||'',photo_before:it.ipics[0]||it.photos[0]||null,photo_after:null,status:'open',round:I.round})}
+else if(ex&&ex.status=='open')await save('defects',{...ex,status:'closed',fixed_at:now()})}
+I.inspector_name=me.name;if(fails){I.defect_no=I.defect_no||defNo();await mv(I,'needs_fix',`พบข้อบกพร่อง ${fails} รายการ`,'inspector',s)}else await mv(I,'pending_approval','ผ่านทั้งหมด','inspector',s);render()}
+async function defPh(id){const f=document.createElement('input');f.type='file';f.accept='image/*';f.onchange=async()=>{const d=S.defects.find(x=>x.id==id);d.photo_after=await comp(f.files[0]);await save('defects',d);render()};f.click()}
+async function defNote(id,v){const d=S.defects.find(x=>x.id==id);d.fix_note=v;await save('defects',d)}
+async function fixSub(){if(S.defects.some(d=>d.inspection_id==I.id&&d.status=='open'&&!d.photo_after))return toast('แนบรูปหลังแก้ไขให้ครบทุกข้อ');I.round++;await mv(I,'fix_review','ส่งตรวจสอบการแก้ไข');render()}
+async function appr(ok){const s=sigData('sg');if(!s)return toast('กรุณาเซ็นชื่อ');let n='';if(!ok){n=prompt('เหตุผลที่ไม่อนุมัติ');if(!n)return}I.approver_name=me.name;await mv(I,ok?'approved':'needs_fix',n,'approver',s);render()}
+/* ---------- 4 documents + defect knowledge base ---------- */
+function docs(){const L=S.inspections.filter(i=>i.status=='approved'),K=S.defects.filter(d=>d.fix_note);
+return `<h2>เอกสารที่อนุมัติแล้ว</h2><input placeholder="🔍 ค้นหาเลขที่เอกสาร / โครงการ" oninput="document.querySelectorAll('.dr').forEach(e=>e.hidden=!e.textContent.toLowerCase().includes(this.value.toLowerCase()))">${L.map(i=>`<div class="card dr"><div class=m><b style="color:var(--t)">${h(i.doc_no)}</b>${fd(i.updated_at)}</div><div>${h(frm(i.form_code).s)} · ${h(proj(i.project_id).code)}</div><div class=row><button class=b onclick="pdfDoc('${i.id}','insp')">📄 ดาวน์โหลด PDF</button>${i.defect_no?`<button class=b onclick="pdfDoc('${i.id}','def')">⚠️ Defect</button>`:''}<button class=b onclick="pdfDoc('${i.id}','insp',1)">📤 แชร์</button><a class=b style="text-align:center;text-decoration:none" href="#/insp/${i.id}">เปิดดู</a></div></div>`).join('')||'<div class="card m">ยังไม่มีเอกสารที่อนุมัติ</div>'}
+<h2>คลังความรู้ Defect งานติดตั้ง</h2>${K.map(d=>`<div class="card dr"><b>${h(d.check_label)}</b> · ${h(frm(d.form_code).s)} <span class=pill style="background:${d.severity=='major'?'#dc2626':'#f59e0b'}">${d.severity}</span><div>${h(d.description)}</div><div class=m>วิธีแก้ไข: ${h(d.fix_note)}</div><div class=ph>${d.photo_before?`<img src="${d.photo_before}">`:''}${d.photo_after?`<img src="${d.photo_after}">`:''}</div></div>`).join('')||'<div class="card m">คลังความรู้จะเริ่มสะสมเมื่อผู้ติดตั้งบันทึกวิธีแก้ไข Defect</div>'}`}
+/* ---------- 5 notifications / 6 settings ---------- */
+function notif(){const L=S.notifications.filter(n=>n.to_role==me.role).sort((a,b)=>a.created_at<b.created_at?1:-1);L.filter(n=>!n.read).forEach(n=>{n.read=true;save('notifications',n)});return `<h2>การแจ้งเตือน</h2>${L.map(n=>`<a class="card li" href="#/insp/${n.inspection_id}">${h(n.text)}<div class=m>${fmt(n.created_at)}</div></a>`).join('')||'<div class="card m">ไม่มีการแจ้งเตือน</div>'}`}
+function settings(){const a=me.role=='admin',s=S.settings;return `<h2>ตั้งค่า</h2><div class=card><h3>โปรไฟล์</h3><label>ชื่อ</label><input value="${h(me.name)}" onchange="me.name=this.value;pf()"><label>บริษัท</label><input value="${h(me.company)}" onchange="me.company=this.value;pf()"><label>อีเมล</label><input value="${h(me.email)}" onchange="me.email=this.value;pf()"><label>บทบาท (MVP: เปลี่ยนได้)</label><select onchange="me.role=this.value;pf();render()">${Object.entries(ROLES).map(([k,v])=>`<option value=${k} ${k==me.role?'selected':''}>${v}</option>`).join('')}</select>
+<div class=row><button class=b onclick="localStorage.th=document.documentElement.dataset.theme=(localStorage.th=='dark'?'light':'dark')">🌓 Dark / Light</button><button class=b onclick="me=null;localStorage.removeItem('me');render()">Logout</button><button class="b d" onclick="if(confirm('ลบโปรไฟล์?')){me=null;localStorage.removeItem('me');render()}">ลบโปรไฟล์</button></div></div>
+${a?`<div class=card><h3>Admin · ค่าระบบ</h3><label>จำนวนอุปกรณ์สูงสุด/ใบตรวจ</label><input type=number value="${s.max_items}" onchange="S.settings.max_items=+this.value;saveSet()"><label>จำนวนรูปสูงสุด/ช่อง</label><input type=number value="${s.max_photos}" onchange="S.settings.max_photos=+this.value;saveSet()"><label>ขนาดกระดาษ PDF</label><select onchange="S.settings.paper=this.value;saveSet()"><option value=a4 ${s.paper=='a4'?'selected':''}>A4 แนวนอน</option><option value=a3 ${s.paper=='a3'?'selected':''}>A3 แนวนอน (ตามต้นฉบับ)</option></select><label>ชื่อบริษัทหัวเอกสาร</label><input value="${h(s.company)}" onchange="S.settings.company=this.value;saveSet()"></div>
+<div class=card><h3>Admin · โครงการ</h3>${S.projects.map(p=>`<div class=ck><span>${h(p.code)} ${h(p.name)}</span><button class="pf ${p.active!==false?'ok':''}" onclick="tp('${p.id}')">${p.active!==false?'Active':'ปิด'}</button></div>`).join('')}<input id=pc placeholder="รหัสโครงการ เช่น PJ68/075"><input id=pn placeholder="ชื่อโครงการ"><button class="b p" onclick="addP()">＋ เพิ่มโครงการ</button></div>
+<div class=card><h3>Admin · เชื่อมต่อ Supabase</h3><input id=su placeholder="Project URL" value="${h(JSON.parse(localStorage.sbcfg||'{}').url)}"><input id=sk placeholder="anon key"><div class=row><button class="b p" onclick="localStorage.sbcfg=JSON.stringify({url:$('#su').value,key:$('#sk').value});location.reload()">เชื่อมต่อ & รีโหลด</button><button class=b onclick="localStorage.removeItem('sbcfg');location.reload()">กลับโหมดทดลอง</button></div></div>`:''}`}
+const pf=()=>localStorage.me=JSON.stringify(me);
+const tp=async id=>{const p=proj(id);p.active=p.active===false;await save('projects',p);render()};
+async function addP(){const c=$('#pc').value.trim(),n=$('#pn').value.trim();if(!c||!n)return toast('กรอกรหัสและชื่อโครงการ');await save('projects',{id:uid(),code:c,name:n,owner_company:S.settings.company,active:true,created_at:now()});render()}
+/* ---------- PDF (ISO layout, fixed template) ---------- */
+const dim=()=>S.settings.paper=='a3'?[1587,1123,420,297]:[1123,794,297,210];
+const pgW=(x,I_,t)=>{const[w,hh]=dim();return `<div class=pg style="width:${w}px;height:${hh}px"><div class=hd><img src="${LOGO}"><div><b>${h(S.settings.company)}</b>${t}</div><div class=bx style="flex:none;text-align:left">เลขที่เอกสาร: ${h(I_.doc_no)}<br>วันที่: ${fd(I_.inspect_at||I_.updated_at)}<br>โครงการ: ${h(proj(I_.project_id).code)} ${h(proj(I_.project_id).name)}</div></div>${x}<div class=ft><span>${h(frm(I_.form_code).code)}</span><span>หน้า %N / %T</span></div></div>`};
+const sgB=(I_,r,l)=>{const s=I_.sigs?.[r];return `<div class=sg><b>${l}</b><div class=si>${s?`<img src="${s.img}">`:''}</div><div>(${s?h(s.name):'..............................'})</div><div>${s?fd(s.at):'........./......../............'}</div></div>`};
+function pgCover(I_){const f=frm(I_.form_code),e=f.x,n=4+e.length+f.c.length*2+1;return pgW(`<table><tr><th rowspan=2 style="width:3.5%">ลำดับ</th><th rowspan=2 style="width:11%">รายการ</th><th rowspan=2>รุ่น</th><th rowspan=2>ตำแหน่ง</th><th rowspan=2>แบบ</th>${e.map(k=>`<th rowspan=2>${XF[k]}</th>`).join('')}${f.c.map(c=>`<th colspan=2>${c[1]}</th>`).join('')}<th rowspan=2 style="width:9%">หมายเหตุ</th></tr><tr>${f.c.map(()=>'<th>ผ่าน</th><th>ไม่ผ่าน</th>').join('')}</tr>${[...Array(10)].map((_,r)=>{const it=I_.items[r];return `<tr><td>${r+1}</td>${it?`<td class=l>${h(it.eq.name)}</td><td>${h(it.eq.model)}</td><td>${h(it.eq.pos)}</td><td>${h(it.eq.drawing)}</td>${e.map(k=>`<td>${h(it.eq[k])}</td>`).join('')}${f.c.map(([k])=>`<td>${it.res?.[k]=='pass'?'✓':''}</td><td class=x>${it.res?.[k]=='fail'?'✗':''}</td>`).join('')}<td class=l>${h(it.remark)}</td>`:'<td></td>'.repeat(n-1)}</tr>`}).join('')}</table><div class=sgs>${sgB(I_,'installer','ผู้ผลิต/ผู้ติดตั้ง')}${sgB(I_,'inspector','ผู้ตรวจสอบ')}${sgB(I_,'approver','ผู้อนุมัติ')}</div>`,I_,`<span>${h(f.s)}</span>`)}
+const im=(a,n)=>`<div class=im style="height:${dim()[1]-250}px;grid-template-rows:repeat(${Math.ceil(n/2)},1fr)">${a.slice(0,n).map(s=>`<div><img src="${s}"></div>`).join('')}</div>`;
+const pgEv=(I_,it,i)=>pgW(`<div style="margin-bottom:6px"><b>หลักฐานการตรวจ #${i+1}: ${h(it.eq.name)}</b> <span>${[it.eq.model,it.eq.pos,it.eq.drawing].filter(Boolean).map(h).join(' · ')}</span></div><div class=eg><div><h4>รูปการติดตั้ง (ผู้ผลิต/ผู้ติดตั้ง)${(it.eq.dwg||[]).length?' + แบบ':''}</h4>${im([...it.photos,...(it.eq.dwg||[])],6)}</div><div><h4>รูปตรวจสอบ/ไฮไลต์ (ผู้ตรวจสอบ)</h4>${im(it.ipics?.length?it.ipics:[],6)}</div></div>`,I_,'<span>ภาพหลักฐานการส่งตรวจ และตรวจสอบ</span>');
+function pgsDef(I_){const D=S.defects.filter(d=>d.inspection_id==I_.id),c=[];for(let i=0;i<D.length;i+=4)c.push(D.slice(i,i+4));const hh=(dim()[1]-420)/4;
+return c.map((ch,pi)=>pgW(`<div style="margin:4px 0">ถึง: ผู้แก้ไข(ผู้ประกอบ/ผู้ติดตั้ง) ${h(I_.installer_name)} · เรื่อง: Defect ของงาน ${h(I_.form_code)} (${h(frm(I_.form_code).s)}) · ออกเอกสารโดย: ${h(I_.inspector_name)}</div><table><tr><th style="width:5%">ลำดับ</th><th style="width:28%">รายละเอียดการแก้ไข</th><th style="width:25%">รูปถ่ายก่อนการแก้ไข</th><th style="width:25%">รูปถ่ายหลังการแก้ไข</th><th>หมายเหตุ</th></tr>${ch.map((d,k)=>`<tr style="height:${hh}px"><td>${pi*4+k+1}</td><td class=l><b>${h(d.equipment_name)}</b><br>${h(d.check_label)} (${d.severity})<br>${h(d.description)}</td><td>${d.photo_before?`<img src="${d.photo_before}" style="max-width:100%;max-height:${hh-8}px">`:''}</td><td>${d.photo_after?`<img src="${d.photo_after}" style="max-width:100%;max-height:${hh-8}px">`:''}</td><td class=l>${h(d.fix_note)}</td></tr>`).join('')}</table>${pi==c.length-1?`<div class=sgs>${sgB(I_,'installer','ผู้แก้ไข(ผู้ประกอบ/ผู้ติดตั้ง)')}${sgB(I_,'inspector','ผู้ตรวจสอบ')}${sgB(I_,'approver','ผู้อนุมัติ')}</div>`:''}`,{...I_,doc_no:I_.defect_no,form_code:'FR-INS-ME-004'},'<span>เอกสารแจ้งแก้ไขข้อบกพร่องงานผลิต และติดตั้ง</span>'))}
+async function pdfDoc(id,kind,share){const x=S.inspections.find(q=>q.id==id),pages=kind=='def'?pgsDef(x):[pgCover(x),...x.items.map((it,i)=>pgEv(x,it,i))],name=(kind=='def'?x.defect_no:x.doc_no).replace(/\//g,'-')+'.pdf';toast('กำลังสร้าง PDF...');await document.fonts.ready;
+const[,,mw,mh]=dim(),pdf=new jspdf.jsPDF({orientation:'l',unit:'mm',format:[mw,mh]}),box=document.createElement('div');box.style.cssText='position:fixed;left:-99999px;top:0';document.body.appendChild(box);
+for(let n=0;n<pages.length;n++){box.innerHTML=pages[n].replace('%N',n+1).replace('%T',pages.length);await new Promise(r=>setTimeout(r,80));const cv=await html2canvas(box.firstElementChild,{scale:2,useCORS:true});if(n)pdf.addPage([mw,mh],'l');pdf.addImage(cv.toDataURL('image/jpeg',.88),'JPEG',0,0,mw,mh)}
+box.remove();if(share&&navigator.canShare){const f=new File([pdf.output('blob')],name,{type:'application/pdf'});if(navigator.canShare({files:[f]}))return navigator.share({files:[f],title:name}).catch(()=>{})}pdf.save(name)}
+/* ---------- boot ---------- */
+(async()=>{document.documentElement.dataset.theme=localStorage.th||'light';const c=JSON.parse(localStorage.sbcfg||'null');if(c&&window.supabase)sb=supabase.createClient(c.url,c.key);
+if(sb){for(const t of['projects','equipment_catalog','inspections','defects','status_log','notifications']){const{data}=await sb.from(t).select('*');S[t]=data||[]}const{data:a}=await sb.from('app_settings').select('*').eq('key','main');if(a?.[0])S.settings={...S.settings,...a[0].value}}
+else{const d=await kv('get');if(d)S=d;else{S.projects=[{id:uid(),code:'PJ68/074',name:'โรงสีข้าวพันทวี',owner_company:S.settings.company,active:true}];await persist()}}render()})();
+</script></body></html>
