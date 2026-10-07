@@ -1,872 +1,1622 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>SmartQC - Quality Inspection System</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
-<style>
-:root{
-  --blue:#2563eb; --blue-dark:#1e40af; --green:#16a34a; --red:#dc2626;
-  --amber:#d97706; --gray-50:#f8fafc; --gray-100:#f1f5f9; --gray-200:#e2e8f0;
-  --gray-400:#94a3b8; --gray-600:#475569; --gray-800:#1e293b; --gray-900:#0f172a;
-  --radius:14px;
-}
-*{box-sizing:border-box;}
-html,body{margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Sarabun,Tahoma,sans-serif;background:var(--gray-100);color:var(--gray-900);}
-#app{max-width:520px;margin:0 auto;min-height:100vh;background:var(--gray-50);padding-bottom:90px;position:relative;}
-a{color:inherit;text-decoration:none;}
-button{font-family:inherit;cursor:pointer;}
-.topbar{position:sticky;top:0;z-index:20;background:var(--blue);color:#fff;padding:14px 16px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 8px rgba(0,0,0,.1);}
-.topbar .back{font-size:22px;background:none;border:none;color:#fff;padding:4px 8px;border-radius:8px;}
-.topbar .back:active{background:rgba(255,255,255,.2);}
-.topbar h1{font-size:17px;margin:0;flex:1;font-weight:700;}
-.topbar .sub{font-size:12px;opacity:.85;margin-top:1px;}
-.page{padding:16px;}
-.card{background:#fff;border-radius:var(--radius);padding:16px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06);}
-.card:active{transform:scale(.995);}
-.proj-card{display:flex;justify-content:space-between;align-items:center;}
-.proj-code{color:var(--blue);font-weight:700;font-size:14px;}
-.proj-name{font-size:16px;font-weight:600;margin-top:2px;}
-.chev{color:var(--gray-400);font-size:20px;}
-.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
-.stat{background:#fff;border-radius:var(--radius);padding:14px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.06);}
-.stat .num{font-size:26px;font-weight:800;}
-.stat .lbl{font-size:12px;color:var(--gray-600);margin-top:2px;}
-.stat.pass .num{color:var(--green);}
-.stat.fail .num{color:var(--red);}
-.stat.pending .num{color:var(--amber);}
-.stat.defect .num{color:var(--red);}
-.actions-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.action-btn{background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);padding:16px 10px;text-align:center;font-weight:700;font-size:14px;color:var(--blue-dark);}
-.action-btn .ic{font-size:22px;display:block;margin-bottom:4px;}
-.doc-card{margin-bottom:10px;}
-.doc-code{font-family:monospace;font-size:12px;color:var(--blue);font-weight:700;}
-.doc-name{font-size:15px;font-weight:600;margin-top:3px;}
-.badge{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;margin-top:6px;}
-.badge.draft{background:#e2e8f0;color:#475569;}
-.badge.in_progress{background:#fef3c7;color:#92400e;}
-.badge.completed{background:#dcfce7;color:#166534;}
-.progress-row{margin-top:8px;}
-.progress-bar{background:var(--gray-200);border-radius:10px;height:8px;overflow:hidden;}
-.progress-fill{background:var(--blue);height:100%;border-radius:10px;transition:width .3s;}
-.progress-txt{font-size:12px;color:var(--gray-600);margin-top:4px;}
-.item-row{display:flex;justify-content:space-between;align-items:center;padding:14px 4px;border-bottom:1px solid var(--gray-200);}
-.item-row:last-child{border-bottom:none;}
-.item-num{width:26px;height:26px;border-radius:50%;background:var(--gray-200);color:var(--gray-600);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
-.item-num.pass{background:var(--green);color:#fff;}
-.item-num.fail{background:var(--red);color:#fff;}
-.item-info{flex:1;padding:0 10px;}
-.item-name{font-size:15px;font-weight:600;}
-.item-score{font-size:12px;color:var(--gray-600);}
-.section-title{font-size:14px;font-weight:700;color:var(--gray-600);margin:18px 0 8px;text-transform:uppercase;letter-spacing:.03em;}
-.field-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--gray-100);}
-.field-label{font-size:15px;font-weight:600;}
-.pf-btns{display:flex;gap:6px;}
-.pf-btn{padding:8px 14px;border-radius:10px;border:2px solid var(--gray-200);background:#fff;font-weight:700;font-size:13px;}
-.pf-btn.pass.active{background:var(--green);border-color:var(--green);color:#fff;}
-.pf-btn.fail.active{background:var(--red);border-color:var(--red);color:#fff;}
-.stars{display:flex;gap:6px;font-size:32px;justify-content:center;padding:10px 0;}
-.star{color:var(--gray-200);cursor:pointer;}
-.star.filled{color:#f59e0b;}
-textarea,input[type=text]{width:100%;border:1px solid var(--gray-200);border-radius:10px;padding:10px;font-size:15px;font-family:inherit;resize:vertical;}
-.photo-actions{display:flex;gap:8px;margin-top:10px;}
-.photo-actions label,.photo-actions button{flex:1;background:var(--blue);color:#fff;border:none;border-radius:10px;padding:12px;font-weight:700;font-size:14px;text-align:center;}
-.photo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px;}
-.photo-thumb{position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;background:var(--gray-200);}
-.photo-thumb img{width:100%;height:100%;object-fit:cover;}
-.photo-thumb .rm{position:absolute;top:2px;right:2px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:12px;line-height:1;}
-.footer-nav{position:fixed;bottom:0;left:0;right:0;max-width:520px;margin:0 auto;background:#fff;border-top:1px solid var(--gray-200);display:flex;padding:10px 14px;gap:10px;box-shadow:0 -2px 8px rgba(0,0,0,.06);}
-.nav-btn{flex:1;padding:14px;border-radius:12px;border:none;font-weight:700;font-size:15px;}
-.nav-btn.secondary{background:var(--gray-200);color:var(--gray-800);}
-.nav-btn.primary{background:var(--blue);color:#fff;}
-.nav-btn:disabled{opacity:.4;}
-.empty{text-align:center;padding:40px 20px;color:var(--gray-600);}
-.empty .ic{font-size:40px;margin-bottom:10px;}
-.fail-banner{background:#fef2f2;border:1px solid #fecaca;color:#991b1b;border-radius:10px;padding:10px 12px;font-size:13px;font-weight:600;margin-top:10px;}
-.hist-item{padding:12px 0;border-bottom:1px solid var(--gray-100);}
-.hist-date{font-size:12px;color:var(--gray-600);}
-.hist-doc{font-family:monospace;font-size:12px;color:var(--blue);margin-top:2px;}
-.hist-action{font-size:14px;font-weight:600;margin-top:2px;}
-.res-pass{color:var(--green);font-weight:700;}
-.res-fail{color:var(--red);font-weight:700;}
-.def-card .status{float:right;}
-.status-pill{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;}
-.status-pill.open{background:#fee2e2;color:#991b1b;}
-.status-pill.in_progress{background:#fef3c7;color:#92400e;}
-.status-pill.fixed{background:#dbeafe;color:#1e40af;}
-.status-pill.verified,.status-pill.closed{background:#dcfce7;color:#166534;}
-.sig-pad-wrap{border:1px dashed var(--gray-400);border-radius:10px;background:#fff;}
-canvas.sigpad{width:100%;height:150px;touch-action:none;}
-.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:var(--gray-900);color:#fff;padding:10px 18px;border-radius:30px;font-size:13px;z-index:50;opacity:0;transition:opacity .25s;pointer-events:none;}
-.toast.show{opacity:1;}
-.spinner{width:34px;height:34px;border:3px solid var(--gray-200);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;margin:40px auto;}
-@keyframes spin{to{transform:rotate(360deg);}}
-.pdf-btn-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
-.pdf-btn-grid button{background:var(--blue);color:#fff;border:none;border-radius:12px;padding:14px;font-weight:700;font-size:14px;}
-.pdf-btn-grid button.alt{background:#fff;color:var(--blue);border:2px solid var(--blue);}
-.field-group{margin-top:14px;}
-.autosave-note{font-size:11px;color:var(--gray-400);text-align:center;margin-top:6px;}
-.link-file{display:flex;align-items:center;gap:8px;background:var(--gray-100);border-radius:10px;padding:10px 12px;margin-top:8px;font-size:14px;}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบตรวจงานติดตั้งเครื่องจักร</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #2c3e50;
+      --secondary: #e74c3c;
+      --success: #27ae60;
+      --warning: #f39c12;
+      --info: #3498db;
+      --light: #ecf0f1;
+      --dark: #2c3e50;
+      --border-color: #bdc3c7;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      color: var(--dark);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    /* Auth Page */
+    .auth-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .auth-box {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      padding: 40px;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .auth-box h1 {
+      text-align: center;
+      color: var(--primary);
+      margin-bottom: 30px;
+      font-size: 24px;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--primary);
+      font-weight: 500;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 5px;
+      font-size: 14px;
+      font-family: inherit;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--info);
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    }
+
+    button {
+      background: var(--info);
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: background 0.3s;
+      width: 100%;
+    }
+
+    button:hover {
+      background: #2980b9;
+    }
+
+    button.secondary {
+      background: var(--secondary);
+      margin-top: 10px;
+    }
+
+    button.secondary:hover {
+      background: #c0392b;
+    }
+
+    /* Header */
+    .header {
+      background: white;
+      padding: 15px 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .header h1 {
+      color: var(--primary);
+      font-size: 20px;
+    }
+
+    .header-right {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .user-info {
+      color: var(--dark);
+      font-size: 14px;
+    }
+
+    /* Main Layout */
+    .app {
+      display: none;
+    }
+
+    .app.active {
+      display: block;
+    }
+
+    .sidebar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+      margin-bottom: 20px;
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .sidebar button {
+      padding: 12px 15px;
+      text-align: left;
+      background: var(--light);
+      color: var(--dark);
+      border: 2px solid transparent;
+      transition: all 0.3s;
+    }
+
+    .sidebar button:hover,
+    .sidebar button.active {
+      background: var(--info);
+      color: white;
+      border-color: var(--info);
+    }
+
+    /* Page Content */
+    .page {
+      display: none;
+      background: white;
+      border-radius: 10px;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    .page h2 {
+      color: var(--primary);
+      margin-bottom: 20px;
+      font-size: 22px;
+    }
+
+    /* Dashboard */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+
+    .stat-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    .stat-card h3 {
+      font-size: 14px;
+      margin-bottom: 10px;
+      opacity: 0.9;
+    }
+
+    .stat-card .number {
+      font-size: 32px;
+      font-weight: bold;
+    }
+
+    .stat-card.waiting {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+
+    .stat-card.correction {
+      background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    }
+
+    .stat-card.approved {
+      background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+    }
+
+    /* Forms */
+    .form-section {
+      margin-bottom: 25px;
+      padding: 20px;
+      background: var(--light);
+      border-radius: 8px;
+      border-left: 4px solid var(--info);
+    }
+
+    .form-section h3 {
+      color: var(--primary);
+      margin-bottom: 15px;
+      font-size: 16px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+
+    .checkbox-group {
+      display: flex;
+      gap: 15px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    .checkbox-group label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      margin: 0;
+    }
+
+    .checkbox-group input[type="radio"],
+    .checkbox-group input[type="checkbox"] {
+      width: auto;
+      cursor: pointer;
+    }
+
+    /* Checklist */
+    .checklist-item {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      border-left: 4px solid var(--light);
+    }
+
+    .checklist-item.pass {
+      border-left-color: var(--success);
+      background: #f0fdf4;
+    }
+
+    .checklist-item.fail {
+      border-left-color: var(--secondary);
+      background: #fef2f2;
+    }
+
+    .checklist-item h4 {
+      color: var(--primary);
+      margin-bottom: 10px;
+      font-size: 15px;
+    }
+
+    .checklist-result {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .checklist-result label {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      margin: 0;
+    }
+
+    /* Image Upload */
+    .image-section {
+      margin-top: 15px;
+    }
+
+    .image-upload {
+      border: 2px dashed var(--border-color);
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      background: var(--light);
+    }
+
+    .image-upload:hover {
+      border-color: var(--info);
+      background: #e8f4f8;
+    }
+
+    .image-upload input[type="file"] {
+      display: none;
+    }
+
+    .preview-container {
+      margin-top: 15px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 10px;
+    }
+
+    .preview-image {
+      position: relative;
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--light);
+      aspect-ratio: 1;
+    }
+
+    .preview-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .preview-image .tools {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0,0,0,0.7);
+      padding: 8px;
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    .preview-image button {
+      padding: 5px 10px;
+      font-size: 12px;
+      background: var(--info);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    /* Table */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      font-size: 14px;
+    }
+
+    .data-table th {
+      background: var(--primary);
+      color: white;
+      padding: 12px;
+      text-align: left;
+      font-weight: 600;
+    }
+
+    .data-table td {
+      padding: 12px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .data-table tr:hover {
+      background: var(--light);
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .status-badge.draft {
+      background: #e8e8e8;
+      color: #333;
+    }
+
+    .status-badge.waiting {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    .status-badge.approved {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .status-badge.rejected {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 10px;
+      padding: 30px;
+      width: 100%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+
+    .modal-header {
+      font-size: 18px;
+      font-weight: bold;
+      color: var(--primary);
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .close-modal {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: var(--dark);
+      width: auto;
+      padding: 0;
+    }
+
+    /* Signature Canvas */
+    #signatureCanvas {
+      border: 1px solid var(--border-color);
+      cursor: crosshair;
+      margin: 10px 0;
+      border-radius: 5px;
+    }
+
+    /* Admin Panel */
+    .admin-section {
+      margin-bottom: 30px;
+    }
+
+    .admin-section h3 {
+      background: var(--primary);
+      color: white;
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      cursor: pointer;
+    }
+
+    .admin-section-content {
+      display: none;
+      padding: 20px;
+      background: var(--light);
+      border-radius: 5px;
+    }
+
+    .admin-section-content.active {
+      display: block;
+    }
+
+    .user-list,
+    .project-list {
+      margin-top: 20px;
+    }
+
+    .user-item,
+    .project-item {
+      background: white;
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .user-item .actions,
+    .project-item .actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .user-item button,
+    .project-item button {
+      padding: 5px 15px;
+      font-size: 12px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .sidebar {
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
+      .data-table {
+        font-size: 12px;
+      }
+
+      .data-table th,
+      .data-table td {
+        padding: 8px;
+      }
+
+      .header {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .page {
+        padding: 15px;
+      }
+    }
+
+    .success-message {
+      background: #d4edda;
+      color: #155724;
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      border-left: 4px solid var(--success);
+    }
+
+    .error-message {
+      background: #f8d7da;
+      color: #721c24;
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      border-left: 4px solid var(--secondary);
+    }
+  </style>
 </head>
 <body>
-<div id="app"></div>
-<div class="toast" id="toast"></div>
+
+<!-- Auth Page -->
+<div id="authPage" class="auth-container">
+  <div class="auth-box">
+    <h1>ระบบตรวจงานติดตั้ง</h1>
+    
+    <div id="loginTab">
+      <div class="form-group">
+        <label>อีเมล</label>
+        <input type="email" id="loginEmail" placeholder="user@example.com">
+      </div>
+      <div class="form-group">
+        <label>รหัสผ่าน</label>
+        <input type="password" id="loginPassword" placeholder="••••••••">
+      </div>
+      <button onclick="handleLogin()">เข้าสู่ระบบ</button>
+      <button class="secondary" onclick="toggleAuthTab()">สมัครสมาชิก</button>
+    </div>
+
+    <div id="signupTab" style="display: none;">
+      <div class="form-group">
+        <label>ชื่อ-นามสกุล</label>
+        <input type="text" id="signupName" placeholder="จอห์น ดู">
+      </div>
+      <div class="form-group">
+        <label>อีเมล</label>
+        <input type="email" id="signupEmail" placeholder="user@example.com">
+      </div>
+      <div class="form-group">
+        <label>รหัสผ่าน</label>
+        <input type="password" id="signupPassword" placeholder="••••••••">
+      </div>
+      <button onclick="handleSignup()">สมัครสมาชิก</button>
+      <button class="secondary" onclick="toggleAuthTab()">เข้าสู่ระบบ</button>
+    </div>
+
+    <div id="authMessage" style="margin-top: 20px;"></div>
+  </div>
+</div>
+
+<!-- Main App -->
+<div id="app" class="app">
+  <div class="container">
+    <div class="header">
+      <h1>📋 ระบบตรวจงานติดตั้งเครื่องจักร</h1>
+      <div class="header-right">
+        <div class="user-info">
+          <div id="currentUser"></div>
+          <div id="currentRole" style="font-size: 12px; margin-top: 3px;"></div>
+        </div>
+        <button onclick="handleLogout()" style="width: auto; padding: 8px 15px;">ออกจากระบบ</button>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="sidebar" id="navButtons"></div>
+
+    <!-- Dashboard Page -->
+    <div id="dashboardPage" class="page active">
+      <h2>แดชบอร์ด</h2>
+      <div class="stats-grid" id="statsGrid"></div>
+      <div>
+        <h3 style="color: var(--primary); margin-bottom: 15px;">การตรวจเสียบล่าสุด</h3>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>โครงการ</th>
+              <th>แบบฟอร์ม</th>
+              <th>อุปกรณ์</th>
+              <th>สถานะ</th>
+              <th>วันที่</th>
+            </tr>
+          </thead>
+          <tbody id="recentInspections"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Projects Page -->
+    <div id="projectsPage" class="page">
+      <h2>โครงการ</h2>
+      <button onclick="openProjectModal()" style="margin-bottom: 20px;">+ เพิ่มโครงการใหม่</button>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>ชื่อโครงการ</th>
+            <th>บริษัท</th>
+            <th>สถานะ</th>
+            <th>การดำเนิน</th>
+          </tr>
+        </thead>
+        <tbody id="projectsList"></tbody>
+      </table>
+    </div>
+
+    <!-- Inspection Page -->
+    <div id="inspectionPage" class="page">
+      <h2>สร้างการตรวจสอบใหม่</h2>
+      
+      <div class="form-section">
+        <h3>ข้อมูลทั่วไป</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label>เลือกโครงการ</label>
+            <select id="inspectionProject" onchange="updateInspectionForms()">
+              <option value="">-- เลือกโครงการ --</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>เลือกแบบฟอร์ม</label>
+            <select id="inspectionForm" onchange="updateInspectionChecklist()">
+              <option value="">-- เลือกแบบฟอร์ม --</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3>อุปกรณ์</h3>
+        <div id="equipmentSection">
+          <button onclick="toggleEquipmentForm()" style="margin-bottom: 15px;">+ เพิ่มอุปกรณ์ใหม่</button>
+          <div id="equipmentForm" style="display: none; padding: 15px; background: white; border-radius: 5px; margin-bottom: 15px;">
+            <div class="form-row">
+              <div class="form-group">
+                <label>รหัสอุปกรณ์</label>
+                <input type="text" id="equipmentCode">
+              </div>
+              <div class="form-group">
+                <label>ชื่ออุปกรณ์</label>
+                <input type="text" id="equipmentName">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>รุ่น</label>
+                <input type="text" id="equipmentModel">
+              </div>
+              <div class="form-group">
+                <label>ตำแหน่ง</label>
+                <input type="text" id="equipmentPosition">
+              </div>
+            </div>
+            <button onclick="saveEquipment()" style="margin-right: 10px;">บันทึก</button>
+            <button onclick="toggleEquipmentForm()" style="background: #ccc; color: #333;">ยกเลิก</button>
+          </div>
+          <select id="existingEquipment" style="margin-bottom: 15px;">
+            <option value="">-- เลือกอุปกรณ์ที่มีอยู่ --</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3>รายการตรวจสอบ</h3>
+        <div id="checklistContainer"></div>
+      </div>
+
+      <button onclick="submitInspection()" style="margin-top: 20px; background: var(--success); width: 100%;">
+        ส่งการตรวจสอบ
+      </button>
+
+      <div id="inspectionMessage" style="margin-top: 20px;"></div>
+    </div>
+
+    <!-- Inspections List Page -->
+    <div id="inspectionsPage" class="page">
+      <h2>รายการตรวจสอบ</h2>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>โครงการ</th>
+            <th>แบบฟอร์ม</th>
+            <th>สถานะ</th>
+            <th>วันที่</th>
+            <th>การดำเนิน</th>
+          </tr>
+        </thead>
+        <tbody id="inspectionsList"></tbody>
+      </table>
+    </div>
+
+    <!-- Defects Page -->
+    <div id="defectsPage" class="page">
+      <h2>ข้อบกพร่อง</h2>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>หมายเลข</th>
+            <th>โครงการ</th>
+            <th>ความรุนแรง</th>
+            <th>สถานะ</th>
+            <th>วันที่</th>
+            <th>การดำเนิน</th>
+          </tr>
+        </thead>
+        <tbody id="defectsList"></tbody>
+      </table>
+    </div>
+
+    <!-- Documents Page -->
+    <div id="documentsPage" class="page">
+      <h2>เอกสาร</h2>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>หมายเลขเอกสาร</th>
+            <th>โครงการ</th>
+            <th>สถานะ</th>
+            <th>ฉบับแก้ไข</th>
+            <th>วันที่</th>
+            <th>การดำเนิน</th>
+          </tr>
+        </thead>
+        <tbody id="documentsList"></tbody>
+      </table>
+    </div>
+
+    <!-- Admin Page -->
+    <div id="adminPage" class="page">
+      <h2>จัดการระบบ</h2>
+
+      <div class="admin-section">
+        <h3 onclick="toggleAdminSection(this)">👥 จัดการผู้ใช้</h3>
+        <div class="admin-section-content">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>อีเมล</th>
+                <th>ชื่อ</th>
+                <th>บทบาท</th>
+                <th>สถานะ</th>
+                <th>การดำเนิน</th>
+              </tr>
+            </thead>
+            <tbody id="adminUsersList"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="admin-section">
+        <h3 onclick="toggleAdminSection(this)">📋 จัดการแบบฟอร์ม</h3>
+        <div class="admin-section-content">
+          <button onclick="openFormModal()" style="margin-bottom: 20px;">+ เพิ่มแบบฟอร์มใหม่</button>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>รหัส</th>
+                <th>ชื่อ</th>
+                <th>สถานะ</th>
+                <th>การดำเนิน</th>
+              </tr>
+            </thead>
+            <tbody id="adminFormsList"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="admin-section">
+        <h3 onclick="toggleAdminSection(this)">📊 บันทึกการตรวจสอบ</h3>
+        <div class="admin-section-content">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ผู้ใช้</th>
+                <th>การดำเนิน</th>
+                <th>ตาราง</th>
+                <th>วันที่/เวลา</th>
+              </tr>
+            </thead>
+            <tbody id="auditLogsList"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modals -->
+<div id="projectModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <span>เพิ่มโครงการใหม่</span>
+      <button class="close-modal" onclick="closeProjectModal()">×</button>
+    </div>
+    <div class="form-group">
+      <label>ชื่อโครงการ</label>
+      <input type="text" id="projectName">
+    </div>
+    <div class="form-group">
+      <label>ชื่อบริษัท</label>
+      <input type="text" id="projectCompany">
+    </div>
+    <div class="form-group">
+      <label>คำอธิบาย</label>
+      <textarea id="projectDescription" rows="4"></textarea>
+    </div>
+    <button onclick="saveProject()">บันทึก</button>
+  </div>
+</div>
+
+<div id="signatureModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <span>ลงนามด้วยลายเซ็น</span>
+      <button class="close-modal" onclick="closeSignatureModal()">×</button>
+    </div>
+    <p style="font-size: 12px; color: #666; margin-bottom: 15px;">ลงนามด้านล่างด้วยเมาส์หรือนิ้ว</p>
+    <canvas id="signatureCanvas" width="400" height="200" style="border: 1px solid #ddd; border-radius: 5px;"></canvas>
+    <div style="margin-top: 15px; display: flex; gap: 10px;">
+      <button onclick="clearSignature()">ล้างลายเซ็น</button>
+      <button onclick="saveSignature()" style="flex: 1; background: var(--success);">บันทึกลายเซ็น</button>
+    </div>
+  </div>
+</div>
+
+<div id="formModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <span>เพิ่มแบบฟอร์มใหม่</span>
+      <button class="close-modal" onclick="closeFormModal()">×</button>
+    </div>
+    <div class="form-group">
+      <label>รหัสแบบฟอร์ม</label>
+      <input type="text" id="formCode">
+    </div>
+    <div class="form-group">
+      <label>ชื่อแบบฟอร์ม</label>
+      <input type="text" id="formName">
+    </div>
+    <div class="form-group">
+      <label>คำอธิบาย</label>
+      <textarea id="formDescription" rows="4"></textarea>
+    </div>
+    <button onclick="saveForm()">บันทึก</button>
+  </div>
+</div>
 
 <script>
-// ============================================================
-// CONFIG — แก้ 2 ค่านี้ให้เป็นของโปรเจกต์ Supabase ของคุณ
-// ============================================================
-const SUPABASE_URL = "https://tisshukqkeejmmokvoss.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRpc3NodWtxa2Vlam1tb2t2b3NzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzMzQ3MDgsImV4cCI6MjEwNjkxMDcwOH0.onYYx-c4MH8HOnDyIngEy-M43GTHQiQLGD4looHAv7U";
-const BUCKET = "smartqc";
+  // Supabase Configuration
+  const SUPABASE_URL = 'https://tisshukqkeejmmokvoss.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRpc3NodWtxa2Vlam1tb2t2b3NzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzMzQ3MDgsImV4cCI6MjEwNjkxMDcwOH0.onYYx-c4MH8HOnDyIngEy-M43GTHQiQLGD4looHAv7U';
+  
+  let supabase = null;
+  let currentUser = null;
+  let currentRole = null;
+  let currentProject = null;
 
-const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-// ============================================================
-// TINY ROUTER + STATE
-// ============================================================
-const app = document.getElementById("app");
-
-function toast(msg){
-  const t = document.getElementById("toast");
-  t.textContent = msg;
-  t.classList.add("show");
-  clearTimeout(toast._t);
-  toast._t = setTimeout(()=>t.classList.remove("show"), 1800);
-}
-
-function esc(s){ return (s==null?'':String(s)).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-
-function nav(hash){ location.hash = hash; }
-window.addEventListener("hashchange", render);
-window.addEventListener("DOMContentLoaded", render);
-
-function parseHash(){
-  const h = location.hash.slice(1) || "/";
-  const parts = h.split("/").filter(Boolean);
-  return parts;
-}
-
-async function render(){
-  const parts = parseHash();
-  window.scrollTo(0,0);
-  try{
-    if(parts.length===0) return renderHome();
-    if(parts[0]==="project" && parts[2]==="documents") return renderDocuments(parts[1]);
-    if(parts[0]==="project" && parts[2]==="defects") return renderProjectDefects(parts[1]);
-    if(parts[0]==="project" && parts[2]==="history") return renderHistory(parts[1]);
-    if(parts[0]==="project") return renderDashboard(parts[1]);
-    if(parts[0]==="document" && parts[2]==="item") return renderInspectionItem(parts[1], parts[3]);
-    if(parts[0]==="document" && parts[2]==="pdf") return renderPdfScreen(parts[1]);
-    if(parts[0]==="document" && parts[2]==="files") return renderDocFiles(parts[1]);
-    if(parts[0]==="document") return renderDocumentDetail(parts[1]);
-    if(parts[0]==="defect") return renderDefectDetail(parts[1]);
-    return renderHome();
-  }catch(err){
-    console.error(err);
-    app.innerHTML = `<div class="page"><div class="empty"><div class="ic">⚠️</div><b>เกิดข้อผิดพลาด</b><br><span style="font-size:12px">${esc(err.message||err)}</span></div></div>`;
-  }
-}
-
-function topbar(title, sub, backHash){
-  return `<div class="topbar">
-    ${backHash?`<button class="back" onclick="nav('${backHash}')">‹</button>`:''}
-    <div><h1>${esc(title)}</h1>${sub?`<div class="sub">${esc(sub)}</div>`:''}</div>
-  </div>`;
-}
-
-// ============================================================
-// HOME — Project list
-// ============================================================
-async function renderHome(){
-  app.innerHTML = topbar("SmartQC","Quality Inspection System") + `<div class="page" id="list"><div class="spinner"></div></div>`;
-  const { data, error } = await sb.from("projects").select("*").order("created_at");
-  if(error) throw error;
-  const el = document.getElementById("list");
-  if(!data.length){ el.innerHTML = `<div class="empty"><div class="ic">📁</div>ยังไม่มีโครงการ</div>`; return; }
-  el.innerHTML = data.map(p=>`
-    <a class="card proj-card" href="#/project/${p.id}">
-      <div><div class="proj-code">${esc(p.code)}</div><div class="proj-name">${esc(p.name)}</div></div>
-      <div class="chev">›</div>
-    </a>`).join("");
-}
-
-// ============================================================
-// PROJECT DASHBOARD
-// ============================================================
-async function renderDashboard(projectId){
-  app.innerHTML = topbar("โครงการ","",'/') + `<div class="page" id="dash"><div class="spinner"></div></div>`;
-  const { data: proj } = await sb.from("projects").select("*").eq("id", projectId).single();
-  const { data: docs } = await sb.from("documents").select("id,status").eq("project_id", projectId);
-  const { data: prog } = await sb.from("v_document_progress").select("*").eq("project_id", projectId);
-  const { data: defects } = await sb.from("defects").select("id,status,document_id").in("document_id", (docs||[]).map(d=>d.id).length?(docs||[]).map(d=>d.id):['00000000-0000-0000-0000-000000000000']);
-
-  const totalItems = (prog||[]).reduce((s,p)=>s+Number(p.total_items||0),0);
-  const checked = (prog||[]).reduce((s,p)=>s+Number(p.checked_items||0),0);
-  const pass = (prog||[]).reduce((s,p)=>s+Number(p.pass_items||0),0);
-  const fail = (prog||[]).reduce((s,p)=>s+Number(p.fail_items||0),0);
-  const pending = totalItems - checked;
-  const openDefects = (defects||[]).filter(d=>!['closed','verified'].includes(d.status)).length;
-
-  app.querySelector(".topbar > div").innerHTML = `<h1>${esc(proj.name)}</h1><div class="sub">${esc(proj.code)}</div>`;
-
-  document.getElementById("dash").innerHTML = `
-    <div class="stat-grid">
-      <div class="stat"><div class="num">${totalItems}</div><div class="lbl">ตรวจทั้งหมด</div></div>
-      <div class="stat pass"><div class="num">${pass}</div><div class="lbl">ผ่าน</div></div>
-      <div class="stat fail"><div class="num">${fail}</div><div class="lbl">ไม่ผ่าน</div></div>
-      <div class="stat pending"><div class="num">${pending}</div><div class="lbl">รอตรวจ</div></div>
-    </div>
-    <div class="stat defect" style="margin-bottom:14px;"><div class="num">${openDefects}</div><div class="lbl">Defect ค้าง</div></div>
-    <div class="actions-grid">
-      <a class="action-btn" href="#/project/${projectId}/documents"><span class="ic">📋</span>เอกสารตรวจสอบ</a>
-      <a class="action-btn" href="#/project/${projectId}/defects"><span class="ic">🛠️</span>Defect</a>
-      <a class="action-btn" href="#/project/${projectId}/history"><span class="ic">🕒</span>ประวัติ</a>
-      <a class="action-btn" href="#/project/${projectId}/documents"><span class="ic">📄</span>สร้าง PDF</a>
-    </div>`;
-}
-
-// ============================================================
-// DOCUMENT LIST
-// ============================================================
-async function renderDocuments(projectId){
-  app.innerHTML = topbar("เอกสารตรวจสอบ","",`#/project/${projectId}`) + `<div class="page" id="list"><div class="spinner"></div></div>`;
-  const { data: proj } = await sb.from("projects").select("*").eq("id", projectId).single();
-  app.querySelector(".topbar > div").innerHTML = `<h1>เอกสารตรวจสอบ</h1><div class="sub">${esc(proj.code)}</div>`;
-
-  const { data: docs, error } = await sb.from("documents")
-    .select("id,document_code,status,template_id,checklist_templates(name)")
-    .eq("project_id", projectId).order("document_code");
-  if(error) throw error;
-  const { data: prog } = await sb.from("v_document_progress").select("*").eq("project_id", projectId);
-  const progMap = {}; (prog||[]).forEach(p=>progMap[p.document_id]=p);
-
-  const el = document.getElementById("list");
-  if(!docs.length){ el.innerHTML = `<div class="empty"><div class="ic">📄</div>ยังไม่มีเอกสาร</div>`; return; }
-  el.innerHTML = docs.map(d=>{
-    const p = progMap[d.id] || {total_items:0,checked_items:0};
-    const pct = p.total_items ? Math.round((p.checked_items/p.total_items)*100) : 0;
-    return `<a class="card doc-card" href="#/document/${d.id}">
-      <div class="doc-code">${esc(d.document_code)}</div>
-      <div class="doc-name">${esc(d.checklist_templates?.name || '')}</div>
-      <span class="badge ${d.status}">${statusTh(d.status)}</span>
-      <div class="progress-row">
-        <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
-        <div class="progress-txt">ตรวจแล้ว ${p.checked_items||0} / ${p.total_items||0} (${pct}%)</div>
-      </div>
-    </a>`;
-  }).join("");
-}
-function statusTh(s){ return {draft:"ร่าง",in_progress:"กำลังตรวจ",completed:"เสร็จสิ้น"}[s] || s; }
-
-// ============================================================
-// DOCUMENT DETAIL — item checklist
-// ============================================================
-async function renderDocumentDetail(documentId){
-  app.innerHTML = topbar("รายละเอียดเอกสาร","",'#/') + `<div class="page" id="body"><div class="spinner"></div></div>`;
-  const { data: doc } = await sb.from("documents")
-    .select("*, checklist_templates(name,code), projects(id,code,name)").eq("id", documentId).single();
-  if(!doc) throw new Error("ไม่พบเอกสาร");
-  app.querySelector(".back").setAttribute("onclick", `nav('#/project/${doc.projects.id}/documents')`);
-  app.querySelector(".topbar > div").innerHTML = `<h1>${esc(doc.document_code)}</h1><div class="sub">${esc(doc.projects.code)}</div>`;
-
-  const { data: items } = await sb.from("checklist_template_items").select("*").eq("template_id", doc.template_id).order("sort_order");
-  // latest inspection for this doc (create if none)
-  let { data: insp } = await sb.from("inspections").select("*").eq("document_id", documentId).order("created_at",{ascending:false}).limit(1);
-  let inspection = insp && insp[0];
-  if(!inspection){
-    const { data: newInsp, error } = await sb.from("inspections").insert({document_id: documentId}).select().single();
-    if(error) throw error;
-    inspection = newInsp;
-  }
-  const { data: results } = await sb.from("inspection_results").select("*").eq("inspection_id", inspection.id);
-  const resMap = {}; (results||[]).forEach(r=>resMap[r.template_item_id]=r);
-  const checkedCount = Object.values(resMap).filter(r=>r.status==='pass'||r.status==='fail').length;
-  const pct = items.length ? Math.round((checkedCount/items.length)*100) : 0;
-
-  document.getElementById("body").innerHTML = `
-    <div class="card">
-      <div style="font-weight:700;font-size:15px">${esc(doc.checklist_templates.name)}</div>
-      <div class="progress-row">
-        <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
-        <div class="progress-txt">ตรวจแล้ว ${checkedCount} / ${items.length} (${pct}%)</div>
-      </div>
-      <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
-        <a class="action-btn" style="flex:1" href="#/document/${documentId}/files"><span class="ic">📎</span>เอกสารต้นฉบับ</a>
-        <a class="action-btn" style="flex:1" href="#/document/${documentId}/pdf"><span class="ic">🖨️</span>สร้าง PDF</a>
-      </div>
-    </div>
-    <div class="section-title">รายการตรวจสอบ</div>
-    <div class="card" style="padding:6px 12px;">
-      ${items.map((it,idx)=>{
-        const r = resMap[it.id];
-        const st = r ? r.status : 'pending';
-        return `<div class="item-row" onclick="nav('#/document/${documentId}/item/${it.id}')">
-          <div class="item-num ${st}">${idx+1}</div>
-          <div class="item-info">
-            <div class="item-name">${esc(it.name)}</div>
-            <div class="item-score">${r && r.score!=null ? '★'.repeat(r.score)+'☆'.repeat(5-r.score)+' · '+(st==='pass'?'ผ่าน':st==='fail'?'ไม่ผ่าน':'') : 'ยังไม่ตรวจ'}</div>
-          </div>
-          <div class="chev">›</div>
-        </div>`;
-      }).join("")}
-    </div>`;
-}
-
-// ============================================================
-// DOCUMENT ORIGINAL FILES
-// ============================================================
-async function renderDocFiles(documentId){
-  app.innerHTML = topbar("เอกสารต้นฉบับ","",`#/document/${documentId}`) + `<div class="page" id="body"><div class="spinner"></div></div>`;
-  const { data: files } = await sb.from("document_files").select("*").eq("document_id", documentId).order("uploaded_at",{ascending:false});
-  const body = document.getElementById("body");
-  body.innerHTML = `
-    <div class="card">
-      <label style="display:block;background:var(--blue);color:#fff;text-align:center;padding:12px;border-radius:10px;font-weight:700;">
-        + อัปโหลดไฟล์ (PDF/รูป)
-        <input type="file" id="fileInput" accept="application/pdf,image/*" style="display:none">
-      </label>
-    </div>
-    <div id="fileList">
-      ${(files||[]).map(f=>`<div class="link-file"><span>📄</span><span style="flex:1">${esc(f.file_name||'ไฟล์')}</span><a href="${publicUrl(f.storage_path)}" target="_blank">เปิด</a></div>`).join("") || '<div class="empty">ยังไม่มีไฟล์</div>'}
-    </div>`;
-  document.getElementById("fileInput").addEventListener("change", async (e)=>{
-    const file = e.target.files[0]; if(!file) return;
-    toast("กำลังอัปโหลด...");
-    const path = `docfiles/${documentId}/${Date.now()}_${file.name}`;
-    const { error } = await sb.storage.from(BUCKET).upload(path, file);
-    if(error){ toast("อัปโหลดไม่สำเร็จ"); return; }
-    await sb.from("document_files").insert({document_id: documentId, storage_path: path, file_name: file.name});
-    toast("อัปโหลดสำเร็จ");
-    renderDocFiles(documentId);
-  });
-}
-function publicUrl(path){ return sb.storage.from(BUCKET).getPublicUrl(path).data.publicUrl; }
-
-// ============================================================
-// INSPECTION ITEM SCREEN
-// ============================================================
-async function renderInspectionItem(documentId, itemId){
-  app.innerHTML = topbar("กำลังโหลด...","",`#/document/${documentId}`) + `<div class="page" id="body"><div class="spinner"></div></div>`;
-
-  const { data: doc } = await sb.from("documents").select("*, projects(code), checklist_templates(name,code)").eq("id", documentId).single();
-  const { data: items } = await sb.from("checklist_template_items").select("*").eq("template_id", doc.template_id).order("sort_order");
-  const idx = items.findIndex(i=>i.id===itemId);
-  const item = items[idx];
-  if(!item) throw new Error("ไม่พบรายการตรวจ");
-  const { data: fields } = await sb.from("checklist_template_fields").select("*").eq("template_item_id", itemId).order("sort_order");
-
-  let { data: insp } = await sb.from("inspections").select("*").eq("document_id", documentId).order("created_at",{ascending:false}).limit(1);
-  const inspection = insp[0];
-
-  let { data: result } = await sb.from("inspection_results").select("*").eq("inspection_id", inspection.id).eq("template_item_id", itemId).maybeSingle();
-  if(!result){
-    const { data: newRes, error } = await sb.from("inspection_results").insert({inspection_id: inspection.id, template_item_id: itemId, status:'pending'}).select().single();
-    if(error) throw error;
-    result = newRes;
-  }
-  const { data: fieldResults } = await sb.from("checklist_results").select("*").eq("inspection_result_id", result.id);
-  const fieldMap = {}; (fieldResults||[]).forEach(f=>fieldMap[f.template_field_id]=f.passed);
-
-  const { data: photos } = await sb.from("photos").select("*").eq("inspection_result_id", result.id).eq("kind","inspection");
-
-  app.querySelector(".topbar > div").innerHTML = `<h1>${esc(doc.checklist_templates.code)}</h1><div class="sub">${esc(doc.projects.code)}</div>`;
-  app.querySelector(".back").setAttribute("onclick", `nav('#/document/${documentId}')`);
-
-  let score = result.score || 0;
-  let note = result.note || "";
-  let localFieldState = {...fieldMap};
-  let localPhotos = photos || [];
-
-  const body = document.getElementById("body");
-  function renderBody(){
-    body.innerHTML = `
-      <div class="card">
-        <div style="font-weight:700;font-size:12px;color:var(--gray-600)">${esc(doc.checklist_templates.name)}</div>
-        <div style="font-size:14px;color:var(--gray-600);margin-top:6px;">รายการ ${idx+1} / ${items.length}</div>
-        <div class="progress-bar" style="margin-top:6px;"><div class="progress-fill" style="width:${Math.round(((idx+1)/items.length)*100)}%"></div></div>
-        <div style="font-size:20px;font-weight:800;margin-top:12px;">${esc(item.name)}</div>
-      </div>
-
-      <div class="card">
-        <div class="section-title" style="margin-top:0">Checklist</div>
-        ${fields.map(f=>`
-          <div class="field-row">
-            <div class="field-label">${esc(f.label)}</div>
-            <div class="pf-btns">
-              <button class="pf-btn pass ${localFieldState[f.id]===true?'active':''}" onclick="window.__setField('${f.id}',true)">ผ่าน</button>
-              <button class="pf-btn fail ${localFieldState[f.id]===false?'active':''}" onclick="window.__setField('${f.id}',false)">ไม่ผ่าน</button>
-            </div>
-          </div>`).join("")}
-      </div>
-
-      <div class="card">
-        <div class="section-title" style="margin-top:0">คะแนน</div>
-        <div class="stars" id="starsRow">
-          ${[1,2,3,4,5].map(n=>`<span class="star ${n<=score?'filled':''}" data-n="${n}" onclick="window.__setScore(${n})">★</span>`).join("")}
-        </div>
-        ${score>0 && score<3 ? `<div class="fail-banner">⚠️ คะแนนต่ำกว่า 3 ระบบจะสร้าง Defect อัตโนมัติเมื่อบันทึก</div>` : ''}
-      </div>
-
-      <div class="card">
-        <div class="section-title" style="margin-top:0">หมายเหตุ</div>
-        <textarea id="noteBox" rows="3" placeholder="เขียนรายละเอียดเพิ่มเติม...">${esc(note)}</textarea>
-      </div>
-
-      <div class="card">
-        <div class="section-title" style="margin-top:0">รูปภาพ</div>
-        <div class="photo-actions">
-          <label>📷 ถ่ายรูป<input type="file" accept="image/*" capture="environment" id="camInput" style="display:none"></label>
-          <label>🖼️ เพิ่มรูป<input type="file" accept="image/*" multiple id="galInput" style="display:none"></label>
-        </div>
-        <div class="photo-grid" id="photoGrid">
-          ${localPhotos.map(p=>`<div class="photo-thumb"><img src="${publicUrl(p.storage_path)}"><button class="rm" onclick="window.__removePhoto('${p.id}')">✕</button></div>`).join("")}
-        </div>
-      </div>
-      <div class="autosave-note">บันทึกอัตโนมัติเมื่อกดถัดไป/ก่อนหน้า</div>
-    `;
-    document.getElementById("noteBox").addEventListener("input", e=> note = e.target.value);
-    document.getElementById("camInput").addEventListener("change", e=>uploadPhotos(e.target.files));
-    document.getElementById("galInput").addEventListener("change", e=>uploadPhotos(e.target.files));
-  }
-
-  window.__setField = (fieldId, val)=>{ localFieldState[fieldId]=val; renderBody(); };
-  window.__setScore = (n)=>{ score = n; renderBody(); };
-  window.__removePhoto = async (photoId)=>{
-    const p = localPhotos.find(x=>x.id===photoId);
-    if(p) await sb.storage.from(BUCKET).remove([p.storage_path]);
-    await sb.from("photos").delete().eq("id", photoId);
-    localPhotos = localPhotos.filter(x=>x.id!==photoId);
-    renderBody();
-  };
-
-  async function compressImage(file){
-    return new Promise((resolve)=>{
-      const img = new Image();
-      const reader = new FileReader();
-      reader.onload = e => img.src = e.target.result;
-      img.onload = () => {
-        const maxDim = 1600;
-        let {width, height} = img;
-        if(width>maxDim || height>maxDim){
-          const ratio = Math.min(maxDim/width, maxDim/height);
-          width = Math.round(width*ratio); height = Math.round(height*ratio);
-        }
-        const canvas = document.createElement("canvas");
-        canvas.width=width; canvas.height=height;
-        canvas.getContext("2d").drawImage(img,0,0,width,height);
-        canvas.toBlob(blob=>resolve(blob), "image/jpeg", 0.8);
-      };
-      reader.readAsDataURL(file);
-    });
-  }
-
-  async function uploadPhotos(fileList){
-    toast("กำลังอัปโหลดรูป...");
-    for(const file of fileList){
-      const blob = await compressImage(file);
-      const path = `inspection/${result.id}/${Date.now()}_${Math.random().toString(36).slice(2,7)}.jpg`;
-      const { error } = await sb.storage.from(BUCKET).upload(path, blob, {contentType:'image/jpeg'});
-      if(error){ toast("อัปโหลดไม่สำเร็จ"); continue; }
-      const { data: newPhoto } = await sb.from("photos").insert({inspection_result_id: result.id, storage_path: path, kind:'inspection'}).select().single();
-      localPhotos.push(newPhoto);
-    }
-    toast("อัปโหลดสำเร็จ");
-    renderBody();
-  }
-
-  renderBody();
-
-  // footer nav
-  const footer = document.createElement("div");
-  footer.className = "footer-nav";
-  footer.innerHTML = `
-    <button class="nav-btn secondary" id="prevBtn" ${idx===0?'disabled':''}>← ก่อนหน้า</button>
-    <button class="nav-btn primary" id="nextBtn">${idx===items.length-1?'บันทึก & เสร็จสิ้น':'บันทึก & ถัดไป →'}</button>
-  `;
-  app.appendChild(footer);
-
-  async function saveResult(){
-    const anyFieldFail = Object.values(localFieldState).some(v=>v===false);
-    const anyFieldSet = Object.keys(localFieldState).length>0;
-    let status = 'pending';
-    if(score>0) status = score>=3 ? 'pass' : 'fail';
-    else if(anyFieldSet) status = anyFieldFail ? 'fail' : (Object.keys(localFieldState).length===fields.length ? 'pass' : 'pending');
-
-    await sb.from("inspection_results").update({score: score||null, status, note, updated_at: new Date().toISOString()}).eq("id", result.id);
-
-    for(const f of fields){
-      if(f.id in localFieldState){
-        await sb.from("checklist_results").upsert({inspection_result_id: result.id, template_field_id: f.id, passed: localFieldState[f.id]}, {onConflict:'inspection_result_id,template_field_id'});
-      }
-    }
-
-    // log activity
-    await sb.from("activity_logs").insert({
-      project_id: doc.project_id, document_id: documentId, item_name: item.name,
-      action: 'ตรวจสอบ', result: status==='pass'?'PASS':status==='fail'?'FAIL':null
-    });
-
-    // auto defect on fail
-    if(status==='fail'){
-      const { data: existingDefect } = await sb.from("defects").select("id").eq("inspection_result_id", result.id).eq("status","open").maybeSingle();
-      if(!existingDefect){
-        const { count } = await sb.from("defects").select("*",{count:'exact',head:true});
-        const defectNo = 'DEF-' + String((count||0)+1).padStart(4,'0');
-        const { data: defect } = await sb.from("defects").insert({
-          defect_no: defectNo, inspection_result_id: result.id, document_id: documentId,
-          description: `${item.name} - คะแนน ${score||0}/5`, score_at_fail: score||0, status:'open'
-        }).select().single();
-        // link current photos as "before" defect evidence too
-        for(const p of localPhotos){
-          await sb.from("photos").update({defect_id: defect.id}).eq("id", p.id);
-        }
-        toast(`สร้าง Defect ${defectNo} อัตโนมัติ`);
-      }
-    } else if(status==='pass'){
-      // auto-verify open defects tied to this result on pass (re-inspection success)
-      await sb.from("defects").update({status:'verified'}).eq("inspection_result_id", result.id).in("status",['open','in_progress','fixed']);
+  // Initialize Supabase
+  async function initSupabase() {
+    const { createClient } = window.supabase;
+    supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    
+    // Check if user is logged in
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      currentUser = user;
+      await loadUserProfile();
+      showApp();
     }
   }
 
-  document.getElementById("nextBtn").addEventListener("click", async ()=>{
-    document.getElementById("nextBtn").textContent = "กำลังบันทึก...";
-    await saveResult();
-    if(idx < items.length-1){
-      nav(`#/document/${documentId}/item/${items[idx+1].id}`);
+  // Authentication
+  async function handleLogin() {
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+    
+    if (!email || !password) {
+      showAuthMessage('กรุณากรอกอีเมลและรหัสผ่าน', 'error');
+      return;
+    }
+
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      showAuthMessage('เข้าสู่ระบบไม่สำเร็จ: ' + error.message, 'error');
     } else {
-      // check if all items done
-      const { data: allResults } = await sb.from("inspection_results").select("status").eq("inspection_id", inspection.id);
-      const allDone = allResults.length===items.length && allResults.every(r=>r.status==='pass'||r.status==='fail');
-      if(allDone){
-        await sb.from("inspections").update({status:'completed'}).eq("id", inspection.id);
-        await sb.from("documents").update({status:'completed'}).eq("id", documentId);
-      } else {
-        await sb.from("documents").update({status:'in_progress'}).eq("id", documentId);
-      }
-      toast("บันทึกครบทุกรายการแล้ว");
-      nav(`#/document/${documentId}`);
-    }
-  });
-  if(idx>0) document.getElementById("prevBtn").addEventListener("click", async ()=>{
-    await saveResult();
-    nav(`#/document/${documentId}/item/${items[idx-1].id}`);
-  });
-}
-
-// ============================================================
-// PROJECT DEFECTS LIST
-// ============================================================
-async function renderProjectDefects(projectId){
-  app.innerHTML = topbar("Defect","",`#/project/${projectId}`) + `<div class="page" id="body"><div class="spinner"></div></div>`;
-  const { data: docs } = await sb.from("documents").select("id,document_code").eq("project_id", projectId);
-  const docIds = (docs||[]).map(d=>d.id);
-  const docMap = {}; (docs||[]).forEach(d=>docMap[d.id]=d.document_code);
-  const { data: defects } = docIds.length
-    ? await sb.from("defects").select("*").in("document_id", docIds).order("created_at",{ascending:false})
-    : {data:[]};
-
-  const body = document.getElementById("body");
-  if(!defects.length){ body.innerHTML = `<div class="empty"><div class="ic">✅</div>ไม่มี Defect</div>`; return; }
-  body.innerHTML = defects.map(d=>`
-    <a class="card def-card" href="#/defect/${d.id}">
-      <span class="status status-pill ${d.status}">${defStatusTh(d.status)}</span>
-      <div class="doc-code">${d.defect_no}</div>
-      <div class="doc-name">${esc(d.description||'')}</div>
-      <div style="font-size:12px;color:var(--gray-600);margin-top:4px;">${esc(docMap[d.document_id]||'')}</div>
-    </a>`).join("");
-}
-function defStatusTh(s){ return {open:'เปิด',in_progress:'กำลังแก้ไข',fixed:'แก้ไขแล้ว',verified:'ตรวจซ้ำผ่าน',closed:'ปิดงาน'}[s]||s; }
-
-// ============================================================
-// DEFECT DETAIL
-// ============================================================
-async function renderDefectDetail(defectId){
-  app.innerHTML = topbar("Defect","",'#/') + `<div class="page" id="body"><div class="spinner"></div></div>`;
-  const { data: defect } = await sb.from("defects").select("*, documents(id,document_code,project_id,projects(code,name))").eq("id", defectId).single();
-  if(!defect) throw new Error("ไม่พบ Defect");
-  app.querySelector(".back").setAttribute("onclick", `nav('#/project/${defect.documents.project_id}/defects')`);
-  app.querySelector(".topbar > div").innerHTML = `<h1>${defect.defect_no}</h1><div class="sub">${esc(defect.documents.document_code)}</div>`;
-
-  const { data: result } = await sb.from("inspection_results").select("*, checklist_template_items(name)").eq("id", defect.inspection_result_id).single();
-  const { data: beforePhotos } = await sb.from("photos").select("*").eq("defect_id", defectId).eq("kind","defect");
-  const { data: corrections } = await sb.from("defect_corrections").select("*").eq("defect_id", defectId).order("created_at",{ascending:false});
-  let correctionPhotosMap = {};
-  for(const c of (corrections||[])){
-    const { data: ph } = await sb.from("photos").select("*").eq("correction_id", c.id);
-    correctionPhotosMap[c.id] = ph || [];
-  }
-
-  const body = document.getElementById("body");
-  body.innerHTML = `
-    <div class="card">
-      <span class="status-pill ${defect.status}">${defStatusTh(defect.status)}</span>
-      <div style="font-weight:700;font-size:16px;margin-top:8px;">${esc(result.checklist_template_items.name)}</div>
-      <div style="font-size:14px;color:var(--gray-600);margin-top:4px;">คะแนนที่พบ: ${defect.score_at_fail}/5</div>
-      <div style="font-size:14px;margin-top:8px;">${esc(defect.description||'')}</div>
-      <div class="section-title">รูปก่อนแก้ไข</div>
-      <div class="photo-grid">${beforePhotos.map(p=>`<div class="photo-thumb"><img src="${publicUrl(p.storage_path)}"></div>`).join("") || '<span style="font-size:13px;color:var(--gray-400)">ไม่มีรูป</span>'}</div>
-    </div>
-
-    <div class="card">
-      <div class="section-title" style="margin-top:0">บันทึกการแก้ไข</div>
-      <textarea id="fixNote" rows="3" placeholder="เช่น เชื่อมเสริมบริเวณรอยต่อและทาสีกันสนิมใหม่"></textarea>
-      <div class="photo-actions">
-        <label>📷 ถ่ายรูปหลังแก้ไข<input type="file" accept="image/*" capture="environment" multiple id="fixPhotos" style="display:none"></label>
-      </div>
-      <div class="photo-grid" id="newFixPhotos"></div>
-      <button class="nav-btn primary" style="width:100%;margin-top:12px;" id="saveFixBtn">บันทึกการแก้ไข</button>
-    </div>
-
-    ${defect.status!=='closed' ? `
-    <div class="card">
-      <button class="nav-btn primary" style="width:100%;" onclick="nav('#/document/${defect.documents.id}/item/${result.template_item_id}')">🔄 ตรวจซ้ำ (Re-inspection)</button>
-    </div>` : ''}
-
-    <div class="section-title">ประวัติการแก้ไข</div>
-    ${(corrections||[]).map(c=>`
-      <div class="card">
-        <div style="font-size:12px;color:var(--gray-600)">${new Date(c.created_at).toLocaleString('th-TH')}</div>
-        <div style="margin-top:4px;">${esc(c.detail||'')}</div>
-        <div class="photo-grid">${(correctionPhotosMap[c.id]||[]).map(p=>`<div class="photo-thumb"><img src="${publicUrl(p.storage_path)}"></div>`).join("")}</div>
-      </div>`).join("") || '<div class="empty" style="padding:16px;">ยังไม่มีการแก้ไข</div>'}
-  `;
-
-  let pendingFiles = [];
-  document.getElementById("fixPhotos").addEventListener("change", (e)=>{
-    pendingFiles = Array.from(e.target.files);
-    document.getElementById("newFixPhotos").innerHTML = pendingFiles.map(f=>`<div class="photo-thumb"><img src="${URL.createObjectURL(f)}"></div>`).join("");
-  });
-
-  document.getElementById("saveFixBtn").addEventListener("click", async ()=>{
-    const detail = document.getElementById("fixNote").value;
-    if(!detail && pendingFiles.length===0){ toast("กรุณาใส่รายละเอียดหรือรูปภาพ"); return; }
-    toast("กำลังบันทึก...");
-    const { data: correction } = await sb.from("defect_corrections").insert({defect_id: defectId, detail}).select().single();
-    for(const file of pendingFiles){
-      const path = `correction/${correction.id}/${Date.now()}_${Math.random().toString(36).slice(2,7)}.jpg`;
-      const { error } = await sb.storage.from(BUCKET).upload(path, file);
-      if(!error) await sb.from("photos").insert({correction_id: correction.id, storage_path: path, kind:'correction'});
-    }
-    await sb.from("defects").update({status:'fixed'}).eq("id", defectId);
-    await sb.from("activity_logs").insert({project_id: defect.documents.project_id, document_id: defect.documents.id, item_name: result.checklist_template_items.name, action:'แก้ไข Defect', result: null});
-    toast("บันทึกสำเร็จ");
-    renderDefectDetail(defectId);
-  });
-}
-
-// ============================================================
-// HISTORY
-// ============================================================
-async function renderHistory(projectId){
-  app.innerHTML = topbar("ประวัติ","",`#/project/${projectId}`) + `<div class="page" id="body"><div class="spinner"></div></div>`;
-  const { data: logs } = await sb.from("activity_logs").select("*, documents(document_code)").eq("project_id", projectId).order("created_at",{ascending:false}).limit(100);
-  const body = document.getElementById("body");
-  if(!logs || !logs.length){ body.innerHTML = `<div class="empty"><div class="ic">🕒</div>ยังไม่มีประวัติ</div>`; return; }
-  body.innerHTML = `<div class="card" style="padding:6px 14px;">` + logs.map(l=>`
-    <div class="hist-item">
-      <div class="hist-date">${new Date(l.created_at).toLocaleString('th-TH')}</div>
-      <div class="hist-doc">${esc(l.documents?.document_code||'')}</div>
-      <div class="hist-action">${esc(l.item_name||'')} — ${esc(l.action)} ${l.result?`<span class="${l.result==='PASS'?'res-pass':'res-fail'}">${l.result}</span>`:''}</div>
-    </div>`).join("") + `</div>`;
-}
-
-// ============================================================
-// PDF GENERATION SCREEN
-// ============================================================
-async function renderPdfScreen(documentId){
-  app.innerHTML = topbar("สร้าง PDF","",`#/document/${documentId}`) + `<div class="page" id="body"><div class="spinner"></div></div>`;
-  const { data: doc } = await sb.from("documents").select("*, projects(code,name), checklist_templates(name,code)").eq("id", documentId).single();
-  const body = document.getElementById("body");
-  body.innerHTML = `
-    <div class="card">
-      <div style="font-weight:700;">${esc(doc.document_code)}</div>
-      <div style="font-size:14px;color:var(--gray-600);margin-top:4px;">${esc(doc.checklist_templates.name)}</div>
-    </div>
-    <div class="card">
-      <div class="section-title" style="margin-top:0">ลงชื่อ</div>
-      <div style="font-size:13px;font-weight:600;margin-bottom:4px;">ผู้ตรวจสอบ</div>
-      <div class="sig-pad-wrap"><canvas class="sigpad" id="sig1"></canvas></div>
-      <button class="nav-btn secondary" style="width:100%;margin-top:6px;" onclick="window.__clearSig(1)">ล้างลายเซ็น</button>
-      <input type="text" id="inspectorName" placeholder="ชื่อผู้ตรวจสอบ" style="margin-top:8px;">
-
-      <div style="font-size:13px;font-weight:600;margin:14px 0 4px;">ผู้อนุมัติ</div>
-      <div class="sig-pad-wrap"><canvas class="sigpad" id="sig2"></canvas></div>
-      <button class="nav-btn secondary" style="width:100%;margin-top:6px;" onclick="window.__clearSig(2)">ล้างลายเซ็น</button>
-      <input type="text" id="approverName" placeholder="ชื่อผู้อนุมัติ" style="margin-top:8px;">
-    </div>
-    <div class="pdf-btn-grid">
-      <button id="genBtn">📄 สร้าง PDF</button>
-    </div>
-    <div id="pdfResult"></div>
-  `;
-
-  function setupPad(id){
-    const canvas = document.getElementById(id);
-    const ratio = Math.max(window.devicePixelRatio||1,1);
-    canvas.width = canvas.offsetWidth * ratio;
-    canvas.height = canvas.offsetHeight * ratio;
-    canvas.getContext("2d").scale(ratio,ratio);
-    return new SignaturePad(canvas, {backgroundColor:'rgb(255,255,255)'});
-  }
-  const pad1 = setupPad("sig1");
-  const pad2 = setupPad("sig2");
-  window.__clearSig = (n)=> (n===1?pad1:pad2).clear();
-
-  document.getElementById("genBtn").addEventListener("click", async ()=>{
-    document.getElementById("genBtn").textContent = "กำลังสร้าง...";
-    try{
-      await generatePdf(documentId, doc, pad1, pad2,
-        document.getElementById("inspectorName").value,
-        document.getElementById("approverName").value);
-    }catch(e){ console.error(e); toast("สร้าง PDF ไม่สำเร็จ: "+e.message); }
-    document.getElementById("genBtn").textContent = "📄 สร้าง PDF";
-  });
-}
-
-async function generatePdf(documentId, doc, pad1, pad2, inspectorName, approverName){
-  const { jsPDF } = window.jspdf;
-  const pdf = new jsPDF({unit:'pt', format:'a4'});
-  const pageW = pdf.internal.pageSize.getWidth();
-  let y = 40;
-  const marginX = 40;
-
-  pdf.setFontSize(18); pdf.text("SmartQC - Inspection Report", marginX, y); y+=24;
-  pdf.setFontSize(11);
-  pdf.text(`Project: ${doc.projects.code}  ${doc.projects.name}`, marginX, y); y+=16;
-  pdf.text(`Document: ${doc.document_code}`, marginX, y); y+=16;
-  pdf.text(`Title: ${doc.checklist_templates.name}`, marginX, y); y+=16;
-  pdf.text(`Date: ${new Date().toLocaleDateString('en-GB')}`, marginX, y); y+=24;
-
-  const { data: items } = await sb.from("checklist_template_items").select("*").eq("template_id", doc.template_id).order("sort_order");
-  const { data: insp } = await sb.from("inspections").select("*").eq("document_id", documentId).order("created_at",{ascending:false}).limit(1);
-  const inspection = insp[0];
-  const { data: results } = await sb.from("inspection_results").select("*").eq("inspection_id", inspection.id);
-  const resMap = {}; (results||[]).forEach(r=>resMap[r.template_item_id]=r);
-
-  pdf.setFontSize(13); pdf.text("Checklist Results", marginX, y); y+=18;
-  pdf.setFontSize(10);
-  for(const it of items){
-    const r = resMap[it.id];
-    if(y > 760){ pdf.addPage(); y=40; }
-    const statusTxt = r ? (r.status==='pass'?'PASS':r.status==='fail'?'FAIL':'-') : '-';
-    pdf.text(`${it.name}  |  Score: ${r&&r.score!=null?r.score:'-'}/5  |  ${statusTxt}`, marginX, y);
-    y += 14;
-    if(r && r.note){ pdf.setTextColor(90); pdf.text(`Note: ${r.note}`, marginX+10, y); y+=14; pdf.setTextColor(0); }
-  }
-  y += 10;
-
-  // photos
-  for(const it of items){
-    const r = resMap[it.id];
-    if(!r) continue;
-    const { data: photos } = await sb.from("photos").select("*").eq("inspection_result_id", r.id).eq("kind","inspection");
-    if(!photos || !photos.length) continue;
-    if(y > 700){ pdf.addPage(); y=40; }
-    pdf.setFontSize(11); pdf.text(`Photos: ${it.name}`, marginX, y); y+=10;
-    let x = marginX;
-    const imgSize = 110;
-    for(const p of photos){
-      try{
-        const dataUrl = await imgToDataUrl(publicUrl(p.storage_path));
-        if(x + imgSize > pageW - marginX){ x = marginX; y += imgSize + 10; }
-        if(y + imgSize > 780){ pdf.addPage(); y=40; x=marginX; }
-        pdf.addImage(dataUrl, 'JPEG', x, y, imgSize, imgSize);
-        x += imgSize + 10;
-      }catch(e){ console.warn("img fail", e); }
-    }
-    y += imgSize + 20;
-  }
-
-  // defects
-  const { data: defects } = await sb.from("defects").select("*, inspection_results(template_item_id, checklist_template_items(name))").eq("document_id", documentId);
-  if(defects && defects.length){
-    if(y > 700){ pdf.addPage(); y=40; }
-    pdf.setFontSize(13); pdf.text("Defects", marginX, y); y+=18; pdf.setFontSize(10);
-    for(const d of defects){
-      if(y > 760){ pdf.addPage(); y=40; }
-      pdf.text(`${d.defect_no} - ${d.inspection_results?.checklist_template_items?.name||''} - Status: ${d.status}`, marginX, y); y+=14;
-      if(d.description){ pdf.text(`  ${d.description}`, marginX, y); y+=14; }
+      currentUser = data.user;
+      await loadUserProfile();
+      showApp();
     }
   }
 
-  // signatures
-  if(y > 650){ pdf.addPage(); y=40; }
-  y += 20;
-  pdf.setFontSize(13); pdf.text("Signatures", marginX, y); y+=20;
-  const sigW = 200, sigH = 70;
-  if(!pad1.isEmpty()){ pdf.addImage(pad1.toDataURL(), 'PNG', marginX, y, sigW, sigH); }
-  if(!pad2.isEmpty()){ pdf.addImage(pad2.toDataURL(), 'PNG', marginX + 250, y, sigW, sigH); }
-  y += sigH + 12;
-  pdf.setFontSize(10);
-  pdf.text(`Inspector: ${inspectorName||'____________________'}`, marginX, y);
-  pdf.text(`Approver: ${approverName||'____________________'}`, marginX+250, y);
-
-  // save signature images to storage + inspection record
-  try{
-    if(!pad1.isEmpty()){
-      const blob1 = await (await fetch(pad1.toDataURL())).blob();
-      const path1 = `signatures/${inspection.id}_inspector_${Date.now()}.png`;
-      await sb.storage.from(BUCKET).upload(path1, blob1, {contentType:'image/png'});
-      await sb.from("signatures").insert({inspection_id: inspection.id, role:'inspector', storage_path: path1});
+  async function handleSignup() {
+    const name = document.getElementById('signupName').value;
+    const email = document.getElementById('signupEmail').value;
+    const password = document.getElementById('signupPassword').value;
+    
+    if (!name || !email || !password) {
+      showAuthMessage('กรุณากรอกข้อมูลให้ครบถ้วน', 'error');
+      return;
     }
-    if(!pad2.isEmpty()){
-      const blob2 = await (await fetch(pad2.toDataURL())).blob();
-      const path2 = `signatures/${inspection.id}_approver_${Date.now()}.png`;
-      await sb.storage.from(BUCKET).upload(path2, blob2, {contentType:'image/png'});
-      await sb.from("signatures").insert({inspection_id: inspection.id, role:'approver', storage_path: path2});
+
+    const { data, error: signupError } = await supabase.auth.signUp({ email, password });
+    if (signupError) {
+      showAuthMessage('สมัครสมาชิกไม่สำเร็จ: ' + signupError.message, 'error');
+    } else {
+      // Create profile
+      await supabase.from('profiles').insert({
+        id: data.user.id,
+        email: email,
+        full_name: name,
+        status: 'pending'
+      });
+      showAuthMessage('สมัครสมาชิกสำเร็จ รอการอนุมัติจากแอดมิน', 'success');
+      document.getElementById('signupName').value = '';
+      document.getElementById('signupEmail').value = '';
+      document.getElementById('signupPassword').value = '';
     }
-    await sb.from("inspections").update({inspector_name: inspectorName, approver_name: approverName}).eq("id", inspection.id);
-  }catch(e){ console.warn("sig save fail", e); }
+  }
 
-  const fileName = doc.document_code.replace(/\//g,'-') + '.pdf';
-  const blob = pdf.output('blob');
-  const blobUrl = URL.createObjectURL(blob);
+  async function handleLogout() {
+    await supabase.auth.signOut();
+    currentUser = null;
+    currentRole = null;
+    hideApp();
+  }
 
-  document.getElementById("pdfResult").innerHTML = `
-    <div class="card">
-      <div style="font-weight:700;margin-bottom:10px;">✅ สร้าง PDF สำเร็จ</div>
-      <div class="pdf-btn-grid">
-        <button onclick="window.open('${blobUrl}','_blank')">👁️ เปิด PDF</button>
-        <button class="alt" id="dlBtn">⬇️ ดาวน์โหลด</button>
-        <button class="alt" onclick="window.print()">🖨️ Print</button>
-        <button class="alt" id="shareBtn">📤 Share</button>
-      </div>
-    </div>`;
-  document.getElementById("dlBtn").addEventListener("click", ()=>{
-    const a = document.createElement('a'); a.href = blobUrl; a.download = fileName; a.click();
-  });
-  document.getElementById("shareBtn").addEventListener("click", async ()=>{
-    if(navigator.share && navigator.canShare){
-      const file = new File([blob], fileName, {type:'application/pdf'});
-      if(navigator.canShare({files:[file]})){
-        try{ await navigator.share({files:[file], title: fileName}); return; }catch(e){}
-      }
+  async function loadUserProfile() {
+    const { data } = await supabase
+      .from('profiles')
+      .select('*, roles(name)')
+      .eq('id', currentUser.id)
+      .single();
+    
+    if (data) {
+      currentRole = data.roles?.name || 'visitor';
+      document.getElementById('currentUser').textContent = data.full_name || data.email;
+      document.getElementById('currentRole').textContent = data.roles?.name || 'ผู้เข้าชม';
+      loadNavigation();
+      await loadDashboard();
     }
-    const a = document.createElement('a'); a.href = blobUrl; a.download = fileName; a.click();
-    toast("อุปกรณ์นี้ไม่รองรับ Share — ดาวน์โหลดแทน");
-  });
-  toast("สร้าง PDF สำเร็จ");
-}
+  }
 
-function imgToDataUrl(url){
-  return new Promise((resolve,reject)=>{
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.onload = ()=>{
-      const canvas = document.createElement("canvas");
-      canvas.width = img.width; canvas.height = img.height;
-      canvas.getContext("2d").drawImage(img,0,0);
-      resolve(canvas.toDataURL("image/jpeg", 0.85));
+  function loadNavigation() {
+    const navButtons = document.getElementById('navButtons');
+    navButtons.innerHTML = '';
+    
+    const buttons = [
+      { id: 'dashboardPage', label: '📊 แดชบอร์ด' },
+      { id: 'projectsPage', label: '📁 โครงการ' },
+    ];
+
+    if (['manufacturer', 'inspector', 'approver'].includes(currentRole)) {
+      buttons.push({ id: 'inspectionPage', label: '📋 สร้างตรวจสอบ' });
+      buttons.push({ id: 'inspectionsPage', label: '📝 รายการตรวจสอบ' });
+      buttons.push({ id: 'defectsPage', label: '⚠️ ข้อบกพร่อง' });
+      buttons.push({ id: 'documentsPage', label: '📄 เอกสาร' });
+    }
+
+    if (currentRole === 'admin') {
+      buttons.push({ id: 'adminPage', label: '⚙️ จัดการระบบ' });
+    }
+
+    buttons.forEach(btn => {
+      const button = document.createElement('button');
+      button.textContent = btn.label;
+      button.onclick = () => showPage(btn.id);
+      navButtons.appendChild(button);
+    });
+  }
+
+  // Page Navigation
+  function showPage(pageId) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(pageId).classList.add('active');
+    
+    document.querySelectorAll('.sidebar button').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+  }
+
+  function showApp() {
+    document.getElementById('authPage').style.display = 'none';
+    document.getElementById('app').classList.add('active');
+  }
+
+  function hideApp() {
+    document.getElementById('app').classList.remove('active');
+    document.getElementById('authPage').style.display = 'flex';
+    clearAuthForm();
+  }
+
+  function toggleAuthTab() {
+    const loginTab = document.getElementById('loginTab');
+    const signupTab = document.getElementById('signupTab');
+    loginTab.style.display = loginTab.style.display === 'none' ? 'block' : 'none';
+    signupTab.style.display = signupTab.style.display === 'none' ? 'block' : 'none';
+  }
+
+  function showAuthMessage(message, type) {
+    const element = document.getElementById('authMessage');
+    element.innerHTML = `<div class="${type}-message">${message}</div>`;
+  }
+
+  function clearAuthForm() {
+    document.getElementById('loginEmail').value = '';
+    document.getElementById('loginPassword').value = '';
+    document.getElementById('signupName').value = '';
+    document.getElementById('signupEmail').value = '';
+    document.getElementById('signupPassword').value = '';
+    document.getElementById('authMessage').innerHTML = '';
+  }
+
+  // Dashboard
+  async function loadDashboard() {
+    // Load stats
+    const { data: allInspections } = await supabase.from('inspections').select('status');
+    const { data: allDefects } = await supabase.from('defects').select('status, severity');
+    
+    const stats = {
+      total_inspections: allInspections?.length || 0,
+      waiting: allInspections?.filter(i => i.status === 'WAITING_INSPECTION').length || 0,
+      correction: allInspections?.filter(i => i.status === 'CORRECTION_REQUIRED').length || 0,
+      approved: allInspections?.filter(i => i.status === 'APPROVED').length || 0,
+      major_defects: allDefects?.filter(d => d.severity === 'Major').length || 0,
+      minor_defects: allDefects?.filter(d => d.severity === 'Minor').length || 0,
     };
-    img.onerror = reject;
-    img.src = url;
+
+    const statsGrid = document.getElementById('statsGrid');
+    statsGrid.innerHTML = `
+      <div class="stat-card">
+        <h3>ทั้งหมด</h3>
+        <div class="number">${stats.total_inspections}</div>
+      </div>
+      <div class="stat-card waiting">
+        <h3>รอตรวจสอบ</h3>
+        <div class="number">${stats.waiting}</div>
+      </div>
+      <div class="stat-card correction">
+        <h3>ต้องแก้ไข</h3>
+        <div class="number">${stats.correction}</div>
+      </div>
+      <div class="stat-card approved">
+        <h3>อนุมัติแล้ว</h3>
+        <div class="number">${stats.approved}</div>
+      </div>
+      <div class="stat-card">
+        <h3>ข้อบกพร่อง Major</h3>
+        <div class="number">${stats.major_defects}</div>
+      </div>
+    `;
+
+    // Load recent inspections
+    const { data: recentInspections } = await supabase
+      .from('inspections')
+      .select(`
+        id, status, created_at,
+        projects(name),
+        form_templates(code),
+        equipment(name)
+      `)
+      .order('created_at', { ascending: false })
+      .limit(5);
+
+    const tbody = document.getElementById('recentInspections');
+    tbody.innerHTML = recentInspections?.map(inspection => `
+      <tr>
+        <td>${inspection.projects?.name || '-'}</td>
+        <td>${inspection.form_templates?.code || '-'}</td>
+        <td>${inspection.equipment?.name || '-'}</td>
+        <td><span class="status-badge ${inspection.status.toLowerCase()}">${inspection.status}</span></td>
+        <td>${new Date(inspection.created_at).toLocaleDateString('th-TH')}</td>
+      </tr>
+    `).join('') || '<tr><td colspan="5" style="text-align: center; padding: 20px;">ไม่มีข้อมูล</td></tr>';
+  }
+
+  // Projects
+  async function loadProjects() {
+    const { data } = await supabase.from('projects').select('*').order('created_at', { ascending: false });
+    const tbody = document.getElementById('projectsList');
+    tbody.innerHTML = data?.map(p => `
+      <tr>
+        <td>${p.name}</td>
+        <td>${p.company_name || '-'}</td>
+        <td><span class="status-badge ${p.status.toLowerCase()}">${p.status}</span></td>
+        <td>
+          <button onclick="editProject('${p.id}')" style="padding: 5px 10px; font-size: 12px;">แก้ไข</button>
+          <button onclick="deleteProject('${p.id}')" style="padding: 5px 10px; font-size: 12px; background: var(--secondary);">ลบ</button>
+        </td>
+      </tr>
+    `).join('') || '<tr><td colspan="4" style="text-align: center; padding: 20px;">ไม่มีโครงการ</td></tr>';
+  }
+
+  async function saveProject() {
+    const name = document.getElementById('projectName').value;
+    const company = document.getElementById('projectCompany').value;
+    const description = document.getElementById('projectDescription').value;
+
+    if (!name) {
+      alert('กรุณากรอกชื่อโครงการ');
+      return;
+    }
+
+    await supabase.from('projects').insert({
+      name, company_name: company, description, created_by: currentUser.id
+    });
+
+    closeProjectModal();
+    await loadProjects();
+  }
+
+  function openProjectModal() {
+    document.getElementById('projectModal').classList.add('active');
+  }
+
+  function closeProjectModal() {
+    document.getElementById('projectModal').classList.remove('active');
+    document.getElementById('projectName').value = '';
+    document.getElementById('projectCompany').value = '';
+    document.getElementById('projectDescription').value = '';
+  }
+
+  async function deleteProject(id) {
+    if (confirm('คุณต้องการลบโครงการนี้หรือไม่?')) {
+      await supabase.from('projects').delete().eq('id', id);
+      await loadProjects();
+    }
+  }
+
+  // Forms
+  async function loadForms() {
+    const { data } = await supabase.from('form_templates').select('*').order('code');
+    
+    // Populate form selector
+    const inspectionForm = document.getElementById('inspectionForm');
+    inspectionForm.innerHTML = '<option value="">-- เลือกแบบฟอร์ม --</option>';
+    data?.forEach(form => {
+      const option = document.createElement('option');
+      option.value = form.id;
+      option.textContent = `${form.code} - ${form.name}`;
+      inspectionForm.appendChild(option);
+    });
+
+    // Admin forms list
+    const tbody = document.getElementById('adminFormsList');
+    tbody.innerHTML = data?.map(f => `
+      <tr>
+        <td>${f.code}</td>
+        <td>${f.name}</td>
+        <td><span class="status-badge ${f.status.toLowerCase()}">${f.status}</span></td>
+        <td>
+          <button onclick="editForm('${f.id}')" style="padding: 5px 10px; font-size: 12px;">แก้ไข</button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  async function saveForm() {
+    const code = document.getElementById('formCode').value;
+    const name = document.getElementById('formName').value;
+    const description = document.getElementById('formDescription').value;
+
+    if (!code || !name) {
+      alert('กรุณากรอกรหัสและชื่อแบบฟอร์ม');
+      return;
+    }
+
+    await supabase.from('form_templates').insert({
+      code, name, description, created_by: currentUser.id
+    });
+
+    closeFormModal();
+    await loadForms();
+  }
+
+  function openFormModal() {
+    document.getElementById('formModal').classList.add('active');
+  }
+
+  function closeFormModal() {
+    document.getElementById('formModal').classList.remove('active');
+    document.getElementById('formCode').value = '';
+    document.getElementById('formName').value = '';
+    document.getElementById('formDescription').value = '';
+  }
+
+  // Inspection
+  async function updateInspectionForms() {
+    const projectId = document.getElementById('inspectionProject').value;
+    currentProject = projectId;
+    if (projectId) await loadProjectEquipment();
+  }
+
+  async function updateInspectionChecklist() {
+    const formId = document.getElementById('inspectionForm').value;
+    if (!formId) return;
+
+    const { data: checklist } = await supabase
+      .from('checklist_items')
+      .select('*')
+      .eq('form_template_id', formId)
+      .order('sequence');
+
+    const container = document.getElementById('checklistContainer');
+    container.innerHTML = checklist?.map(item => `
+      <div class="checklist-item">
+        <h4>${item.sequence}. ${item.title}</h4>
+        <div class="checklist-result">
+          <label>
+            <input type="radio" name="result_${item.id}" value="pass" onchange="updateChecklistClass(this)">
+            ✓ ผ่าน
+          </label>
+          <label>
+            <input type="radio" name="result_${item.id}" value="fail" onchange="updateChecklistClass(this)">
+            ✗ ไม่ผ่าน
+          </label>
+        </div>
+        <div style="margin-top: 10px;">
+          <textarea placeholder="หมายเหตุ" id="remark_${item.id}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px;"></textarea>
+        </div>
+        <div class="image-section">
+          <div class="image-upload" onclick="triggerImageUpload('${item.id}')">
+            📷 คลิกเพื่ออัปโหลดรูปภาพ
+            <input type="file" id="image_${item.id}" accept="image/*" onchange="handleImageUpload('${item.id}', event)">
+          </div>
+          <div class="preview-container" id="preview_${item.id}"></div>
+        </div>
+      </div>
+    `).join('') || '<p>ไม่มีรายการตรวจสอบ</p>';
+  }
+
+  async function loadProjectEquipment() {
+    const { data } = await supabase
+      .from('equipment')
+      .select('*')
+      .eq('project_id', currentProject)
+      .order('created_at', { ascending: false });
+
+    const select = document.getElementById('existingEquipment');
+    select.innerHTML = '<option value="">-- เลือกอุปกรณ์ที่มีอยู่ --</option>';
+    data?.forEach(eq => {
+      const option = document.createElement('option');
+      option.value = eq.id;
+      option.textContent = `${eq.code} - ${eq.name} (${eq.position || 'ไม่ระบุ'})`;
+      select.appendChild(option);
+    });
+  }
+
+  function toggleEquipmentForm() {
+    document.getElementById('equipmentForm').style.display = 
+      document.getElementById('equipmentForm').style.display === 'none' ? 'block' : 'none';
+  }
+
+  async function saveEquipment() {
+    const { data } = await supabase.from('equipment').insert({
+      project_id: currentProject,
+      code: document.getElementById('equipmentCode').value,
+      name: document.getElementById('equipmentName').value,
+      model: document.getElementById('equipmentModel').value,
+      position: document.getElementById('equipmentPosition').value,
+    });
+
+    document.getElementById('equipmentCode').value = '';
+    document.getElementById('equipmentName').value = '';
+    document.getElementById('equipmentModel').value = '';
+    document.getElementById('equipmentPosition').value = '';
+    
+    toggleEquipmentForm();
+    await loadProjectEquipment();
+  }
+
+  function triggerImageUpload(itemId) {
+    document.getElementById(`image_${itemId}`).click();
+  }
+
+  async function handleImageUpload(itemId, event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const preview = document.getElementById(`preview_${itemId}`);
+      const div = document.createElement('div');
+      div.className = 'preview-image';
+      div.innerHTML = `
+        <img src="${e.target.result}" alt="preview">
+        <div class="tools">
+          <button onclick="annotateImage(this)">🎨 โครงเครื่อง</button>
+          <button onclick="removeImage(this)">🗑️ ลบ</button>
+        </div>
+      `;
+      preview.appendChild(div);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function updateChecklistClass(input) {
+    const checklistItem = input.closest('.checklist-item');
+    checklistItem.classList.remove('pass', 'fail');
+    if (input.value === 'pass') {
+      checklistItem.classList.add('pass');
+    } else if (input.value === 'fail') {
+      checklistItem.classList.add('fail');
+    }
+  }
+
+  function annotateImage(button) {
+    alert('คุณสมบัติโครงเครื่องภาพ (กำลังพัฒนา)');
+  }
+
+  function removeImage(button) {
+    button.closest('.preview-image').remove();
+  }
+
+  async function submitInspection() {
+    const projectId = document.getElementById('inspectionProject').value;
+    const formId = document.getElementById('inspectionForm').value;
+    const equipmentId = document.getElementById('existingEquipment').value;
+
+    if (!projectId || !formId || !equipmentId) {
+      showMessage('inspectionMessage', 'กรุณากรอกข้อมูลทั้งหมด', 'error');
+      return;
+    }
+
+    // Create inspection
+    const { data: inspection } = await supabase
+      .from('inspections')
+      .insert({
+        project_id: projectId,
+        form_template_id: formId,
+        equipment_id: equipmentId,
+        status: 'WAITING_INSPECTION',
+        submitted_by: currentUser.id,
+        submitted_at: new Date().toISOString()
+      })
+      .select();
+
+    showMessage('inspectionMessage', 'ส่งการตรวจสอบสำเร็จ', 'success');
+    setTimeout(() => {
+      document.getElementById('inspectionProject').value = '';
+      document.getElementById('inspectionForm').value = '';
+      document.getElementById('existingEquipment').value = '';
+      document.getElementById('checklistContainer').innerHTML = '';
+    }, 2000);
+  }
+
+  // Utilities
+  function showMessage(elementId, message, type) {
+    const element = document.getElementById(elementId);
+    element.innerHTML = `<div class="${type}-message">${message}</div>`;
+    setTimeout(() => {
+      element.innerHTML = '';
+    }, 3000);
+  }
+
+  function toggleAdminSection(element) {
+    const content = element.nextElementSibling;
+    content.classList.toggle('active');
+  }
+
+  // Load admin data
+  async function loadAdminData() {
+    // Users
+    const { data: users } = await supabase
+      .from('profiles')
+      .select('*, roles(name)')
+      .order('created_at', { ascending: false });
+
+    const usersList = document.getElementById('adminUsersList');
+    usersList.innerHTML = users?.map(u => `
+      <tr>
+        <td>${u.email}</td>
+        <td>${u.full_name || '-'}</td>
+        <td>${u.roles?.name || 'ไม่ระบุ'}</td>
+        <td><span class="status-badge">${u.status}</span></td>
+        <td>
+          <button onclick="approveUser('${u.id}')" style="padding: 5px 10px; font-size: 12px;">อนุมัติ</button>
+        </td>
+      </tr>
+    `).join('');
+
+    // Audit logs
+    const { data: logs } = await supabase
+      .from('audit_logs')
+      .select('*, profiles(full_name)')
+      .order('created_at', { ascending: false })
+      .limit(20);
+
+    const logsList = document.getElementById('auditLogsList');
+    logsList.innerHTML = logs?.map(log => `
+      <tr>
+        <td>${log.profiles?.full_name || '-'}</td>
+        <td>${log.action}</td>
+        <td>${log.table_name}</td>
+        <td>${new Date(log.created_at).toLocaleDateString('th-TH')}</td>
+      </tr>
+    `).join('');
+  }
+
+  async function approveUser(userId) {
+    await supabase
+      .from('profiles')
+      .update({ status: 'active' })
+      .eq('id', userId);
+    
+    await loadAdminData();
+  }
+
+  async function loadInspections() {
+    const { data } = await supabase
+      .from('inspections')
+      .select(`
+        id, status, created_at,
+        projects(name),
+        form_templates(code),
+        equipment(name)
+      `)
+      .order('created_at', { ascending: false });
+
+    const tbody = document.getElementById('inspectionsList');
+    tbody.innerHTML = data?.map(i => `
+      <tr>
+        <td>${i.projects?.name || '-'}</td>
+        <td>${i.form_templates?.code || '-'}</td>
+        <td><span class="status-badge ${i.status.toLowerCase()}">${i.status}</span></td>
+        <td>${new Date(i.created_at).toLocaleDateString('th-TH')}</td>
+        <td>
+          <button onclick="viewInspection('${i.id}')" style="padding: 5px 10px; font-size: 12px;">ดู</button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  async function loadDefects() {
+    const { data } = await supabase
+      .from('defects')
+      .select(`
+        id, severity, status, created_at,
+        projects(name)
+      `)
+      .order('created_at', { ascending: false });
+
+    const tbody = document.getElementById('defectsList');
+    tbody.innerHTML = data?.map(d => `
+      <tr>
+        <td>#${d.id.substring(0, 8)}</td>
+        <td>${d.projects?.name || '-'}</td>
+        <td>${d.severity}</td>
+        <td><span class="status-badge">${d.status}</span></td>
+        <td>${new Date(d.created_at).toLocaleDateString('th-TH')}</td>
+        <td>
+          <button onclick="viewDefect('${d.id}')" style="padding: 5px 10px; font-size: 12px;">ดู</button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function viewInspection(id) {
+    alert(`ดูรายละเอียดการตรวจสอบ: ${id}`);
+  }
+
+  function viewDefect(id) {
+    alert(`ดูรายละเอียดข้อบกพร่อง: ${id}`);
+  }
+
+  // Signature
+  let signatureCanvas, signatureCtx;
+  let isDrawing = false;
+
+  function initSignatureCanvas() {
+    signatureCanvas = document.getElementById('signatureCanvas');
+    signatureCtx = signatureCanvas.getContext('2d');
+    
+    signatureCanvas.addEventListener('mousedown', () => { isDrawing = true; });
+    signatureCanvas.addEventListener('mouseup', () => { isDrawing = false; });
+    signatureCanvas.addEventListener('mousemove', drawSignature);
+    
+    signatureCanvas.addEventListener('touchstart', () => { isDrawing = true; });
+    signatureCanvas.addEventListener('touchend', () => { isDrawing = false; });
+    signatureCanvas.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      const touch = e.touches[0];
+      const mouseEvent = new MouseEvent('mousemove', {
+        clientX: touch.clientX,
+        clientY: touch.clientY
+      });
+      signatureCanvas.dispatchEvent(mouseEvent);
+    });
+  }
+
+  function drawSignature(e) {
+    if (!isDrawing) return;
+    
+    const rect = signatureCanvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    signatureCtx.lineWidth = 2;
+    signatureCtx.lineCap = 'round';
+    signatureCtx.strokeStyle = '#333';
+    signatureCtx.lineTo(x, y);
+    signatureCtx.stroke();
+  }
+
+  function clearSignature() {
+    signatureCtx.clearRect(0, 0, signatureCanvas.width, signatureCanvas.height);
+  }
+
+  function saveSignature() {
+    const imageData = signatureCanvas.toDataURL('image/png');
+    console.log('ลายเซ็นบันทึก:', imageData);
+    closeSignatureModal();
+  }
+
+  function openSignatureModal() {
+    document.getElementById('signatureModal').classList.add('active');
+    setTimeout(initSignatureCanvas, 100);
+  }
+
+  function closeSignatureModal() {
+    document.getElementById('signatureModal').classList.remove('active');
+  }
+
+  // Init
+  document.addEventListener('DOMContentLoaded', async () => {
+    await initSupabase();
   });
-}
 </script>
+
 </body>
 </html>
