@@ -2,7 +2,7 @@
 <html lang="th"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>QCall by cpe · ระบบตรวจสอบงานติดตั้ง</title><meta name="theme-color" content="#185b38"><meta name="apple-mobile-web-app-capable" content="yes"><link id="fav" rel="icon" href="data:,">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -184,13 +184,20 @@ details.tip{border:1px dashed var(--p);border-radius:12px;padding:10px 12px;marg
 .tsel{position:relative;padding:0;border:2px solid var(--b);border-radius:12px;overflow:hidden;background:var(--c);cursor:pointer;aspect-ratio:1}.tsel img{width:100%;height:100%;object-fit:cover;display:block}.tsel small{position:absolute;left:0;right:0;bottom:0;background:#000a;color:#fff;font-size:10px;padding:1px 4px}.tsel b{position:absolute;top:6px;right:6px;width:26px;height:26px;border-radius:50%;background:var(--p);color:#fff;display:none;place-items:center}.tsel.on{border-color:var(--p);box-shadow:0 0 0 3px color-mix(in srgb,var(--p) 30%,transparent)}.tsel.on b{display:grid}
 .tipok{width:100%;margin-top:8px;background:linear-gradient(135deg,#15803d,#22c55e)!important;border-color:#15803d!important}
 .tipsv{border-top:1px solid var(--b);margin-top:10px;padding-top:8px}.dfi{border-top:1px solid var(--b);padding:8px 0}.dfi:first-of-type{border-top:0}
+.dfl{display:flex;flex-direction:column;gap:8px;margin:4px 0 10px}
+.dfx{display:flex;gap:10px;align-items:flex-start;background:var(--p2);border-radius:10px;padding:8px}
+.dfx img{width:60px;height:60px;object-fit:cover;border-radius:8px;flex:none;cursor:pointer}
+.dfx .dfxb{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.dfx .dfxb select,.dfx .dfxb input{margin:0}
+.dfreq{color:#dc2626;font-size:12px;font-weight:600}
 .kbs{margin:10px 0}.kbg{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin:10px 0}.kbg figure{margin:0}.kbg img{width:100%;border-radius:10px;border:1px solid var(--b);cursor:zoom-in}.kbg figcaption{font-size:12px;color:var(--m);text-align:center}
 
 /* ===== v6 look & feel ===== */
-:root{--bg:#f5f7f6;--c:#fff;--t:#16231d;--m:#566860;--b:#dfe7e3;--p:#1a6b43;--p2:#e8f3ed;--a:#b45309;--r:12px;--sh:none}
-[data-theme=dark]{--bg:#0f1713;--c:#17221c;--t:#e8f0eb;--m:#9bb0a4;--b:#27382f;--p:#4cc388;--p2:#183223}
-html{font-family:'IBM Plex Sans Thai',Sarabun,system-ui,sans-serif}*:not(.pg):not(.pg *){font-family:inherit}
-body{line-height:1.55;-webkit-font-smoothing:antialiased}:focus-visible{outline:2px solid var(--p);outline-offset:2px}
+:root{--bg:#f5f7f6;--c:#fff;--t:#16231d;--m:#566860;--b:#dfe7e3;--p:#1a6b43;--p2:#e8f3ed;--a:#b45309;--r:14px;--sh:0 1px 2px #10201a08,0 10px 24px #10201a12}
+[data-theme=dark]{--bg:#0f1713;--c:#17221c;--t:#e8f0eb;--m:#9bb0a4;--b:#27382f;--p:#4cc388;--p2:#183223;--sh:0 1px 2px #0005,0 10px 24px #0007}
+html{font-family:'IBM Plex Sans Thai','Noto Sans Thai',Sarabun,-apple-system,system-ui,sans-serif}*:not(.pg):not(.pg *){font-family:inherit}
+body{font-size:15.5px;line-height:1.65;letter-spacing:.1px;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}:focus-visible{outline:2px solid var(--p);outline-offset:2px}
+h2{font-weight:700;letter-spacing:-.3px}h3{font-weight:600}
 nav a{font-weight:500;color:var(--m)}nav a:hover{background:var(--p2);color:var(--p)}nav a.on{background:var(--p2);color:var(--p);box-shadow:none;font-weight:600}.av{background:var(--p)}
 .tb{background:var(--bg);backdrop-filter:none}.card,.rl,.kpi{box-shadow:none}a.card:hover,a.kpi:hover{transform:none;border-color:var(--p);box-shadow:none}
 .b{font-weight:600}.b:hover{border-color:var(--p);color:var(--p)}.b.p,.b.p:hover{background:var(--p);box-shadow:none;color:#fff;border-color:var(--p)}.b.p:hover{filter:brightness(1.1)}[data-theme=dark] .b.p{color:#06130c}
@@ -225,7 +232,7 @@ const thm=()=>{localStorage.th=document.documentElement.dataset.theme=(localStor
 function bellPop(e){e.stopPropagation();const L=S.notifications.filter(n=>n.to_role==me.role).sort((a,b)=>a.created_at<b.created_at?1:-1).slice(0,8),m=document.createElement('div');m.className='pop';m.onclick=e=>e.stopPropagation();m.innerHTML=`<div class=ph2><b>การแจ้งเตือน</b><a href="#/notif">ดูทั้งหมด</a></div>`+(L.map(n=>`<a class="ni ${n.read?'':'un'}" href="${n.inspection_id?'#/insp/'+n.inspection_id:'#/settings'}">${h(n.text)}<small>${fmt(n.created_at)}</small></a>`).join('')||'<p class=m style="padding:14px">ไม่มีการแจ้งเตือน</p>');$('.pop')?.remove();document.body.append(m);markRead(L);document.querySelectorAll('.tb .ic>i').forEach(x=>x.remove());setTimeout(()=>document.addEventListener('click',()=>m.remove(),{once:true}),0);m.querySelectorAll('a').forEach(a=>a.onclick=()=>m.remove())}
 function cmdk(){const m=modal(`<input id=cq placeholder="ค้นหาเลขที่เอกสาร / อุปกรณ์ / โครงการ..." autocomplete=off><div id=cr></div>`),q=m.querySelector('#cq'),r=m.querySelector('#cr'),go=()=>{const s=q.value.trim(),Li=S.inspections.filter(i=>seeI(i)&&matchQ([i.doc_no,proj(i.project_id).code,proj(i.project_id).name,frm(i.form_code).s,...(i.items||[]).map(t=>t.eq?.name)].join(' '),s)).slice(0,6),Le=s?S.equipment_catalog.filter(e=>matchQ([e.name,e.model,e.pos,proj(e.project_id).code].join(' '),s)).slice(0,5):[];
 r.innerHTML=(Li.length?`<div class=m style="margin:4px 0">ใบตรวจ</div>`:'')+Li.map(i=>`<a class="card li" href="#/insp/${i.id}" onclick="closeAll()"><div class=m><b style="color:var(--t)">${h(i.doc_no)}</b>${pill(i.status)}</div><div class=m>${h(frm(i.form_code).s)} · ${h(proj(i.project_id).code)}</div></a>`).join('')+(Le.length?`<div class=m style="margin:8px 0 4px">อุปกรณ์</div>`+Le.map(e=>`<a class="card li" href="#/eq/${e.id}" onclick="closeAll()"><div class=m><b style="color:var(--t)">${h(e.name)}</b></div><div class=m>${[e.model,e.pos].filter(Boolean).map(h).join(' · ')} · ${h(proj(e.project_id).code)}</div></a>`).join(''):'')||'<p class=m>ไม่พบรายการ</p>'};q.oninput=go;go();q.focus()}
-const RVW=new WeakSet(),rvSave=()=>{try{localStorage['rv_'+I.id]=JSON.stringify(I.items.map(t=>({res:t.res,sev:t.sev,notes:t.notes,remark:t.remark})))}catch(e){}},allP=i=>{frm(I.form_code).c.forEach(([k])=>{I.items[i].res[k]='pass'});rvSave();persist();render()};
+const RVW=new WeakSet(),rvSave=()=>{try{localStorage['rv_'+I.id]=JSON.stringify(I.items.map(t=>({res:t.res,sev:t.sev,notes:t.notes,defs:t.defs,remark:t.remark})))}catch(e){}},allP=i=>{frm(I.form_code).c.forEach(([k])=>{I.items[i].res[k]='pass'});rvSave();persist();render()};
 let LP='';
 const XF={hp:'แรงม้า (hp)',len:'ยาว (m)',h:'สูง (m)',qty:'จำนวน'},XL=(f,k)=>(f.xl&&f.xl[k])||XF[k]||k;
 const ST={draft:['แบบร่าง','#64748b'],pending:['รอตรวจสอบ','#b45309'],needs_fix:['ต้องแก้ไข','#dc2626'],fix_review:['รอตรวจสอบการแก้ไข','#7c3aed'],pending_approval:['รออนุมัติ','#2563eb'],approved:['อนุมัติแล้ว','#15803d']};
@@ -363,7 +370,7 @@ return `<div class=hero style="display:flex;justify-content:space-between;align-
 const card=i=>`<a class="card li" href="#/insp/${i.id}"><div class=m><b style="color:var(--t)">${h(i.doc_no||'(ร่าง)')}</b>${pill(i.status)}</div><div>${h(frm(i.form_code).s||i.form_code)} · ${i.items?.length||0} รายการ</div><div class=m>${h(proj(i.project_id).code)} · ${fmt(i.updated_at||i.created_at)}</div><div class=prg><i style="width:${PG[i.status]}%;background:${ST[i.status][1]}"></i></div></a>`;
 /* ---------- 2 submit wizard (installer) ---------- */
 function newW(){W={id:uid(),doc_no:'',project_id:sessionStorage.pid||myProj()[0]?.id,form_code:'',status:'draft',round:1,inspect_at:'',created_by:me.id,installer_name:me.name,items:[],sigs:{},_s:0}}
-const blank=()=>({eq:{},photos:[],photos_t:[],res:{},sev:{},notes:{},ipics:[],ipics_t:[],remark:''});
+const blank=()=>({eq:{},photos:[],photos_t:[],res:{},sev:{},notes:{},defs:{},ipics:[],ipics_t:[],remark:''});
 function wizSave(){try{if(W)localStorage.wizDraft=JSON.stringify(W)}catch(e){}}
 function wizClear(){localStorage.removeItem('wizDraft')}
 function pickF(c){W.form_code=c;if(!W.items.length)W.items.push(blank());W._s=1;wizSave();render()}
@@ -404,9 +411,13 @@ function stUp(){$('#sl').innerHTML=stHtml();$('#sc').textContent=stFil(baseL()).
 function status(){if(sessionStorage.st){SF.st=sessionStorage.st;SF.n=20;sessionStorage.removeItem('st')}const L=baseL();
 return `<h2>สถานะงาน</h2><div class=flt><div class=sbar>${ic('search')}<input placeholder="ค้นหา เลขที่เอกสาร / อุปกรณ์ / ผู้ติดตั้ง" value="${h(SF.q)}" oninput="SF.q=this.value;SF.n=20;stUp()" autocomplete=off></div><select onchange="SF.pj=this.value;SF.n=20;stUp()"><option value="">ทุกโครงการ</option>${myProj().map(p=>`<option value=${p.id} ${SF.pj==p.id?'selected':''}>${h(p.code)} ${h(p.name)}</option>`).join('')}</select><select onchange="SF.fm=this.value;SF.n=20;stUp()"><option value="">ทุกฟอร์ม</option>${forms().map(f=>`<option value=${f.code} ${SF.fm==f.code?'selected':''}>${h(f.s)}</option>`).join('')}</select></div><div class=tabs>${['all',...Object.keys(ST)].map(s=>`<button class="b ${SF.st==s?'on':''}" data-st="${s}" onclick="SF.st='${s}';SF.n=20;stUp()">${s=='all'?'ทั้งหมด':ST[s][0]} (${s=='all'?L.length:L.filter(i=>i.status==s).length})</button>`).join('')}</div><div class=m style="margin:0 2px 8px">พบ <b id=sc>${stFil(L).length}</b> รายการ</div><div id=sl>${stHtml()}</div>`}
 const RES_LBL={pass:['✓ ผ่าน','#15803d'],fail:['✗ ไม่ผ่าน','#dc2626'],na:['N/A ไม่เกี่ยวข้อง','var(--m)'],obs:['👁 ข้อสังเกต','#b45309'],pending:['⏳ รอดำเนินการ','#7c3aed']};
+function defList(i,k,it,ed){const ds=(it.defs&&it.defs[k])||[];
+if(ed)return `<div class=dfl>${ds.map((d,j)=>`<div class=dfx><img src="${d.photo}" onclick="viewImg(${G.push(d.photo)-1})"><div class=dfxb><select onchange="defSet(${i},'${k}',${j},'severity',this.value)"><option value=minor ${d.severity!='major'?'selected':''}>เล็กน้อย (Minor)</option><option value=major ${d.severity=='major'?'selected':''}>ร้ายแรง (Major)</option></select><input placeholder="รายละเอียดข้อบกพร่องข้อนี้" value="${h(d.desc)}" onchange="defSet(${i},'${k}',${j},'desc',this.value)"></div><button type=button class="b sm d" onclick="defDel(${i},'${k}',${j})">🗑</button></div>`).join('')}${!ds.length?`<div class=dfreq>⚠ ต้องถ่าย/อัปโหลดรูปอย่างน้อย 1 รูปต่อ Defect — ระบบจะไม่ดึงรูปอื่นมาใส่ให้อัตโนมัติ</div>`:''}<button type=button class="b sm" onclick="defAdd(${i},'${k}')">📷 เพิ่ม Defect (ถ่าย/เลือกรูปตอนนี้)</button></div>`;
+return ds.length?`<div class=dfl>${ds.map(d=>`<div class=dfx><img src="${d.photo}" onclick="viewImg(${G.push(d.photo)-1})"><div class=dfxb><span class=m>${SEV(d.severity||'minor')}</span>${d.desc?`<div>${h(d.desc)}</div>`:''}</div></div>`).join('')}</div>`:'<div class=m>ยังไม่มีรูป Defect</div>'}
 function ckRow(i,k,l,it,ed){const v=it.res[k];
 const btns=ed?`<div><button class="pf ${v=='pass'?'ok':''}" onclick="chk(${i},'${k}','pass')">ผ่าน</button><button class="pf ${v=='fail'?'no':''}" onclick="chk(${i},'${k}','fail')">ไม่ผ่าน</button><select style="width:96px;margin:0" onchange="this.value&&chk(${i},'${k}',this.value)"><option value="">อื่นๆ…</option><option value=na ${v=='na'?'selected':''}>N/A</option><option value=obs ${v=='obs'?'selected':''}>ข้อสังเกต</option><option value=pending ${v=='pending'?'selected':''}>รอดำเนินการ</option></select></div>`:`<b style="color:${(RES_LBL[v]||['-','var(--m)'])[1]}">${(RES_LBL[v]||['-'])[0]}</b>`;
-const extra=v&&v!='pending'?(ed?`<div class=fl>${v=='fail'?`<select onchange="it_s(${i},'${k}',this.value)"><option value=minor ${it.sev[k]!='major'?'selected':''}>เล็กน้อย (Minor)</option><option value=major ${it.sev[k]=='major'?'selected':''}>ร้ายแรง (Major)</option></select>`:''}<input placeholder="${v=='fail'?'รายละเอียดข้อบกพร่อง':'หมายเหตุ/ข้อสังเกต (ไม่บังคับ)'}" value="${h(it.notes[k])}" onchange="it_n(${i},'${k}',this.value)"></div>`:(it.notes[k]?`<div class=m>${v=='fail'?SEV(it.sev[k]||'minor')+' · ':''}${h(it.notes[k])}</div>`:'')):'';
+if(v=='fail')return `<div class=ck><span>${l}</span>${btns}</div>${defList(i,k,it,ed)}`;
+const extra=v&&v!='pending'?(ed?`<div class=fl><input placeholder="หมายเหตุ/ข้อสังเกต (ไม่บังคับ)" value="${h(it.notes[k])}" onchange="it_n(${i},'${k}',this.value)"></div>`:(it.notes[k]?`<div class=m>${h(it.notes[k])}</div>`:'')):'';
 return `<div class=ck><span>${l}</span>${btns}</div>${extra}`}
 function insp(id){I=S.inspections.find(x=>x.id==id);if(!I)return deny();const f=frm(I.form_code),L=S.status_log.filter(l=>l.inspection_id==I.id).sort((a,b)=>a.created_at<b.created_at?-1:1),D=S.defects.filter(d=>d.inspection_id==I.id),open=D.filter(d=>d.status=='open'),ed=can('inspector')&&['pending','fix_review'].includes(I.status),last=L[L.length-1];
 let act='';if(ed&&!RVW.has(I)){RVW.add(I);try{(JSON.parse(localStorage['rv_'+I.id]||'null')||[]).forEach((x,i)=>I.items[i]&&Object.assign(I.items[i],x))}catch(e){}}const tot=I.items.length*f.c.length,dn=I.items.reduce((n,it)=>n+f.c.filter(([k])=>it.res?.[k]).length,0);
@@ -422,12 +433,25 @@ ${f.c.map(([k,l])=>ckRow(i,k,l,it,ed)).join('')}
 <div class=m>รูปตรวจสอบ (ไฮไลต์ · เลือกรายการตรวจของแต่ละรูป)</div>${photoBox('I',i,'ipics',!ed)}${ed?`<input placeholder="หมายเหตุ" value="${h(it.remark)}" onchange="I.items[${i}].remark=this.value;rvSave();persist()">`:it.remark?`<div class=m>หมายเหตุ: ${h(it.remark)}</div>`:''}${ed?tipBox(i,it):tipSaved(i)}</div>`).join('')}${act}${ed?`<div class=sab><div><b>ตรวจแล้ว ${dn}/${tot} ข้อ</b><div class=prg><i style="width:${tot?dn/tot*100:0}%"></i></div></div><button class="b p" onclick="document.getElementById('act').scrollIntoView({behavior:'smooth'})">สรุปผลตรวจ ${ic('cr')}</button></div>`:''}
 <div class=card><h3>ประวัติสถานะ</h3>${L.map(l=>`<div class=m>• ${fmt(l.created_at)} — ${ST[l.to_status][0]} · ${h(l.actor_name)} (${ROLES[l.actor_role]})${l.note?' · '+h(l.note):''}</div>`).join('')||'<span class=m>-</span>'}</div>`}
 const chk=(i,k,v)=>{I.items[i].res[k]=v;navigator.vibrate?.(15);const f=frm(I.form_code),left=I.items.reduce((n,it)=>n+f.c.filter(([q])=>!it.res[q]).length,0);rvSave();persist();render();if(!left)toast('ตรวจครบทุกข้อแล้ว 🎉 กดสรุปผลตรวจได้เลย','ok')},it_s=(i,k,v)=>{I.items[i].sev[k]=v;rvSave();persist()},it_n=(i,k,v)=>{I.items[i].notes[k]=v;rvSave();persist()};
+function defAdd(i,k){const f=document.createElement('input');f.type='file';f.accept='image/*';f.onchange=async()=>{if(!f.files[0])return;const bz=busy('กำลังเตรียมรูป...');let d;try{d=await comp(f.files[0])}catch(e){bz.x();return toast('อ่านรูปไม่สำเร็จ: '+e.message,'er')}bz.x();
+const push=p=>{const it=I.items[i];it.defs=it.defs||{};(it.defs[k]=it.defs[k]||[]).push({photo:p,desc:'',severity:'minor'});rvSave();persist();render()};
+annotate(d,push,()=>push(d))};f.click()}
+function defDel(i,k,j){if(!confirm('ลบ Defect รายการนี้?'))return;I.items[i].defs[k].splice(j,1);rvSave();persist();render()}
+function defSet(i,k,j,field,v){I.items[i].defs[k][j][field]=v;rvSave();persist()}
 const defNo=()=>{const pre=`FR-INS-ME-004-${proj(I.project_id).code}-`,mx=Math.max(0,...S.inspections.filter(x=>x.defect_no?.startsWith(pre)).map(x=>+x.defect_no.slice(pre.length)||0));return pre+String(mx+1).padStart(3,'0')};
 const hasDef=i=>!!(i&&(i.defect_no||(S.defects||[]).some(d=>d.inspection_id==i.id))),defNoOf=i=>i.defect_no||`FR-INS-ME-004-${proj(i.project_id).code}-${(String(i.doc_no||'').match(/(\d+)$/)||[,'001'])[1]}`;
-async function decide(){const s=sigData('sg');if(!s)return toast('กรุณาเซ็นชื่อ');const f=frm(I.form_code);let fails=0;
-for(const[i,it]of I.items.entries())for(const[k,l]of f.c){if(!it.res[k])return toast(`ยังไม่ได้ตรวจ: #${i+1} ${l}`);if(it.res[k]=='pending')return toast(`ยังรอดำเนินการ (Pending): #${i+1} ${l}`);const id=`${I.id}:${i}:${k}`,ex=S.defects.find(d=>d.id==id);
-if(it.res[k]=='fail'){fails++;await save('defects',{...(ex||{created_at:now()}),id,inspection_id:I.id,project_id:I.project_id,form_code:I.form_code,item_seq:i+1,equipment_name:it.eq.name,check_key:k,check_label:l,severity:it.sev[k]||'minor',description:it.notes[k]||'',photo_before:((it.ipics_t||[]).indexOf(k)>=0?it.ipics[(it.ipics_t||[]).indexOf(k)]:null)||((it.photos_t||[]).indexOf(k)>=0?it.photos[(it.photos_t||[]).indexOf(k)]:null)||it.ipics[0]||it.photos[0]||null,photo_after:null,status:'open',round:I.round})}
-else if(ex&&ex.status=='open')await save('defects',{...ex,status:'closed',fixed_at:now()})}
+async function decide(){const s=sigData('sg');if(!s)return toast('กรุณาเซ็นชื่อ');const f=frm(I.form_code);
+for(const[i,it]of I.items.entries())for(const[k,l]of f.c){
+if(!it.res[k])return toast(`ยังไม่ได้ตรวจ: #${i+1} ${l}`);
+if(it.res[k]=='pending')return toast(`ยังรอดำเนินการ (Pending): #${i+1} ${l}`);
+if(it.res[k]=='fail'){const ds=(it.defs&&it.defs[k])||[];if(!ds.length)return toast(`กรุณาเพิ่ม Defect พร้อมถ่าย/อัปโหลดรูปอย่างน้อย 1 รายการ: #${i+1} ${l}`);if(ds.some(d=>!d.photo))return toast(`มี Defect ที่ยังไม่ได้อัปโหลดรูป: #${i+1} ${l}`)}}
+let fails=0;
+for(const[i,it]of I.items.entries())for(const[k,l]of f.c){const prev=S.defects.filter(d=>d.inspection_id==I.id&&d.item_seq==i+1&&d.check_key==k);
+if(it.res[k]=='fail'){fails++;const ds=it.defs[k];
+for(let j=0;j<ds.length;j++){const id=`${I.id}:${i}:${k}:${j}`,ex=S.defects.find(d=>d.id==id);
+await save('defects',{...(ex||{created_at:now()}),id,inspection_id:I.id,project_id:I.project_id,form_code:I.form_code,item_seq:i+1,equipment_name:it.eq.name,check_key:k,check_label:l,severity:ds[j].severity||'minor',description:ds[j].desc||'',photo_before:ds[j].photo,photo_after:(ex&&ex.photo_after)||null,status:(ex&&ex.status)||'open',round:I.round})}
+for(const d of prev){const jn=+((d.id.match(/:(\d+)$/)||[])[1]??-1);if(jn>=ds.length&&d.status=='open')await save('defects',{...d,status:'closed',fixed_at:now()})}}
+else for(const d of prev.filter(d=>d.status=='open'))await save('defects',{...d,status:'closed',fixed_at:now()})}
 I.inspector_name=me.name;if(fails){I.defect_no=I.defect_no||defNo();await mv(I,'needs_fix',`พบข้อบกพร่อง ${fails} รายการ`,'inspector',s)}else{await mv(I,'pending_approval','ผ่านทั้งหมด','inspector',s);celeb('ผ่านการตรวจครบทุกรายการ','ส่งให้ผู้อนุมัติแล้ว')};localStorage.removeItem('rv_'+I.id);render()}
 async function defPh(id){const f=document.createElement('input');f.type='file';f.accept='image/*';f.onchange=async()=>{const d=S.defects.find(x=>x.id==id);d.photo_after=await comp(f.files[0]);await save('defects',d);render()};f.click()}
 async function defNote(id,v){const d=S.defects.find(x=>x.id==id);d.fix_note=v;await save('defects',d)}
