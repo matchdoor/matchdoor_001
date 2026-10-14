@@ -411,6 +411,7 @@ main.pgin,.pop,.toast,.sheet,.modal{animation:none!important}
 [data-theme=dark] #actb{background:#3a2a10;color:#ffd9a0}
 #actb span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #actb button{border:0;border-radius:10px;background:#e78623;color:#fff;font:inherit;padding:8px 12px;cursor:pointer;white-space:nowrap}
+.pt.sel{outline:4px solid #dc2626;outline-offset:-4px;border-radius:10px}.pt.sel img{opacity:.55}
 </style></head><body><div id="ldb"></div><div id="app"><div class="splash"><img id="sp" alt=""><div class="spin"></div></div></div>
 <button id="totop" class="totop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="เลื่อนขึ้นบนสุด" title="ขึ้นบนสุด">↑</button>
 <script>
@@ -525,7 +526,7 @@ const up=()=>{const n=arr(o,i,k).length;m.querySelector('#cn').textContent=`ถ�
 m.querySelector('#sh').onclick=()=>{if(!v.videoWidth)return;const q=Math.min(1,1280/Math.max(v.videoWidth,v.videoHeight)),c=document.createElement('canvas');c.width=v.videoWidth*q;c.height=v.videoHeight*q;c.getContext('2d').drawImage(v,0,0,c.width,c.height);pushP(o,i,k,c.toDataURL('image/jpeg',.78));navigator.vibrate?.(20);v.style.opacity=.3;setTimeout(()=>v.style.opacity=1,90);up()};
 m.querySelector('#dn').onclick=()=>{const n=arr(o,i,k).length-n0;m.remove();persist();render();if(n)toast(`ถ่าย ${n} รูปแล้ว — เลือกรายการตรวจของแต่ละรูปจาก Dropdown ได้เลย`)}}
 const pdfImgs=async f=>{await lib('pdfjs');pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';const d=await pdfjsLib.getDocument({data:await f.arrayBuffer()}).promise,r=[];for(let n=1;n<=Math.min(d.numPages,S.settings.max_photos);n++){const p=await d.getPage(n),v0=p.getViewport({scale:1}),v=p.getViewport({scale:1800/Math.max(v0.width,v0.height)}),c=document.createElement('canvas');c.width=v.width;c.height=v.height;await p.render({canvasContext:c.getContext('2d'),viewport:v}).promise;r.push(c.toDataURL('image/jpeg',.85))}return r};
-function thumb(o,i,k,j,ro){modal(`<img src="${arr(o,i,k)[j]}" style="width:100%;border-radius:8px">${ro?'':`<div class=row><button class=b onclick="closeAll();annotate(arr('${o}',${i},'${k}')[${j}],u=>{arr('${o}',${i},'${k}')[${j}]=u;persist();render()})">✏️ วาด / ไฮไลต์ / ข้อความ</button><button class="b d" onclick="${k=='dwg'?'':`tags('${o}',${i},'${k}').splice(${j},1);`}arr('${o}',${i},'${k}').splice(${j},1);persist();closeAll();render()">🗑 ลบ</button></div>`}`)}
+function thumb(o,i,k,j,ro){modal(`<img src="${arr(o,i,k)[j]}" style="width:100%;border-radius:8px">${ro?'':`<div class=row><button class=b onclick="closeAll();annotate(arr('${o}',${i},'${k}')[${j}],u=>{arr('${o}',${i},'${k}')[${j}]=u;persist();render()})">✏️ วาด / ไฮไลต์ / ข้อความ</button><button class="b d" onclick="if(!confirm('ลบรูปนี้? ลบแล้วกู้คืนไม่ได้'))return;${k=='dwg'?'':`tags('${o}',${i},'${k}').splice(${j},1);`}arr('${o}',${i},'${k}').splice(${j},1);persist();closeAll();render()">🗑 ลบ</button></div>`}`)}
 const G=[],viewImg=i=>modal(`<img src="${G[i]}" style="width:100%;border-radius:8px">`);
 const strip=(a,t,f)=>`<div class="${t&&f?'tg ro':'ph lg'}">${(a||[]).map((s,j)=>t&&f?`<div class=pt><img loading=lazy decoding=async src="${s}" onclick="viewImg(${G.push(s)-1})"><small class=m>${h((f.c.find(c=>c[0]==t[j])||[])[1]||'ไม่ระบุรายการตรวจ')}</small></div>`:`<img loading=lazy decoding=async src="${s}" onclick="viewImg(${G.push(s)-1})">`).join('')||'<span class=m>ไม่มีรูป</span>'}</div>`;
 const deny=()=>`<div class=card>บทบาทของคุณไม่มีสิทธิ์ใช้งานส่วนนี้</div>`;
@@ -980,4 +981,24 @@ function banner(){const old=document.getElementById('actb');if(!me||!document.qu
 document.addEventListener('click',e=>{if(e.target.closest('.pop .ni[href^="#/insp/"]'))AS=1});
 addEventListener('hashchange',()=>{setTimeout(banner,200);if(AS)scrollAct()});
 setInterval(banner,2500);setTimeout(banner,800)})();
+
+/* ===== v8 เฟส A (ต่อ): ลบรูปหลายรายการ · Dropdown จากฐานข้อมูล · เติมข้อมูลอุปกรณ์เดิมอัตโนมัติ ===== */
+(function(){const DM={};
+window.pbSel=(o,i,k,on)=>{DM[o+i+k]=on?[]:null;render()};
+window.pbTog=(o,i,k,j,el)=>{const a=DM[o+i+k]||[],x=a.indexOf(j);x<0?a.push(j):a.splice(x,1);DM[o+i+k]=a;const b=document.getElementById('pbn'+o+i+k);if(b)b.textContent=a.length;el.closest('.pt').classList.toggle('sel',x<0)};
+window.pbDel=(o,i,k)=>{const a=(DM[o+i+k]||[]).slice().sort((x,y)=>y-x);if(!a.length)return toast('ยังไม่ได้เลือกรูป');if(!confirm('ลบรูปที่เลือก '+a.length+' รูป? ลบแล้วกู้คืนไม่ได้'))return;a.forEach(j=>{if(k!='dwg')tags(o,i,k).splice(j,1);arr(o,i,k).splice(j,1)});DM[o+i+k]=null;persist();render()};
+const _pb=photoBox;
+photoBox=function(o,i,k,ro){const key=o+i+k,a=arr(o,i,k);if(ro)return _pb(o,i,k,ro);
+ if(DM[key])return `<div class=m style="margin:6px 0">แตะรูปเพื่อเลือกลบ (รูปที่เลือกมีกรอบแดง)</div><div class=ph>${a.map((s,j)=>`<div class="pt${DM[key].includes(j)?' sel':''}"><img src="${s}" onclick="pbTog('${o}',${i},'${k}',${j},this)"></div>`).join('')}</div><div class=row><button type=button class="b d" onclick="pbDel('${o}',${i},'${k}')">🗑 ลบที่เลือก (<span id="pbn${key}">${DM[key].length}</span>)</button><button type=button class=b onclick="pbSel('${o}',${i},'${k}',false)">ยกเลิก</button></div>`;
+ return _pb(o,i,k,ro)+(a.length>1?`<button type=button class=b style="margin-top:6px" onclick="pbSel('${o}',${i},'${k}',true)">☑️ เลือกลบหลายรูป</button>`:'')};
+const uniq=a=>[...new Set(a.filter(Boolean))],cx=()=>location.hash.startsWith('#/new')?W:I;
+function dl(id,v){let d=document.getElementById(id);if(!d){d=document.createElement('datalist');d.id=id;document.body.append(d)}const k=v.length+':'+v[0]+v[v.length-1];if(d.dataset.k!=k){d.dataset.k=k;d.innerHTML=v.slice(0,400).map(x=>`<option value="${h(x)}">`).join('')}}
+document.addEventListener('focusin',e=>{const t=e.target;if(t.tagName!='INPUT'||t.getAttribute('list'))return;
+ const m=(t.getAttribute('onchange')||'').match(/^eq\(\d+,'(name|model|pos|drawing)'/);
+ if(m){const c=cx()||{};let L=S.equipment_catalog.filter(x=>(!c.project_id||x.project_id==c.project_id)&&(!c.form_code||x.form_code==c.form_code));if(!L.length)L=S.equipment_catalog;L=L.slice().sort((a,b)=>(b.use_count||0)-(a.use_count||0));dl('dl_eq_'+m[1],uniq(L.map(x=>x[m[1]])));t.setAttribute('list','dl_eq_'+m[1]);return}
+ if(/ค้นหา/.test(t.getAttribute('placeholder')||'')||t.id=='cq'){dl('dl_search',uniq([...S.projects.map(x=>x.code),...S.projects.map(x=>x.name),...S.equipment_catalog.map(x=>x.name),...S.inspections.map(x=>x.doc_no)]));t.setAttribute('list','dl_search')}});
+document.addEventListener('change',e=>{const t=e.target,m=((t.getAttribute&&t.getAttribute('onchange'))||'').match(/^eq\((\d+),'name'/);if(!m)return;const i=+m[1],c=cx();if(!c||!c.items||!c.items[i])return;
+ const r=S.equipment_catalog.filter(x=>x.name==t.value&&(!c.project_id||x.project_id==c.project_id)).sort((a,b)=>(b.use_count||0)-(a.use_count||0))[0];if(!r)return;
+ let ch=0;['model','pos','drawing'].forEach(k=>{if(r[k]&&!c.items[i].eq[k]){eq(i,k,r[k]);ch=1}});if(ch){persist();render();toast('เติมรุ่น/ตำแหน่ง/แบบ จากรายการเดิมแล้ว')}});
+})();
 </script></body></html>
