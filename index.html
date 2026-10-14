@@ -1001,4 +1001,16 @@ document.addEventListener('change',e=>{const t=e.target,m=((t.getAttribute&&t.ge
  const r=S.equipment_catalog.filter(x=>x.name==t.value&&(!c.project_id||x.project_id==c.project_id)).sort((a,b)=>(b.use_count||0)-(a.use_count||0))[0];if(!r)return;
  let ch=0;['model','pos','drawing'].forEach(k=>{if(r[k]&&!c.items[i].eq[k]){eq(i,k,r[k]);ch=1}});if(ch){persist();render();toast('เติมรุ่น/ตำแหน่ง/แบบ จากรายการเดิมแล้ว')}});
 })();
+
+/* ===== v8 เฟส B: ค้นหารวมครอบคลุม Defect / วิธีแก้ไข / คลังความรู้ ===== */
+(function(){const _ck=cmdk;
+cmdk=function(){_ck();const q=document.querySelector('#cq'),r=document.querySelector('#cr');if(!q||!r)return;const base=q.oninput;
+ const ins=id=>S.inspections.find(i=>i.id==id),
+ row=(id,a,b)=>`<a class="card li" href="#/insp/${id}" onclick="closeAll()"><div class=m><b style="color:var(--t)">${h(a)}</b></div><div class=m>${h(b)}</div></a>`;
+ const ex=()=>{const s=q.value.trim();if(!s)return;
+  const D=S.defects.filter(d=>{const i=ins(d.inspection_id);return i&&seeI(i)&&matchQ([d.equipment_name,d.check_label,d.description,d.fix_note,d.inspector_comment,i.doc_no].join(' '),s)}).slice(0,6),
+  K=S.kb_tips.filter(t=>{const i=ins(t.inspection_id);return i&&seeI(i)&&matchQ([t.equipment_name,t.note].join(' '),s)}).slice(0,4);
+  if(!D.length&&!K.length)return;if(r.textContent.trim()=='ไม่พบรายการ')r.innerHTML='';
+  r.insertAdjacentHTML('beforeend',(D.length?`<div class=m style="margin:8px 0 4px">Defect / วิธีแก้ไข</div>`+D.map(d=>row(d.inspection_id,(d.equipment_name||'')+' · '+(d.check_label||''),(d.fix_note||d.description||'').slice(0,90))).join(''):'')+(K.length?`<div class=m style="margin:8px 0 4px">คลังความรู้</div>`+K.map(t=>row(t.inspection_id,t.equipment_name||'',(t.note||'').slice(0,90))).join(''):''))};
+ q.oninput=()=>{base();ex()}}})();
 </script></body></html>
