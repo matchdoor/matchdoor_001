@@ -396,11 +396,7 @@ a.b{text-decoration:none}
 .ih-no{word-break:normal;overflow-wrap:anywhere}
 .kpi::after{opacity:.05}
 @media(max-width:860px){.ih-no{font-size:var(--fs-title)}}
-.totop{position:fixed;right:16px;bottom:calc(var(--bbh,0px) + 16px + env(safe-area-inset-bottom));width:44px;height:44px;border-radius:50%;border:1px solid var(--b);background:var(--c);color:var(--t);box-shadow:var(--shl,0 4px 16px #0003);display:flex;align-items:center;justify-content:center;font-size:20px;line-height:1;cursor:pointer;z-index:39;opacity:0;visibility:hidden;transform:translateY(8px);transition:opacity .2s,transform .2s,visibility .2s}
-.totop.show{opacity:1;visibility:visible;transform:translateY(0)}
-@media(max-width:860px){.totop{right:14px}}
 </style></head><body><div id="ldb"></div><div id="app"><div class="splash"><img id="sp" alt=""><div class="spin"></div></div></div>
-<button id="totop" class="totop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="เลื่อนขึ้นบนสุด" title="ขึ้นบนสุด">↑</button>
 <script>
 /* ===== ใส่ค่า Supabase ที่นี่ (Project Settings → API) หรือกรอกในหน้าเว็บครั้งแรก ===== */
 const SHOW_BYPASS=false,SHOW_HELP=false; /* เปลี่ยนเป็น true เพื่อแสดงปุ่ม Bypass / คำแนะนำ Login อีกครั้ง */
@@ -950,5 +946,4 @@ return[cv,...pg(a.drawings,'แบบที่ผู้แจ้งทำเค�
 boot();
 setTimeout(()=>{if(navigator.connection?.saveData)return;(window.requestIdleCallback||setTimeout)(()=>['pdf','zip'].forEach(k=>lib(k).catch(()=>{})))},5000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&sb&&me&&Date.now()-LAST>60000)bgRefresh()});
-(function(){var btn=document.getElementById('totop');if(!btn)return;var onSc=function(){btn.classList.toggle('show',(window.scrollY||document.documentElement.scrollTop||0)>360)};window.addEventListener('scroll',onSc,{passive:true});onSc()})();
 </script></body></html>
