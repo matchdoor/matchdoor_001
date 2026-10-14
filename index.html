@@ -1043,4 +1043,34 @@ window.impGo=async()=>{const pid=$('#imp').value;if(!sb)return toast('ต้อ�
  const bz=busy('กำลังนำเข้า...');let n=0;try{for(let i=0;i<IR.length;i+=200){const{data,error}=await sb.rpc('import_equipment',{p_project:pid,p_rows:IR.slice(i,i+200)});if(error)throw error;n+=data||0}
   await loadAll(['equipment_catalog']);IR=[];$('#impv').innerHTML=`<p><b>นำเข้าสำเร็จ ${n} รายการ</b> — เลือกได้ใน Dropdown ตอนส่งตรวจ</p>`}catch(e){toast('นำเข้าไม่สำเร็จ: '+e.message)}bz.x()};
 })();
+
+/* ===== v8 เฟส D (ต่อ): แนบแบบจากคลังกับใบตรวจ + วิดีโอหลักฐาน (ไม่เข้า PDF) ===== */
+(function(){
+const fu=p=>!p?'':/^https?:/.test(p)?p:sb.storage.from('qc-files').getPublicUrl(p).data.publicUrl,C={},
+can=()=>!!(me&&I&&(['admin','inspector','approver'].includes(me.role)||I.created_by==me.id)),
+pg=t=>[...new Set(t.split(',').flatMap(x=>{const m=x.trim().match(/^(\d+)(?:-(\d+))?$/);if(!m)return[];const a=+m[1],b=+(m[2]||m[1]);return Array.from({length:Math.min(Math.max(b-a+1,0),50)},(_,i)=>a+i)}))].sort((a,b)=>a-b),
+cc=()=>C[I.id]||(C[I.id]={d:[],v:[]});
+function draw(){const c=I&&C[I.id],a=document.getElementById('idwl'),b=document.getElementById('evl');if(!c||!a||!b)return;
+ if(c.err){a.innerHTML=b.innerHTML='<p class=m>ยังใช้ส่วนนี้ไม่ได้ — ต้องรัน database.sql v8 ใน Supabase ก่อน</p>';return}
+ const dl=S.drawing_library||[];
+ a.innerHTML=c.d.map(x=>{const d=dl.find(y=>y.id==x.drawing_id)||{},ps=x.pages||[];return `<div class=ck><span><b>${h(d.code||'?')}</b> ${h(d.title||'')}<br><span class=m>${ps.length?'หน้า '+ps.join(', '):'ทั้งไฟล์'}</span></span><span><a class=pf href="${fu(d.file_path)}${ps[0]?'#page='+ps[0]:''}" target=_blank rel=noopener>เปิด</a>${can()?` <button class=pf onclick="idwDel('${x.id}')">ลบ</button>`:''}</span></div>`}).join('')||'<p class=m>ยังไม่ได้แนบแบบ</p>';
+ b.innerHTML=c.v.map(x=>`<div class=ck><span>🎬 ${h(x.caption||'วิดีโอ')}${x.item_seq?` <span class=m>· อุปกรณ์ #${x.item_seq}</span>`:''}<br><span class=m>${fmt(x.created_at)}</span></span><span><button class=pf onclick="evPlay('${x.id}')">ดู</button>${can()?` <button class=pf onclick="evDel('${x.id}')">ลบ</button>`:''}</span></div>`).join('')||'<p class=m>ยังไม่มีวิดีโอ</p>'}
+async function load(){const id=I&&I.id;if(!id||!sb)return;if(!C[id]){const[a,b]=await Promise.all([sb.from('inspection_drawings').select('*').eq('inspection_id',id),sb.from('evidence_files').select('*').eq('inspection_id',id).eq('kind','video').order('created_at')]);C[id]={d:a.data||[],v:b.data||[],err:a.error||b.error}}draw()}
+const _i=insp;
+insp=function(id){const r=_i(id);if(typeof r!='string'||!sb||!I||!I.id)return r;setTimeout(load,0);
+ return r+`<div class=card><h3>📐 แบบที่แนบ</h3><div id=idwl class=lst></div>${can()?'<button type=button class=b onclick="idwAdd()">＋ แนบแบบจากคลัง</button>':''}</div><div class=card><h3>🎬 วิดีโอหลักฐาน</h3><div class=m>เก็บในคลังและเปิดดูจากใบตรวจ · ไม่แสดงในเอกสาร PDF อัตโนมัติ</div><div id=evl class=lst></div>${can()?'<button type=button class=b onclick="evAdd()">＋ อัปโหลดวิดีโอ</button>':''}</div>`};
+window.idwAdd=()=>{const dl=(S.drawing_library||[]).filter(d=>d.project_id==I.project_id);if(!dl.length)return toast('ยังไม่มีแบบของโครงการนี้ในคลัง (ตั้งค่า → คลังแบบ)');
+ const m=modal(`<h3>แนบแบบจากคลัง</h3><input id=idq placeholder="ค้นหารหัส / ชื่อแบบ" autocomplete=off><div id=idr class=lst></div>`),q=m.querySelector('#idq'),r=m.querySelector('#idr');
+ const go=()=>{r.innerHTML=dl.filter(d=>matchQ(d.code+' '+d.title,q.value)).slice(0,20).map(d=>`<div class=ck><span><b>${h(d.code)}</b> ${h(d.title)}</span><span><input id="pg_${d.id}" placeholder="หน้า เช่น 1,3-5" style="width:120px"> <button type=button class=pf onclick="idwSave('${d.id}')">แนบ</button></span></div>`).join('')||'<p class=m>ไม่พบแบบ</p>'};q.oninput=go;go()};
+window.idwSave=async did=>{const p=pg(document.getElementById('pg_'+did).value),{data,error}=await sb.from('inspection_drawings').upsert({inspection_id:I.id,drawing_id:did,pages:p},{onConflict:'inspection_id,drawing_id'}).select().single();
+ if(error)return toast('แนบไม่สำเร็จ: '+error.message);const c=cc();c.d=c.d.filter(x=>x.drawing_id!=did);c.d.push(data);draw();document.querySelector('.ov')?.remove();toast('แนบแบบแล้ว')};
+window.idwDel=async id=>{if(!confirm('เอาแบบนี้ออกจากใบตรวจ? (ไฟล์ในคลังยังอยู่)'))return;const{error}=await sb.from('inspection_drawings').delete().eq('id',id);if(error)return toast('ลบไม่สำเร็จ: '+error.message);const c=cc();c.d=c.d.filter(x=>x.id!=id);draw()};
+window.evAdd=()=>modal(`<h3>อัปโหลดวิดีโอหลักฐาน</h3><label>คำอธิบาย</label><input id=evc placeholder="เช่น ทดสอบเดินเครื่องเปล่า" autocomplete=off><label>อุปกรณ์ที่เกี่ยวข้อง (ไม่บังคับ)</label><select id=evi><option value="">— ทั้งใบตรวจ —</option>${I.items.map((t,i)=>`<option value=${i+1}>#${i+1} ${h(t.eq.name||'')}</option>`).join('')}</select><label>ไฟล์วิดีโอ (ไม่เกิน 50 MB)</label><input id=evf type=file accept="video/*"><button type=button class="b p" style="margin-top:8px;width:100%" onclick="evUp()">อัปโหลด</button>`);
+window.evUp=async()=>{const f=$('#evf').files[0];if(!f)return toast('เลือกไฟล์วิดีโอก่อน');if(f.size>50e6)return toast('ไฟล์ใหญ่เกิน 50 MB — ตัดหรือบีบอัดก่อนอัปโหลด');const bz=busy('กำลังอัปโหลดวิดีโอ...');
+ try{const ext=((f.name.split('.').pop()||'mp4').toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,5))||'mp4',p='videos/'+uid()+'.'+ext,u=await sb.storage.from('qc-files').upload(p,f,{contentType:f.type||'video/mp4'});if(u.error)throw u.error;
+  const{data,error}=await sb.from('evidence_files').insert({inspection_id:I.id,item_seq:+$('#evi').value||null,kind:'video',file_path:p,caption:$('#evc').value.trim()||null,in_pdf:false,created_by:me.id}).select().single();if(error)throw error;
+  cc().v.push(data);draw();document.querySelector('.ov')?.remove();toast('อัปโหลดวิดีโอแล้ว')}catch(e){toast('อัปโหลดไม่สำเร็จ: '+e.message)}bz.x()};
+window.evPlay=id=>{const x=cc().v.find(y=>y.id==id);if(x)modal(`<video src="${fu(x.file_path)}" controls playsinline preload=metadata style="width:100%;border-radius:8px"></video>`)};
+window.evDel=async id=>{if(!confirm('ลบวิดีโอนี้ออกจากใบตรวจ? ลบแล้วกู้คืนไม่ได้'))return;const{error}=await sb.from('evidence_files').delete().eq('id',id);if(error)return toast('ลบไม่สำเร็จ: '+error.message);const c=cc();c.v=c.v.filter(x=>x.id!=id);draw()};
+})();
 </script></body></html>
