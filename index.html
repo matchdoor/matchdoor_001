@@ -1058,12 +1058,12 @@ sub=x=>[x.category&&'หมวด '+x.category,x.model,x.hp&&x.hp+' HP',x.qty&&'
 more=(n,tot,js)=>tot>n?`<button type=button class=b style="width:100%;margin-top:8px" onclick="${js}">แสดงเพิ่ม (เหลือ ${tot-n})</button>`:'',
 EQS=window.EQS={p:'',c:'',f:'',q:'',n:PG,sel:0,ids:new Set()},DWS=window.DWS={p:'',t:'',q:'',n:PG};
 /* ---- เชื่อมเข้าหน้า "เอกสาร" ---- */
-const _d=docs,TB=[['eqlib','📦 คลังอุปกรณ์'],['dwg','📐 คลังแบบ']],
-tb=()=>TB.map(([k,l])=>`<button class="b ${DF.tab==k?'on':''}" data-dt=${k} onclick="DF.tab='${k}';render()">${l}</button>`).join('');
-docs=function(){const mine=DF.tab=='eqlib'||DF.tab=='dwg',t=DF.tab;if(mine)DF.tab='doc';let r=_d.apply(this,arguments);DF.tab=t;
+const _d=docs,TB=[['eqlib','📦 คลังอุปกรณ์'],['dwg','📐 คลังแบบ'],['zip','🗂️ ส่งออกโครงการ']],
+tb=()=>TB.filter(([k])=>k!='zip'||ed()).map(([k,l])=>`<button class="b ${DF.tab==k?'on':''}" data-dt=${k} onclick="DF.tab='${k}';render()">${l}</button>`).join('');
+docs=function(){const mine=['eqlib','dwg','zip'].includes(DF.tab),t=DF.tab;if(mine)DF.tab='doc';let r=_d.apply(this,arguments);DF.tab=t;
  if(!mine)return r.replace('</div><div class=chips id=kc',tb()+'</div><div class=chips id=kc');
  const T=(r.match(/<div class=tabs>[\s\S]*?<\/div>/)||['<div class=tabs>'])[0].replace(/dUp\(\)/g,'render()').replace(/ on"/g,'"').replace('</div>',tb()+'</div>');
- return `<h2>เอกสาร</h2>${T}${t=='eqlib'?eqView():dwView()}`};
+ return `<h2>เอกสาร</h2>${T}${t=='eqlib'?eqView():t=='zip'?zipView():dwView()}`};
 window.libPage=()=>{DF.tab=sessionStorage.ltab=='dl'?'dwg':'eqlib';return docs()};
 /* ---- คลังอุปกรณ์ ---- */
 const sp=(id,l)=>`<select onchange="${id}">`;
@@ -1138,6 +1138,25 @@ window.prevPick=()=>{const L=S.inspections.filter(x=>x.project_id==W.project_id&
 window.prevOpen=id=>{const x=S.inspections.find(y=>y.id==id);if(!x)return;closeAll();modal(`<h3>${h(x.doc_no||'')} — เลือกรายการที่จะคัดลอก</h3><div style="max-height:55vh;overflow:auto">${x.items.map((t,i)=>`<label class=ck style="padding:8px 2px;display:flex;gap:8px;align-items:center"><input type=checkbox class=pvc value=${i} checked style="width:auto;flex:none"><span style="flex:1">${h(t.eq?.name||'')}<br><span class=m>${h([t.eq?.model,t.eq?.pos].filter(Boolean).join(' · '))}</span></span></label>`).join('')}</div><button type=button class="b p" style="width:100%;margin-top:8px" onclick="prevGo('${id}')">คัดลอกรายการที่เลือก</button>`)};
 window.prevGo=id=>{const x=S.inspections.find(y=>y.id==id),ix=[...document.querySelectorAll('.pvc:checked')].map(c=>+c.value);if(!x||!ix.length)return toast('ยังไม่ได้เลือกรายการ');closeAll();addEqs(ix.map(i=>JSON.parse(JSON.stringify(x.items[i].eq||{}))))};
 const _w=wiz;wiz=function(){const r=_w.apply(this,arguments);if(typeof r!='string'||!W||W._s!=1)return r;const k=r.indexOf('</div></div>',r.indexOf('class=stp'));if(k<0)return r;return r.slice(0,k+12)+`<div class=card style="padding:10px"><div class=row><button type=button class=b onclick="eqPick(-1)">🔎 เลือกอุปกรณ์หลายรายการจากคลัง</button><button type=button class=b onclick="prevPick()">📋 คัดลอกจากใบตรวจเดิม</button></div></div>`+r.slice(k+12)};
+
+/* ---- ส่งออกทั้งโครงการเป็น Zip (รวมไฟล์ที่มีอยู่แล้ว ไม่สร้างข้อมูลซ้ำ) ---- */
+function zipView(){if(!ed())return '<div class=card>เฉพาะแอดมินและผู้ตรวจสอบ</div>';const c=(i,l,on)=>`<label class=ck style="display:flex;gap:8px;align-items:center;padding:6px 0"><input type=checkbox id=zk${i} ${on?'checked':''} style="width:auto;flex:none"><span style="flex:1">${l}</span></label>`;
+ return `<div class=card><h3>ส่งออกทั้งโครงการ (Zip)</h3><div class=m>รวมไฟล์ที่มีอยู่แล้วเป็นไฟล์เดียว แยกโฟลเดอร์ให้ ไม่สร้างข้อมูลหรือไฟล์ซ้ำในระบบ</div><label>โครงการ</label><select id=zp>${myProj().map(p=>op(p.id,p.code+' · '+p.name,'')).join('')}</select>${c(1,'PDF เอกสารตรวจงาน / Defect / As-built',1)}${c(2,'แบบในคลัง (PDF)',1)}${c(3,'รายการอุปกรณ์ (CSV เปิดใน Excel ได้)',1)}${c(4,'รายการ Defect (CSV)',1)}${c(5,'วิดีโอหลักฐาน (ไฟล์ใหญ่ ใช้เวลานาน)',0)}<button type=button class="b p" style="width:100%;margin-top:10px" onclick="zipGo()">สร้างไฟล์ Zip</button><div id=zst class=m style="margin-top:8px"></div></div>`}
+window.zipGo=async()=>{const pid=$('#zp').value,P=proj(pid),st=$('#zst'),ck=i=>$('#zk'+i).checked;if(!pid)return;st.textContent='กำลังเตรียม...';
+ const sn=t=>String(t||'').replace(/[\\/:*?"<>|]/g,'_').trim().slice(0,80),used=new Set(),nm=p=>{let q=p,k=1;while(used.has(q)){k++;q=p.replace(/(\.\w+)?$/,' ('+k+')$1')}used.add(q);return q},
+ csv=(H,R)=>'\ufeff'+[H,...R].map(r=>r.map(c=>`"${String(c??'').replace(/"/g,'""')}"`).join(',')).join('\r\n');
+ try{await lib('zip');const Z=new JSZip(),log=[],ins=S.inspections.filter(i=>i.project_id==pid),ids=new Set(ins.map(i=>i.id)),F=[],dn=id=>(ins.find(i=>i.id==id)||{}).doc_no||'';
+  if(ck(1)){const dd=(S.documents||[]).filter(d=>ids.has(d.inspection_id)&&d.file_path);dd.forEach(d=>F.push({p:({inspection:'เอกสารตรวจงาน',defect:'Defect',asbuilt:'As-built'}[d.kind]||'เอกสารอื่น')+'/'+sn(d.doc_no)+'.pdf',u:d.file_path}));
+   const no=ins.filter(i=>i.status=='approved'&&!dd.some(d=>d.inspection_id==i.id&&d.kind=='inspection'));if(no.length)log.push('ใบตรวจที่อนุมัติแล้วแต่ยังไม่มี PDF ในระบบ (เปิดดู PDF ในระบบก่อนจึงจะถูกบันทึก): '+no.map(i=>i.doc_no).join(', '))}
+  if(ck(2))(S.drawing_library||[]).filter(d=>d.project_id==pid).forEach(d=>F.push({p:'คลังแบบ/'+sn(WT[d.work_type]||'อื่นๆ')+'/'+sn(d.code+' '+d.title)+'.pdf',u:fu(d.file_path)}));
+  if(ck(5)&&sb&&ids.size){const{data,error}=await sb.from('evidence_files').select('*').in('inspection_id',[...ids]).eq('kind','video');if(error)log.push('อ่านรายการวิดีโอไม่ได้: '+error.message);(data||[]).forEach(v=>F.push({p:'วิดีโอ/'+sn(dn(v.inspection_id))+'_'+sn(v.caption||String(v.id).slice(0,6))+'.'+(String(v.file_path).split('.').pop()||'mp4'),u:fu(v.file_path)}))}
+  let n=0,bad=0;for(const f of F){n++;st.textContent=`กำลังดึงไฟล์ ${n}/${F.length} …`;try{const r=await fetch(f.u);if(!r.ok)throw new Error('HTTP '+r.status);Z.file(nm(f.p),await r.blob())}catch(e){bad++;log.push('ดึงไฟล์ไม่ได้: '+f.p+' ('+e.message+')')}}
+  if(ck(3))Z.file('รายการอุปกรณ์.csv',csv(['หมวด','รหัสในแบบ','รายการ','ขนาด/รายละเอียด','รุ่น','ตำแหน่ง','เลขที่แบบ','HP','kW','จำนวน','ฟอร์ม','หมายเหตุ'],S.equipment_catalog.filter(x=>x.project_id==pid).sort((a,b)=>nat(a.item_code,b.item_code)).map(x=>[x.category,x.item_code,x.name,x.size_spec,x.model,x.pos,x.drawing,x.hp,x.kw,x.qty,x.form_code?fn(x.form_code):'',x.note])));
+  if(ck(4))Z.file('รายการ_Defect.csv',csv(['เลขที่ใบตรวจ','อุปกรณ์','หัวข้อตรวจ','ความรุนแรง','รายละเอียด','วิธีแก้ไข','สถานะ','รอบ','วันที่พบ','วันที่แก้'],S.defects.filter(d=>d.project_id==pid||ids.has(d.inspection_id)).map(d=>[dn(d.inspection_id),d.equipment_name,d.check_label,d.severity,d.description,d.fix_note,d.status=='closed'?'ปิดแล้ว':'เปิดอยู่',d.round,d.created_at&&String(d.created_at).slice(0,10),d.fixed_at&&String(d.fixed_at).slice(0,10)])));
+  if(log.length)Z.file('_บันทึกการส่งออก.txt',log.join('\n'));
+  const b=await Z.generateAsync({type:'blob',compression:'STORE'},m=>{st.textContent=`กำลังรวมไฟล์ ${Math.round(m.percent)}%`}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=sn(P.code)+'_export_'+new Date().toISOString().slice(0,10)+'.zip';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),6e4);
+  st.innerHTML=`✅ สร้างไฟล์แล้ว · ไฟล์ ${F.length-bad}/${F.length}${log.length?` · มีหมายเหตุ ${log.length} ข้อ (ดูไฟล์ _บันทึกการส่งออก.txt ใน Zip)`:''}`}
+ catch(e){st.innerHTML=`<span style="color:#dc2626">ไม่สำเร็จ: ${h(e.message)}</span>`}};
 window.selAll=async t=>{let out=[],from=0;for(;;){const r=await sb.from(t).select('*').order('id').range(from,from+999);if(r.error)return r;out=out.concat(r.data||[]);if(!r.data||r.data.length<1000)return{data:out,error:null};from+=1000}};
 })();
 </script></body></html>
