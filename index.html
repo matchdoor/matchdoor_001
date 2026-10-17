@@ -458,14 +458,6 @@ input[type=checkbox]:checked{background:var(--p);border-color:var(--p)}input[typ
 .ck button.pf{min-height:32px;padding:3px 12px;font-size:13px}
 .tk .a{color:var(--t);text-decoration:none;font-weight:700}.tk.c{gap:6px;padding:5px 8px}.tk.c .b.sm{min-height:30px;padding:3px 10px;font-size:12px}.tk.c .fg{width:26px;height:26px;padding:0}.kp .kpi small{display:block;font-size:10px;color:var(--m);margin-top:-2px}
 .ph2 .ncl{border:0;background:none;color:var(--m);font:600 13px var(--ff);cursor:pointer;margin-right:10px;padding:0}
-/* ===== Phase1 ===== */
-.b.dz{background:var(--c);color:#dc2626;border-color:#f3a6a6}
-.b.ed{background:var(--c);color:var(--p);border-color:color-mix(in srgb,var(--p) 55%,var(--b))}
-#selp.inl{background:transparent;align-items:flex-start;justify-content:flex-start}
-#selp.inl .sp{position:fixed;max-width:none;max-height:320px;border-radius:14px;box-shadow:0 12px 32px #0005;padding-bottom:6px;margin:0}
-#selp.inl .sph{display:none}
-#selp.inl .spl{max-height:300px;overflow:auto}
-@media(max-width:860px){.nb{bottom:96px}main{padding-bottom:150px}}
 </style></head><body><div id="ldb"></div><div id="app"><div class="splash"><img id="sp" alt=""><div class="spin"></div></div></div>
 <button id="totop" class="totop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="เลื่อนขึ้นบนสุด" title="ขึ้นบนสุด">↑</button>
 <script>
@@ -1238,11 +1230,11 @@ window.selAll=async t=>{let out=[],from=0;for(;;){const r=await sb.from(t).selec
  
  /* Phase2: custom select picker (consistent on every phone browser) */
  const selOk=e=>e&&e.tagName=='SELECT'&&!e.multiple&&!e.disabled&&e.dataset.native==null&&!(e.size>1);let selLast=0;
- function openSel(sel){if(Date.now()-selLast<350||document.getElementById('selp'))return;selLast=Date.now();const lb=(sel.closest('label')?.firstChild?.textContent||sel.getAttribute('aria-label')||sel.previousElementSibling?.textContent||'เลือก').trim().slice(0,40),ov=document.createElement('div');ov.id='selp';const opts=[...sel.options],many=opts.length>12;
+ function openSel(sel){if(Date.now()-selLast<350||document.getElementById('selp'))return;selLast=Date.now();const lb=(sel.closest('label')?.firstChild?.textContent||sel.getAttribute('aria-label')||sel.previousElementSibling?.textContent||'เลือก').trim().slice(0,40),ov=document.createElement('div');ov.id='selp';const opts=[...sel.options],many=opts.length>9;
   ov.innerHTML=`<div class=sp><div class=sph><span></span><button type=button class=x>ปิด</button></div>${many?'<div class=sps><input data-nosel placeholder="ค้นหา"></div>':''}<div class=spl></div></div>`;ov.querySelector('.sph span').textContent=lb;const L=ov.querySelector('.spl');
   const draw=q=>{L.innerHTML='';let g=null;opts.forEach(o=>{const t=o.textContent.trim();if(q&&!t.toLowerCase().includes(q))return;const pg=o.parentElement.tagName=='OPTGROUP'?o.parentElement.label:null;if(pg&&pg!==g){g=pg;const d=document.createElement('div');d.className='spg';d.textContent=pg;L.appendChild(d)}const b=document.createElement('button');b.type='button';b.className='spo'+(o.value==sel.value?' on':'');b.disabled=o.disabled;const sp=document.createElement('span');sp.textContent=t||'—';b.appendChild(sp);if(o.value==sel.value)b.appendChild(Object.assign(document.createElement('span'),{textContent:'✓'}));b.addEventListener('click',()=>{close();if(sel.value!==o.value){sel.value=o.value;sel.dispatchEvent(new Event('input',{bubbles:true}));sel.dispatchEvent(new Event('change',{bubbles:true}))}});L.appendChild(b)});if(!L.children.length)L.innerHTML='<div class=spg>ไม่พบรายการ</div>'};
   const close=()=>{ov.remove();document.removeEventListener('keydown',kd)},kd=e=>{if(e.key=='Escape')close()};document.addEventListener('keydown',kd);
-  ov.addEventListener('click',e=>{if(e.target===ov)close()});ov.querySelector('.x').addEventListener('click',close);document.body.appendChild(ov);draw('');if(!many){ov.classList.add('inl');const p=ov.querySelector('.sp'),r=sel.getBoundingClientRect(),w=Math.max(r.width,220),h=Math.min(p.scrollHeight,320),up=r.bottom+h+12>innerHeight&&r.top>h+12;p.style.width=w+'px';p.style.left=Math.max(8,Math.min(r.left,innerWidth-w-8))+'px';p.style.top=(up?r.top-h-6:r.bottom+4)+'px';ov.querySelector('.spo.on')?.scrollIntoView({block:'nearest'})}else ov.querySelector('.spo.on')?.scrollIntoView({block:'center'});const si=ov.querySelector('.sps input');if(si)si.addEventListener('input',()=>draw(si.value.trim().toLowerCase()))}
+  ov.addEventListener('click',e=>{if(e.target===ov)close()});ov.querySelector('.x').addEventListener('click',close);document.body.appendChild(ov);draw('');ov.querySelector('.spo.on')?.scrollIntoView({block:'center'});const si=ov.querySelector('.sps input');if(si)si.addEventListener('input',()=>draw(si.value.trim().toLowerCase()))}
  let tsx=0,tsy=0,tst=0,tsT=null;
  document.addEventListener('touchstart',e=>{const t=e.target.closest&&e.target.closest('select');if(t&&selOk(t)){tsT=t;tsx=e.touches[0].clientX;tsy=e.touches[0].clientY;tst=Date.now()}else tsT=null},{passive:true,capture:true});
  document.addEventListener('touchend',e=>{const t=tsT;tsT=null;if(!t||!selOk(t))return;const c=e.changedTouches[0];if(Math.abs(c.clientX-tsx)<10&&Math.abs(c.clientY-tsy)<10&&Date.now()-tst<600){e.preventDefault();if(document.activeElement&&/INPUT|TEXTAREA/.test(document.activeElement.tagName))document.activeElement.blur();openSel(t)}},{passive:false,capture:true});
@@ -1255,10 +1247,5 @@ window.selAll=async t=>{let out=[],from=0;for(;;){const r=await sb.from(t).selec
  let tm;new MutationObserver(()=>{clearTimeout(tm);tm=setTimeout(scan,60)}).observe(document.body,{childList:true,subtree:true});scan();
  document.addEventListener('click',e=>{const i=e.target;if(i&&i.matches&&i.matches('input[type=date],input[type=datetime-local],input[type=time]')&&i.showPicker){try{i.showPicker()}catch(_){}}});
 })();
-</script>
-<script>/* Phase1: ระดับปุ่มกลาง */
-(()=>{const DZ=/^(ลบ|ปฏิเสธ)/,ED=/^แก้ไข/;
-const run=()=>document.querySelectorAll('button.b,a.b').forEach(b=>{if(['on','dz','ed','d'].some(c=>b.classList.contains(c)))return;const t=(b.textContent||'').trim();if(DZ.test(t))b.classList.add('dz');else if(ED.test(t)&&t.length<=24){b.classList.remove('p');b.classList.add('ed')}});
-let q;new MutationObserver(()=>{clearTimeout(q);q=setTimeout(run,80)}).observe(document.body,{childList:true,subtree:true});run()})();
 </script>
 </body></html>
