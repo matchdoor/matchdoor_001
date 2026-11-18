@@ -931,7 +931,7 @@ h2{margin:6px 0 12px;font-size:20px}
 <script>
 /* ===== ใส่ค่า Supabase ที่นี่ (Project Settings → API) หรือกรอกในหน้าเว็บครั้งแรก ===== */
 const SHOW_BYPASS=false,SHOW_HELP=false; /* เปลี่ยนเป็น true เพื่อแสดงปุ่ม Bypass / คำแนะนำ Login อีกครั้ง */
-const SUPABASE_URL='https://svvxpiffofsnrycwunlu.supabase.co',SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2dnhwaWZmb2ZzbnJ5Y3d1bmx1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ4NzE5NzEsImV4cCI6MjExMDQ0Nzk3MX0.-lr56dfvIVNgcL3WNOVCpvwgxz4U8DaFtQVkQdGsAVs';
+const SUPABASE_URL='https://ppibbrtktgdhwrsdrmzj.supabase.co',SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBwaWJicnRrdGdkaHdyc2RybXpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ1NzI2OTMsImV4cCI6MjExMDE0ODY5M30.bIdl282_7Yq328ppwwyebIV7cSJ-QhBDVuSI482-JzE';
 /* ---- โหลดไลบรารีหนัก (PDF / ZIP / QR) เมื่อใช้งานจริง เพื่อให้เปิดแอปเร็วขึ้น ---- */
 const LIBU={pdf:['https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js','https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'],pdfjs:['https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js'],qr:['https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js'],xlsx:['https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'],zip:['https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js']},LIBP={};
 const lib=k=>LIBP[k]||(LIBP[k]=Promise.all(LIBU[k].map(u=>new Promise((ok,no)=>{const e=document.createElement('script');e.src=u;e.onload=ok;e.onerror=()=>{delete LIBP[k];no(new Error('โหลดไลบรารีไม่สำเร็จ — ตรวจสอบอินเทอร์เน็ตแล้วลองใหม่'))};document.head.appendChild(e)}))));
